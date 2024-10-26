@@ -1,4 +1,6 @@
-// Module to access the database
+/**
+ * Module to access the database
+ */
 
 import sqlite3 from "sqlite3";
 
