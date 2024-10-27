@@ -1,24 +1,26 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import './App.css'
+  import 'bootstrap/dist/css/bootstrap.min.css';
+  import 'bootstrap-icons/font/bootstrap-icons.css';
 
-import React from 'react';
-import { useState,useEffect } from 'react'
-import { Container, Alert } from 'react-bootstrap';
-import { Route, Routes, useNavigate } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
+  import React from 'react';
+  import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+  import NavigationBar from './NavigationBar';
+  import { Login } from './Login';
 
 
 
-function App() {
-  
+  function App() {
+    return (
+      
+        <div className="min-vh-100 d-flex flex-column">
+          <NavigationBar />
+          <div className="container mt-4">
+            <Routes>
+              <Route path="/" element={<Login />} /> 
+              <Route path="/login" element={<Login />} /> 
+            </Routes>
+          </div>
+        </div>
+    );
+  }
 
-
-  return (
-    <div className="min-vh-100 d-flex flex-column">
-      It works
-    </div>
-  );
-}
-
-export default App;
+  export default App;

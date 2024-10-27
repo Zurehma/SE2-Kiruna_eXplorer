@@ -1,0 +1,74 @@
+/* Login.css */
+.login-background {
+  background-image: url('../public/kirunalogin.jpg'); /* Replace with your image path */
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333; /* Darker text for readability */
+  font-family: Arial, sans-serif;
+}
+
+.login-container {
+  background: rgba(255, 255, 255, 0.85); /* More transparent for a softer effect */
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2); /* Softer, larger shadow */
+  max-width: 350px; /* Limit form width */
+  width: 100%;
+  text-align: center; /* Center-align text */
+}
+
+.login-container h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2c3e50; /* Darker title color */
+}
+
+.form-label {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #555;
+}
+
+.form-control {
+  border-radius: 5px;
+  height: 45px;
+  font-size: 1rem;
+  box-shadow: none;
+  border: 1px solid #ddd;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 2px rgba(32, 166, 255, 0.2);
+  border-color: #20a6ff;
+}
+
+.btn-black {
+  background-color: #2c3e50;
+  border: none;
+  width: 100%;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 8px;
+  color: #fff;
+  transition: background-color 0.3s ease;
+}
+
+.btn-black:hover {
+  background-color: #34495e;
+}
+
+.alert-danger {
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+/* Prevent scrolling on the entire page */
+html, body {
+  overflow: hidden;
+  height: 100%;
+}
