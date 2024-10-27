@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import './Login.css';
+import './styles/Login.css'
 
 function Login({ setLoggedIn }) {
   const [username, setUsername] = useState('');
