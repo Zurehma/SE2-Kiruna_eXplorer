@@ -13,33 +13,72 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    padding: 0 5%;
   }
   
-  /* Container styling similar to login */
+  /* Container styling for the main text */
   .home-container {
     background: rgba(255, 255, 255, 0.85);
     padding: 30px;
     border-radius: 30px;
     box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
-    max-width: 600px;
-    width: 100%;
+    max-width: 500px;
     text-align: center;
-    z-index: 1;
+    z-index: 1; /* Ensure it's above images */
   }
   
-  /* Title and description styling */
+  /* Images container */
+  .home-images {
+    position: relative; /* Allows for absolute positioning of images */
+    width: 100%; /* Full width for positioning */
+    height: 100%; /* Full height for positioning */
+  }
+  
+  /* Styling for static images */
+  .static-image {
+    object-fit: cover;
+    border-radius: 10px;
+    transition: transform 0.2s;
+  }
+  
+  .static-image:hover {
+    transform: scale(1.05); /* Slightly increase size on hover */
+  }
+  
+  /* Title styling */
   .home-title {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: bold;
     color: #2c3e50;
     animation: fadeInUp 1.5s ease forwards;
   }
   
-  .home-description {
-    font-size: 1.2rem;
-    color: #555;
-    margin-top: 10px;
-    animation: fadeInUp 1.8s ease forwards;
+  /* Custom modal styling */
+  .custom-modal .modal-backdrop {
+    background-color: rgba(255, 255, 255, 0.8); /* Lighten the backdrop */
+  }
+  
+  .custom-modal-body {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 10px; /* Less padding for a smaller modal */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    position: relative;
+  }
+  
+  /* Modal image styling */
+  .modal-image {
+    width: 60%; /* Full width of modal */
+    border-radius: 10px;
+    margin-top: 10px; /* Space above image */
+    max-height: 150px; /* Set a max height for better scaling */
+  }
+  
+  /* Description styling */
+  .modal-description {
+    font-size: 1rem; /* Font size for description */
+    margin-bottom: 10px; /* Space below description */
   }
   
   /* Animation keyframes */
