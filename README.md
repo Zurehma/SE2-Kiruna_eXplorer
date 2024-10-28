@@ -17,5 +17,9 @@ Each document is uniquely identified by an ID.
 - Primary key: docID1,docID2
 - Description: The tables stores the link between 2 documents and the link type. The link type can be one of: [`Direct`, `Collateral`, `Projection`, `Update`]
 
+### Access Credentials
+- Urban Planner: 
+    - Username: johndoe
+    - Password: password
 
 
