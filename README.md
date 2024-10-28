@@ -1,6 +1,27 @@
 # SE2-Kiruna_eXplorer
 
-## Database Table
+## User APIs
+#### POST `api/sessions/login`
+- Performs user login with username and password
+#### DELETE `api/sessions/logout`
+- Logs out the user
+#### GET `api/sessions/current`
+- Returns information of the logged in user
+- Example: 
+    ```json
+    {
+        "id": 1,
+        "name": "John",
+        "surname": "Doe",
+        "username": "johndoe",
+        "role": "Urban Planner"
+    }
+    ```
+
+## Document APIs
+
+
+## Database Tables
 ### Table `User`
 - Fields: id-name-surname-username-password-salt-role
 - Primary key: id
