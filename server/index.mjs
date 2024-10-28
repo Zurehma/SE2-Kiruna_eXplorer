@@ -9,6 +9,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 
 import Utility from "./utility.mjs";
+import DocumentRoutes from "./routes/DocumentRoutes.mjs";
 
 const app = express();
 const port = 3001;
@@ -24,7 +25,10 @@ app.use(express.json({ limit: "25mb" }));
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-//
+const documentRoutes = new DocumentRoutes();
+documentRoutes.initRoutes();
+
+app.use(baseURL + "/document", documentRoutes.getRouter());
 
 app.use(Utility.errorHandler);
 
