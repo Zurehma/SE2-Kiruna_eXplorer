@@ -3,9 +3,9 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import NavigationBar from './NavigationBar';
-import { Login } from './Login';
-import Home from './Home';
+import NavigationBar from './components/NavigationBar';
+import { Login } from './components/Login';
+import Home from './components/Home';
   
 
 

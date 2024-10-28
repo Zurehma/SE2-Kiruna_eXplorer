@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Navbar, Nav } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './styles/Navbar.css';
+import '../styles/Navbar.css';
 
 const NavigationBar = ({ setLoggedIn, loggedIn, setCurrentUser, currentUser }) => {
   const [showNavbar, setShowNavbar] = useState(false);
