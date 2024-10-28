@@ -1,8 +1,8 @@
-/* Add this to your CSS file for the Navbar */
+
 .navbar {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 2; /* Ensure this is higher than the background image */
+    z-index: 2; 
   }
   

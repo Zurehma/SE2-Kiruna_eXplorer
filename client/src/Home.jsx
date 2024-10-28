@@ -54,7 +54,7 @@ const Home = () => {
             key={image.id}
             src={image.src}
             alt={`Image ${image.id}`}
-            className="static-image animated-image" // Ensure animated-image is added here
+            className="static-image animated-image" 
             style={{
                 ...image.style,
                 position: 'absolute',

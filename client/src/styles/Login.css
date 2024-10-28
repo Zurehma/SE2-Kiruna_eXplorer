@@ -4,7 +4,7 @@
   background-position: center;
   background-repeat: no-repeat;
   position: fixed;
-  top: 0; /* Ensure it covers the entire screen */
+  top: 0; 
   left: 0;
   width: 100vw;
   height: 100vh;
@@ -19,7 +19,7 @@
   padding: 40px;
   border-radius: 30px;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
-  max-width: 800px; /* Increased width */
+  max-width: 800px; 
   width: 100%;
   text-align: center;
   z-index: 1;
@@ -29,7 +29,7 @@
 .login-container h1 {
   font-size: 2rem;
   font-weight: bold;
-  color: #2c3e50; /* Darker title color */
+  color: #2c3e50; 
 }
 
 .form-label {
