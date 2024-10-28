@@ -7,7 +7,7 @@ import passport from "passport";
 import LocalStrategy from "passport-local";
 import session from "express-session";
 
-import Utility from "../utilities.mjs";
+import Utility from "../utility.mjs";
 
 import UserDAO from "../dao/userDAO.mjs";
 
@@ -55,8 +55,9 @@ function AuthRoutes(app) {
     //Register a user
     this.router.post("/register", async (req, res) => {
       try {
-        const { name, role, username, password } = req.body;
-        await userDAO.createUser(name, role, username, password);
+        console.log(req.body);
+        const { name,surname, role, username, password } = req.body;
+        await userDAO.createUser(name,surname, role, username, password);
         res.status(200).json({ message: "User created successfully" });
       } catch (error) {
         res.status(500).json({ error: error.message });

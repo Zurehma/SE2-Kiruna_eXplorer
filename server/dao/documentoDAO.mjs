@@ -1,4 +1,4 @@
-import db from db;
+import db from '../db/db.mjs';
 
 function DocumentDAO() {
   this.getDocuments = () => {

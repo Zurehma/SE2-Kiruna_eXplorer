@@ -11,8 +11,9 @@ export default function UserDAO() {
         return new Promise((resolve,reject)=>{
             const salt = crypto.randomBytes(16);
             const hashedPassword = crypto.scryptSync(password,salt,16);
-            const query = 'INSERT INTO users (name,role,username,password,salt) VALUES (?,?,?,?,?,?)'
-            db.run(query,[name,role,username,hashedPassword,salt],(err)=>{
+            const query = 'INSERT INTO user (name,surname,role,email,password,salt) VALUES (?,?,?,?,?,?)'
+            console.log(query);
+            db.run(query,[name,surname,role,username,hashedPassword,salt],(err)=>{
                 if (err) {
                     reject(err);
                 } else {
@@ -25,7 +26,7 @@ export default function UserDAO() {
     //get user by ID
     this.getUserById = (id) => {
         return new Promise((resolve, reject) => {
-            const query = 'SELECT * FROM users WHERE id=?';
+            const query = 'SELECT * FROM user WHERE id=?';
             db.get(query, [id], (err, row) => {
                 if (err) {
                     reject(err);
@@ -33,7 +34,7 @@ export default function UserDAO() {
                 if (row === undefined) {
                     resolve({error: 'User not found.'});
                 } else {
-                    resolve(new User(row.id, row.name, row.role, row.username));
+                    resolve(new User(row.id, row.name,row.surname, row.role, row.email));
                 }
             });
         });
@@ -42,7 +43,7 @@ export default function UserDAO() {
     //get user by credentials
     this.getUserByCredentials = (username, password) => {
         return new Promise((resolve, reject) => {
-            const sql = 'SELECT * FROM users WHERE username=?';
+            const sql = 'SELECT * FROM user WHERE email=?';
             db.get(sql, [username], (err, row) => {
                 if (err) {
                     reject(err);
@@ -55,7 +56,7 @@ export default function UserDAO() {
                         if (!crypto.timingSafeEqual(Buffer.from(row.password, 'hex'), hashedPassword))
                             resolve(false);
                         else
-                            resolve(new User(row.id, row.name, row.role, row.username));
+                            resolve(new User(row.id, row.name,row.surname, row.role, row.email));
                     });
                 }
             });

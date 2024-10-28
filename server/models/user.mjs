@@ -1,6 +1,7 @@
-function User(id, name, role, username) {
+function User(id, name,surname, role, username) {
     this.id = id;
     this.name = name;
+    this.surname = surname;
     this.username = username;
     this.role = role;
   }
