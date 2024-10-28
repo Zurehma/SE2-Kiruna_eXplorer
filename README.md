@@ -4,7 +4,7 @@
 ### Table `User`
 - Fields: id-name-surname-username-password-salt-role
 - Primary key: id
-- Description: Each user is uniquely identified through an ID. Role is a string and can be one of: [`Urban Planner`, `Resident`]
+- Description: Each user is uniquely identified through an ID. Role is a string and can be one of: [`Urban Planner`]
 
 ### Table `Document`
 - Fields: id-title-stakeholder-scale-issuanceDate-type-connections-language-pages-description
