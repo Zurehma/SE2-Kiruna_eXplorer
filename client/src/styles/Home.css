@@ -92,4 +92,36 @@
       transform: translateY(0);
     }
   }
+  /* Keyframes for floating animation */
+@keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px); /* Adjust as needed */
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+  
+  /* Keyframes for scaling effect */
+  @keyframes scaleUp {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05); /* Slightly increase size */
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  /* Styling for animated images */
+  .animated-image {
+    animation: float 3s ease-in-out infinite, scaleUp 5s ease-in-out infinite; /* Apply both animations */
+    transition: transform 0.2s;
+  }
+  
   

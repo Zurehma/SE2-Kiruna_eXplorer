@@ -48,22 +48,23 @@ const Home = () => {
 
   return (
     <div className="home-background">
-      <div className="home-images">
+        <div className="home-images">
         {images.map((image) => (
-          <img
+            <img
             key={image.id}
             src={image.src}
             alt={`Image ${image.id}`}
-            className={`static-image animated-image`} // Add animated-image class here
+            className="static-image animated-image" // Ensure animated-image is added here
             style={{
-              ...image.style,
-              position: 'absolute',
-              cursor: 'pointer',
+                ...image.style,
+                position: 'absolute',
+                cursor: 'pointer',
             }}
             onClick={(event) => openModal(image, event)}
-          />
+            />
         ))}
-      </div>
+        </div>
+
       <div className="home-container">
         <h1 className="home-title">"Kiruna: The Heart of Sweden's Iron Legacy and Gateway to the Arctic"</h1>
       </div>
