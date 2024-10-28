@@ -1,4 +1,6 @@
-// Utilities module
+/**
+ * Utility module
+ */
 
 import { validationResult } from "express-validator";
 
@@ -36,7 +38,7 @@ const validateRequest = (req, res, next) => {
   errors.array().forEach((error) => {
     errorMessage +=
       "- Parameter: **" +
-      error.param +
+      error.value +
       "** - Reason: **" +
       error.msg +
       "** - Location: **" +
@@ -62,9 +64,6 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-/**
- *
- */
 const Utility = {
   isLoggedIn,
   validateRequest,

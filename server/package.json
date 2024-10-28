@@ -3,23 +3,26 @@
   "version": "1.0.0",
   "description": "projectSEII",
   "main": "index.js",
-  "directories": {
-    "test": "tests"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon index.mjs",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage  --detectOpenHandles --forceExit"
   },
   "author": "Stefano Fumero",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^2.0.1",
     "cors": "^2.8.5",
     "dayjs": "^1.11.13",
-    "express": "^4.21.0",
-    "express-session": "^1.18.0",
+    "express": "^5.0.1",
+    "express-session": "^1.18.1",
     "express-validator": "^7.2.0",
     "morgan": "^1.10.0",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
   }
 }
