@@ -1,24 +1,56 @@
-.home {
+/* Home background styling similar to login */
+.home-background {
+    background-image: url('../public/kiruna.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  /* Container styling similar to login */
+  .home-container {
+    background: rgba(255, 255, 255, 0.85);
+    padding: 30px;
+    border-radius: 30px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    width: 100%;
     text-align: center;
-    padding: 20px;
+    z-index: 1;
   }
   
-  .text-container {
-    margin-bottom: 20px;
+  /* Title and description styling */
+  .home-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+    animation: fadeInUp 1.5s ease forwards;
   }
   
-  .animated-image {
-    width: 300px; /* Set the desired width */
-    height: auto; /* Maintain aspect ratio */
-    animation: fadeIn 1s ease-in-out; /* Add a fade-in animation */
+  .home-description {
+    font-size: 1.2rem;
+    color: #555;
+    margin-top: 10px;
+    animation: fadeInUp 1.8s ease forwards;
   }
   
-  @keyframes fadeIn {
-    from {
+  /* Animation keyframes */
+  @keyframes fadeInUp {
+    0% {
       opacity: 0;
+      transform: translateY(20px);
     }
-    to {
+    100% {
       opacity: 1;
+      transform: translateY(0);
     }
   }
   
