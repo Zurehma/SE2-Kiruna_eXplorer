@@ -134,3 +134,6 @@ dist
 
 # HTTP test files
 .http
+
+
+db/db.db
