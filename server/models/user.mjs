@@ -1,10 +1,9 @@
-
-function User(id,name,surname,role,username){
+function User(id, name,surname, role, username) {
     this.id = id;
     this.name = name;
     this.surname = surname;
-    this.role = role;
     this.username = username;
-}
-
-export default User;
+    this.role = role;
+  }
+  
+  export default User;
