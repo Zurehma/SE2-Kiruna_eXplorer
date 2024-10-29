@@ -24,3 +24,6 @@ DELETE http://localhost:3001/api/sessions/logout HTTP/1.1
 
 ### Get current logged in user
 GET http://localhost:3001/api/sessions/current HTTP/1.1
+
+### Get all documents
+GET http://localhost:3001/api/document HTTP/1.1

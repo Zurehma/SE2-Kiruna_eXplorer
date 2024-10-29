@@ -1,4 +1,4 @@
-import DocumentDAO from "../dao/DocumentoDAO.mjs";
+import DocumentDAO from "../dao/documentDAO.mjs";
 
 function DocumentController() {
   this.documentDAO = new DocumentDAO();

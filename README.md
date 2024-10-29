@@ -19,7 +19,23 @@
     ```
 
 ## Document APIs
-
+#### GET `api/document`
+- Return all the documents in the document table
+- Example: 
+  [
+  {
+    "id": 2,
+    "title": "Compilation of responses “So what the people of Kiruna think?”",
+    "stakeholder": "Kiruna kommun/Residents",
+    "scale": "Text",
+    "issuaceDate": "2007",
+    "type": "Informative document",
+    "connections": 3,
+    "language": "Swedish",
+    "pages": 1,
+    "description": "This document is a compilation of the responses to the survey"
+  }
+  ]
 
 ## Database Tables
 ### Table `User`
