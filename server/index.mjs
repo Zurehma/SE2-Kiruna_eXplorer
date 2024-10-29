@@ -10,6 +10,7 @@ import bodyParser from "body-parser";
 
 import Utility from "./utility.mjs";
 import DocumentRoutes from "./routes/DocumentRoutes.mjs";
+import AuthRoutes from "./routes/authRoutes.mjs";
 
 const app = express();
 const port = 3001;
@@ -28,10 +29,14 @@ app.use(bodyParser.json());
 const documentRoutes = new DocumentRoutes();
 documentRoutes.initRoutes();
 
+const authRoutes = new AuthRoutes(app);
+authRoutes.initRoutes();
+
 app.use(baseURL + "/document", documentRoutes.getRouter());
+app.use(baseURL + "/sessions", authRoutes.getRouter());
 
 app.use(Utility.errorHandler);
 
-const httpServer = createServer(app);
+//const httpServer = createServer(app);
 
-httpServer.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+app.listen(port, () => console.log(`Server running at http://localhost:${port}`));

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import db from "../db/db.mjs";
+=======
+import db from '../db/db.mjs';
+>>>>>>> backend
 
 function DocumentDAO() {
   this.getDocuments = () => {

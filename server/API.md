@@ -35,7 +35,7 @@ Returns the list of all documents.
   ]
   ```
 
-- Access Constraints: Can only be called by a logged in user.
+- Access Constraints: _None_
 - Additional Constraints: _None_
 
 #### POST `api/document`
@@ -69,8 +69,26 @@ Add a new document with the provided information.
   }
   ```
 
-- Access Constraints: Can only be called by a logged in user.
+- Access Constraints: Can only be called by a logged in user whose role is Urban Planner.
 - Additional Constraints:
   - It should return a 400 error when `issuanceDate` is after the current date.
 
 #### POST `api/document/:id/link`
+- Request Parameters: `id` - ID of the first document (document being linked from...). 
+- Request Body: An object with the following fields: 
+  - `id2`: an integer that is the ID of the second document (...document being linked to)
+  - `type`: a string that represents the type of the link. Must be one of the following: [`Direct`, `Collateral`, `Projection`, `Update`]
+
+- Response Body: The newly created link:
+- Example:
+  ```json
+  {
+    "docID1": 3,
+    "docID2": 4,
+    "type": "Direct"
+  }
+  ```
+- Access Constraints: Can only be called by a logged in user whose role is Urban Planner.
+- Additional Constraints: 
+  - It should return a `404` error when document ID does not exist
+  - It should return a `422` error if the link type is invalid
