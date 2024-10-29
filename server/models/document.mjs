@@ -43,7 +43,7 @@ const DOCUMENT_TYPES = {
 /**
  * Check if the input type is a valid document type
  * @param {String} type
- * @returns The document type if it founds a match otherwise undefined
+ * @returns {String | undefined} The document type if it founds a match otherwise undefined
  */
 export const isDocumentType = (type) => {
   if (typeof type !== "string") {

@@ -4,14 +4,16 @@ import Utility from "../utility.mjs";
 import DocumentController from "../controllers/documentController.mjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
 
-function DocumentRoutes() {
-  this.router = new Router();
-  this.documentController = new DocumentController();
-  this.documentDAO = new DocumentDAO();
+class DocumentRoutes {
+  constructor() {
+    this.router = new Router();
+    this.documentController = new DocumentController();
+    this.documentDAO = new DocumentDAO();
+  }
 
-  this.getRouter = () => this.router;
+  getRouter = () => this.router;
 
-  this.initRoutes = () => {
+  initRoutes = () => {
     this.router.get("/", Utility.isLoggedIn, async (req, res, next) => {
       try {
         const doc = await this.documentDAO.getDocuments();
