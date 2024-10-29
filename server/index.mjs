@@ -32,11 +32,11 @@ documentRoutes.initRoutes();
 const authRoutes = new AuthRoutes(app);
 authRoutes.initRoutes();
 
-app.use(baseURL + "/document", documentRoutes.getRouter());
+app.use(baseURL + "/documents", documentRoutes.getRouter());
 app.use(baseURL + "/sessions", authRoutes.getRouter());
 
 app.use(Utility.errorHandler);
 
-//const httpServer = createServer(app);
+const httpServer = createServer(app);
 
-app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+httpServer.listen(port, () => console.log(`Server running at http://localhost:${port}`));
