@@ -24,11 +24,12 @@
     "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.25.9",
     "@babel/preset-env": "^7.25.7",
     "@babel/preset-react": "^7.25.7",
     "@eslint/js": "^9.11.1",
     "@testing-library/jest-dom": "^6.5.0",
-    "@testing-library/react": "^16.0.1",
+    "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.5.2",
     "@vitejs/plugin-react-swc": "^3.7.1",
     "babel-jest": "^29.7.0",
@@ -42,6 +43,9 @@
     "transform": {
       "^.+\\.(js|jsx)$": "babel-jest"
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!react-leaflet|@react-leaflet)"
+    ],
     "testEnvironment": "jsdom",
     "moduleNameMapper": {
       "\\.(css|less|scss|sass)$": "identity-obj-proxy",

@@ -52,9 +52,10 @@ function Map() {
 
             {/* Mostra il marker se le coordinate sono definite */}
             {position.lat && position.lng && (
-            <Marker position={[position.lat, position.lng]} icon={markerIcon}>
+            <Marker position={[position.lat, position.lng]} icon={markerIcon} data-testid="map-marker">
                 <Popup>Selected Location</Popup>
             </Marker>
+        
             )}
         </MapContainer>
 

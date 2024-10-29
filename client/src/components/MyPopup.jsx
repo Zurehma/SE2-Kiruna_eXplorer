@@ -6,26 +6,27 @@ function MyPopup(props) {
   // Determine the icon based on the document type
   const renderIcon = () => {
     switch (props.doc.type) {
-      case 'Design':
-        return <i className="bi bi-file-earmark-text my-icons"></i>;
-      case 'Informative':
-        return <i className="bi bi-info-circle my-icons"></i>;
-      case 'Prescriptive':
-        return <i className="bi bi-arrow-right-square my-icons"></i>;
-      case 'Technical':
-        return <i className="bi bi-file-earmark-code my-icons"></i>;
-      case 'Agreement':
-        return <i className="bi bi-people-fill my-icons"></i>;
-      case 'Conflict':
-        return <i className="bi bi-x-circle my-icons"></i>;
-      case 'Consultation':
-        return <i className="bi bi-chat-dots my-icons"></i>;
-      case 'Action':
-        return <i className="bi bi-exclamation-triangle my-icons"></i>;
-      default:
-        return null;
+        case 'Design':
+            return <i className="bi bi-file-earmark-text my-icons" data-testid={`my-icon-${props.doc.type}`}></i>;
+        case 'Informative':
+            return <i className="bi bi-info-circle my-icons" data-testid={`my-icon-${props.doc.type}`}></i>;
+        case 'Prescriptive':
+            return <i className="bi bi-arrow-right-square my-icons" data-testid={`my-icon-${props.doc.type}`}></i>;
+        case 'Technical':
+            return <i className="bi bi-file-earmark-code my-icons" data-testid={`my-icon-${props.doc.type}`}></i>;
+        case 'Agreement':
+            return <i className="bi bi-people-fill my-icons" data-testid={`my-icon-${props.doc.type}`}></i>;
+        case 'Conflict':
+            return <i className="bi bi-x-circle my-icons" data-testid={`my-icon-${props.doc.type}`}></i>;
+        case 'Consultation':
+            return <i className="bi bi-chat-dots my-icons" data-testid={`my-icon-${props.doc.type}`}></i>;
+        case 'Action':
+            return <i className="bi bi-exclamation-triangle my-icons" data-testid={`my-icon-${props.doc.type}`}></i>;
+        default:
+            return null;
     }
-  };
+};
+
 
   return (
     <Row>
