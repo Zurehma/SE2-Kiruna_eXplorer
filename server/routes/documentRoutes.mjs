@@ -14,6 +14,7 @@ function DocumentRoutes() {
 
     this.router.post(
       "/",
+      Utility.isLoggedIn,
       body("title").isString().notEmpty(),
       body("stakeholder").isString().notEmpty(),
       body("scale").isInt({ gt: 0 }),
@@ -39,7 +40,10 @@ function DocumentRoutes() {
             req.body.lat || null,
             req.body.long || null
           )
-          .then((document) => res.status(200).json(document))
+          .then((document) => {
+            console.log(document);
+            res.status(200).json(document);
+          })
           .catch((err) => next(err));
       }
     );
