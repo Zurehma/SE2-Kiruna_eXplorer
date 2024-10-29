@@ -5,6 +5,8 @@ class Document {
     stakeholder,
     scale,
     issuanceDate,
+    type,
+    connections,
     language,
     description,
     pages = null,
@@ -16,12 +18,18 @@ class Document {
     this.stakeholder = stakeholder;
     this.scale = scale;
     this.issuanceDate = issuanceDate;
+    this.type = type;
+    this.connections = connections;
     this.language = language;
     this.description = description;
     this.pages = pages;
     this.lat = lat;
     this.long = long;
   }
+}
+
+export const DOCUMENT_TYPES = {
+  
 }
 
 export default Document;

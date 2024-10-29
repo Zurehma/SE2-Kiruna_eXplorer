@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import db from "../db/db.mjs";
-=======
-import db from '../db/db.mjs';
->>>>>>> backend
 
 function DocumentDAO() {
   this.getDocuments = () => {
@@ -36,6 +32,7 @@ function DocumentDAO() {
    * @param {String} stakeholder
    * @param {Number} scale
    * @param {String} issuanceDate
+   * @param {String} type
    * @param {String} language
    * @param {String} description
    * @param {Number | null} pages
@@ -48,6 +45,7 @@ function DocumentDAO() {
     stakeholder,
     scale,
     issuanceDate,
+    type,
     language,
     description,
     pages = null,
@@ -56,11 +54,11 @@ function DocumentDAO() {
   ) => {
     return new Promise((resolve, reject) => {
       const query =
-        "INSERT INTO DOCUMENT (title, stakeholder, scale, issuanceDate, language, description, pages, lat, long) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO DOCUMENT (title, stakeholder, scale, issuanceDate, type, connections, language, description, pages, lat, long) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
       db.run(
         query,
-        [title, stakeholder, scale, issuanceDate, language, description, pages, lat, long],
+        [title, stakeholder, scale, issuanceDate, type, 0, language, description, pages, lat, long],
         function (err) {
           if (err) {
             reject(err);

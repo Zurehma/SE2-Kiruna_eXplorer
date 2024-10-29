@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import DocumentDAO from "../dao/DocumentoDAO.mjs";
+import { DOCUMENT_TYPES } from "../models/document.mjs";
 
 function DocumentController() {
   this.documentDAO = new DocumentDAO();
@@ -12,6 +13,7 @@ function DocumentController() {
    * @param {String} stakeholder
    * @param {Number} scale
    * @param {String} issuanceDate
+   * @param {String} type
    * @param {String} language
    * @param {String} description
    * @param {Number | null} pages
@@ -24,6 +26,7 @@ function DocumentController() {
     stakeholder,
     scale,
     issuanceDate,
+    type,
     language,
     description,
     pages = null,
@@ -37,11 +40,17 @@ function DocumentController() {
           throw error;
         }
 
+        if (!(type in DOCUMENT_TYPES)) {
+          const error = { errCode: 400, errMessage: "Document type error!" };
+          throw error;
+        }
+
         const result = await this.documentDAO.addDocument(
           title,
           stakeholder,
           scale,
           issuanceDate,
+          type,
           language,
           description,
           pages,

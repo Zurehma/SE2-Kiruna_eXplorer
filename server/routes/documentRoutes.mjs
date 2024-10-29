@@ -14,11 +14,11 @@ function DocumentRoutes() {
 
     this.router.post(
       "/",
-      Utility.isLoggedIn,
       body("title").isString().notEmpty(),
       body("stakeholder").isString().notEmpty(),
       body("scale").isInt({ gt: 0 }),
       body("issuanceDate").isISO8601({ strict: true }),
+      body("type").isString().notEmpty(),
       body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
       body("pages").isInt({ gt: 0 }).optional(),
@@ -32,6 +32,7 @@ function DocumentRoutes() {
             req.body.stakeholder,
             req.body.scale,
             req.body.issuanceDate,
+            req.body.type,
             req.body.language,
             req.body.description,
             req.body.pages || null,
