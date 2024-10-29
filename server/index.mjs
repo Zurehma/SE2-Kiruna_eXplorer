@@ -9,7 +9,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 
 import Utility from "./utility.mjs";
-import DocumentRoutes from "./routes/DocumentRoutes.mjs";
+import DocumentRoutes from "./routes/documentRoutes.mjs";
 import AuthRoutes from "./routes/authRoutes.mjs";
 
 const app = express();

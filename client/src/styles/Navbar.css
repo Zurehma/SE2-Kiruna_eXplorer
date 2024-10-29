@@ -1,0 +1,21 @@
+
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 2; 
+  }
+  
+  .container {
+    margin-top: 70px; /* Adjust based on the Navbar height */
+  }
+  
+  /* Add padding to the brand and navigation links */
+.navbar-brand {
+  padding-left: 20px; /* Adjust left padding for Kiruna */
+  cursor:pointer;
+}
+
+.navbar-nav .nav-link {
+  padding-right: 40px; /* Adjust right padding for login/logout links */
+}
