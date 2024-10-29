@@ -125,15 +125,36 @@
 .static-image {
   object-fit: cover;
   border-radius: 10px;
-  transition: transform 0.2s;
+  transition: transform 0.3s ease; /* Smooth transition on hover */
 }
 
 .static-image:hover {
-  transform: scale(1.05); 
+  transform: scale(1.1); /* Adjust scale as desired */
 }
-
 @media (max-width: 850px) {
   .home-images {
     display: none;
   }
+}
+
+.redirect-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #ffffff;
+  background-color: #2c3e50;
+  border: none;
+  border-radius: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.redirect-button:hover {
+  background-color: #34495e;
+  transform: translateY(-2px);
+}
+
+.redirect-button:active {
+  transform: translateY(0);
 }
