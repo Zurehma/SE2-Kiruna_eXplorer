@@ -7,8 +7,6 @@ import NavigationBar from './components/NavigationBar';
 import { Login } from './components/Login';
 import Home from './components/Home';
 
-  
-
 
 
   function App() {
