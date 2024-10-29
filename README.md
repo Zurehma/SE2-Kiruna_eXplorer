@@ -45,7 +45,6 @@
         "description": "This document is a compilation of the responses to the survey"
     }
   ]
-    ```
   ````
 
 ## Database Tables
