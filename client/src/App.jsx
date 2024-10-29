@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavigationBar from './components/NavigationBar';
 import { Login } from './components/Login';
 import Home from './components/Home';
-  
+  import Documents from './components/Documents';
 
 
 
@@ -24,6 +24,7 @@ import Home from './components/Home';
             <Routes>
               <Route path="/" element={<Home/>} /> 
               <Route path="/login" element={<Login setLoggedIn={setLoggedIn} setCurrentUser={setCurrentUser}/>} /> 
+              <Route path="/doc" element={<Documents/>} /> 
             </Routes>
           </div>
         </div>
