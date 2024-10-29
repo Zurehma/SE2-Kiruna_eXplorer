@@ -7,6 +7,28 @@ Specific error scenarios will have their corresponding error code.
 
 ### User APIs
 
+#### POST `api/sessions/login`
+
+- Performs user login with username and password
+
+#### DELETE `api/sessions/logout`
+
+- Logs out the user
+
+#### GET `api/sessions/current`
+
+- Returns information of the logged in user
+- Example:
+  ```json
+  {
+    "id": 1,
+    "name": "John",
+    "surname": "Doe",
+    "username": "johndoe",
+    "role": "Urban Planner"
+  }
+  ```
+
 ### Document APIs
 
 #### GET `api/document`
@@ -74,8 +96,10 @@ Add a new document with the provided information.
   - It should return a 400 error when `issuanceDate` is after the current date.
 
 #### POST `api/document/:id/link`
-- Request Parameters: `id` - ID of the first document (document being linked from...). 
-- Request Body: An object with the following fields: 
+
+- Request Parameters: `id` - ID of the first document (document being linked from...).
+- Request Body: An object with the following fields:
+
   - `id2`: an integer that is the ID of the second document (...document being linked to)
   - `type`: a string that represents the type of the link. Must be one of the following: [`Direct`, `Collateral`, `Projection`, `Update`]
 
@@ -89,6 +113,33 @@ Add a new document with the provided information.
   }
   ```
 - Access Constraints: Can only be called by a logged in user whose role is Urban Planner.
-- Additional Constraints: 
+- Additional Constraints:
   - It should return a `404` error when document ID does not exist
   - It should return a `422` error if the link type is invalid
+
+## Database Tables
+
+### Table `User`
+
+- Fields: id-name-surname-username-password-salt-role
+- Primary key: id
+- Description: Each user is uniquely identified through an ID. Role is a string and can be one of: [`Urban Planner`]
+
+### Table `Document`
+
+- Fields: id-title-stakeholder-scale-issuanceDate-type-connections-language-pages-description
+- Primary key: id
+- Description: The table stores information on each document. The information is the one from the cards along with longitude & latitude (NULL default means the document covers the whole area).  
+  Each document is uniquely identified by an ID.
+
+### Table `Link`
+
+- Fields: docID1-docID2-type
+- Primary key: docID1,docID2
+- Description: The tables stores the link between 2 documents and the link type. The link type can be one of: [`Direct`, `Collateral`, `Projection`, `Update`]
+
+### Access Credentials
+
+- Urban Planner:
+  - Username: johndoe
+  - Password: password

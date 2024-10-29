@@ -1,11 +1,13 @@
 import dayjs from "dayjs";
 import DocumentDAO from "../dao/DocumentoDAO.mjs";
-import { DOCUMENT_TYPES } from "../models/document.mjs";
+import { isDocumentType } from "../models/document.mjs";
 
-function DocumentController() {
-  this.documentDAO = new DocumentDAO();
+class DocumentController {
+  constructor() {
+    this.documentDAO = new DocumentDAO();
+  }
 
-  this.getDocuments = () => {};
+  getDocuments = () => {};
 
   /**
    * Add a new document with the provided information
@@ -19,9 +21,9 @@ function DocumentController() {
    * @param {Number | null} pages
    * @param {String | null} lat
    * @param {String | null} long
-   * @returns A promise that resolves to the newly created object
+   * @returns {Promise<Document>} A promise that resolves to the newly created object
    */
-  this.addDocument = (title, stakeholder, scale, issuanceDate, type, language, description, pages = null, lat = null, long = null) => {
+  addDocument = (title, stakeholder, scale, issuanceDate, type, language, description, pages = null, lat = null, long = null) => {
     return new Promise(async (resolve, reject) => {
       try {
         if (dayjs().isBefore(issuanceDate)) {
@@ -29,12 +31,26 @@ function DocumentController() {
           throw error;
         }
 
-        if (!Object.values(DOCUMENT_TYPES).find((DOCUMENT_TYPE) => DOCUMENT_TYPE === type)) {
+        const documentType = isDocumentType(type);
+        console.log(documentType);
+
+        if (documentType === undefined) {
           const error = { errCode: 400, errMessage: "Document type error!" };
           throw error;
         }
 
-        const result = await this.documentDAO.addDocument(title, stakeholder, scale, issuanceDate, type, language, description, pages, lat, long);
+        const result = await this.documentDAO.addDocument(
+          title,
+          stakeholder,
+          scale,
+          issuanceDate,
+          documentType,
+          language,
+          description,
+          pages,
+          lat,
+          long
+        );
 
         if (result.changes === 0) {
           const error = {};
@@ -50,7 +66,7 @@ function DocumentController() {
     });
   };
 
-  this.addLink = () => {};
+  addLink = () => {};
 }
 
 export default DocumentController;
