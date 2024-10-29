@@ -55,7 +55,6 @@ function AuthRoutes(app) {
     //Register a user
     this.router.post("/register", async (req, res) => {
       try {
-        console.log(req.body);
         const { name,surname, role, username, password } = req.body;
         await userDAO.createUser(name,surname, role, username, password);
         res.status(200).json({ message: "User created successfully" });

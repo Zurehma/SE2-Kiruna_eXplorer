@@ -1,6 +1,7 @@
 ### Register a new user
 POST http://localhost:3001/api/sessions/register HTTP/1.1
 Content-Type: application/json
+
 {
     "name": "John",
     "surname": "Doe",
@@ -8,3 +9,21 @@ Content-Type: application/json
     "username": "johndoe",
     "password": "password"
 }
+
+### Login
+POST http://localhost:3001/api/sessions/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "username": "johndoe",
+    "password": "password"
+}
+
+### Logout
+DELETE http://localhost:3001/api/sessions/logout HTTP/1.1
+
+### Get current logged in user
+GET http://localhost:3001/api/sessions/current HTTP/1.1
+
+### Get all documents
+GET http://localhost:3001/api/documents HTTP/1.1

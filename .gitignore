@@ -133,6 +133,4 @@ dist
 .DS_Store
 
 # HTTP test files
-.http
-
-
+*.http
