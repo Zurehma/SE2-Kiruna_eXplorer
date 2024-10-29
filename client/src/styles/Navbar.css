@@ -6,3 +6,7 @@
     z-index: 2; 
   }
   
+  .container {
+    margin-top: 70px; /* Adjust based on the Navbar height */
+  }
+  

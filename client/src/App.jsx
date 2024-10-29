@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavigationBar from './components/NavigationBar';
 import { Login } from './components/Login';
 import Home from './components/Home';
+
   
 
 
@@ -20,9 +21,9 @@ import Home from './components/Home';
       
         <div className="min-vh-100 d-flex flex-column">
           <NavigationBar setLoggedIn={setLoggedIn} loggedIn={loggedIn} currentUser={currentUser} setCurrentUser ={setCurrentUser}/>
-          <div className="container mt-4">
+          <div className="container mt-5 pt-4">
             <Routes>
-              <Route path="/" element={<Home/>} /> 
+              <Route path="/" element={<Home/>} />
               <Route path="/login" element={<Login setLoggedIn={setLoggedIn} setCurrentUser={setCurrentUser}/>} /> 
             </Routes>
           </div>
