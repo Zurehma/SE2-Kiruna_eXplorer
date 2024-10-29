@@ -21,18 +21,7 @@ function DocumentController() {
    * @param {String | null} long
    * @returns A promise that resolves to the newly created object
    */
-  this.addDocument = (
-    title,
-    stakeholder,
-    scale,
-    issuanceDate,
-    type,
-    language,
-    description,
-    pages = null,
-    lat = null,
-    long = null
-  ) => {
+  this.addDocument = (title, stakeholder, scale, issuanceDate, type, language, description, pages = null, lat = null, long = null) => {
     return new Promise(async (resolve, reject) => {
       try {
         if (dayjs().isBefore(issuanceDate)) {
@@ -40,23 +29,12 @@ function DocumentController() {
           throw error;
         }
 
-        if (!(type in DOCUMENT_TYPES)) {
+        if (!Object.values(DOCUMENT_TYPES).find((DOCUMENT_TYPE) => DOCUMENT_TYPE === type)) {
           const error = { errCode: 400, errMessage: "Document type error!" };
           throw error;
         }
 
-        const result = await this.documentDAO.addDocument(
-          title,
-          stakeholder,
-          scale,
-          issuanceDate,
-          type,
-          language,
-          description,
-          pages,
-          lat,
-          long
-        );
+        const result = await this.documentDAO.addDocument(title, stakeholder, scale, issuanceDate, type, language, description, pages, lat, long);
 
         if (result.changes === 0) {
           const error = {};

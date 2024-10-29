@@ -1,18 +1,5 @@
 class Document {
-  constructor(
-    id,
-    title,
-    stakeholder,
-    scale,
-    issuanceDate,
-    type,
-    connections,
-    language,
-    description,
-    pages = null,
-    lat = null,
-    long = null
-  ) {
+  constructor(id, title, stakeholder, scale, issuanceDate, type, connections, language, description, pages = null, lat = null, long = null) {
     this.id = id;
     this.title = title;
     this.stakeholder = stakeholder;
@@ -29,7 +16,7 @@ class Document {
 }
 
 export const DOCUMENT_TYPES = {
-  
-}
+  INFORMATIVE: "Informative",
+};
 
 export default Document;
