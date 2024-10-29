@@ -1,0 +1,38 @@
+/* styles.css */
+.container {
+    max-width: 700px;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  button {
+    padding: 0.6rem 2rem;
+  }
+
+.input-textarea {
+  height: 100px;
+  resize: none;
+}
+
+.input, .input-textarea, select {
+  border-radius: 8px; 
+}
+
+.documents-background {
+ /* background-image: url('../public/kirunadocs.png');  */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 0; 
+}
