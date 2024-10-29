@@ -26,7 +26,7 @@ function Login({ setLoggedIn,setCurrentUser }) {
       if (response.ok) {
         setLoggedIn(true);
         setCurrentUser(username)
-        navigate('/somewhereInThisPlanet');
+        navigate('/e');
         
       } else {
         const data = await response.json();
