@@ -21,8 +21,10 @@ const mapRowsToDocument = (rows) => {
   );
 };
 
-function DocumentDAO() {
-  this.getDocuments = () => {
+class DocumentDAO {
+  constructor() {}
+
+  getDocuments = () => {
     return new Promise((resolve, reject) => {
       const query = 'SELECT * FROM document';
       db.all(query, [], (err, rows) => {
@@ -31,15 +33,14 @@ function DocumentDAO() {
         }
         resolve(mapRowsToDocument(rows));
       });
-    });
-  }
+    });  };
 
   /**
    * Get a document by its ID
    * @param {Number} ID
-   * @returns A promise that resolves to a document object or undefined if not found
+   * @returns {Promise<Document | undefined>} A promise that resolves to a **Document** object or undefined if not found
    */
-  this.getDocumentByID = (ID) => {
+  getDocumentByID = (ID) => {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM DOCUMENT WHERE id = ?";
 
@@ -67,9 +68,9 @@ function DocumentDAO() {
    * @param {Number | null} pages
    * @param {String | null} lat
    * @param {String | null} long
-   * @returns A promise that resolves to the id of the last document inserted
+   * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the last document inserted and the number of lines changed
    */
-  this.addDocument = (title, stakeholder, scale, issuanceDate, type, language, description, pages = null, lat = null, long = null) => {
+  addDocument = (title, stakeholder, scale, issuanceDate, type, language, description, pages = null, lat = null, long = null) => {
     return new Promise((resolve, reject) => {
       const query =
         "INSERT INTO DOCUMENT (title, stakeholder, scale, issuanceDate, type, connections, language, description, pages, lat, long) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -84,7 +85,7 @@ function DocumentDAO() {
     });
   };
 
-  this.addLink = () => {
+  addLink = () => {
     return new Promise((resolve, reject) => {});
   };
 }
