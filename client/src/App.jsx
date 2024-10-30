@@ -10,8 +10,9 @@ import Documents from './components/Documents';
 
 
 
-  function App() {
 
+  function App() {
+    const [error, setError] = useState(null);
     const [loggedIn, setLoggedIn] = useState(false)
     const [currentUser, setCurrentUser] = useState('')
     console.log(currentUser);
@@ -20,7 +21,12 @@ import Documents from './components/Documents';
       
         <div className="min-vh-100 d-flex flex-column">
           <NavigationBar setLoggedIn={setLoggedIn} loggedIn={loggedIn} currentUser={currentUser} setCurrentUser ={setCurrentUser}/>
-          <div className="container mt-5 pt-4">
+          <div className="flex-grow-1 d-flex flex-column">
+            {error && (
+              <Alert variant="danger" className="fixed-bottom mt-3" dismissible onClose={() => setError(null)}>
+                <p>{error.message}</p>
+              </Alert>
+            )}
             <Routes>
               <Route path="/" element={<Home/>} />
               <Route path="/login" element={<Login setLoggedIn={setLoggedIn} setCurrentUser={setCurrentUser}/>} /> 
