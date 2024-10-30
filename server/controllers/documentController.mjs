@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import DocumentDAO from "../dao/DocumentoDAO.mjs";
+import DocumentDAO from "../dao/documentDAO.mjs";
 import { isDocumentType } from "../models/document.mjs";
 
 class DocumentController {
@@ -32,7 +32,6 @@ class DocumentController {
         }
 
         const documentType = isDocumentType(type);
-        console.log(documentType);
 
         if (documentType === undefined) {
           const error = { errCode: 400, errMessage: "Document type error!" };
