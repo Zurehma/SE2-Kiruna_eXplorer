@@ -31,7 +31,7 @@ import {Map2} from './components/Map2'
               </Alert>
             )}
             <Routes>
-              <Route path="/" element={<Map2 setError={setError}/>} />
+              <Route path="/" element={<Home/>} />
               <Route path="/login" element={<Login setLoggedIn={setLoggedIn} setCurrentUser={setCurrentUser}/>} /> 
               <Route path="/doc" element={<Documents/>} /> 
             </Routes>
