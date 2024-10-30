@@ -1,10 +1,14 @@
 import React from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+import { useState,useEffect } from 'react';
+
 import '../App.css';
 import { MyPopup } from './MyPopup';
+import API from '../../API'
 
 // Custom icon for markers
 const icon = new L.Icon({
@@ -15,6 +19,7 @@ const icon = new L.Icon({
 });
 
 // Sample data with latitude and longitude fields
+
 const data = [
     {
         type : "Action",
@@ -59,28 +64,49 @@ function getRandomOffset() {
     ];
 }
 
-function Map2() {
+function Map2(props) {
     const cornerPosition = [67.834, 20.135]; // Corner position
+    const [data2,setData] = useState(null);
+    const [loading,setLoading] = useState(false)
 
+    //useEffect to call, at every rendering, API.getDocuments and fill the data State
+    useEffect(() => {
+        setLoading(true)
+        const fetchData = async () => {
+          try {
+            const documents = await API.getDocuments();
+            setData(documents);
+          } catch (error) {
+            props.setError(error);
+          }
+        };
+        fetchData();
+        setLoading(false)
+        console.log(data2)
+    }, []); 
+    
     return (
-        <MapContainer center={[67.850, 20.217]} zoom={13} style={{ height: '100vh', width: '100%' }}>
-            <TileLayer
-                url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg"
-                attribution='&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {data.map((item, index) => {
-                const position = item.latitude !== null && item.longitude !== null 
-                    ? [item.latitude, item.longitude] 
-                    : [cornerPosition[0] + getRandomOffset()[0], cornerPosition[1] + getRandomOffset()[1]];
-                return (
-                    <Marker key={index} position={position} icon={icon}>
-                        <Popup maxWidth={600}>
-                            <MyPopup doc={item} />
-                        </Popup>
-                    </Marker>
-                );
-            })}
-        </MapContainer>
+        <>
+            {loading && (<p>Loading...</p>)}
+            <MapContainer center={[67.850, 20.217]} zoom={13} style={{ height: '100vh', width: '100%' }}>
+                <TileLayer
+                    url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg"
+                    attribution='&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                {data.map((item, index) => {
+                    const position = item.latitude !== null && item.longitude !== null 
+                        ? [item.latitude, item.longitude] 
+                        : [cornerPosition[0] + getRandomOffset()[0], cornerPosition[1] + getRandomOffset()[1]];
+                    return (
+                        <Marker key={index} position={position} icon={icon}>
+                            <Popup maxWidth={600}>
+                                <MyPopup doc={item} />
+                            </Popup>
+                        </Marker>
+                    );
+                })}
+            </MapContainer>
+        </>
     );
 }
 
