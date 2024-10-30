@@ -31,7 +31,7 @@ Specific error scenarios will have their corresponding error code.
 
 ### Document APIs
 
-#### GET `api/document`
+#### GET `api/documents`
 
 Returns the list of all documents.
 
@@ -60,7 +60,7 @@ Returns the list of all documents.
 - Access Constraints: _None_
 - Additional Constraints: _None_
 
-#### POST `api/document`
+#### POST `api/documents`
 
 Add a new document with the provided information.
 
@@ -95,7 +95,7 @@ Add a new document with the provided information.
 - Additional Constraints:
   - It should return a 400 error when `issuanceDate` is after the current date.
 
-#### POST `api/document/:id/link`
+#### POST `api/documents/:id/link`
 
 - Request Parameters: `id` - ID of the first document (document being linked from...).
 - Request Body: An object with the following fields:
@@ -127,7 +127,7 @@ Add a new document with the provided information.
 
 ### Table `Document`
 
-- Fields: id-title-stakeholder-scale-issuanceDate-type-connections-language-pages-description
+- Fields: id-title-stakeholder-scale-issuanceDate-type-connections-language-pages-description-lat-long
 - Primary key: id
 - Description: The table stores information on each document. The information is the one from the cards along with longitude & latitude (NULL default means the document covers the whole area).  
   Each document is uniquely identified by an ID.

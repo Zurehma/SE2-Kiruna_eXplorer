@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body } from "express-validator";
+import { body,param } from "express-validator";
 import Utility from "../utility.mjs";
 import DocumentController from "../controllers/documentController.mjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
@@ -57,7 +57,29 @@ class DocumentRoutes {
       }
     );
 
-    this.router.post("/:id/link", (req, res, next) => {});
+    this.router.post("/:id/link",
+    param("id").isInt({ gt: 0 }),
+    body("id2").isInt({ gt: 0 }).notEmpty(),
+    body("type").isString().notEmpty(),
+    Utility.validateRequest,
+    Utility.isLoggedIn,
+    (req, res, next) => {
+      this.documentController
+      .addLink(req.params.id, req.body.id2, req.body.type)
+      .then((link) => {
+        // Assuming link resolves successfully, send the response
+        res.status(200).json({
+          id1: req.params.id,
+          id2: req.body.id2,
+          type: req.body.type,
+        });
+      })
+      .catch((err) => {
+        next(err); // Pass the error to the error handling middleware
+      });
+    });
+
+
   };
 }
 
