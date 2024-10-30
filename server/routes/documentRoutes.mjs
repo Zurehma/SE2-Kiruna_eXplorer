@@ -8,15 +8,14 @@ class DocumentRoutes {
   constructor() {
     this.router = new Router();
     this.documentController = new DocumentController();
-    this.documentDAO = new DocumentDAO();
   }
 
   getRouter = () => this.router;
 
   initRoutes = () => {
-    this.router.get("/", Utility.isLoggedIn, async (req, res, next) => {
+    this.router.get("/", async (req, res, next) => {
       try {
-        const doc = await this.documentDAO.getDocuments();
+        const doc = await this.documentController.getDocuments();
 
         return res.status(200).json(doc);
       } catch (err) {

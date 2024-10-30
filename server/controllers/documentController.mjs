@@ -7,7 +7,16 @@ class DocumentController {
     this.documentDAO = new DocumentDAO();
   }
 
-  getDocuments = () => {};
+  getDocuments = () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const documents = await this.documentDAO.getDocuments();
+        resolve(documents);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
 
   /**
    * Add a new document with the provided information
