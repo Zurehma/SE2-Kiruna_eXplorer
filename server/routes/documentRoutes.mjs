@@ -26,7 +26,6 @@ class DocumentRoutes {
 
     this.router.post(
       "/",
-      Utility.isLoggedIn,
       body("title").isString().notEmpty(),
       body("stakeholder").isString().notEmpty(),
       body("scale").isInt({ gt: 0 }),
@@ -53,7 +52,6 @@ class DocumentRoutes {
             req.body.long || null
           )
           .then((document) => {
-            console.log(document);
             res.status(200).json(document);
           })
           .catch((err) => next(err));
