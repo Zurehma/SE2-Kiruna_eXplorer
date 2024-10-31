@@ -8,15 +8,14 @@ class DocumentRoutes {
   constructor() {
     this.router = new Router();
     this.documentController = new DocumentController();
-    this.documentDAO = new DocumentDAO();
   }
 
   getRouter = () => this.router;
 
   initRoutes = () => {
-    this.router.get("/", Utility.isLoggedIn, async (req, res, next) => {
+    this.router.get("/", async (req, res, next) => {
       try {
-        const doc = await this.documentDAO.getDocuments();
+        const doc = await this.documentController.getDocuments();
 
         return res.status(200).json(doc);
       } catch (err) {
@@ -26,7 +25,6 @@ class DocumentRoutes {
 
     this.router.post(
       "/",
-      Utility.isLoggedIn,
       body("title").isString().notEmpty(),
       body("stakeholder").isString().notEmpty(),
       body("scale").isInt({ gt: 0 }),
@@ -53,7 +51,6 @@ class DocumentRoutes {
             req.body.long || null
           )
           .then((document) => {
-            console.log(document);
             res.status(200).json(document);
           })
           .catch((err) => next(err));

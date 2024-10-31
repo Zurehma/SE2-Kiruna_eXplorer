@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import DocumentDAO from "../dao/DocumentoDAO.mjs";
+import DocumentDAO from "../dao/documentDAO.mjs";
 import { isDocumentType } from "../models/document.mjs";
 
 class DocumentController {
@@ -7,7 +7,16 @@ class DocumentController {
     this.documentDAO = new DocumentDAO();
   }
 
-  getDocuments = () => {};
+  getDocuments = () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const documents = await this.documentDAO.getDocuments();
+        resolve(documents);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
 
   /**
    * Add a new document with the provided information
@@ -32,7 +41,6 @@ class DocumentController {
         }
 
         const documentType = isDocumentType(type);
-        console.log(documentType);
 
         if (documentType === undefined) {
           const error = { errCode: 400, errMessage: "Document type error!" };

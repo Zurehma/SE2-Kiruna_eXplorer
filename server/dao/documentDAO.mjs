@@ -26,14 +26,15 @@ class DocumentDAO {
 
   getDocuments = () => {
     return new Promise((resolve, reject) => {
-      const query = 'SELECT * FROM document';
+      const query = "SELECT * FROM document";
       db.all(query, [], (err, rows) => {
         if (err) {
           reject(err);
         }
         resolve(mapRowsToDocument(rows));
       });
-    });  };
+    });
+  };
 
   /**
    * Get a document by its ID

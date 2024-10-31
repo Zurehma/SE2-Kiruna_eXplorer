@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeAll, beforeEach, afterAll, afterEach, jest } from "@jest/globals";
 
-describe("Example", () => {
-  test("Test1", () => {
+describe("", () => {
+  test("", () => {
     expect(1).toBe(1);
   });
 });
