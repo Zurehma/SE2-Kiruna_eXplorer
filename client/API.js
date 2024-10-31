@@ -42,11 +42,17 @@ const saveDocument = async (doc) => {
     }
   };
 
-
+  const getTypeDocuments = async () => {
+    return await fetch(SERVER_URL + '/typedocument').then(handleInvalidResponse)
+    .then(response => response.json());
+  };
+  
+  
 //Export API methods
 const API = {
     getDocuments,
-    saveDocument
+    saveDocument,
+    getTypeDocuments,
 };
   
 export default API;

@@ -1,11 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Card, Row, Col } from 'react-bootstrap';
 import '../styles/Documents.css';
 import { useNavigate } from 'react-router-dom';
 import API from '../../API.js';
 import Document from '../document.mjs';
 
-function Documents() {
+function Documents() { 
+  // const [types, setTypes] = useState([]);
+  // const [scale, setScale] = useState([]);
+  const [scale, setScale] = useState([
+    { id: 'text', name: 'Text' },
+    { id: 'blueprints/effects', name: 'Blueprints/Effects' },
+    { id: '1:n', name: 'Ratio 1:n' }
+  ]);
+  
+  const [types, setTypes] = useState([
+    { id: 'informative', name: 'Informative' }
+  ]);
+  const [error, setError] = useState(null); 
+  const [showNField, setShowNField] = useState(false);
+  const [nValue, setNValue] = useState('');
+  const navigate = useNavigate();
   const [document, setDocument] = useState({
     title: '',
     stakeholders: '',
@@ -20,7 +35,59 @@ function Documents() {
     description: ''
   });
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchTypes = async () => {
+      try {
+        const response = await API.getTypeDocuments();
+        setTypes(response.data);
+        const response2 = await API.getTypeScale();
+        setScale(response2.data);
+        setScale('Text', 'blueprints/effects', 'Ratio 1:n' );
+        setTypes('Informative');
+     } catch (error) {
+        console.error("Errore nel recupero dei tipi di documenti:", error);
+      }
+    };
+    fetchTypes();
+  }, []);
+
+  const validateDate = (date) => {
+    const validFormats = [
+      /^\d{2}\/\d{2}\/\d{4}$/, // DD/MM/YYYY
+      /^\d{2}\/\d{4}$/,       // MM/YYYY
+      /^\d{4}$/               // YYYY
+    ];
+    return validFormats.some((regex) => regex.test(date));
+  };
+
+  const handleDateChange = (e) => {
+    const { value } = e.target;
+    handleChange(e);
+
+    if (validateDate(value) || value === "") {
+      setError(""); // Rimuove l'errore se il formato è valido
+    } else {
+      setError("Invalid date. Use DD/MM/YYYY, MM/YYYY or YYYY.");
+    }
+  };
+
+  const handleScaleChange = (e) => {
+    const { value } = e.target;
+    handleChange(e);
+
+    // Mostra il campo n solo se la scala selezionata è '1:n'
+    if (value === '1:n') {
+      setShowNField(true);
+    } else {
+      setShowNField(false);
+      setNValue(""); // Reset del valore di n se non serve più
+    }
+  };
+
+  const handleNChange = (e) => {
+    setNValue(e.target.value);
+    // Puoi aggiungere un handler per aggiornare lo stato di `document` se serve
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,9 +100,7 @@ function Documents() {
   const handleSubmit = async () => {
    // e.preventDefault();
     console.log("Document saved:", document);
-
-//MODIFICARE QUI
-
+    
     try {
         const response = await API.saveDocument(document);
         const newId = response.data.id;
@@ -84,20 +149,43 @@ function Documents() {
               </Col>
             </Row>
 
-            <Row className="mb-3">
+             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group controlId="scale">
                   <Form.Label>Scale</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    name="scale" 
-                    value={document.scale} 
-                    onChange={handleChange} 
-                    placeholder="Text, Image, etc."
-                    className="input" 
-                  />
+                  <Form.Select 
+                    as="select"
+                    name="scale"
+                    value={document.scale}
+                    onChange={handleScaleChange}
+                    className="input"
+                  >
+                    <option value="">Select a scale</option>
+                    {scale.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.name}
+                      </option>
+                    ))}
+                  </Form.Select>
                 </Form.Group>
               </Col>
+
+              {showNField && (
+                <Col md={3}>
+                  <Form.Group controlId="nValue">
+                    <Form.Label>Value of n</Form.Label>
+                    <Form.Control 
+                      type="number" 
+                      name="nValue" 
+                      value={nValue} 
+                      onChange={handleNChange} 
+                      placeholder="Enter n"
+                      className="input"
+                    />
+                  </Form.Group>
+                </Col>
+              )}
+
               <Col md={6}>
                 <Form.Group controlId="issuanceDate">
                   <Form.Label>Issuance Date</Form.Label>
@@ -105,10 +193,14 @@ function Documents() {
                     type="text" 
                     name="issuanceDate" 
                     value={document.issuanceDate} 
-                    onChange={handleChange} 
+                    onChange={handleDateChange} 
                     placeholder="e.g., 2007"
                     className="input" 
+                    isInvalid={!!error} // Aggiunge il feedback visivo per errore
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {error}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
             </Row>
@@ -117,28 +209,25 @@ function Documents() {
               <Col md={6}>
                 <Form.Group controlId="type">
                   <Form.Label>Type</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    name="type" 
-                    value={document.type} 
-                    onChange={handleChange} 
-                    placeholder="e.g., Informative document"
-                    className="input" 
-                  />
+                  <Form.Select 
+                    as="select"
+                    name="type"
+                    value={document.type}
+                    onChange={handleChange}
+                    className="input"
+                  >
+                    <option value="">Select a type</option>
+                    {types.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.name}
+                      </option>
+                    ))}
+                </Form.Select>
                 </Form.Group>
               </Col>
               <Col md={6}>
-                {/* <Form.Group controlId="connections">
-                  <Form.Label>Connections</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    name="connections" 
-                    value={document.connections} 
-                    onChange={handleChange} 
-                    placeholder="e.g., 3"
-                    className="input" 
-                  />
-                </Form.Group> */}
+           
+
               </Col>
             </Row>
 
@@ -149,7 +238,6 @@ function Documents() {
                   <Form.Control 
                     type="text" 
                     name="language" 
-                    minLength={2} 
                     value={document.language} 
                     onChange={handleChange} 
                     placeholder="e.g., Swedish"
@@ -163,7 +251,6 @@ function Documents() {
                   <Form.Control 
                     type="integer" 
                     name="pages" 
-                    min={1} 
                     value={document.pages} 
                     onChange={handleChange} 
                     placeholder="Number of pages"
