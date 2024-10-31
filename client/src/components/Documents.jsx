@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Card, Row, Col } from 'react-bootstrap';
-import API from '../API.mjs';
+import API from '../../API.js';
 import '../styles/Documents.css';
 
 function Documents() {

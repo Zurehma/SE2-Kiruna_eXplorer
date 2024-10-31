@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Card } from 'react-bootstrap';
-import axios from 'axios';
+import API from '../../API.js';
 import { useParams } from 'react-router-dom';
 
 function Links() {
@@ -16,7 +16,7 @@ function Links() {
     // Recupera la lista di documenti dal backend
     const fetchDocuments = async () => {
       try {
-        const response = await axios.get('/api/documents');
+        const response = await API.getDocuments();
         setDocuments(response.data);
       } catch (error) {
         console.error("Error fetching documents:", error);
@@ -36,7 +36,7 @@ function Links() {
 
   const handleSaveLinks = async () => {
     try {
-      await axios.post('/api/links', linkData);
+      await API.setLink(linkData);
       alert("Links saved successfully!");
     } catch (error) {
       console.error("Error saving links:", error);
