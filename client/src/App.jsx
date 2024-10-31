@@ -10,6 +10,7 @@ import { Login } from './components/Login';
 import Documents from './components/Documents';
 import { Map2 } from './components/Map2';
 import Home from './components/Home';
+import Links from './components/Links';
 
 function App() {
     const [error, setError] = useState(null);
@@ -39,8 +40,9 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home/>} />
                     <Route path="/login" element={<Login setLoggedIn={setLoggedIn} setCurrentUser={setCurrentUser} />} />
-                    <Route path="/doc" element={<Documents />} />
+                    <Route path="/document" element={<Documents />} />
                     <Route path='/map' element={<Map2 setError={setError} />} />
+                    <Route path="/document/link" element={<Links/>} /> 
                 </Routes>
             </div>
         </div>

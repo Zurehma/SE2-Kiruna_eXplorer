@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Card, Row, Col } from 'react-bootstrap';
 import '../styles/Documents.css';
+import { useNavigate } from 'react-router-dom';
+import API from '../../API.js';
+import Document from '../document.mjs';
 
 function Documents() {
   const [document, setDocument] = useState({
@@ -12,8 +15,12 @@ function Documents() {
     connections: '',
     language: '',
     pages: '',
+    latitude:'',
+    longitude: '',
     description: ''
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,9 +30,20 @@ function Documents() {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+   // e.preventDefault();
     console.log("Document saved:", document);
+
+//MODIFICARE QUI
+
+    try {
+        const response = await API.saveDocument(document);
+        const newId = response.data.id;
+        // Reindirizza alla pagina Links con il nuovo ID
+        navigate(`/document/link`);
+      } catch (error) {
+        console.error("Error saving document:", error);
+      }
   };
 
   return (
@@ -33,7 +51,7 @@ function Documents() {
     <Container className="my-5">
       <Card className="p-4 shadow-sm">
         <Card.Body>
-          <Card.Title className="mb-4 text-center">Save Document</Card.Title>
+          <Card.Title className="mb-4 text-center">ADD NEW DOCUMENT</Card.Title>
           <Form onSubmit={handleSubmit}>
             <Row className="mb-3">
               <Col md={6}>
@@ -42,6 +60,7 @@ function Documents() {
                   <Form.Control 
                     type="text" 
                     name="title" 
+                    minLength={2} 
                     value={document.title} 
                     onChange={handleChange} 
                     placeholder="Enter document title"
@@ -55,6 +74,7 @@ function Documents() {
                   <Form.Control 
                     type="text" 
                     name="stakeholders" 
+                    minLength={2} 
                     value={document.stakeholders} 
                     onChange={handleChange} 
                     placeholder="e.g., Kiruna kommun/Residents"
@@ -108,7 +128,7 @@ function Documents() {
                 </Form.Group>
               </Col>
               <Col md={6}>
-                <Form.Group controlId="connections">
+                {/* <Form.Group controlId="connections">
                   <Form.Label>Connections</Form.Label>
                   <Form.Control 
                     type="text" 
@@ -118,7 +138,7 @@ function Documents() {
                     placeholder="e.g., 3"
                     className="input" 
                   />
-                </Form.Group>
+                </Form.Group> */}
               </Col>
             </Row>
 
@@ -129,6 +149,7 @@ function Documents() {
                   <Form.Control 
                     type="text" 
                     name="language" 
+                    minLength={2} 
                     value={document.language} 
                     onChange={handleChange} 
                     placeholder="e.g., Swedish"
@@ -140,8 +161,9 @@ function Documents() {
                 <Form.Group controlId="pages">
                   <Form.Label>Pages</Form.Label>
                   <Form.Control 
-                    type="text" 
+                    type="integer" 
                     name="pages" 
+                    min={1} 
                     value={document.pages} 
                     onChange={handleChange} 
                     placeholder="Number of pages"
@@ -157,6 +179,7 @@ function Documents() {
                 as="textarea" 
                 rows={5} 
                 name="description" 
+                minLength={2}  
                 value={document.description} 
                 onChange={handleChange} 
                 placeholder="Enter a brief description"
