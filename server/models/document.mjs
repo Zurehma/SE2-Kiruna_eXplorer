@@ -7,17 +7,34 @@ class Document {
    * @param {Number} id
    * @param {String} title
    * @param {String} stakeholder
-   * @param {Number} scale
+   * @param {String} scale
    * @param {String} issuanceDate
    * @param {String} type
    * @param {Number} connections
    * @param {String} language
    * @param {String} description
    * @param {Number | null} pages
+   * @param {Number | null} pageFrom
+   * @param {Number | null} pageTo
    * @param {String | null} lat
    * @param {String | null} long
    */
-  constructor(id, title, stakeholder, scale, issuanceDate, type, connections, language, description, pages = null, lat = null, long = null) {
+  constructor(
+    id,
+    title,
+    stakeholder,
+    scale,
+    issuanceDate,
+    type,
+    connections,
+    language,
+    description,
+    pages = null,
+    pageFrom = null,
+    pageTo = null,
+    lat = null,
+    long = null
+  ) {
     this.id = id;
     this.title = title;
     this.stakeholder = stakeholder;
@@ -28,6 +45,8 @@ class Document {
     this.language = language;
     this.description = description;
     this.pages = pages;
+    this.pageFrom = pageFrom;
+    this.pageTo = pageTo;
     this.lat = lat;
     this.long = long;
   }
@@ -38,6 +57,7 @@ class Document {
  */
 const DOCUMENT_TYPES = {
   INFORMATIVE: "Informative",
+  PRESCRIPTIVE: "Prescriptive",
 };
 
 /**

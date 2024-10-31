@@ -29,11 +29,13 @@ describe("DocumentDAO", () => {
       const result = await documentDAO.addDocument(
         "example",
         "example",
-        100,
+        "100",
         "2024-02-12",
         "Informative",
         "english",
         "Lore ipsum...",
+        null,
+        null,
         null,
         null,
         null
@@ -52,7 +54,20 @@ describe("DocumentDAO", () => {
         return {};
       });
 
-      const result = documentDAO.addDocument("example", "example", 100, "2024-02-12", "Informative", "english", "Lore ipsum...", null, null, null);
+      const result = documentDAO.addDocument(
+        "example",
+        "example",
+        "100",
+        "2024-02-12",
+        "Informative",
+        "english",
+        "Lore ipsum...",
+        null,
+        null,
+        null,
+        null,
+        null
+      );
 
       await expect(result).rejects.toEqual(error);
       expect(mockDBRun).toHaveBeenCalled();

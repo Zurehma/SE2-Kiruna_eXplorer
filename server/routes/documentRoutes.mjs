@@ -1,8 +1,7 @@
 import { Router } from "express";
-import { body,param } from "express-validator";
+import { body, param, oneOf } from "express-validator";
 import Utility from "../utility.mjs";
 import DocumentController from "../controllers/documentController.mjs";
-import DocumentDAO from "../dao/documentDAO.mjs";
 
 class DocumentRoutes {
   constructor() {
@@ -25,16 +24,15 @@ class DocumentRoutes {
 
     this.router.post(
       "/",
+      Utility.isLoggedIn,
       body("title").isString().notEmpty(),
       body("stakeholder").isString().notEmpty(),
-      body("scale").isInt({ gt: 0 }),
+      body("scale").isString().notEmpty(),
       body("issuanceDate").isISO8601({ strict: true }),
       body("type").isString().notEmpty(),
       body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
-      body("pages").isInt({ gt: 0 }).optional(),
-      body("lat").isLatLong().optional(),
-      body("long").isLatLong().optional(),
+      oneOf([body("pages").optional().isInt({ gt: 0 }), [body("pageFrom").isInt({ gt: 0 }), body("pageTo").isInt({ gt: 0 })]]),
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
@@ -47,6 +45,8 @@ class DocumentRoutes {
             req.body.language,
             req.body.description,
             req.body.pages || null,
+            req.body.pageFrom || null,
+            req.body.pageTo || null,
             req.body.lat || null,
             req.body.long || null
           )
@@ -57,29 +57,29 @@ class DocumentRoutes {
       }
     );
 
-    this.router.post("/:id/link",
-    param("id").isInt({ gt: 0 }),
-    body("id2").isInt({ gt: 0 }).notEmpty(),
-    body("type").isString().notEmpty(),
-    Utility.validateRequest,
-    Utility.isLoggedIn,
-    (req, res, next) => {
-      this.documentController
-      .addLink(req.params.id, req.body.id2, req.body.type)
-      .then((link) => {
-        // Assuming link resolves successfully, send the response
-        res.status(200).json({
-          id1: req.params.id,
-          id2: req.body.id2,
-          type: req.body.type,
-        });
-      })
-      .catch((err) => {
-        next(err); // Pass the error to the error handling middleware
-      });
-    });
-
-
+    this.router.post(
+      "/:id/link",
+      param("id").isInt({ gt: 0 }),
+      body("id2").isInt({ gt: 0 }).notEmpty(),
+      body("type").isString().notEmpty(),
+      Utility.validateRequest,
+      Utility.isLoggedIn,
+      (req, res, next) => {
+        this.documentController
+          .addLink(req.params.id, req.body.id2, req.body.type)
+          .then((link) => {
+            // Assuming link resolves successfully, send the response
+            res.status(200).json({
+              id1: req.params.id,
+              id2: req.body.id2,
+              type: req.body.type,
+            });
+          })
+          .catch((err) => {
+            next(err); // Pass the error to the error handling middleware
+          });
+      }
+    );
   };
 }
 
