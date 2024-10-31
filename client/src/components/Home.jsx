@@ -13,25 +13,23 @@ const Home = () => {
     {
       id: 1,
       src: '../public/kirunaSinking.jpg',
-      description:
-        'The town of Kiruna in the Swedish Arctic is sinking due to the giant mine below and the town is in danger of collapsing. The residents have to evacuate, but the mining town is sinking faster than anyone thought.',
-      style: { width: '150px', height: '150px', left: '10%', top: '60%' },
+      description: 'The town of Kiruna in the Swedish Arctic is sinking...',
+      style: { width: '130px', height: '130px', left: '20%', top: '60%' },
     },
     {
       id: 2,
       src: '../public/New_Kiruna_01.jpg',
-      description:
-        'Transportation issues in Kiruna stem from its ongoing relocation due to mining subsidence. The existing road infrastructure has become unusable in some areas, leading to disruptions and the need for realignments. Public transportation services must adapt to new routes, which can create confusion for users and require additional infrastructure.',
-      style: { width: '180px', height: '180px', left: '30%', top: '60%' },
+      description: 'Transportation issues in Kiruna stem from its ongoing relocation...',
+      style: { width: '160px', height: '160px', left: '45%', top: '60%' },
     },
     {
       id: 3,
       src: '../public/swed.jpg',
-      description:
-        'Kiruna is the northernmost city in Sweden, situated in the province of Lapland. It had 17,002 inhabitants in 2016 and is the seat of Kiruna Municipality (population: 23,167 in 2016) in Norrbotten County. The city was originally built in the 1890s to serve the Kiruna Mine.',
-      style: { width: '200px', height: '200px', left: '50%', top: '60%' },
+      description: 'Kiruna is the northernmost city in Sweden...',
+      style: { width: '180px', height: '180px', left: '70%', top: '60%' },
     },
   ];
+  
 
   const openModal = (image, event) => {
     setCurrentImage(image);
@@ -76,7 +74,7 @@ const Home = () => {
           "Kiruna: The Heart of Sweden's Iron Legacy and Gateway to the Arctic"
         </h1>
         <button className="redirect-button" onClick={handleButtonClick}>
-          Learn More
+          Relocation of Kiruna
         </button>
       </div>
 

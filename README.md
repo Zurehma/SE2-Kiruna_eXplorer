@@ -57,7 +57,7 @@
 
 ### Table `Document`
 
-- Fields: id-title-stakeholder-scale-issuanceDate-type-connections-language-pages-description
+- Fields: id-title-stakeholder-scale-issuanceDate-type-connections-language-pages-description-lat-long
 - Primary key: id
 - Description: The table stores information on each document. The information is the one from the cards along with longitude & latitude (NULL default means the document covers the whole area).  
   Each document is uniquely identified by an ID.

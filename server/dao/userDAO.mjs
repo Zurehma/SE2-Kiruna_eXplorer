@@ -11,7 +11,7 @@ export default function UserDAO() {
         return new Promise((resolve,reject)=>{
             const salt = crypto.randomBytes(16);
             const hashedPassword = crypto.scryptSync(password,salt,16);
-            const query = 'INSERT INTO user (name,surname,role,email,password,salt) VALUES (?,?,?,?,?,?)'
+            const query = 'INSERT INTO user (name,surname,role,username,password,salt) VALUES (?,?,?,?,?,?)'
             console.log(query);
             db.run(query,[name,surname,role,username,hashedPassword,salt],(err)=>{
                 if (err) {
@@ -34,7 +34,7 @@ export default function UserDAO() {
                 if (row === undefined) {
                     resolve({error: 'User not found.'});
                 } else {
-                    resolve(new User(row.id, row.name,row.surname, row.role, row.email));
+                    resolve(new User(row.id, row.name,row.surname, row.role, row.username));
                 }
             });
         });
@@ -43,7 +43,7 @@ export default function UserDAO() {
     //get user by credentials
     this.getUserByCredentials = (username, password) => {
         return new Promise((resolve, reject) => {
-            const sql = 'SELECT * FROM user WHERE email=?';
+            const sql = 'SELECT * FROM user WHERE username=?';
             db.get(sql, [username], (err, row) => {
                 if (err) {
                     reject(err);
@@ -56,7 +56,7 @@ export default function UserDAO() {
                         if (!crypto.timingSafeEqual(Buffer.from(row.password, 'hex'), hashedPassword))
                             resolve(false);
                         else
-                            resolve(new User(row.id, row.name,row.surname, row.role, row.email));
+                            resolve(new User(row.id, row.name,row.surname, row.role, row.username));
                     });
                 }
             });
