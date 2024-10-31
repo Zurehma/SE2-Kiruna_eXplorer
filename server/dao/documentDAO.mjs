@@ -26,14 +26,15 @@ class DocumentDAO {
 
   getDocuments = () => {
     return new Promise((resolve, reject) => {
-      const query = 'SELECT * FROM document';
+      const query = "SELECT * FROM document";
       db.all(query, [], (err, rows) => {
         if (err) {
           reject(err);
         }
         resolve(mapRowsToDocument(rows));
       });
-    });  };
+    });
+  };
 
   /**
    * Get a document by its ID
@@ -85,8 +86,30 @@ class DocumentDAO {
     });
   };
 
-  addLink = () => {
-    return new Promise((resolve, reject) => {});
+  addLink = (id1,id2,type) => {
+    return new Promise((resolve, reject) => {
+      //Check if the link already exists in either direction
+      const query1 = "SELECT * FROM LINK WHERE docID1=? AND docID2=? OR docID1=? AND docID2=?";
+      db.all(query1, [id1, id2, id2, id1], (err, rows) => {
+        if (err) {
+          console.log("Error in first query");
+          reject(err);
+        } else if (rows.length > 0) {
+          reject({ errCode: 409, errMessage: "Link already exists" });
+        } else {
+          const query = "INSERT INTO LINK (docID1, docID2, type) VALUES (?, ?, ?)";
+          db.run(query, [id1, id2, type], function (err) {
+            if (err) {
+              console.log("Error in second query", err);
+              reject(err);
+            } else {
+              resolve({ changes: this.changes, lastID: this.lastID, type: type });
+            }
+          });
+        }
+
+      });
+    });
   };
 }
 
