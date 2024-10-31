@@ -1,46 +1,25 @@
 // Module for the authentication routes
 
 import { Router } from "express";
-import { check } from "express-validator";
+import { body, check } from "express-validator";
 
 import passport from "passport";
-import LocalStrategy from "passport-local";
 import session from "express-session";
 
 import Utility from "../utility.mjs";
 
-import UserDAO from "../dao/userDAO.mjs";
+import UserController from "../controllers/userController.mjs";
 
 /**
  *
  * @param {*} app
  */
 function AuthRoutes(app) {
+  this.UserController = new UserController();
   this.router = Router();
   this.app = app;
 
   this.getRouter = () => this.router;
-
-  const userDAO = new UserDAO();
-
-  //Passport configuration
-  passport.use(
-    new LocalStrategy(async function verify(username, password, callback) {
-      const user = await userDAO.getUserByCredentials(username, password);
-      if (!user) {
-        return callback(null, false, { message: "Invalid username or password" });
-      }
-      return callback(null, user);
-    })
-  );
-
-  passport.serializeUser(function (user, callback) {
-    callback(null, user);
-  });
-
-  passport.deserializeUser(function (user, callback) {
-    callback(null, user);
-  });
 
   app.use(
     session({
@@ -53,14 +32,21 @@ function AuthRoutes(app) {
 
   this.initRoutes = () => {
     //Register a user
-    this.router.post("/register", async (req, res) => {
-      try {
-        const { name,surname, role, username, password } = req.body;
-        await userDAO.createUser(name,surname, role, username, password);
-        res.status(200).json({ message: "User created successfully" });
-      } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
+    this.router.post("/register",
+    body("name").isString().notEmpty(),
+    body("surname").isString().notEmpty(),
+    body("role").isString().notEmpty(),
+    body("username").isString().notEmpty(),
+    body("password").isString().notEmpty(),
+    Utility.validateRequest,
+     (req, res,next) => {
+        this.UserController.registerUser(req.body.name,req.body.surname, req.body.role, req.body.username, req.body.password)
+        .then(()=>{
+          res.status(200).json({ message: "User created successfully" });
+        }
+        ).catch((error)=>{
+          res.status(500).json({ error: error.message });
+        });
     });
 
     //Login
