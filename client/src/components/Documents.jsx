@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Card, Row, Col } from 'react-bootstrap';
-import API from '../../API.js';
 import '../styles/Documents.css';
+import { useNavigate } from 'react-router-dom';
+import API from '../../API.js';
+import Document from '../document.mjs';
 
 function Documents() {
   const [document, setDocument] = useState({
@@ -29,7 +31,7 @@ function Documents() {
   };
 
   const handleSubmit = async () => {
-    //e.preventDefault();
+   // e.preventDefault();
     console.log("Document saved:", document);
 
 //MODIFICARE QUI
@@ -37,9 +39,8 @@ function Documents() {
     try {
         const response = await API.saveDocument(document);
         const newId = response.data.id;
-        
         // Reindirizza alla pagina Links con il nuovo ID
-        navigate(`/document/${newId}/link`);
+        navigate(`/document/link`);
       } catch (error) {
         console.error("Error saving document:", error);
       }
