@@ -24,7 +24,11 @@ import {Map2} from './components/Map2'
       
         <div className="min-vh-100 d-flex flex-column">
           <NavigationBar setLoggedIn={setLoggedIn} loggedIn={loggedIn} currentUser={currentUser} setCurrentUser ={setCurrentUser}/>
-          <Container fluid className="flex-grow-1 d-flex flex-column">
+          <Container
+            fluid
+            className="flex-grow-1 d-flex flex-column"
+            style={{ paddingTop: '3.5rem' }} // Adjust this value based on NavigationBar's height
+          >
             {error && (
               <Alert variant="danger" className="fixed-bottom mt-3" dismissible onClose={() => setError(null)}>
                 <p>{error.message}</p>
