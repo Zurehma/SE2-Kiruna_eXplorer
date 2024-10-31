@@ -47,7 +47,7 @@ const Home = () => {
   };
 
   const handleButtonClick = () => {
-    navigate('/new-route'); // Replace '/new-route' with your actual route path
+    navigate('/map'); // Replace '/new-route' with your actual route path
   };
 
   return (

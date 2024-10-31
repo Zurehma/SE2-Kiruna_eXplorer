@@ -9,6 +9,7 @@ import NavigationBar from './components/NavigationBar';
 import { Login } from './components/Login';
 import Documents from './components/Documents';
 import { Map2 } from './components/Map2';
+import Home from './components/Home';
 
 function App() {
     const [error, setError] = useState(null);
@@ -36,9 +37,10 @@ function App() {
                     </Alert>
                 )}
                 <Routes>
-                    <Route path="/" element={<Map2 setError={setError} />} />
+                    <Route path="/" element={<Home/>} />
                     <Route path="/login" element={<Login setLoggedIn={setLoggedIn} setCurrentUser={setCurrentUser} />} />
                     <Route path="/doc" element={<Documents />} />
+                    <Route path='/map' element={<Map2 setError={setError} />} />
                 </Routes>
             </div>
         </div>
