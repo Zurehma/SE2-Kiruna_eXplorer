@@ -119,4 +119,34 @@ export const isScaleType = (scale) => {
   return Object.values(SCALE_TYPES).find((SCALE_TYPE) => SCALE_TYPE.toLowerCase().trim() === scale.toLowerCase().trim());
 };
 
+/**
+ * Link type enum
+ */
+const LINK_TYPES = {
+  DIRECT: "Direct",
+  COLLATERAL: "Collateral",
+  PROJECTION: "Projection",
+  UPDATE: "Update",
+};
+
+/**
+ * Get the link type values
+ */
+export const getLinkTypes = () => {
+  return Object.values(LINK_TYPES);
+}
+
+/**
+ * Check if the input type is a valid link type
+ * @param {String} link
+ * @returns {String | undefined} The link type if it founds a match otherwise undefined
+ */
+export const isLinkType = (link) => {
+  if (typeof link !== "string") {
+    return undefined;
+  }
+
+  return Object.values(LINK_TYPES).find((LINK_TYPE) => LINK_TYPE.toLowerCase().trim() === link.toLowerCase().trim());
+};
+
 export default Document;
