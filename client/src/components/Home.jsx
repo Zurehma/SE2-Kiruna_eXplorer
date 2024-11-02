@@ -14,19 +14,19 @@ const Home = () => {
       id: 1,
       src: '../public/kirunaSinking.jpg',
       description: 'The town of Kiruna in the Swedish Arctic is sinking...',
-      style: { width: '130px', height: '130px', left: '20%', top: '60%' },
+      style: { width: '130px', height: '130px', left: '15%', top: '60%' },
     },
     {
       id: 2,
       src: '../public/New_Kiruna_01.jpg',
       description: 'Transportation issues in Kiruna stem from its ongoing relocation...',
-      style: { width: '160px', height: '160px', left: '45%', top: '60%' },
+      style: { width: '160px', height: '160px', left: '30%', top: '60%' },
     },
     {
       id: 3,
       src: '../public/swed.jpg',
       description: 'Kiruna is the northernmost city in Sweden...',
-      style: { width: '180px', height: '180px', left: '70%', top: '60%' },
+      style: { width: '180px', height: '180px', left: '45%', top: '60%' },
     },
   ];
   

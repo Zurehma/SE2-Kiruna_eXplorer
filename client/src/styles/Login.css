@@ -1,35 +1,38 @@
+/* Background styling */
 .login-background {
-  background-image: url('../public/kirunalogin.jpg'); 
+  background-image: url('../public/kirunalogin.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   position: fixed;
-  top: 0; 
+  top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 0; 
+  z-index: 0;
+  overflow-y: hidden; /* Prevent scroll on large screens */
 }
 
+/* Login container styling */
 .login-container {
-  background: rgba(255, 255, 255, 0.85); 
+  background: rgba(255, 255, 255, 0.85);
   padding: 40px;
   border-radius: 30px;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
-  max-width: 800px; 
+  max-width: 800px;
   width: 100%;
   text-align: center;
   z-index: 1;
 }
 
-
+/* Responsive typography */
 .login-container h1 {
   font-size: 2rem;
   font-weight: bold;
-  color: #2c3e50; 
+  color: #2c3e50;
 }
 
 .form-label {
@@ -44,7 +47,6 @@
   font-size: 1rem;
   box-shadow: none;
   border: 1px solid #ddd;
-  position: relative;
 }
 
 .form-control:focus {
@@ -73,9 +75,47 @@
   margin-top: 1rem;
 }
 
+/* Adjustments for small screens */
+@media (max-width: 576px) {
+  .login-background {
+    overflow-y: auto; /* Enable scroll on small screens */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    padding: 20px; /* Add padding */
+  }
+
+  .login-container {
+    padding: 20px;
+    margin: auto;
+    width: 90%;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  .login-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .btn-black {
+    font-size: 1rem;
+  }
+
+  .form-label, .form-control {
+    font-size: 0.9rem;
+  }
+}
+
+/* General reset for page layout */
 html, body {
   height: 100%;
-  margin: 0; 
+  margin: 0;
   padding: 0;
-  overflow: auto;
+  overflow: hidden; /* Prevent scroll on large screens */
+}
+
+/* Scroll activation for small screens */
+@media (max-width: 576px) {
+  html, body {
+    overflow: auto; /* Allow scroll only on smaller screens */
+  }
 }
