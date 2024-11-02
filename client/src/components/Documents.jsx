@@ -8,15 +8,20 @@ import Document from '../document.mjs';
 function Documents() { 
   // const [types, setTypes] = useState([]);
   // const [scale, setScale] = useState([]);
+
+
+  //****per test 
   const [scale, setScale] = useState([
     { id: 'text', name: 'Text' },
     { id: 'blueprints/effects', name: 'Blueprints/Effects' },
     { id: '1:n', name: 'Ratio 1:n' }
   ]);
-  
   const [types, setTypes] = useState([
     { id: 'informative', name: 'Informative' }
   ]);
+  //****per test 
+
+
   const [error, setError] = useState(null); 
   const [showNField, setShowNField] = useState(false);
   const [nValue, setNValue] = useState('');
@@ -25,6 +30,7 @@ function Documents() {
     title: '',
     stakeholders: '',
     scale: '',
+    nValue: '',
     issuanceDate: '',
     type: '',
     connections: '',
@@ -38,12 +44,10 @@ function Documents() {
   useEffect(() => {
     const fetchTypes = async () => {
       try {
-        const response = await API.getTypeDocuments();
-        setTypes(response.data);
-        const response2 = await API.getTypeScale();
-        setScale(response2.data);
-        setScale('Text', 'blueprints/effects', 'Ratio 1:n' );
-        setTypes('Informative');
+        // const response = await API.getTypeDocuments();
+        // setTypes(response.data);
+        // const response2 = await API.getTypeScale();
+        // setScale(response2.data);
      } catch (error) {
         console.error("Errore nel recupero dei tipi di documenti:", error);
       }
@@ -84,11 +88,6 @@ function Documents() {
     }
   };
 
-  const handleNChange = (e) => {
-    setNValue(e.target.value);
-    // Puoi aggiungere un handler per aggiornare lo stato di `document` se serve
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setDocument((prevDocument) => ({
@@ -118,6 +117,9 @@ function Documents() {
         <Card.Body>
           <Card.Title className="mb-4 text-center">ADD NEW DOCUMENT</Card.Title>
           <Form onSubmit={handleSubmit}>
+
+        {/* PRIMA RIGA */}
+
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group controlId="title">
@@ -149,6 +151,8 @@ function Documents() {
               </Col>
             </Row>
 
+        {/* SECONDA RIGA */}
+
              <Row className="mb-3">
               <Col md={6}>
                 <Form.Group controlId="scale">
@@ -171,14 +175,14 @@ function Documents() {
               </Col>
 
               {showNField && (
-                <Col md={3}>
+                <Col md={6}>
                   <Form.Group controlId="nValue">
                     <Form.Label>Value of n</Form.Label>
                     <Form.Control 
                       type="number" 
                       name="nValue" 
-                      value={nValue} 
-                      onChange={handleNChange} 
+                      value={document.nValue} 
+                      onChange={handleChange} 
                       placeholder="Enter n"
                       className="input"
                     />
@@ -186,24 +190,9 @@ function Documents() {
                 </Col>
               )}
 
-              <Col md={6}>
-                <Form.Group controlId="issuanceDate">
-                  <Form.Label>Issuance Date</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    name="issuanceDate" 
-                    value={document.issuanceDate} 
-                    onChange={handleDateChange} 
-                    placeholder="e.g., 2007"
-                    className="input" 
-                    isInvalid={!!error} // Aggiunge il feedback visivo per errore
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {error}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
             </Row>
+            
+        {/* TERZA RIGA */}
 
             <Row className="mb-3">
               <Col md={6}>
@@ -225,11 +214,28 @@ function Documents() {
                 </Form.Select>
                 </Form.Group>
               </Col>
-              <Col md={6}>
-           
 
-              </Col>
+              <Col md={6}>
+                <Form.Group controlId="issuanceDate">
+                  <Form.Label>Issuance Date</Form.Label>
+                  <Form.Control 
+                    type="text" 
+                    name="issuanceDate" 
+                    value={document.issuanceDate} 
+                    onChange={handleDateChange} 
+                    placeholder="e.g., 2007"
+                    className="input" 
+                    isInvalid={!!error} // Aggiunge il feedback visivo per errore
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {error}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>           
+
             </Row>
+
+        {/* QUARTA RIGA */}
 
             <Row className="mb-3">
               <Col md={6}>
@@ -260,6 +266,39 @@ function Documents() {
               </Col>
             </Row>
 
+        {/* QUINTA RIGA */}
+
+        <Row className="mb-3">
+          <Col md={6}>
+            <Form.Group controlId="latitude">
+              <Form.Label>Latitude</Form.Label>
+              <Form.Control 
+                type="text" 
+                name="latitude" 
+                value={document.latitude} 
+                onChange={handleChange} 
+                placeholder="e.g., 59.3293"
+                className="input" 
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            <Form.Group controlId="longitude">
+              <Form.Label>Longitude</Form.Label>
+              <Form.Control 
+                type="text" 
+                name="longitude" 
+                value={document.longitude} 
+                onChange={handleChange} 
+                placeholder="e.g., 18.0686"
+                className="input" 
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+
+        {/* SESTA RIGA */}
+
             <Form.Group controlId="description" className="mb-4">
             <Form.Label>Description</Form.Label>
             <Form.Control 
@@ -289,3 +328,8 @@ function Documents() {
 }
 
 export default Documents;
+
+
+
+
+
