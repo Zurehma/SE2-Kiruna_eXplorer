@@ -1,16 +1,17 @@
 /* Navbar Styling */
 .custom-navbar {
-  position: sticky;
+  position: fixed; /* Fixed positioning to keep it at the top */
   top: 0;
   width: 100%;
-  z-index: 2;
+  z-index: 1000; /* High z-index to keep it above other elements */
   background-color: #343a40; /* Dark background color */
+  padding: 0.5rem 1rem; /* Add padding for a balanced look */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for visual separation */
 }
 
-/* Add space at the top of the content */
+/* Main content wrapper */
 .main-content {
-  padding-top: 70px; /* Adjust based on Navbar height */
-  /* Optional: Add padding to the sides if needed */
+  padding-top: 70px; /* Adjust based on navbar height to avoid overlap */
   padding-left: 15px;
   padding-right: 15px;
 }
