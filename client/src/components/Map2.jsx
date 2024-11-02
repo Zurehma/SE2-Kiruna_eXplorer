@@ -18,8 +18,8 @@ const icon = new L.Icon({
     popupAnchor: [1, -34],
 });
 
-// Sample data with latitude and longitude fields
-
+// Sample data with latitude and longitude fields, used when the API was not ready yet for development
+/*
 const data = [
     {
         type : "Action",
@@ -55,6 +55,7 @@ const data = [
         longitude: null
     }
 ];
+*/
 
 function getRandomOffset() {
     const offset = 0.002; // Adjusted for visible spread
@@ -66,7 +67,7 @@ function getRandomOffset() {
 
 function Map2(props) {
     const cornerPosition = [67.834, 20.135]; // Corner position
-    const [data2,setData] = useState(null);
+    const [data,setData] = useState([]);
     const [loading,setLoading] = useState(false)
 
     //useEffect to call, at every rendering, API.getDocuments and fill the data State
@@ -78,34 +79,36 @@ function Map2(props) {
             setData(documents);
           } catch (error) {
             props.setError(error);
+          }finally{
+            setLoading(false)
+            console.log(data)
           }
         };
         fetchData();
-        setLoading(false)
-        console.log(data2)
     }, []); 
     
     return (
         <>
             {loading && (<p>Loading...</p>)}
+            {!loading && 
             <MapContainer center={[67.850, 20.217]} zoom={13} style={{ height: '100vh', width: '100%' }}>
                 <TileLayer
                     url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg"
                     attribution='&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
-                {data.map((item, index) => {
-                    const position = item.latitude !== null && item.longitude !== null 
+                {data && data.map((item) => {
+                    const position = item.latitude !== null && item.longitude !== null && item.latitude !== undefined && item.longitude !== undefined
                         ? [item.latitude, item.longitude] 
                         : [cornerPosition[0] + getRandomOffset()[0], cornerPosition[1] + getRandomOffset()[1]];
                     return (
-                        <Marker key={index} position={position} icon={icon}>
+                        <Marker key={item.id} position={position} icon={icon}>
                             <Popup maxWidth={600}>
                                 <MyPopup doc={item} />
                             </Popup>
                         </Marker>
                     );
                 })}
-            </MapContainer>
+            </MapContainer>}
         </>
     );
 }
