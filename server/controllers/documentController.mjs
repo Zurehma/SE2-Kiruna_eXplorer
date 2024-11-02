@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
-import { isDocumentType } from "../models/document.mjs";
+import { getDocumentTypes, getScaleTypes, isDocumentType, isScaleType } from "../models/document.mjs";
 
 class DocumentController {
   constructor() {
@@ -28,11 +28,26 @@ class DocumentController {
    * @param {String} language
    * @param {String} description
    * @param {Number | null} pages
+   * @param {Number | null} pages
+   * @param {Number | null} pages
    * @param {String | null} lat
    * @param {String | null} long
    * @returns {Promise<Document>} A promise that resolves to the newly created object
    */
-  addDocument = (title, stakeholder, scale, issuanceDate, type, language, description, pages = null, lat = null, long = null) => {
+  addDocument = (
+    title,
+    stakeholder,
+    scale,
+    issuanceDate,
+    type,
+    description,
+    language = null,
+    pages = null,
+    pageFrom = null,
+    pageTo = null,
+    lat = null,
+    long = null
+  ) => {
     return new Promise(async (resolve, reject) => {
       try {
         if (dayjs().isBefore(issuanceDate)) {
@@ -47,15 +62,34 @@ class DocumentController {
           throw error;
         }
 
+        const scaleType = isScaleType(scale);
+
+        if (scaleType === undefined) {
+          const error = { errCode: 400, errMessage: "Scale type error!" };
+          throw error;
+        }
+
+        let processedPages = pages;
+        let processedPageFrom = null;
+        let processedPageTo = null;
+
+        if (pageFrom && pageTo) {
+          pageFrom <= pageTo ? (processedPageFrom = pageFrom) : (processedPageFrom = pageTo);
+          pageFrom <= pageTo ? (processedPageTo = pageTo) : (processedPageTo = pageFrom);
+          processedPages = processedPageTo - processedPageFrom;
+        }
+
         const result = await this.documentDAO.addDocument(
           title,
           stakeholder,
-          scale,
+          scaleType,
           issuanceDate,
           documentType,
-          language,
           description,
-          pages,
+          language,
+          processedPages,
+          processedPageFrom,
+          processedPageTo,
           lat,
           long
         );
@@ -74,10 +108,13 @@ class DocumentController {
     });
   };
 
-  addLink = (id1,id2,type) => {
-    return new Promise(async(resolve, reject) => {
-      try {
+  getDocumentTypes = () => getDocumentTypes();
 
+  getScaleTypes = () => getScaleTypes();
+
+  addLink = (id1, id2, type) => {
+    return new Promise(async (resolve, reject) => {
+      try {
         if (id1 === id2) {
           const error = { errCode: 400, errMessage: "Document cannot be linked to itself!" };
           throw error;
@@ -96,14 +133,12 @@ class DocumentController {
           const error = {};
           throw error;
         }
-        resolve(id1,id2,type);
-      }
-      catch (err) {
+        resolve(id1, id2, type);
+      } catch (err) {
         reject(err);
-      } 
+      }
     });
   };
-
 }
 
 export default DocumentController;

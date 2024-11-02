@@ -1,52 +1,5 @@
 # SE2-Kiruna_eXplorer
 
-## User APIs
-
-#### POST `api/sessions/login`
-
-- Performs user login with username and password
-
-#### DELETE `api/sessions/logout`
-
-- Logs out the user
-
-#### GET `api/sessions/current`
-
-- Returns information of the logged in user
-- Example:
-  ```json
-  {
-    "id": 1,
-    "name": "John",
-    "surname": "Doe",
-    "username": "johndoe",
-    "role": "Urban Planner"
-  }
-  ```
-
-## Document APIs
-
-#### GET `api/document`
-
-- Return all the documents in the document table
-- Example:
-  ````json
-  [
-    {
-        "id": 2,
-        "title": "Compilation of responses “So what the people of Kiruna think?”",
-        "stakeholder": "Kiruna kommun/Residents",
-        "scale": "Text",
-        "issuaceDate": "2007",
-        "type": "Informative document",
-        "connections": 3,
-        "language": "Swedish",
-        "pages": 1,
-        "description": "This document is a compilation of the responses to the survey"
-    }
-  ]
-  ````
-
 ## Database Tables
 
 ### Table `User`

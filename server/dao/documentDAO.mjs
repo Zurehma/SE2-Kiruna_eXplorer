@@ -15,6 +15,8 @@ const mapRowsToDocument = (rows) => {
         row.language,
         row.description,
         row.pages || null,
+        row.pageFrom || null,
+        row.pageTo || null,
         row.lat || null,
         row.long || null
       )
@@ -67,16 +69,31 @@ class DocumentDAO {
    * @param {String} language
    * @param {String} description
    * @param {Number | null} pages
+   * @param {Number | null} pageFrom
+   * @param {Number | null} pageTo
    * @param {String | null} lat
    * @param {String | null} long
    * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the last document inserted and the number of lines changed
    */
-  addDocument = (title, stakeholder, scale, issuanceDate, type, language, description, pages = null, lat = null, long = null) => {
+  addDocument = (
+    title,
+    stakeholder,
+    scale,
+    issuanceDate,
+    type,
+    description,
+    language = null,
+    pages = null,
+    pageFrom = null,
+    pageTo = null,
+    lat = null,
+    long = null
+  ) => {
     return new Promise((resolve, reject) => {
       const query =
-        "INSERT INTO DOCUMENT (title, stakeholder, scale, issuanceDate, type, connections, language, description, pages, lat, long) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO DOCUMENT (title, stakeholder, scale, issuanceDate, type, connections, language, description, pages, pageFrom, pageTo, lat, long) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-      db.run(query, [title, stakeholder, scale, issuanceDate, type, 0, language, description, pages, lat, long], function (err) {
+      db.run(query, [title, stakeholder, scale, issuanceDate, type, 0, language, description, pages, pageFrom, pageTo, lat, long], function (err) {
         if (err) {
           reject(err);
         } else {
@@ -86,7 +103,7 @@ class DocumentDAO {
     });
   };
 
-  addLink = (id1,id2,type) => {
+  addLink = (id1, id2, type) => {
     return new Promise((resolve, reject) => {
       //Check if the link already exists in either direction
       const query1 = "SELECT * FROM LINK WHERE docID1=? AND docID2=? OR docID1=? AND docID2=?";
@@ -107,7 +124,6 @@ class DocumentDAO {
             }
           });
         }
-
       });
     });
   };

@@ -60,6 +60,38 @@ Returns the list of all documents.
 - Access Constraints: _None_
 - Additional Constraints: _None_
 
+#### GET `api/documents/document-types`
+
+Returns the list of all document types.
+
+- Request Parameters: _None_
+- Request Body Content: _None_
+- Response Body Content: An array of strings.
+- Example:
+
+```json
+["Informative", "Prescriptive", "Material", "Design", "Technical"]
+```
+
+- Access Constraints: Can only be called by a logged in user.
+- Additional Constraints: _None_
+
+#### GET `api/documents/scale-types`
+
+Returns the list of all specific scale types.
+
+- Request Parameters: _None_
+- Request Body Content: _None_
+- Response Body Content: An array of strings.
+- Example:
+
+```json
+["Blueprint/effects", "Text"]
+```
+
+- Access Constraints: Can only be called by a logged in user.
+- Additional Constraints: _None_
+
 #### POST `api/documents`
 
 Add a new document with the provided information.
@@ -68,11 +100,13 @@ Add a new document with the provided information.
 - Request Body Content: An object with the following parameters:
   - `title`: a string that must not be empty.
   - `stakeholder`: a string that must not be empty.
-  - `scale`: an integer that must be greater than 0. It represent the relationship between the dimensions drawn on a plan or
-    architectural drawing and the actual dimensions of the building.
+  - `scale`: an integer that must be greater than 0 or a specific value between: [`Blueprint/effects`, `Text`]. It has to be sent as string value. It represent the relationship between the dimensions drawn on a plan or architectural drawing and the actual dimensions of the building.
   - `issuanceDate`: a string that represent the date. It must be in the format _YYYY-MM-DD_.
+  - `type`: a string that represent the type. Can be a value between: [`Informative`, `Prescriptive`, `Material`, `Design`, `Technical`].
   - `language`: a string that must not be empty.
-  - `page`: an integer that must be greater than 0.
+  - `pages`: an integer that must be greater than 0. If `pageFrom` and `pageTo` are present, this parameter is ignored and computed as the difference between `pageTo` and `pageFrom`.
+  - `pageFrom`: an integer that must be greater than 0.
+  - `pageTo`: an integer that must be greater than 0.
   - `description`: a string that must not be empty. It represent a brief description of the document.
 - Response Body Content: The newly created **Document** object.
 - Example:
@@ -86,7 +120,9 @@ Add a new document with the provided information.
     "issuanceDate": "2024-10-28",
     "connections": 0,
     "language": "english",
-    "page": 2,
+    "pages": 20,
+    "pageFrom": 12,
+    "pageTo": 32,
     "description": "Lore ipsum..."
   }
   ```
