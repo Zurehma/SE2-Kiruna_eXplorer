@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
-import { isDocumentType } from "../models/document.mjs";
+import { getDocumentTypes, getScaleTypes, isDocumentType, isScaleType } from "../models/document.mjs";
 
 class DocumentController {
   constructor() {
@@ -40,8 +40,8 @@ class DocumentController {
     scale,
     issuanceDate,
     type,
-    language,
     description,
+    language = null,
     pages = null,
     pageFrom = null,
     pageTo = null,
@@ -62,6 +62,13 @@ class DocumentController {
           throw error;
         }
 
+        const scaleType = isScaleType(scale);
+
+        if (scaleType === undefined) {
+          const error = { errCode: 400, errMessage: "Scale type error!" };
+          throw error;
+        }
+
         let processedPages = pages;
         let processedPageFrom = null;
         let processedPageTo = null;
@@ -75,11 +82,11 @@ class DocumentController {
         const result = await this.documentDAO.addDocument(
           title,
           stakeholder,
-          scale,
+          scaleType,
           issuanceDate,
           documentType,
-          language,
           description,
+          language,
           processedPages,
           processedPageFrom,
           processedPageTo,
@@ -100,6 +107,10 @@ class DocumentController {
       }
     });
   };
+
+  getDocumentTypes = () => getDocumentTypes();
+
+  getScaleTypes = () => getScaleTypes();
 
   addLink = (id1, id2, type) => {
     return new Promise(async (resolve, reject) => {

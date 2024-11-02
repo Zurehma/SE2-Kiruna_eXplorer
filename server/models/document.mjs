@@ -58,6 +58,17 @@ class Document {
 const DOCUMENT_TYPES = {
   INFORMATIVE: "Informative",
   PRESCRIPTIVE: "Prescriptive",
+  MATERIAL: "Material",
+  DESIGN: "Design",
+  TECHNICAL: "Technical",
+};
+
+/**
+ * Get the document type values
+ * @returns {Array<String>} An array of document type values
+ */
+export const getDocumentTypes = () => {
+  return Object.values(DOCUMENT_TYPES);
 };
 
 /**
@@ -71,6 +82,41 @@ export const isDocumentType = (type) => {
   }
 
   return Object.values(DOCUMENT_TYPES).find((DOCUMENT_TYPE) => DOCUMENT_TYPE.toLowerCase().trim() === type.toLowerCase().trim());
+};
+
+/**
+ * Scale type enum
+ */
+const SCALE_TYPES = {
+  BLUEPRINT_EFFECTS: "Blueprint/effects",
+  TEXT: "Text",
+};
+
+/**
+ * Get the document type values
+ * @returns {Array<String>} An array of scale type values
+ */
+export const getScaleTypes = () => {
+  return Object.values(SCALE_TYPES);
+};
+
+/**
+ * Check if the input type is a valid scale type
+ * @param {String} scale
+ * @returns {String | undefined} The scale type if it founds a match otherwise undefined
+ */
+export const isScaleType = (scale) => {
+  if (typeof scale !== "string") {
+    return undefined;
+  }
+
+  const numberScale = Number(scale);
+
+  if (numberScale != undefined) {
+    return scale;
+  }
+
+  return Object.values(SCALE_TYPES).find((SCALE_TYPE) => SCALE_TYPE.toLowerCase().trim() === scale.toLowerCase().trim());
 };
 
 export default Document;

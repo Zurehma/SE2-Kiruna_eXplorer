@@ -24,14 +24,13 @@ class DocumentRoutes {
 
     this.router.post(
       "/",
-      Utility.isLoggedIn,
       body("title").isString().notEmpty(),
       body("stakeholder").isString().notEmpty(),
       body("scale").isString().notEmpty(),
       body("issuanceDate").isISO8601({ strict: true }),
       body("type").isString().notEmpty(),
-      body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
+      body("language").optional().isString().notEmpty(),
       oneOf([body("pages").optional().isInt({ gt: 0 }), [body("pageFrom").isInt({ gt: 0 }), body("pageTo").isInt({ gt: 0 })]]),
       Utility.validateRequest,
       (req, res, next) => {
@@ -42,8 +41,8 @@ class DocumentRoutes {
             req.body.scale,
             req.body.issuanceDate,
             req.body.type,
-            req.body.language,
             req.body.description,
+            req.body.language || null,
             req.body.pages || null,
             req.body.pageFrom || null,
             req.body.pageTo || null,
@@ -56,6 +55,10 @@ class DocumentRoutes {
           .catch((err) => next(err));
       }
     );
+
+    this.router.get("/document-types", Utility.isLoggedIn, (req, res, next) => res.status(200).json(this.documentController.getDocumentTypes()));
+
+    this.router.get("/scale-types", Utility.isLoggedIn, (req, res, next) => res.status(200).json(this.documentController.getScaleTypes()));
 
     this.router.post(
       "/:id/link",
