@@ -3,7 +3,7 @@ import { Form, Button, Container, Card, Row, Col } from 'react-bootstrap';
 import '../styles/Documents.css';
 import { useNavigate } from 'react-router-dom';
 import API from '../../API.js';
-import Document from '../document.mjs';
+
 
 function Documents() { 
   // const [types, setTypes] = useState([]);
@@ -112,11 +112,11 @@ function Documents() {
 
   return (
     <div className="documents-background">
-    <Container className="my-5">
-      <Card className="p-4 shadow-sm">
-        <Card.Body>
-          <Card.Title className="mb-4 text-center">ADD NEW DOCUMENT</Card.Title>
-          <Form onSubmit={handleSubmit}>
+      <Container className="d-flex align-items-center justify-content-center min-vh-100">
+        <Card className="p-4 shadow-lg w-100" style={{ maxWidth: '700px' }}>
+          <Card.Body>
+            <Card.Title className="mb-4 text-center">ADD NEW DOCUMENT</Card.Title>
+            <Form onSubmit={handleSubmit}>
 
         {/* PRIMA RIGA */}
 
@@ -314,11 +314,9 @@ function Documents() {
             </Form.Group>
 
 
-            <div className="text-center">
-              <Button variant="primary" type="submit">
-                Save Document
-              </Button>
-            </div>
+            <div className="text-center mt-4">
+                <Button variant="primary" type="submit" className="btn-save">Save Document</Button>
+              </div>
           </Form>
         </Card.Body>
       </Card>

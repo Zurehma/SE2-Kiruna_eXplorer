@@ -20,7 +20,8 @@
   top: 56px; /* Altezza stimata della navbar */
   width: 100vw;
   height: calc(100vh - 56px); /* Altezza dello schermo meno la navbar */
-  overflow: hidden;
+  overflow-y: auto; /* Permette lo scorrimento verticale */
+  padding-bottom: 1rem; /* Spazio per il contenuto */
 }
 
 /* Stile della mappa interna */

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Card, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import API from '../../API.js';
+import '../styles/Links.css';
+
 
 function Links(props) {
   // const [documents, setDocuments] = useState([]); // Default to empty array
@@ -86,14 +88,15 @@ function Links(props) {
   const handleClose = () => navigate('/');
 
   return (
-    <Container className="my-5">
-      <Card className="p-4 shadow-sm">
-        <Card.Body>
-          <Card.Title className="mb-4 text-center">Save Links</Card.Title>
+    <div className="links-background">
+      <Container className="d-flex align-items-center justify-content-center min-vh-100">
+        <Card className="p-4 shadow-sm">
+          <Card.Body>
+          <Card.Title className="links-card-title">ADD NEW LINK</Card.Title>
           <Form>
-            <Form.Group controlId="document1" className="mb-3">
-              <Form.Label>Document 1</Form.Label>
-              <Form.Select 
+          <Form.Group controlId="document1" className="links-form-group">
+          <Form.Label className="links-form-label">Document 1</Form.Label>
+          <Form.Select 
                 name="document1" 
                 value={linkData.document1} 
                 onChange={handleChange}
@@ -105,9 +108,9 @@ function Links(props) {
               </Form.Select>
             </Form.Group>
 
-            <Form.Group controlId="document2" className="mb-3">
-              <Form.Label>Document 2</Form.Label>
-              <Form.Select 
+            <Form.Group controlId="document2" className="links-form-group">
+              <Form.Label className="links-form-label">Document 2</Form.Label>
+              <Form.Select
                 name="document2" 
                 value={linkData.document2} 
                 onChange={handleChange}
@@ -119,9 +122,9 @@ function Links(props) {
               </Form.Select>
             </Form.Group>
 
-            <Form.Group controlId="linkType" className="mb-3">
-              <Form.Label>Link Type</Form.Label>
-              <Form.Select 
+            <Form.Group controlId="linkType" className="links-form-group">
+              <Form.Label className="links-form-label">Link Type</Form.Label>
+              <Form.Select
                 name="linkType" 
                 value={linkData.linkType} 
                 onChange={handleChange}
@@ -133,20 +136,21 @@ function Links(props) {
               </Form.Select>
             </Form.Group>
 
-            <div className="text-center">
-              <Button variant="primary" onClick={handleSaveLinks}>
-                Save Links
-              </Button>
+            <div className="text-center mt-4">
+                <Button variant="primary" onClick={handleSaveLinks} className="btn-save">Save Link</Button>
             </div>
+
           </Form>
         </Card.Body>
       </Card>
 
       <Modal show={showModal} onHide={handleClose} centered>
         <Modal.Header closeButton>
-          <Modal.Title>{saveStatus === 'Completed' ? 'Success' : 'Error'}</Modal.Title>
+          <Modal.Title className="links-modal-title">
+            {saveStatus === 'Completed' ? 'Success' : 'Error'}
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="links-modal-body">
           {saveStatus === 'Completed'
             ? 'Link saved successfully!'
             : 'Failed to save the link.'}
@@ -163,6 +167,7 @@ function Links(props) {
         </Modal.Footer>
       </Modal>
     </Container>
+    </div>
   );
 }
 
