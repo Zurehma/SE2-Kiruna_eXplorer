@@ -131,6 +131,22 @@ Add a new document with the provided information.
 - Additional Constraints:
   - It should return a 400 error when `issuanceDate` is after the current date.
 
+#### GET `api/documents/link-types`
+Returns the list of all specific scale types.
+
+- Request Parameters: _None_
+- Request Body Content: _None_
+- Response Body Content: An array of strings.
+- Example:
+
+```json
+["Direct", "Collateral", "Projection", "Update"]
+```
+
+- Access Constraints: Can only be called by a logged in user.
+- Additional Constraints: _None_
+
+
 #### POST `api/documents/:id/link`
 
 - Request Parameters: `id` - ID of the first document (document being linked from...).

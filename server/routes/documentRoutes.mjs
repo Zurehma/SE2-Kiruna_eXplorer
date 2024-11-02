@@ -33,6 +33,7 @@ class DocumentRoutes {
       body("language").optional().isString().notEmpty(),
       oneOf([body("pages").optional().isInt({ gt: 0 }), [body("pageFrom").isInt({ gt: 0 }), body("pageTo").isInt({ gt: 0 })]]),
       Utility.validateRequest,
+      Utility.isLoggedIn,
       (req, res, next) => {
         this.documentController
           .addDocument(
@@ -59,6 +60,8 @@ class DocumentRoutes {
     this.router.get("/document-types", Utility.isLoggedIn, (req, res, next) => res.status(200).json(this.documentController.getDocumentTypes()));
 
     this.router.get("/scale-types", Utility.isLoggedIn, (req, res, next) => res.status(200).json(this.documentController.getScaleTypes()));
+
+    this.router.get("/link-types", Utility.isLoggedIn, (req, res, next) => res.status(200).json(this.documentController.getLinkTypes()));
 
     this.router.post(
       "/:id/link",

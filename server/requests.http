@@ -71,3 +71,6 @@ Content-Type: application/json
     "id2" : 3,
     "type" : "Direct"
 }
+
+### Get link types
+GET http://localhost:3001/api/documents/link-types HTTP/1.1
