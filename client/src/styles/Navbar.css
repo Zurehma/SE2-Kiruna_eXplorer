@@ -1,21 +1,35 @@
+/* Navbar Styling */
+.custom-navbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 2;
+  background-color: #343a40; /* Dark background color */
+}
 
-.navbar {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 2; 
-  }
-  
-  .container {
-    margin-top: 70px; /* Adjust based on the Navbar height */
-  }
-  
-  /* Add padding to the brand and navigation links */
+/* Add space at the top of the content */
+.main-content {
+  padding-top: 70px; /* Adjust based on Navbar height */
+  /* Optional: Add padding to the sides if needed */
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Navbar brand and icon styling */
 .navbar-brand {
-  padding-left: 20px; /* Adjust left padding for Kiruna */
-  cursor:pointer;
+  padding-left: 20px;
+  cursor: pointer;
 }
 
 .navbar-nav .nav-link {
-  padding-right: 40px; /* Adjust right padding for login/logout links */
+  padding-right: 40px;
+}
+
+.my-arrow-dropdown {
+  color: #ffffff;
+}
+
+.my-icons {
+  color: #ffffff;
+  font-size: 1.2em;
 }

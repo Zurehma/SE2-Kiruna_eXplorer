@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Navbar, Nav } from 'react-bootstrap';
+import { Navbar, Nav, Dropdown } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Navbar.css';
 
@@ -11,22 +11,12 @@ const NavigationBar = ({ setLoggedIn, loggedIn, setCurrentUser, currentUser }) =
   const handleLogout = async () => {
     try {
       await fetch('http://localhost:3001/api/sessions/logout', { method: 'DELETE' });
-      setLoggedIn(false); // Update loggedIn state in your app
-      setCurrentUser(''); // Clear the current user
-      navigate('/login'); // Redirect to login page after logout
+      setLoggedIn(false);
+      setCurrentUser('');
+      navigate('/login');
     } catch (error) {
       console.error('Logout failed', error);
     }
-  };
-
-  const handleNavigation = () => {
-    // Navigate to Home if on Login page, or Login if on Home page
-    if (location.pathname === '/login') {
-      navigate('/');
-    } else {
-      navigate('/login');
-    }
-    setShowNavbar(false); // Close the navbar on navigation
   };
 
   const handleToggle = () => {
@@ -34,25 +24,39 @@ const NavigationBar = ({ setLoggedIn, loggedIn, setCurrentUser, currentUser }) =
   };
 
   return (
-    <Navbar variant="dark" expand="lg" className="bg-dark fixed-top">
-      <Navbar.Brand onClick={() => navigate('/')}>
-        Kiruna
+    <Navbar variant="dark" expand="lg" className="custom-navbar">
+      <Navbar.Brand onClick={() => navigate('/')} className="navbar-brand">
+        <i className="bi bi-envelope ms-2 me-2 text-white"></i> Kiruna
       </Navbar.Brand>
-
-      {/* Toggle button for smaller screens */}
       <Navbar.Toggle aria-controls="navbar-content" onClick={handleToggle} />
 
       <Navbar.Collapse in={showNavbar} id="navbar-content">
         <Nav className="ms-auto">
           {loggedIn ? (
-            <>
-              <Nav.Link disabled>{currentUser}</Nav.Link> {/* Display username */}
-              <Nav.Link onClick={handleLogout}>
-                <span><i className="bi bi-box-arrow-left me-2"></i> Logout</span>
-              </Nav.Link>
-            </>
+            <div className="d-flex align-items-center">
+              <i className="bi bi-person-circle text-white me-2 my-icons"></i>
+              <h5 className="text-white mt-1">Welcome, {currentUser}</h5>
+              <Dropdown>
+                <Dropdown.Toggle
+                  variant="link"
+                  id="dropdown-custom-navbar"
+                  className="my-arrow-dropdown"
+                ></Dropdown.Toggle>
+                <Dropdown.Menu className="dropdown-menu-end me-2">
+                  {location.pathname !== '/' && (
+                    <Dropdown.Item onClick={() => navigate('/')}>
+                      <i className="bi bi-house-door"></i> Home
+                    </Dropdown.Item>
+                  )}
+                  <Dropdown.Divider />
+                  <Dropdown.Item onClick={handleLogout} className="text-danger">
+                    <i className="bi bi-box-arrow-right"></i> Logout
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
           ) : (
-            <Nav.Link onClick={handleNavigation}>
+            <Nav.Link onClick={() => navigate(location.pathname === '/login' ? '/' : '/login')}>
               {location.pathname === '/login' ? (
                 <span><i className="bi bi-house-door me-2"></i> Home</span>
               ) : (
