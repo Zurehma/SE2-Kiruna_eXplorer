@@ -11,14 +11,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow-y: auto; /* Abilita lo scroll solo quando necessario */
+  overflow-y: auto; 
 }
 
 body, html {
-  overflow-y: auto; /* Permette lo scorrimento verticale */
+  overflow-y: auto; 
   height: 100%;
   margin: 0;
-  padding: 0; /* Rimuove padding indesiderati per uno scroll più fluido */
+  padding: 0; 
 }
 
 .card {

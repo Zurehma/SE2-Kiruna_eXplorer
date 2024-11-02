@@ -6,22 +6,8 @@ import API from '../../API.js';
 
 
 function Documents() { 
-  // const [types, setTypes] = useState([]);
-  // const [scale, setScale] = useState([]);
-
-
-  //****per test 
-  const [scale, setScale] = useState([
-    { id: 'text', name: 'Text' },
-    { id: 'blueprints/effects', name: 'Blueprints/Effects' },
-    { id: '1:n', name: 'Ratio 1:n' }
-  ]);
-  const [types, setTypes] = useState([
-    { id: 'informative', name: 'Informative' }
-  ]);
-  //****per test 
-
-
+  const [types, setTypes] = useState([]);
+  const [scale, setScale] = useState([]);
   const [error, setError] = useState(null); 
   const [showNField, setShowNField] = useState(false);
   const [nValue, setNValue] = useState('');
@@ -44,10 +30,10 @@ function Documents() {
   useEffect(() => {
     const fetchTypes = async () => {
       try {
-        // const response = await API.getTypeDocuments();
-        // setTypes(response.data);
-        // const response2 = await API.getTypeScale();
-        // setScale(response2.data);
+        const response = await API.getTypeDocuments();
+        setTypes(response.data);
+        const response2 = await API.getTypeScale();
+        setScale(response2.data);
      } catch (error) {
         console.error("Errore nel recupero dei tipi di documenti:", error);
       }
@@ -69,7 +55,7 @@ function Documents() {
     handleChange(e);
 
     if (validateDate(value) || value === "") {
-      setError(""); // Rimuove l'errore se il formato è valido
+      setError(""); 
     } else {
       setError("Invalid date. Use DD/MM/YYYY, MM/YYYY or YYYY.");
     }
@@ -78,13 +64,11 @@ function Documents() {
   const handleScaleChange = (e) => {
     const { value } = e.target;
     handleChange(e);
-
-    // Mostra il campo n solo se la scala selezionata è '1:n'
     if (value === '1:n') {
       setShowNField(true);
     } else {
       setShowNField(false);
-      setNValue(""); // Reset del valore di n se non serve più
+      setNValue(""); 
     }
   };
 
@@ -97,13 +81,12 @@ function Documents() {
   };
 
   const handleSubmit = async () => {
-   // e.preventDefault();
+    e.preventDefault();
     console.log("Document saved:", document);
     
     try {
         const response = await API.saveDocument(document);
         const newId = response.data.id;
-        // Reindirizza alla pagina Links con il nuovo ID
         navigate(`/document/link`);
       } catch (error) {
         console.error("Error saving document:", error);
@@ -117,8 +100,6 @@ function Documents() {
           <Card.Body>
             <Card.Title className="mb-4 text-center">ADD NEW DOCUMENT</Card.Title>
             <Form onSubmit={handleSubmit}>
-
-        {/* PRIMA RIGA */}
 
             <Row className="mb-3">
               <Col md={6}>
@@ -150,8 +131,6 @@ function Documents() {
                 </Form.Group>
               </Col>
             </Row>
-
-        {/* SECONDA RIGA */}
 
              <Row className="mb-3">
               <Col md={6}>
@@ -192,8 +171,6 @@ function Documents() {
 
             </Row>
             
-        {/* TERZA RIGA */}
-
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group controlId="type">
@@ -235,8 +212,6 @@ function Documents() {
 
             </Row>
 
-        {/* QUARTA RIGA */}
-
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group controlId="language">
@@ -266,38 +241,34 @@ function Documents() {
               </Col>
             </Row>
 
-        {/* QUINTA RIGA */}
-
-        <Row className="mb-3">
-          <Col md={6}>
-            <Form.Group controlId="latitude">
-              <Form.Label>Latitude</Form.Label>
-              <Form.Control 
-                type="text" 
-                name="latitude" 
-                value={document.latitude} 
-                onChange={handleChange} 
-                placeholder="e.g., 59.3293"
-                className="input" 
-              />
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group controlId="longitude">
-              <Form.Label>Longitude</Form.Label>
-              <Form.Control 
-                type="text" 
-                name="longitude" 
-                value={document.longitude} 
-                onChange={handleChange} 
-                placeholder="e.g., 18.0686"
-                className="input" 
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        {/* SESTA RIGA */}
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group controlId="latitude">
+                  <Form.Label>Latitude</Form.Label>
+                  <Form.Control 
+                    type="text" 
+                    name="latitude" 
+                    value={document.latitude} 
+                    onChange={handleChange} 
+                    placeholder="e.g., 59.3293"
+                    className="input" 
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group controlId="longitude">
+                  <Form.Label>Longitude</Form.Label>
+                  <Form.Control 
+                    type="text" 
+                    name="longitude" 
+                    value={document.longitude} 
+                    onChange={handleChange} 
+                    placeholder="e.g., 18.0686"
+                    className="input" 
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
 
             <Form.Group controlId="description" className="mb-4">
             <Form.Label>Description</Form.Label>
@@ -313,10 +284,9 @@ function Documents() {
             />
             </Form.Group>
 
-
             <div className="text-center mt-4">
                 <Button variant="primary" type="submit" className="btn-save">Save Document</Button>
-              </div>
+            </div>
           </Form>
         </Card.Body>
       </Card>

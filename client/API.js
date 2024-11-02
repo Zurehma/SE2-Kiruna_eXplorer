@@ -1,15 +1,7 @@
 const SERVER_URL = 'http://localhost:3001/api';
 
-//request to GET http://localhost:3001/api/documents to obtain all the documents
-const getDocuments = async () => {
-    return await fetch(SERVER_URL + '/documents').then(handleInvalidResponse)
-    .then(response => response.json());
-  };
-  
-
 /**
- * Utility function to check if an answer from the server is invalid, it is shown how to use it
- * in the getDocuments 
+ * Utility function to check if an answer from the server is invalid.
  */
 function handleInvalidResponse(response) {
     if (!response.ok) { throw Error(response.statusText) }
@@ -20,40 +12,89 @@ function handleInvalidResponse(response) {
     return response;
 }
 
+// Function to get all documents
+const getDocuments = async () => {
+    return await fetch(`${SERVER_URL}/documents`)
+        .then(handleInvalidResponse)
+        .then(response => response.json());
+};
+
+// Function to get types of documents
+const getTypeDocuments = async () => {
+    return await fetch(`${SERVER_URL}/document-types`)
+        .then(handleInvalidResponse)
+        .then(response => response.json());
+};
+
+// Function to get types of scales
+const getTypeScale = async () => {
+    return await fetch(`${SERVER_URL}/scales`)
+        .then(handleInvalidResponse)
+        .then(response => response.json());
+};
+
+// Function to get types of links
+const getTypeLinks = async () => {
+    return await fetch(`${SERVER_URL}/link-types`)
+        .then(handleInvalidResponse)
+        .then(response => response.json());
+};
+
+// Function to save a document
 const saveDocument = async (doc) => {
     try {
-      const response = await fetch(SERVER_URL + '/api/document', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json', },
-        body: JSON.stringify({title: doc.title , stakeholder: doc.stakeholder, scale: doc.scale, issuanceDate: doc.issuanceDate, type: doc.type, connections: doc.connections, language: doc.language, description: doc.description, pages: doc.pages, lat: game.lat, long: doc.long},),
-        credentials: 'include',
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Failed to save document: ${response.statusText}`);
-      }
-  
-      const id_doc = await response.json();
-      return id_doc;
-  
+        const response = await fetch(`${SERVER_URL}/document`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: doc.title,
+                stakeholders: doc.stakeholders,
+                scale: doc.scale,
+                nValue: doc.nValue,
+                issuanceDate: doc.issuanceDate,
+                type: doc.type,
+                connections: doc.connections,
+                language: doc.language,
+                pages: doc.pages,
+                latitude: doc.latitude,
+                longitude: doc.longitude,
+                description: doc.description
+            }),
+            credentials: 'include',
+        });
+        return handleInvalidResponse(response).json();
     } catch (error) {
-      console.error('Error fetching ticket:', error);
-      throw error;
+        console.error("Error saving document:", error);
+        throw error;
     }
-  };
-
-  const getTypeDocuments = async () => {
-    return await fetch(SERVER_URL + '/typedocument').then(handleInvalidResponse)
-    .then(response => response.json());
-  };
-  
-  
-//Export API methods
-const API = {
-    getDocuments,
-    saveDocument,
-    getTypeDocuments,
 };
-  
-export default API;
-  
+
+// Function to save a link
+const setLink = async (linkData) => {
+    try {
+        const response = await fetch(`${SERVER_URL}/links`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                document1: linkData.document1,
+                document2: linkData.document2,
+                linkType: linkData.linkType
+            }),
+            credentials: 'include',
+        });
+        return handleInvalidResponse(response).json();
+    } catch (error) {
+        console.error("Error saving link:", error);
+        throw error;
+    }
+};
+
+// Exporting all API functions
+export default {
+    getDocuments,
+    getTypeDocuments,
+    getTypeScale,
+    getTypeLinks,
+    saveDocument,
+    setLink,
+};
