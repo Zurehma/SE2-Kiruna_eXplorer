@@ -81,7 +81,6 @@ function Map2(props) {
             props.setError(error);
           }finally{
             setLoading(false)
-            console.log(data)
           }
         };
         fetchData();
@@ -97,12 +96,12 @@ function Map2(props) {
                     attribution='&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
                 {data && data.map((item) => {
-                    const position = item.latitude !== null && item.longitude !== null && item.latitude !== undefined && item.longitude !== undefined
-                        ? [item.latitude, item.longitude] 
+                    const position = item.lat !== null && item.long !== null && item.lat !== undefined && item.long !== undefined
+                        ? [item.lat, item.long] 
                         : [cornerPosition[0] + getRandomOffset()[0], cornerPosition[1] + getRandomOffset()[1]];
                     return (
                         <Marker key={item.id} position={position} icon={icon}>
-                            <Popup maxWidth={600}>
+                            <Popup maxWidth={800}>
                                 <MyPopup doc={item} />
                             </Popup>
                         </Marker>
