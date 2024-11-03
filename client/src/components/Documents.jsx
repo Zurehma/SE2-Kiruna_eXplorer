@@ -3,7 +3,7 @@ import { Form, Button, Container, Card, Row, Col } from 'react-bootstrap';
 import '../styles/Documents.css';
 import { useNavigate } from 'react-router-dom';
 import API from '../../API.js';
-
+import { Map } from './Map.jsx';
 
 function Documents() { 
   const [types, setTypes] = useState([]);
@@ -91,6 +91,14 @@ function Documents() {
       } catch (error) {
         console.error("Error saving document:", error);
       }
+  };
+
+  const handleMapClick = (lat, lng) => {
+    setDocument((prevDocument) => ({
+      ...prevDocument,
+      latitude: lat,
+      longitude: lng,
+    }));
   };
 
   return (
@@ -239,6 +247,10 @@ function Documents() {
                   />
                 </Form.Group>
               </Col>
+            </Row>
+            <Row className="mb-3">
+              <Form.Label>Select a point on the Map, if not selected, the entire municipality is considered</Form.Label>
+              <Map handleMapClick={handleMapClick} />
             </Row>
 
             <Row className="mb-3">
