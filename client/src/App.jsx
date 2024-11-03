@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { Alert, Container } from 'react-bootstrap';
 
@@ -27,20 +27,16 @@ function App() {
     
     const handleLogin = async (credentials) => {
         try {
-            const response = await API.logIn(credentials); // Make sure API.logIn is defined to handle the login request
+            const response = await API.logIn(credentials); 
             if (response.ok) {
-                await response.json(); // Assuming the API returns user data upon successful login
+                await response.json(); 
                 setCurrentUser(username)
-                setLoggedIn(true); // Update loggedIn state
-                navigate('/'); // Redirect to the homepage or desired page after successful login
+                setLoggedIn(true); 
+                navigate('/'); 
             } else {
-                const errorData = await response.json();
-                setError(errorData); // Set the error message from the response
-            }
+                setError( "Login failed. Please check your credentials.");            }
         } catch (error) {
-            console.error("Login failed:", error);
-            setError({ message: "An unexpected error occurred. Please try again." });
-        }
+            setError("Login failed. Please check your credentials." );        }
     };
     
     
@@ -52,19 +48,22 @@ function App() {
         navigate('/');
         setRole('')
     };
-
+    useEffect(() => {
+      if (error) {
+          const timer = setTimeout(() => {
+              setError(null); // Clear the error after 5 seconds
+          }, 3000);
+          return () => clearTimeout(timer); // Cleanup timer on component unmount
+      }
+  }, [error]);
+    
     return (
         <div className="min-vh-100 d-flex flex-column">
           <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} />
           <Container fluid className="flex-grow-1 d-flex flex-column px-0">
-            {error && (
-              <Alert variant="danger" className="fixed-bottom mt-3" dismissible onClose={() => setError(null)}>
-                <p>{error.message || "An error occurred"}</p>
-              </Alert>
-            )}
             <Routes>
               <Route path="/" element={<Home setError={setError} />} />
-              <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole}/>}/>
+              <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} error={error} setError={setError}/>}/>
               <Route path="/map" element={<Map2 handleLogin={handleLogin} username={username} setUsername={setUsername}/>}/>
               <Route path="/documents" element={<Documents/>}/>
             </Routes>

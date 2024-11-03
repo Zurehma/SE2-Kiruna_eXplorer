@@ -142,6 +142,21 @@ font-size: 16px;
 margin: 0;
 } 
 
+.alert-custom {
+  background-color: #f8d7da; /* Light red background */
+  border-color: #f5c6cb; /* Darker red border */
+  color: #721c24; /* Dark red text */
+  border-radius: 0.25rem; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  transition: all 0.3s ease; /* Smooth transition for visibility */
+}
 
+/* Optional: Add animation for when the alert appears */
+.alert-custom.fade {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
 
-
+.alert-custom.show {
+  opacity: 1;
+}

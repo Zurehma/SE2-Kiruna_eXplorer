@@ -64,7 +64,6 @@ const saveDocument = async (doc) => {
         });
         return handleInvalidResponse(response).json();
     } catch (error) {
-        console.error("Error saving document:", error);
         throw error;
     }
 };
@@ -83,7 +82,6 @@ const setLink = async (linkData) => {
         });
         return handleInvalidResponse(response).json();
     } catch (error) {
-        console.error("Error saving link:", error);
         throw error;
     }
 };
@@ -102,8 +100,7 @@ const setLink = async (linkData) => {
         });
         return handleInvalidResponse(response);
     } catch (error) {
-        console.error("Login failed:", error);
-        throw error;
+        throw error
     }
 };
 
