@@ -17,6 +17,13 @@ export function NavigationBar(props) {
         <Nav className="ms-auto">
           {props.loggedIn ? (
             <div className="d-flex align-items-center">
+              <Button 
+                 variant='white-outline'
+                className="me-2 btn-dark" 
+                onClick={() => navigate('/desired-link')} // Change '/desired-link' to your actual route
+              >
+                Add Link
+              </Button>
               <i className="bi bi-person-circle text-white me-2 my-icons"></i>
               <h5 className="text-white mt-1">Welcome, {props.username}</h5>
               <Dropdown>
