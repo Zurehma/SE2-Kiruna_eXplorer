@@ -56,10 +56,13 @@ function Links(props) {
       await API.setLink(linkData);
       console.log('Completed', linkData);
       setShowModal(true);
+      setSaveStatus('Completed');
       setLinkData({ document1: '', document2: '', linkType: '' });
-      props.setNewDoc = '';
-      props.newDoc = '';
+      console.log('Compl', linkData);
+      // props.setNewDoc = '';
+      // props.newDoc = '';
     } catch (error) {
+      console.log('Ebooooooo');
       console.error("Error saving links:", error);
       setSaveStatus('Not Completed');
       setShowModal(true);
