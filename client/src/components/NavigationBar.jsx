@@ -1,47 +1,37 @@
-import React, { useState } from 'react';
-import { Navbar, Nav, Dropdown } from 'react-bootstrap';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React from 'react';
+import { Navbar, Nav, Dropdown, Button } from 'react-bootstrap';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Navbar.css';
 
-const NavigationBar = ({ setLoggedIn, loggedIn, setCurrentUser, currentUser }) => {
-  const [showNavbar, setShowNavbar] = useState(false);
+export function NavigationBar(props) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogout = async () => {
-    try {
-      await fetch('http://localhost:3001/api/sessions/logout', { method: 'DELETE' });
-      setLoggedIn(false);
-      setCurrentUser('');
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout failed', error);
-    }
-  };
-
-  const handleToggle = () => {
-    setShowNavbar(!showNavbar);
-  };
-
   return (
     <Navbar variant="dark" expand="lg" className="custom-navbar">
-      <Navbar.Brand onClick={() => navigate('/')} className="navbar-brand">
-        <i className="bi bi-envelope ms-2 me-2 text-white"></i> Kiruna
+      <Navbar.Brand as={Link} to="/">
+      Kiruna
       </Navbar.Brand>
-      <Navbar.Toggle aria-controls="navbar-content" onClick={handleToggle} />
-
-      <Navbar.Collapse in={showNavbar} id="navbar-content">
+      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="ms-auto">
-          {loggedIn ? (
+          {props.loggedIn ? (
             <div className="d-flex align-items-center">
+              <Button 
+                 variant='white-outline'
+                className="me-2 btn-dark" 
+                onClick={() => navigate('/desired-link')} // Change '/desired-link' to your actual route
+              >
+                Add Link
+              </Button>
               <i className="bi bi-person-circle text-white me-2 my-icons"></i>
-              <h5 className="text-white mt-1">Welcome, {currentUser}</h5>
+              <h5 className="text-white mt-1">Welcome, {props.username}</h5>
               <Dropdown>
                 <Dropdown.Toggle
                   variant="link"
                   id="dropdown-custom-navbar"
                   className="my-arrow-dropdown"
-                ></Dropdown.Toggle>
+                />
                 <Dropdown.Menu className="dropdown-menu-end me-2">
                   {location.pathname !== '/' && (
                     <Dropdown.Item onClick={() => navigate('/')}>
@@ -49,25 +39,37 @@ const NavigationBar = ({ setLoggedIn, loggedIn, setCurrentUser, currentUser }) =
                     </Dropdown.Item>
                   )}
                   <Dropdown.Divider />
-                  <Dropdown.Item onClick={handleLogout} className="text-danger">
+                  <Dropdown.Item onClick={props.handleLogout} className="text-danger">
                     <i className="bi bi-box-arrow-right"></i> Logout
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
             </div>
           ) : (
-            <Nav.Link onClick={() => navigate(location.pathname === '/login' ? '/' : '/login')}>
+            <>
+              {/* If user is not logged in and on the /login page, show Home button */}
               {location.pathname === '/login' ? (
-                <span><i className="bi bi-house-door me-2"></i> Home</span>
+                <Button
+                  variant="outline-light"
+                  className="ms-3"
+                  onClick={() => navigate('/')}
+                >
+                  Home
+                </Button>
               ) : (
-                <span><i className="bi bi-box-arrow-right me-2"></i> Login</span>
+                /* Show Login button on pages other than /login */
+                <Button
+                  variant="outline-light"
+                  className="ms-3"
+                  onClick={() => navigate('/login')}
+                >
+                  Login
+                </Button>
               )}
-            </Nav.Link>
+            </>
           )}
         </Nav>
       </Navbar.Collapse>
     </Navbar>
   );
-};
-
-export default NavigationBar;
+}

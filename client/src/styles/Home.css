@@ -1,146 +1,107 @@
+/* Ensures the background covers the full viewport */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevents horizontal scrolling */
+}
+
+/* Background for the home page */
 .home-background {
   background-image: url("../public/kiruna.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: min(100vh, 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow-y: auto;
-  padding: 0 5%;
+  width: 100vw; 
+  height: 100vh;
+  position: absolute; /* Covers the entire viewport */
+  top: 0; 
+  left: 0; /* Ensures no extra space on the left */
 }
 
-.home-images {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  max-height: calc(100% - 100px); 
-  overflow: hidden; 
-}
-
+/* Container for centered content with transparency effect */
 .home-container {
-  background: rgba(255, 255, 255, 0.85);
-  padding: 30px;
-  border-radius: 30px;
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
-  max-width: 500px;
-  text-align: center;
-  z-index: 1;
+  display: flex; /* Enables Flexbox layout */
+  flex-direction: column; /* Stacks children vertically */
+  justify-content: center; /* Centers content vertically within the container */
+  align-items: flex-end; /* Aligns content to the right */
+  background: rgba(255, 255, 255, 0.92); /* Existing background */
+  backdrop-filter: blur(8px); /* Existing blur effect */
+  padding: 40px; /* Existing padding */
+  border-radius: 20px; /* Existing border radius */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); /* Existing shadow */
+  max-width: 600px; /* Existing max width */
+  margin: 0; /* Removes top margin */
+  position: absolute; /* Make the container absolutely positioned */
+  right: 25px; /* Aligns the container to the right */
+  top: 50%; /* Positions it vertically centered */
+  transform: translateY(-50%); /* Centers it vertically */
+  z-index: 1; /* Existing z-index */
 }
 
-.static-image {
-  object-fit: cover;
-  border-radius: 10px;
-  transition: transform 0.2s;
-}
-
-.static-image:hover {
-  transform: scale(1.05); 
-}
-
-
+/* Typography adjustments for better readability */
 .home-title {
-  font-size: 2rem;
+  font-size: 2.2rem; /* Increase size slightly for better emphasis */
   font-weight: bold;
   color: #2c3e50;
+  margin-bottom: 20px;
   animation: fadeInUp 1.5s ease forwards;
+  line-height: 1.3; /* Improves readability for multi-line titles */
 }
 
-@media (max-width: 600px) {
+/* Responsive font size adjustment */
+@media (max-width: 800px) {
   .home-title {
-    font-size: 1.5rem; 
+    font-size: 1.8rem;
+    justify-content: center;
+    justify-items: center;
+  }
+
+  .home-container {
+    justify-content: center;
+    padding: 10px;
+    margin-top: 1%; 
   }
 }
 
-.custom-modal .modal-backdrop {
-  background-color: rgba(255, 255, 255, 0.8); 
+@media (max-width: 300px) {
+  .home-title {
+    display: none;
+  }
+
+  .home-container {
+    display: none;
+  }
 }
 
+/* Modal customization */
 .custom-modal-body {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 15px;
-  padding: 10px; 
+  padding: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   text-align: center;
   position: relative;
 }
 
-
+/* Image within the modal */
 .modal-image {
-  width: 100%; 
+  width: 100%;
   max-width: 250px;
-  max-height: 150px; 
+  max-height: 150px;
 }
 
+/* Text description within the modal */
 .modal-description {
-  font-size: 1rem; 
-  margin-bottom: 10px; 
-}
-
-
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px); 
-  }
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-@keyframes scaleUp {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05); 
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.animated-image {
-  animation: float 3s ease-in-out infinite, scaleUp 5s ease-in-out infinite; 
-  transition: transform 0.2s;
-}
-
-.static-image {
-  object-fit: cover;
-  border-radius: 10px;
-  transition: transform 0.3s ease; /* Smooth transition on hover */
-}
-
-.static-image:hover {
-  transform: scale(1.1); /* Adjust scale as desired */
-}
-@media (max-width: 850px) {
-  .home-images {
-    display: none;
-  }
-}
-
-.redirect-button {
-  margin-top: 20px;
-  padding: 10px 20px;
   font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+/* Redirect button styles */
+.redirect-button {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 25px;
+  font-size: 1.1rem;
   color: #ffffff;
   background-color: #2c3e50;
   border: none;
@@ -157,4 +118,68 @@
 
 .redirect-button:active {
   transform: translateY(0);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Static image styling */
+.static-image {
+  object-fit: cover;
+  border-radius: 10px;
+  transition: transform 0.2s ease;
+}
+
+.static-image:hover {
+  transform: scale(1.05);
+}
+
+/* Hide images on smaller screens */
+@media (max-width: 850px) {
+  .home-images {
+    position: absolute; /* Positioning relative to the container */
+    left: 50%; /* Center horizontally */
+    bottom: 25%; 
+    transform: translateX(-50%); /* Adjust the center */
+    /* Optional styles for appearance */
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  }
+  .image-one{
+    width: 50px;
+    height: 50px;
+    left: 1%;
+    top: 60%;
+    /* position: absolute;. */
+  }
+}
+
+/* Specific styles for each static image */
+.image-one {
+  width: 130px;
+  height: 130px;
+  left: 10%;
+  top: 60%;
+  position: absolute;
+}
+
+.image-two {
+  width: 160px;
+  height: 160px;
+  left: 18%;
+  top: 58%;
+  position: absolute;
+}
+
+.image-three {
+  width: 180px;
+  height: 180px;
+  left: 28%;
+  top: 57%;
+  position: absolute;
 }

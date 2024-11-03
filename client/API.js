@@ -69,7 +69,6 @@ const saveDocument = async (doc) => {
     }
 };
 
-// Function to save a link
 const setLink = async (linkData) => {
     try {
         const response = await fetch(`${SERVER_URL}/links`, {
@@ -89,12 +88,48 @@ const setLink = async (linkData) => {
     }
 };
 
-// Exporting all API functions
-export default {
+
+
+  const logIn = async (credentials) => {
+    try {
+        const response = await fetch(SERVER_URL + '/sessions/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(credentials),
+        });
+        return handleInvalidResponse(response);
+    } catch (error) {
+        console.error("Login failed:", error);
+        throw error;
+    }
+};
+
+  /**
+  * This function destroy the current user's session (executing the log-out).
+  */
+  const logOut = async() => {
+    return await fetch(SERVER_URL + '/sessions/logout', {
+      method: 'DELETE',
+      credentials: 'include'
+    }).then(handleInvalidResponse);
+  }
+
+
+//Export API methods
+const API = {
     getDocuments,
+    saveDocument,
+    logIn,
+    logOut,
     getTypeDocuments,
     getTypeScale,
     getTypeLinks,
-    saveDocument,
     setLink,
 };
+  
+
+export default API;
+  

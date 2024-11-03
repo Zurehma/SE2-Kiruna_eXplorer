@@ -1,17 +1,11 @@
-/* Stile principale del contenitore */
-.app-container {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+
+
+ .custom-navbar {
+  background-color: #030303; 
 }
 
-/* Navbar come overlay fisso */
-.navbar-overlay {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1000;
+.my-arrow-dropdown::after {
+  color: white !important; 
 }
 
 /* Mappa che occupa l'intero schermo, sotto la navbar */
@@ -23,53 +17,71 @@
   overflow-y: auto; /* Permette lo scorrimento verticale */
   padding-bottom: 1rem; /* Spazio per il contenuto */
 }
-
-/* Stile della mappa interna */
-.leaflet-container {
-  width: 100%;
-  height: 100%;
+.text-danger:focus, .text-danger:active {
+  color: red !important; 
+  background-color: transparent !important; 
+  outline: none !important; 
+  box-shadow: none !important;
 }
 
-/* Personalizzazione popup della mappa */
-.myPopup {
-  padding: 1.25rem;
-  border-right: 0.125rem solid black;
+.btn-black {
+  background-color: black !important; 
+  color: white !important;
+  border: none;
 }
 
-.leaflet-popup-content-wrapper {
-  width: 100%;
-  max-width: 90vw;
-  max-height: 70vh;
-  overflow-y: auto;
-  background-color: rgba(255, 255, 255, 0.8);
-  color: #000;
-  border-radius: 0.5rem;
-  padding: 0.625rem;
+.btn-black:hover {
+  background-color: #333 !important; 
 }
 
-.leaflet-popup-content {
-  white-space: normal;
+.service-container {
+display: flex;
+justify-content: space-around;
+padding: 20px;
 }
 
-/* Responsive adjustments for smaller screens */
-@media (max-width: 768px) {
-  .myPopup {
-      padding: 0.625rem;
-      border-right: none; /* Rimuovi bordo destro */
-      border-bottom: 0.125rem solid black; /* Aggiungi bordo inferiore */
-  }
-
-  .my-icons {
-      font-size: 2rem;
-  }
-
-  .leaflet-popup-content-wrapper {
-      max-width: 90vw;
-      padding: 0.9375rem;
-      max-height: 60vh;
-  }
+.service-button {
+border: 2px solid black;
+background-color: white;
+border-radius: 10px;
+padding: 20px;
+width: 150px;
+text-align: center;
+cursor: pointer;
+transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.my-icons {
-  font-size: 3rem;
+.service-title {
+font-size: 32px;
+font-weight: bold; 
+color: #4a4a4a; 
+text-transform: uppercase; 
+margin-top: 40px; 
+letter-spacing: 2px; 
+margin-bottom: 50px; 
+border-bottom: 2px solid black; 
+display: inline-block; 
+padding-bottom: 10px; 
+position: relative; 
+left: 50%; 
+transform: translateX(-50%); 
 }
+
+.service-button:hover {
+background-color: #f0f0f0;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.service-icon {
+font-size: 48px;
+margin-bottom: 10px;
+}
+
+.service-button p {
+font-size: 16px;
+margin: 0;
+} 
+
+
+
+
