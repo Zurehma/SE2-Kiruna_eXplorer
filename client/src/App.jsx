@@ -25,19 +25,31 @@ function App() {
     const [newDoc, setNewDoc] = useState('');
     const navigate = useNavigate();
     
+    
     const handleLogin = async (credentials) => {
         try {
-            const response = await API.logIn(credentials); 
-            if (response.ok) {
-                await response.json(); 
-                setCurrentUser(username)
-                setLoggedIn(true); 
-                navigate('/'); 
-            } else {
-                setError( "Login failed. Please check your credentials.");            }
+            // Attempt to log in with provided credentials
+            const response = await API.logIn(credentials);
+            
+            // Check if the login was successful
+            if (!response.ok) {
+                throw new Error("Login failed. Please check your credentials.");
+            }
+    
+            // After successful login, fetch user information
+            const user = await API.getUserInfo();
+            setCurrentUser(user);
+            setLoggedIn(true);
+            setRole(user.role)
+            navigate('/');
+            
         } catch (error) {
-            setError("Login failed. Please check your credentials." );        }
+            // Handle errors (either from login or fetching user info)
+            setError(error.message || "Login failed. Please check your credentials.");
+        }
     };
+    
+
     
     
     const handleLogout = async () => {
@@ -59,7 +71,7 @@ function App() {
     
     return (
         <div className="min-vh-100 d-flex flex-column">
-          <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} />
+          <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} role={role} />
           <Container fluid className="flex-grow-1 d-flex flex-column px-0">
             {error && (
             <Alert variant="danger" className="fixed-bottom mt-3" dismissible onClose={() => setError(null)}>
