@@ -31,7 +31,7 @@ export function NavigationBar(props) {
               <Button 
                 variant='outline-blue' 
                 className="me-lg-2 mb-2 mb-lg-0 btn-dark" 
-                onClick={() => { navigate('/link'); handleClose(); }}
+                onClick={() => { navigate('/documents/links'); handleClose(); }}
               >
                 Add Link
               </Button>
