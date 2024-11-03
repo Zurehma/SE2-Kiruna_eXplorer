@@ -27,7 +27,7 @@ export function NavigationBar(props) {
               <Button 
                  variant='white-outline'
                 className="me-2 btn-dark" 
-                onClick={() => navigate('/desired-link')} // Change '/desired-link' to your actual route
+                onClick={() => navigate('/documents/links')} // Change '/desired-link' to your actual route
               >
                 Add Link
               </Button>
