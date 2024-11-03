@@ -1,6 +1,65 @@
+/* Personalizzazione popup della mappa */
+.myPopup {
+  padding: 20px;
+  border-right: 2px solid black;
+  padding: 1.25rem;
+  border-right: 0.125rem solid black;
+}
 
+.leaflet-popup-content-wrapper {
+  width: 100%;
+  max-width: 90vw;
+  max-height: 70vh;
+  overflow-y: auto;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #000;
+  border-radius: 0.5rem;
+  padding: 0.625rem;
+}
 
- .custom-navbar {
+.leaflet-popup-content {
+  white-space: normal;
+}
+
+.leaflet-container .leaflet-popup-content-wrapper {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #000;
+  border-radius: 8px;
+  padding: 10px;
+}
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .myPopup {
+    padding: 10px;
+    border-right: none; /* Remove the right border */
+    border-bottom: 2px solid black; /* Add a bottom border */
+      padding: 0.625rem;
+      border-right: none; /* Rimuovi bordo destro */
+      border-bottom: 0.125rem solid black; /* Aggiungi bordo inferiore */
+  }
+
+  .my-icons {
+    text-align: left;
+    font-size: 2em;
+      font-size: 2rem;
+  }
+
+  .leaflet-popup-content-wrapper {
+    max-width: 90vw;
+    padding: 15px;
+    max-height: 60vh;
+      max-width: 90vw;
+      padding: 0.9375rem;
+      max-height: 60vh;
+  }
+}
+
+.my-icons {
+  font-size: 3em;
+  font-size: 3rem;
+}
+
+.custom-navbar {
   background-color: #030303; 
 }
 

@@ -24,7 +24,7 @@ export function NavigationBar(props) {
               >
                 Add Link
               </Button>
-              <i className="bi bi-person-circle text-white me-2 my-icons"></i>
+              <i className="bi bi-person-circle text-white me-2"></i>
               <h5 className="text-white mt-1">Welcome, {props.username}</h5>
               <Dropdown>
                 <Dropdown.Toggle

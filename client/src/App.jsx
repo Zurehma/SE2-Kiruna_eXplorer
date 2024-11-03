@@ -65,7 +65,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home setError={setError} />} />
               <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole}/>}/>
-              <Route path="/map" element={<Map handleLogin={handleLogin} username={username} setUsername={setUsername}/>}/>
+              <Route path="/map" element={<Map2 handleLogin={handleLogin} username={username} setUsername={setUsername}/>}/>
               <Route path="/documents" element={<Documents/>}/>
             </Routes>
           </Container>
