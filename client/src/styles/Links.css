@@ -1,10 +1,7 @@
-/* Links.css */
 
-* {
-    box-sizing: border-box;
-  }
+
   
-  .links-background {
+   .links-background {
     background: linear-gradient(to right, #006d77, #83c5be);
     min-height: 100vh;
     padding: 2rem;
@@ -18,18 +15,24 @@
     overflow-y: auto;
     margin: 0;
     padding: 0;
-  }
-  
-  .card {
+  } 
+
+  .card-link {
     border-radius: 10px;
-    height: 500px;
-    width: 400px;
+    height: 450px;
+    width: 500px;
     border: none;
+    display: flex;
+    align-items: top; 
+    margin-top: 10px ;
+    justify-content: center;
   }
-  
+    
+
   .links-card-title {
     font-size: 1.8rem;
     font-weight: bold;
+    text-align: center;
     color: #006d77;
   }
   
@@ -70,4 +73,4 @@
       font-size: 1.5rem;
     }
   }
-  
+   

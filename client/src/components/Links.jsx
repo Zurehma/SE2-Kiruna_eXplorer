@@ -72,8 +72,8 @@ function Links(props) {
 
   return (
     <div className="links-background">
-      <Container className="d-flex align-items-center justify-content-center min-vh-100">
-        <Card className="p-4 shadow-sm">
+      <Container className="d-flex align-items-top justify-content-center min-vh-100">
+        <Card className="card-link p-4 shadow-sm">
           <Card.Body>
           <Card.Title className="links-card-title">ADD NEW LINK</Card.Title>
           <Form>
@@ -119,7 +119,7 @@ function Links(props) {
                 </Form.Select>
               </Form.Group>
 
-              <div className="text-center mt-4">
+              <div className="text-center  mt-5">
                   <Button variant="primary" onClick={handleSaveLinks} className="btn-save">Save Link</Button>
               </div>
 
