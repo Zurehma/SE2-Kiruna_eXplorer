@@ -3,8 +3,8 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
 import React, { useState,useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import { Alert, Container } from 'react-bootstrap';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Link } from 'react-router-dom';
+import {Container } from 'react-bootstrap';
 
 
 import { Login } from './components/Login';
@@ -14,6 +14,7 @@ import { NavigationBar } from './components/NavigationBar.jsx';
 import {Map2} from '../src/components/Map2.jsx'
 import { Map } from '../src/components/Map.jsx'
 import API from '../API.js';
+import Links from './components/Links.jsx';
 
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
               <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} error={error} setError={setError}/>}/>
               <Route path="/map" element={<Map2 handleLogin={handleLogin} username={username} setUsername={setUsername}/>}/>
               <Route path="/documents" element={<Documents/>}/>
+              <Route path='/link' element={<Links/>}/>
             </Routes>
           </Container>
         </div>
