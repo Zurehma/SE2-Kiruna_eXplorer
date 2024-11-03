@@ -90,7 +90,7 @@ function Map2(props) {
         <>
             {loading && (<p>Loading...</p>)}
             {!loading && 
-            <MapContainer center={[67.850, 20.217]} zoom={13} style={{ height: '100vh', width: '100%' }}>
+            <MapContainer center={[67.850, 20.217]} zoom={13} style={{ height: '93vh', width: '100%' }}>
                 <TileLayer
                     url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg"
                     attribution='&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
