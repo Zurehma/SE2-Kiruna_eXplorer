@@ -125,10 +125,16 @@ function Documents(props) {
   };
 
   const [position, setPosition] = useState({ lat: null, lng: null });
+  useEffect(() => {
+    document.latitude = position.lat;
+    document.longitude = position.lng;
+    console.log(document.latitude,document.longitude);
+  }, [position.lat,position.lng]);
 
   useEffect(() => {
     if (document.latitude && document.longitude) {
       setPosition({ lat: document.latitude, lng: document.longitude });
+      
     }
   }, [document.latitude, document.longitude]);
 
