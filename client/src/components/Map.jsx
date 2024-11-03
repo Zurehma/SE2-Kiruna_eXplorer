@@ -60,9 +60,10 @@ function Map({ handleMapClick,setPosition,latitude,longitude }) {
       </MapContainer>
 
       {/* Pulsante per rimuovere il marker */}
+      {latitude && longitude && 
       <Button onClick={clearMarker} variant="primary" type="button" className="btn-save mt-2 text-center">
         Remove marker
-      </Button>
+      </Button>}
     </div>
   );
 }
