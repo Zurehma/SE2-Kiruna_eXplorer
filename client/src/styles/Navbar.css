@@ -1,29 +1,33 @@
-
+/* Navbar styling */
 .custom-navbar {
-  position: sticky; /* in case remove for scrolling navbar*/
+  position: sticky;
   top: 0;
   width: 100%;
-  z-index: 1500; 
-  background-color: #343a40; 
-  padding: 0.5rem 1rem; 
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); 
+  z-index: 1500;
+  background-color: #000000;
+  padding: 0.5rem 1rem;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+/* Main content padding */
 .main-content {
   padding-top: 70px;
   padding-left: 15px;
   padding-right: 15px;
 }
 
+/* Brand logo padding */
 .navbar-brand {
   padding-left: 20px;
   cursor: pointer;
 }
 
+/* Adjust nav-link padding for responsiveness */
 .navbar-nav .nav-link {
-  padding-right: 40px;
+  padding-right: 20px; /* Reduced padding for smaller screens */
 }
 
+/* Icon and text styling */
 .my-arrow-dropdown {
   color: #ffffff;
 }
@@ -31,4 +35,25 @@
 .my-icons {
   color: #ffffff;
   font-size: 1.2em;
+}
+
+/* Hide welcome text on smaller screens */
+@media (max-width: 992px) {
+  .welcome-text {
+    display: none;
+  }
+}
+
+/* Stack buttons vertically and adjust spacing on smaller screens */
+@media (max-width: 768px) {
+  .navbar-nav .btn {
+    margin: 0.25rem 0;  
+    width: 100%;
+    text-align: center;
+  }
+  /* Additional styling for alignment on small screens */
+  .navbar-nav {
+    align-items: center;
+    flex-direction: column;
+  }
 }

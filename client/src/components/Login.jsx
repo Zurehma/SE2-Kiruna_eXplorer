@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
-function Login({ handleLogin,username,password, setUsername, setPassword,setRole }) {
+function Login({ handleLogin,username,password, setUsername, setPassword,error, setError }) {
 
-    const [show, setShow] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
 
-    const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -22,14 +18,10 @@ function Login({ handleLogin,username,password, setUsername, setPassword,setRole
                 <Col md={12} className="login-container">
                     <h1 className="pb-3">Login</h1>
                     <Form onSubmit={handleSubmit}>
-                        <Alert
-                            dismissible
-                            show={show}
-                            onClose={() => setShow(false)}
-                            variant="danger"
-                        >
-                            {errorMessage}
-                        </Alert>
+                    {error && (
+                        <Alert variant="danger" dismissible onClose={() => setError(null)}>
+                            {error}
+                        </Alert>)}
                         <Form.Group className="mb-2" controlId="username">
                             <Form.Label>Username</Form.Label>
                             <Form.Control
