@@ -100,7 +100,13 @@ function Documents() {
       longitude: lng,
     }));
   };
-
+  const [position, setPosition] = useState({ lat: null, lng: null });
+  useEffect(() => {
+    // Update the position when latitude or longitude change
+    if (document.latitude && document.longitude) {
+      setPosition({ lat: document.latitude, lng: document.longitude });
+    }
+  }, [document.latitude, document.longitude]);
   return (
     <div className="documents-background">
       <Container className="d-flex align-items-center justify-content-center min-vh-100">
@@ -250,7 +256,7 @@ function Documents() {
             </Row>
             <Row className="mb-3">
               <Form.Label>Select a point on the Map, if not selected, the entire municipality is considered</Form.Label>
-              <Map handleMapClick={handleMapClick} />
+              <Map handleMapClick={handleMapClick} setPosition={setPosition} latitude={position.lat} longitude={position.lng} />
             </Row>
 
             <Row className="mb-3">
@@ -261,7 +267,7 @@ function Documents() {
                     type="text" 
                     name="latitude" 
                     value={document.latitude} 
-                    onChange={handleChange} 
+                    onChange={handleChange}
                     placeholder="e.g., 59.3293"
                     className="input" 
                   />

@@ -13,9 +13,8 @@ const markerIcon = new L.Icon({
   popupAnchor: [1, -34],
 });
 
-function Map({ handleMapClick }) {
-  const [position, setPosition] = useState({ lat: null, lng: null });
-
+function Map({ handleMapClick,setPosition,latitude,longitude }) {
+  
   const MapClickHandler = () => {
     useMapEvents({
       click: (e) => {
@@ -53,8 +52,8 @@ function Map({ handleMapClick }) {
         <MapClickHandler />
 
         {/* Mostra il marker se le coordinate sono definite */}
-        {position.lat && position.lng && (
-          <Marker position={[position.lat, position.lng]} icon={markerIcon} data-testid="map-marker">
+        {latitude && longitude && (
+          <Marker position={[latitude, longitude]} icon={markerIcon} data-testid="map-marker">
             <Popup>Selected Location</Popup>
           </Marker>
         )}

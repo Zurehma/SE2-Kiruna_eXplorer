@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 
 describe('Map Component', () => {
     test('renders the map and the remove marker button', () => {
-        render(<Map handleMapClick={jest.fn()} />);
+        render(<Map handleMapClick={jest.fn()} setPosition={jest.fn()} latitude={null} longitude={null} />);
         
         const removeButton = screen.getByRole('button', { name: /remove marker/i });
         expect(removeButton).toBeInTheDocument();
@@ -16,7 +16,8 @@ describe('Map Component', () => {
 
     test('places a marker when clicking on the map', async () => {
         const mockHandleMapClick = jest.fn();
-        render(<Map handleMapClick={mockHandleMapClick} />);
+        const mockSetPosition = jest.fn();
+        render(<Map handleMapClick={mockHandleMapClick} setPosition={mockSetPosition} latitude={null} longitude={null} />);
         
         const mapContainer = screen.getByRole('img', { name: '' });
         act(() => {
@@ -33,7 +34,8 @@ describe('Map Component', () => {
 
     test('removes the marker when the remove button is clicked', async () => {
         const mockHandleMapClick = jest.fn();
-        render(<Map handleMapClick={mockHandleMapClick} />);
+        const mockSetPosition = jest.fn();
+        render(<Map handleMapClick={mockHandleMapClick} setPosition={mockSetPosition} latitude={67.8558} longitude={20.2253} />);
         
         // Simula il clic sulla mappa per posizionare un marker
         const mapContainer = screen.getByRole('img', { name: '' });
@@ -60,7 +62,8 @@ describe('Map Component', () => {
 
     test('calls handleMapClick with correct coordinates when clicking on the map', async () => {
         const mockHandleMapClick = jest.fn();
-        render(<Map handleMapClick={mockHandleMapClick} />);
+        const mockSetPosition = jest.fn();
+        render(<Map handleMapClick={mockHandleMapClick} setPosition={mockSetPosition} latitude={null} longitude={null} />);
         
         const mapContainer = screen.getByRole('img', { name: '' });
 
