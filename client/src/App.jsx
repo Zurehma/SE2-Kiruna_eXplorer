@@ -56,7 +56,7 @@ function App() {
     return (
         <div className="min-vh-100 d-flex flex-column">
           <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} />
-          <Container fluid className="flex-grow-1 d-flex flex-column">
+          <Container fluid className="flex-grow-1 d-flex flex-column px-0">
             {error && (
               <Alert variant="danger" className="fixed-bottom mt-3" dismissible onClose={() => setError(null)}>
                 <p>{error.message || "An error occurred"}</p>

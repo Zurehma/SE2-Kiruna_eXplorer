@@ -1,6 +1,6 @@
 
 .custom-navbar {
-  /* position: fixed;  */
+  position: sticky; /* in case remove for scrolling navbar*/
   top: 0;
   width: 100%;
   z-index: 1000; 
