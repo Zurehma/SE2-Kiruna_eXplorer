@@ -3,8 +3,8 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
 import React, { useState,useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import { Alert, Container } from 'react-bootstrap';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Link } from 'react-router-dom';
+import {Container } from 'react-bootstrap';
 
 import Links from './components/Links.jsx';
 import { Login } from './components/Login';
@@ -13,6 +13,7 @@ import Documents from './components/Documents.jsx';
 import { NavigationBar } from './components/NavigationBar.jsx';
 import {Map2} from '../src/components/Map2.jsx';
 import API from '../API.js';
+import Links from './components/Links.jsx';
 
 
 function App() {
