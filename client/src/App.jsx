@@ -20,6 +20,7 @@ function App() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
+    const [loggedinError, setloggedinError] = useState(null)
     const [loggedIn, setLoggedIn] = useState(false);
     const [role, setRole] = useState('');
     const [newDoc, setNewDoc] = useState('');
@@ -45,7 +46,7 @@ function App() {
             
         } catch (error) {
             // Handle errors (either from login or fetching user info)
-            setError(error.message || "Login failed. Please check your credentials.");
+            setloggedinError(error.message || "Login failed. Please check your credentials.");
         }
     };
     
@@ -63,7 +64,7 @@ function App() {
     useEffect(() => {
       if (error) {
           const timer = setTimeout(() => {
-              setError(null); // Clear the error after 5 seconds
+              setloggedinError(null); // Clear the error after 5 seconds
           }, 3000);
           return () => clearTimeout(timer); // Cleanup timer on component unmount
       }
@@ -80,7 +81,7 @@ function App() {
             )}
             <Routes>
               <Route path="/" element={<Home setError={setError} />} />
-              <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} error={error} setError={setError}/>}/>
+              <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} loggedinError={loggedinError} setloggedinError={setloggedinError}/>}/>
               <Route path="/map" element={<Map2 setError={setError}/>}/>
               <Route path="/documents" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} />}/>
               <Route path="/documents/links" element={<Links newDoc={newDoc} setNewDoc={setNewDoc} />}/>

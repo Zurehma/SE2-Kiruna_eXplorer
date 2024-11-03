@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap';
 import '../styles/Login.css';
 
-function Login({ handleLogin, username, password, setUsername, setPassword, error, setError }) {
+function Login({ handleLogin, username, password, setUsername, setPassword, loggedinError, setloggedinError }) {
     const handleSubmit = async (event) => {
         event.preventDefault();
         const credentials = { username, password };
@@ -17,9 +17,9 @@ function Login({ handleLogin, username, password, setUsername, setPassword, erro
 
                     {/* Static space for the alert */}
                     <div className="alert-placeholder">
-                        {error && (
-                            <Alert variant="danger" dismissible onClose={() => setError(null)}>
-                                {error}
+                        {loggedinError && (
+                            <Alert variant="danger" dismissible onClose={() => setloggedinError(null)}>
+                                {loggedinError}
                             </Alert>
                         )}
                     </div>
