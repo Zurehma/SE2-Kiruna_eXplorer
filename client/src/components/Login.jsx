@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap';
 import '../styles/Login.css';
 
-function Login({ handleLogin,username,password, setUsername, setPassword,error, setError }) {
-
-
-
+function Login({ handleLogin, username, password, setUsername, setPassword, error, setError }) {
     const handleSubmit = async (event) => {
         event.preventDefault();
         const credentials = { username, password };
-        await handleLogin(credentials); 
+        await handleLogin(credentials);
     };
 
     return (
@@ -17,11 +14,17 @@ function Login({ handleLogin,username,password, setUsername, setPassword,error, 
             <Row className="justify-content-md-center">
                 <Col md={12} className="login-container">
                     <h1 className="pb-3">Login</h1>
+
+                    {/* Static space for the alert */}
+                    <div className="alert-placeholder">
+                        {error && (
+                            <Alert variant="danger" dismissible onClose={() => setError(null)}>
+                                {error}
+                            </Alert>
+                        )}
+                    </div>
+
                     <Form onSubmit={handleSubmit}>
-                    {error && (
-                        <Alert variant="danger" dismissible onClose={() => setError(null)}>
-                            {error}
-                        </Alert>)}
                         <Form.Group className="mb-2" controlId="username">
                             <Form.Label>Username</Form.Label>
                             <Form.Control
