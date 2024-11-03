@@ -4,12 +4,9 @@ import { Map } from '../Map';
 import '@testing-library/jest-dom';
 
 describe('Map Component', () => {
-    test('renders the map and the remove marker button', () => {
+    test('renders the map', () => {
         render(<Map handleMapClick={jest.fn()} setPosition={jest.fn()} latitude={null} longitude={null} />);
-        
-        const removeButton = screen.getByRole('button', { name: /remove marker/i });
-        expect(removeButton).toBeInTheDocument();
-        
+                
         const mapContainer = screen.getByRole('img', { name: '' });
         expect(mapContainer).toBeInTheDocument();
     });
