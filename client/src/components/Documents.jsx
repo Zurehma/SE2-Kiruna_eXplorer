@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import API from '../../API.js';
 import { Map } from './Map.jsx';
 
-function Documents() { 
+function Documents(props) { 
   const [types, setTypes] = useState([]);
   const [scale, setScale] = useState([]);
   const [error, setError] = useState(null); 
@@ -85,12 +85,13 @@ function Documents() {
     console.log("Document saved:", document);
     
     try {
-        const response = await API.saveDocument(document);
-        const newId = response.data.id;
-        navigate(`/document/link`);
-      } catch (error) {
-        console.error("Error saving document:", error);
-      }
+      const response = await API.saveDocument(document);
+      const newId = response.data.id;
+      props.setnewId(newId);
+      navigate(`/documents/links`);
+    } catch (error) {
+      console.error("Error saving document:", error);
+    }
   };
 
   const handleMapClick = (lat, lng) => {

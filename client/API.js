@@ -14,28 +14,28 @@ function handleInvalidResponse(response) {
 
 // Function to get all documents
 const getDocuments = async () => {
-    return await fetch(`${SERVER_URL}/documents`)
+    return await fetch(`${SERVER_URL}/documents/documents`)
         .then(handleInvalidResponse)
         .then(response => response.json());
 };
 
 // Function to get types of documents
 const getTypeDocuments = async () => {
-    return await fetch(`${SERVER_URL}/document-types`)
+    return await fetch(`${SERVER_URL}/documents/document-types`)
         .then(handleInvalidResponse)
         .then(response => response.json());
 };
 
 // Function to get types of scales
 const getTypeScale = async () => {
-    return await fetch(`${SERVER_URL}/scales`)
+    return await fetch(`${SERVER_URL}/documents/scale-types`)
         .then(handleInvalidResponse)
         .then(response => response.json());
 };
 
 // Function to get types of links
 const getTypeLinks = async () => {
-    return await fetch(`${SERVER_URL}/link-types`)
+    return await fetch(`${SERVER_URL}/documents/link-types`)
         .then(handleInvalidResponse)
         .then(response => response.json());
 };
@@ -43,7 +43,7 @@ const getTypeLinks = async () => {
 // Function to save a document
 const saveDocument = async (doc) => {
     try {
-        const response = await fetch(`${SERVER_URL}/document`, {
+        const response = await fetch(`${SERVER_URL}/documents/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -53,11 +53,10 @@ const saveDocument = async (doc) => {
                 nValue: doc.nValue,
                 issuanceDate: doc.issuanceDate,
                 type: doc.type,
-                connections: doc.connections,
                 language: doc.language,
                 pages: doc.pages,
-                latitude: doc.latitude,
-                longitude: doc.longitude,
+                lat: doc.latitude,
+                long: doc.longitude,
                 description: doc.description
             }),
             credentials: 'include',
@@ -71,7 +70,7 @@ const saveDocument = async (doc) => {
 
 const setLink = async (linkData) => {
     try {
-        const response = await fetch(`${SERVER_URL}/links`, {
+        const response = await fetch(`${SERVER_URL}/documents/:id/link`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

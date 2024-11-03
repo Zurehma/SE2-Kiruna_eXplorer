@@ -6,12 +6,12 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { Alert, Container } from 'react-bootstrap';
 
-
+import Links from './components/Links.jsx';
 import { Login } from './components/Login';
 import Home from './components/Home';
 import Documents from './components/Documents.jsx';
 import { NavigationBar } from './components/NavigationBar.jsx';
-import {Map2} from '../src/components/Map2.jsx'
+import {Map2} from '../src/components/Map2.jsx';
 import { Map } from '../src/components/Map.jsx'
 import API from '../API.js';
 
@@ -23,6 +23,7 @@ function App() {
     const [error, setError] = useState(null);
     const [loggedIn, setLoggedIn] = useState(false);
     const [role, setRole] = useState('');
+    const [newId, setnewId] = useState('');
     const navigate = useNavigate();
     
     const handleLogin = async (credentials) => {
@@ -66,8 +67,9 @@ function App() {
               <Route path="/" element={<Home setError={setError} />} />
               <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole}/>}/>
               <Route path="/map" element={<Map2 handleLogin={handleLogin} username={username} setUsername={setUsername}/>}/>
-              <Route path="/documents" element={<Documents/>}/>
-            </Routes>
+              <Route path="/documents" element={<Documents newId={newId} setnewId={setnewId} />}/>
+              <Route path="/documents/links" element={<Links newId={newId} setnewId={setnewId} />}/>
+              </Routes>
           </Container>
         </div>
     );
