@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'leaflet/dist/leaflet.css';
 
-
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-
 
 import '../App.css';
 import { MyPopup } from './MyPopup';
@@ -29,20 +27,22 @@ function getRandomOffset() {
 }
 
 // Custom hook to recenter the map
-const RecenterMap = ({ position }) => {
+const RecenterMap = ({ position, zoom }) => {
     const map = useMap();
     useEffect(() => {
-        map.setView(position); // Set the map view to the new position
-    }, [map, position]); // Only run this effect when `position` changes
+        map.setView(position, zoom); // Set the map view to the new position and zoom
+    }, [map, position, zoom]); // Run this effect when either `position` or `zoom` changes
 
     return null;
 }
 
 function Map2(props) {
+    const cornerPosition = [67.840, 20.207]; // Corner position
     const initialPosition = [67.850, 20.217]; // Initial position
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [positionActual, setPositionActual] = useState(initialPosition); // State for current position
+    const [zoomLevel, setZoomLevel] = useState(13); // State for zoom level
 
     // Fetch data from the API
     useEffect(() => {
@@ -60,9 +60,10 @@ function Map2(props) {
         fetchData();
     }, []); 
 
-    // Function to recenter the map on Kiruna
+    // Function to recenter the map on Kiruna with zoom reset to 13
     const recenterMap = () => {
         setPositionActual(initialPosition); // Update state to trigger rerender
+        setZoomLevel(13); // Reset zoom level to 13
     };
 
     return (
@@ -71,7 +72,7 @@ function Map2(props) {
             {!loading && 
             <MapContainer 
                 center={positionActual} // Use the state variable for the center position
-                zoom={13} 
+                zoom={zoomLevel} 
                 style={{ height: '91vh', width: '100%' }}
             >
                 <TileLayer
@@ -79,9 +80,16 @@ function Map2(props) {
                     attribution='&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
                 {data.map((item) => {
-                    const position = item.lat !== null && item.long !== null
-                        ? [item.lat, item.long] 
-                        : [initialPosition[0] + getRandomOffset()[0], initialPosition[1] + getRandomOffset()[1]];
+                    // Verifica se lat e long sono null; se sì, genera una posizione casuale
+                    const position = (item.lat != null && item.long != null)
+                        ? [item.lat, item.long]
+                        : [
+                            cornerPosition[0] + getRandomOffset()[0],
+                            cornerPosition[1] + getRandomOffset()[1]
+                        ];
+                    if(item.lat===null){
+                        console.log("Latitudine nulla");
+                    }
                     return (
                         <Marker key={item.id} position={position} icon={icon}>
                             <Popup maxWidth={800}>
@@ -90,9 +98,9 @@ function Map2(props) {
                         </Marker>
                     );
                 })}
-                
+
                 {/* Add the recenter map component */}
-                <RecenterMap position={positionActual} />
+                <RecenterMap position={positionActual} zoom={zoomLevel} />
 
                 <button 
                     onClick={recenterMap} 

@@ -14,7 +14,7 @@ function handleInvalidResponse(response) {
 
 // Function to get all documents
 const getDocuments = async () => {
-    return await fetch(`${SERVER_URL}/documents/documents`)
+    return await fetch(`${SERVER_URL}/documents`)
         .then(handleInvalidResponse)
         .then(response => response.json());
 };
