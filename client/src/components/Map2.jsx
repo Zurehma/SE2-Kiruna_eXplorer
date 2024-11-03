@@ -110,16 +110,16 @@ function Map2(props) {
                         left: '0.8%', 
                         background: 'white', 
                         border: 'none', 
-                        width: '35px', // Larghezza ridotta
-                        height: '40px', // Altezza fissa
+                        width: '30px', 
+                        height: '30px', 
                         borderRadius: '5px', 
                         boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
                         cursor: 'pointer',
-                        zIndex: 1000, // Assicurati che il bottone sia sopra altri elementi
-                        display: 'flex', // Abilita flexbox
-                        alignItems: 'center', // Centra verticalmente
-                        justifyContent: 'center', // Centra orizzontalmente
-                        padding: '0' // Rimuovi il padding
+                        zIndex: 1000, 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        padding: '0' 
                     }}
                     >
                     <i className="bi bi-compass" style={{ fontSize: '20px' }}></i>
