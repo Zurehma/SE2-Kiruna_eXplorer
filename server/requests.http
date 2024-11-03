@@ -64,10 +64,11 @@ Content-Type: application/json
 }
 
 ### Add a link
-POST http://localhost:3001/api/documents/1/link HTTP/1.1
+POST http://localhost:3001/api/documents/link HTTP/1.1
 Content-Type: application/json
 
 {
+    "id1":2,
     "id2" : 3,
     "type" : "Direct"
 }

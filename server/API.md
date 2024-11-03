@@ -147,11 +147,10 @@ Returns the list of all specific scale types.
 - Additional Constraints: _None_
 
 
-#### POST `api/documents/:id/link`
+#### POST `api/documents/link`
 
-- Request Parameters: `id` - ID of the first document (document being linked from...).
 - Request Body: An object with the following fields:
-
+  - `id1`: an integer that is the ID of the first document (document being linked from...)
   - `id2`: an integer that is the ID of the second document (...document being linked to)
   - `type`: a string that represents the type of the link. Must be one of the following: [`Direct`, `Collateral`, `Projection`, `Update`]
 
@@ -167,6 +166,7 @@ Returns the list of all specific scale types.
 - Access Constraints: Can only be called by a logged in user whose role is Urban Planner.
 - Additional Constraints:
   - It should return a `404` error when document ID does not exist
+  - It should return a `409` error when the link already exists
   - It should return a `422` error if the link type is invalid
 
 ## Database Tables

@@ -64,19 +64,19 @@ class DocumentRoutes {
     this.router.get("/link-types", Utility.isLoggedIn, (req, res, next) => res.status(200).json(this.documentController.getLinkTypes()));
 
     this.router.post(
-      "/:id/link",
-      param("id").isInt({ gt: 0 }),
+      "/link",
+      body("id1").isInt({ gt: 0 }),
       body("id2").isInt({ gt: 0 }).notEmpty(),
       body("type").isString().notEmpty(),
       Utility.validateRequest,
       Utility.isLoggedIn,
       (req, res, next) => {
         this.documentController
-          .addLink(req.params.id, req.body.id2, req.body.type)
+          .addLink(req.body.id1, req.body.id2, req.body.type)
           .then((link) => {
             // Assuming link resolves successfully, send the response
             res.status(200).json({
-              id1: req.params.id,
+              id1: req.body.id1,
               id2: req.body.id2,
               type: req.body.type,
             });
