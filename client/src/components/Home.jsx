@@ -13,20 +13,20 @@ const Home = () => {
     {
       id: 1,
       src: '../public/kirunaSinking.jpg',
-      description: 'The town of Kiruna in the Swedish Arctic is sinking...',
-      style: { width: '130px', height: '130px', left: '15%', top: '60%' },
+      description: 'Kiruna is sinking due to underground iron ore mining, threatening its infrastructure. As a result, the town is being relocated 3 kilometers away to ensure residents safety and preserve its cultural heritage.',
+      style: { width: '130px', height: '130px', left: '10%', top: '60%' },
     },
     {
       id: 2,
       src: '../public/New_Kiruna_01.jpg',
-      description: 'Transportation issues in Kiruna stem from its ongoing relocation...',
-      style: { width: '160px', height: '160px', left: '30%', top: '60%' },
+      description: 'Kiruna faces transportation issues due to its remote location and harsh weather conditions, which can disrupt travel and logistics. Limited public transport options and dependence on road networks complicate access to and from the town. Additionally, ongoing construction related to the town`s relocation further impacts transportation efficiency.',
+      style: { width: '160px', height: '160px', left: '18%', top: '58%' },
     },
     {
       id: 3,
       src: '../public/swed.jpg',
-      description: 'Kiruna is the northernmost city in Sweden...',
-      style: { width: '180px', height: '180px', left: '45%', top: '60%' },
+      description: 'Kiruna is a town in northern Sweden known for its rich iron ore deposits and stunning Arctic landscapes. Founded in the late 19th century, it became the largest town in Lapland and is famous for attractions like the Icehotel and the Northern Lights. Currently, Kiruna is undergoing a significant relocation project due to subsidence from mining, reflecting its adaptability and commitment to preserving its cultural heritage.',
+      style: { width: '180px', height: '180px', left: '28%', top: '57%' },
     },
   ];
   

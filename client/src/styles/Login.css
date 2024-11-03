@@ -1,4 +1,3 @@
-/* Background styling */
 .login-background {
   background-image: url('../public/kirunalogin.jpg');
   background-size: cover;
@@ -13,10 +12,9 @@
   align-items: center;
   justify-content: center;
   z-index: 0;
-  overflow-y: hidden; /* Prevent scroll on large screens */
+  overflow-y: hidden; 
 }
 
-/* Login container styling */
 .login-container {
   background: rgba(255, 255, 255, 0.85);
   padding: 40px;
@@ -28,7 +26,6 @@
   z-index: 1;
 }
 
-/* Responsive typography */
 .login-container h1 {
   font-size: 2rem;
   font-weight: bold;
@@ -75,13 +72,12 @@
   margin-top: 1rem;
 }
 
-/* Adjustments for small screens */
 @media (max-width: 576px) {
   .login-background {
-    overflow-y: auto; /* Enable scroll on small screens */
-    align-items: center; /* Center vertically */
-    justify-content: center; /* Center horizontally */
-    padding: 20px; /* Add padding */
+    overflow-y: auto; 
+    align-items: center;
+    justify-content: center; 
+    padding: 20px; 
   }
 
   .login-container {
@@ -105,17 +101,15 @@
   }
 }
 
-/* General reset for page layout */
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent scroll on large screens */
+  overflow: hidden;
 }
 
-/* Scroll activation for small screens */
 @media (max-width: 576px) {
   html, body {
-    overflow: auto; /* Allow scroll only on smaller screens */
+    overflow: auto; 
   }
 }
