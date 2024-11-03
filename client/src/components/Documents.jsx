@@ -8,7 +8,6 @@ import { Map } from './Map.jsx';
 function Documents(props) { 
   const [types, setTypes] = useState([]);
   const [scales, setScales] = useState([]);
-  const [error, setError] = useState(null); 
   const [showNField, setShowNField] = useState(false);
   const navigate = useNavigate();
   const [document, setDocument] = useState({
@@ -32,7 +31,7 @@ function Documents(props) {
         const response2 = await API.getTypeScale();
         setScales(response2); 
       } catch (error) {
-        console.error("Errore nel recupero dei tipi di documenti:", error);
+        console.error("Error fetching data:", error);
       }
     };
     fetchTypes();
@@ -64,6 +63,7 @@ function Documents(props) {
       [name]: value,
     }));
   };
+
   const [errors, setErrors] = useState({
     title: '',
     stakeholder: '',
@@ -106,11 +106,9 @@ function Documents(props) {
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
   
-    // Salvataggio del documento
     try {
       const response = await API.saveDocument(document);
       const doc = response;
-      console.log("New document ID:", doc);
       props.setNewDoc(doc);
       navigate(`/documents/links`);
     } catch (error) {
@@ -118,8 +116,6 @@ function Documents(props) {
     }
   };
   
-  
-
   const handleMapClick = (lat, lng) => {
     setDocument((prevDocument) => ({
       ...prevDocument,
@@ -131,7 +127,6 @@ function Documents(props) {
   const [position, setPosition] = useState({ lat: null, lng: null });
 
   useEffect(() => {
-    // Update the position when latitude or longitude change
     if (document.latitude && document.longitude) {
       setPosition({ lat: document.latitude, lng: document.longitude });
     }
@@ -238,7 +233,7 @@ function Documents(props) {
                     value={document.type}
                     onChange={handleChange}
                     className="input"
-                    isInvalid={!!errors.type} // Aggiunge il feedback visivo per errore
+                    isInvalid={!!errors.type} 
                   >
                     <option value="">Select a type</option>
                     {types.map((type) => (
@@ -263,7 +258,7 @@ function Documents(props) {
                     onChange={handleChange} 
                     placeholder="e.g., 2007"
                     className="input" 
-                    isInvalid={!!errors.issuanceDate} // Aggiunge il feedback visivo per errore
+                    isInvalid={!!errors.issuanceDate} 
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.issuanceDate}

@@ -80,7 +80,7 @@ const saveDocument = async (doc) => {
 
 const setLink = async (linkData) => {
     try {
-        const response = await fetch(`${SERVER_URL}/documents/${linkData.document1}/link`, {
+        const response = await fetch(`${SERVER_URL}/documents/link`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
