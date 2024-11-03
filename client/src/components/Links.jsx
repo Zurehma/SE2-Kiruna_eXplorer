@@ -10,7 +10,8 @@ function Links(props) {
   const [typeLink, setTypeLink] = useState([]);  
 
   const [linkData, setLinkData] = useState({
-    document1: props.newId || '',
+    document1: '',
+    //     document1: props.newDoc.id || '',
     document2: '',
     linkType: ''
   });
@@ -23,22 +24,22 @@ function Links(props) {
     const fetchDocuments = async () => {
       try {
         const response = await API.getDocuments();
-        setDocuments(response.data || []);
+        setDocuments(response);
         const response2 = await API.getTypeLinks();
-        setTypeLink(response2.data || []);
+        setTypeLink(response2);
       } catch (error) {
         console.error("Error fetching documents:", error);
       }
     };
     fetchDocuments();
 
-    if (props.newId) {
+    if (props.newDoc) {
       setLinkData((prevLinkData) => ({
         ...prevLinkData,
-        document1: props.newId,
+        document1: props.newDoc.id,
       }));
     }
-  }, [props.newId]);
+  }, [props.newDoc]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,13 +50,15 @@ function Links(props) {
   };
 
   const handleSaveLinks = async () => {
+    console.log('yyooooo', linkData);
+
     try {
       await API.setLink(linkData);
-      setSaveStatus('Completed');
+      console.log('Completed', linkData);
       setShowModal(true);
       setLinkData({ document1: '', document2: '', linkType: '' });
-      props.setnewId = '';
-      props.newId = '';
+      props.setNewDoc = '';
+      props.newDoc = '';
     } catch (error) {
       console.error("Error saving links:", error);
       setSaveStatus('Not Completed');
@@ -84,7 +87,7 @@ function Links(props) {
                     value={linkData.document1} 
                     onChange={handleChange}
                   >
-                    {!props.newId && <option value="">Select Document 1</option>}
+                    {!props.newDoc && <option value="">Select Document 1</option>}
                     {documents.map((doc) => (
                       <option key={doc.id} value={doc.id}>{doc.title}</option>
                     ))}
@@ -114,7 +117,7 @@ function Links(props) {
                 >
                   <option value="">Select a type of Link</option>
                   {typeLink.map((type) => (
-                    <option key={type.id} value={type.id}>{type.name}</option>
+                    <option key={type.id} value={type.id}>{type}</option>
                   ))}
                 </Form.Select>
               </Form.Group>

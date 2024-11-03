@@ -7,34 +7,31 @@ import { Map } from './Map.jsx';
 
 function Documents(props) { 
   const [types, setTypes] = useState([]);
-  const [scale, setScale] = useState([]);
+  const [scales, setScales] = useState([]);
   const [error, setError] = useState(null); 
   const [showNField, setShowNField] = useState(false);
-  const [nValue, setNValue] = useState('');
   const navigate = useNavigate();
   const [document, setDocument] = useState({
     title: '',
-    stakeholders: '',
+    stakeholder: '',
     scale: '',
-    nValue: '',
     issuanceDate: '',
     type: '',
-    connections: '',
+    description: '',
     language: '',
     pages: '',
     latitude:'',
     longitude: '',
-    description: ''
   });
 
   useEffect(() => {
     const fetchTypes = async () => {
       try {
         const response = await API.getTypeDocuments();
-        setTypes(response.data);
+        setTypes(response); 
         const response2 = await API.getTypeScale();
-        setScale(response2.data);
-     } catch (error) {
+        setScales(response2); 
+      } catch (error) {
         console.error("Errore nel recupero dei tipi di documenti:", error);
       }
     };
@@ -50,17 +47,6 @@ function Documents(props) {
     return validFormats.some((regex) => regex.test(date));
   };
 
-  const handleDateChange = (e) => {
-    const { value } = e.target;
-    handleChange(e);
-
-    if (validateDate(value) || value === "") {
-      setError(""); 
-    } else {
-      setError("Invalid date. Use DD/MM/YYYY, MM/YYYY or YYYY.");
-    }
-  };
-
   const handleScaleChange = (e) => {
     const { value } = e.target;
     handleChange(e);
@@ -68,7 +54,6 @@ function Documents(props) {
       setShowNField(true);
     } else {
       setShowNField(false);
-      setNValue(""); 
     }
   };
 
@@ -79,20 +64,61 @@ function Documents(props) {
       [name]: value,
     }));
   };
-
-  const handleSubmit = async () => {
+  const [errors, setErrors] = useState({
+    title: '',
+    stakeholder: '',
+    scale: '',
+    issuanceDate: '',
+    type: '',
+    language: '',
+    pages: '',
+    latitude: '',
+    longitude: '',
+    description: ''
+  });
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Document saved:", document);
-    
+  
+    const newErrors = {};
+    if (!document.title || document.title.length < 2) {
+      newErrors.title = "Title is required and cannot be empty."
+    }
+    if (!document.stakeholder || document.stakeholder.length < 2) {
+      newErrors.stakeholder = "Stakeholder is required and cannot be empty.";
+    }
+    if (!document.scale) {
+      newErrors.scale = "You must select a scale.";
+    }
+    if (!document.type) {
+      newErrors.type = "You must select a type.";
+    }
+    if (!document.issuanceDate || !validateDate(document.issuanceDate)) {
+      newErrors.issuanceDate = "Issuance Date must be in a valid format (DD/MM/YYYY, MM/YYYY, or YYYY).";
+    }
+    if (!document.language) {
+      newErrors.language = "Language is required and cannot be empty.";
+    }
+    if (!document.description || document.description.length < 2) {
+      newErrors.description = "Description is required and cannot be empty.";
+    }
+  
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+  
+    // Salvataggio del documento
     try {
       const response = await API.saveDocument(document);
-      const newId = response.data.id;
-      props.setnewId(newId);
+      const doc = response;
+      console.log("New document ID:", doc);
+      props.setNewDoc(doc);
       navigate(`/documents/links`);
     } catch (error) {
       console.error("Error saving document:", error);
     }
   };
+  
+  
 
   const handleMapClick = (lat, lng) => {
     setDocument((prevDocument) => ({
@@ -101,13 +127,16 @@ function Documents(props) {
       longitude: lng,
     }));
   };
+
   const [position, setPosition] = useState({ lat: null, lng: null });
+
   useEffect(() => {
     // Update the position when latitude or longitude change
     if (document.latitude && document.longitude) {
       setPosition({ lat: document.latitude, lng: document.longitude });
     }
   }, [document.latitude, document.longitude]);
+
   return (
     <div className="documents-background">
       <Container className="d-flex align-items-center justify-content-center min-vh-100">
@@ -128,22 +157,30 @@ function Documents(props) {
                     onChange={handleChange} 
                     placeholder="Enter document title"
                     className="input" 
+                    isInvalid={!!errors.title} 
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.title}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={6}>
-                <Form.Group controlId="stakeholders">
-                  <Form.Label>Stakeholders</Form.Label>
+                <Form.Group controlId="stakeholder">
+                  <Form.Label>Stakeholder</Form.Label>
                   <Form.Control 
                     type="text" 
-                    name="stakeholders" 
+                    name="stakeholder" 
                     minLength={2} 
-                    value={document.stakeholders} 
+                    value={document.stakeholder} 
                     onChange={handleChange} 
                     placeholder="e.g., Kiruna kommun/Residents"
                     className="input" 
+                    isInvalid={!!errors.stakeholder} 
                   />
-                </Form.Group>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.stakeholder}
+                  </Form.Control.Feedback>
+                </Form.Group>              
               </Col>
             </Row>
 
@@ -156,15 +193,19 @@ function Documents(props) {
                     name="scale"
                     value={document.scale}
                     onChange={handleScaleChange}
-                    className="input"
+                    className="input"    
+                    isInvalid={!!errors.scale} 
                   >
                     <option value="">Select a scale</option>
-                    {scale.map((type) => (
-                      <option key={type.id} value={type.id}>
-                        {type.name}
+                    {scales.map((scale) => (
+                      <option key={scale.id} value={scale.id}>
+                        {scale}
                       </option>
                     ))}
                   </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.scale}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
 
@@ -175,10 +216,11 @@ function Documents(props) {
                     <Form.Control 
                       type="number" 
                       name="nValue" 
-                      value={document.nValue} 
+                      value={document.scale} 
                       onChange={handleChange} 
                       placeholder="Enter n"
                       className="input"
+                      isInvalid={!!errors.scale}
                     />
                   </Form.Group>
                 </Col>
@@ -196,14 +238,18 @@ function Documents(props) {
                     value={document.type}
                     onChange={handleChange}
                     className="input"
+                    isInvalid={!!errors.type} // Aggiunge il feedback visivo per errore
                   >
                     <option value="">Select a type</option>
                     {types.map((type) => (
                       <option key={type.id} value={type.id}>
-                        {type.name}
+                        {type}
                       </option>
                     ))}
                 </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                    {errors.type}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
 
@@ -214,13 +260,13 @@ function Documents(props) {
                     type="text" 
                     name="issuanceDate" 
                     value={document.issuanceDate} 
-                    onChange={handleDateChange} 
+                    onChange={handleChange} 
                     placeholder="e.g., 2007"
                     className="input" 
-                    isInvalid={!!error} // Aggiunge il feedback visivo per errore
+                    isInvalid={!!errors.issuanceDate} // Aggiunge il feedback visivo per errore
                   />
                   <Form.Control.Feedback type="invalid">
-                    {error}
+                    {errors.issuanceDate}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Col>           
@@ -238,7 +284,11 @@ function Documents(props) {
                     onChange={handleChange} 
                     placeholder="e.g., Swedish"
                     className="input" 
+                    isInvalid={!!errors.language}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.language}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col md={6}>
@@ -300,11 +350,15 @@ function Documents(props) {
                 onChange={handleChange} 
                 placeholder="Enter a brief description"
                 className="input-textarea" 
+                isInvalid={!!errors.description}
             />
+            <Form.Control.Feedback type="invalid">
+                {errors.description}
+            </Form.Control.Feedback>
             </Form.Group>
 
             <div className="text-center mt-4">
-                <Button variant="primary" type="submit" className="btn-save">Save Document</Button>
+                <Button variant="primary" type="submit" onClick={handleSubmit} className="btn-save">Save Document</Button>
             </div>
           </Form>
         </Card.Body>

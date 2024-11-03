@@ -23,7 +23,7 @@ function App() {
     const [error, setError] = useState(null);
     const [loggedIn, setLoggedIn] = useState(false);
     const [role, setRole] = useState('');
-    const [newId, setnewId] = useState('');
+    const [newDoc, setNewDoc] = useState('');
     const navigate = useNavigate();
     
     const handleLogin = async (credentials) => {
@@ -67,8 +67,8 @@ function App() {
               <Route path="/" element={<Home setError={setError} />} />
               <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole}/>}/>
               <Route path="/map" element={<Map2 handleLogin={handleLogin} username={username} setUsername={setUsername}/>}/>
-              <Route path="/documents" element={<Documents newId={newId} setnewId={setnewId} />}/>
-              <Route path="/documents/links" element={<Links newId={newId} setnewId={setnewId} />}/>
+              <Route path="/documents" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} />}/>
+              <Route path="/documents/links" element={<Links newDoc={newDoc} setNewDoc={setNewDoc} />}/>
               </Routes>
           </Container>
         </div>
