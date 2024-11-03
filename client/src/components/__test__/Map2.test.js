@@ -9,6 +9,9 @@ jest.mock('react-leaflet', () => ({
     TileLayer: jest.fn(),
     Marker: jest.fn(({ children }) => <div>{children}</div>),
     Popup: jest.fn(({ children }) => <div>{children}</div>),
+    useMap: jest.fn(() => ({
+        setView: jest.fn(),
+    })),
 }));
 
 jest.mock('../../../API', () => ({
@@ -56,11 +59,9 @@ describe('Map2 Component', () => {
     ];
 
     const mockSetError = jest.fn();
-
     beforeEach(() => {
         API.getDocuments.mockResolvedValue(mockData);
     });
-
     afterEach(() => {
         jest.clearAllMocks();
     });
@@ -70,7 +71,6 @@ describe('Map2 Component', () => {
         await waitFor(() => {
             expect(screen.getByText(/Town Hall Demolition/i)).toBeInTheDocument();
         });
-       
         expect(screen.getByText(/New Building Construction/i)).toBeInTheDocument();
     });
 
@@ -105,4 +105,5 @@ describe('Map2 Component', () => {
             expect(mockSetError).toHaveBeenCalledWith(expect.any(Error));
         });
     });
+
 });
