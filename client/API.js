@@ -113,6 +113,12 @@ const setLink = async (linkData) => {
       credentials: 'include'
     }).then(handleInvalidResponse);
   }
+  const getUserInfo = async () => {
+    return await fetch(SERVER_URL + '/sessions/current', {
+        credentials: 'include'
+    }).then(handleInvalidResponse)
+    .then(response => response.json());
+  };
 
 
 //Export API methods
@@ -125,6 +131,7 @@ const API = {
     getTypeScale,
     getTypeLinks,
     setLink,
+    getUserInfo
 };
   
 

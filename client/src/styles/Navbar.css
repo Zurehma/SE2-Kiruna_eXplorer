@@ -57,3 +57,17 @@
     flex-direction: column;
   }
 }
+
+.dropdown-menu {
+  background-color: #000; /* Set background color */
+  border: none; /* Remove border */
+}
+
+.dropdown-item {
+  color: #fff; /* Change text color */
+}
+
+.dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.726); /* Change hover color */
+}
+
