@@ -100,7 +100,7 @@ Add a new document with the provided information.
 - Request Body Content: An object with the following parameters:
   - `title`: a string that must not be empty.
   - `stakeholder`: a string that must not be empty.
-  - `scale`: an string value between: [`Blueprint/effects`, `Text`, `1:n`]. If the user choose `1:n`, it has to send only the value **n** in string format. It represent the relationship between the dimensions drawn on a plan or architectural drawing and the actual dimensions of the building.
+  - `scale`: an string value between: [`Blueprint/effects`, `Text`, `1:n`]. If the user choose `1:n`, it has to send only the value **n** in integer format. It represent the relationship between the dimensions drawn on a plan or architectural drawing and the actual dimensions of the building.
   - `issuanceDate`: a string that represent the date. It must be in the format _YYYY-MM-DD_.
   - `type`: a string that represent the type. Can be a value between: [`Informative`, `Prescriptive`, `Material`, `Design`, `Technical`].
   - `language`: a string that must not be empty.
