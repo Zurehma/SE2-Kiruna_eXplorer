@@ -24,7 +24,7 @@ html, body {
   flex-direction: column; /* Stacks children vertically */
   justify-content: center; /* Centers content vertically within the container */
   align-items: flex-end; /* Aligns content to the right */
-  background: rgba(255, 255, 255, 0.92); /* Existing background */
+  background: rgba(255, 255, 255, 0.486); /* Existing background */
   backdrop-filter: blur(8px); /* Existing blur effect */
   padding: 40px; /* Existing padding */
   border-radius: 20px; /* Existing border radius */
