@@ -75,16 +75,16 @@ function App() {
           <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} role={role} />
           <Container fluid className="flex-grow-1 d-flex flex-column px-0">
             {error && (
-            <Alert variant="danger" className="fixed-bottom mt-3" dismissible onClose={() => setError(null)}>
-            <p>{error.message}</p>
-            </Alert>
+                <Alert variant="danger" className="fixed-top mt-3" style={{zIndex:1500}} dismissible onClose={() => setError(null)}>
+                <p>{error.message}</p>
+                </Alert>
             )}
             <Routes>
               <Route path="/" element={<Home setError={setError} />} />
               <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} loggedinError={loggedinError} setloggedinError={setloggedinError}/>}/>
               <Route path="/map" element={<Map2 setError={setError}/>}/>
-              <Route path="/documents" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} />}/>
-              <Route path="/documents/links" element={<Links newDoc={newDoc} setNewDoc={setNewDoc} />}/>
+              <Route path="/documents" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError}/>}/>
+              <Route path="/documents/links" element={<Links newDoc={newDoc} setNewDoc={setNewDoc}  />}/>
               </Routes>
           </Container>
         </div>

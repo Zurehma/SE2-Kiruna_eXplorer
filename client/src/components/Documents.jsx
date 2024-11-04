@@ -122,6 +122,7 @@ function Documents(props) {
       navigate(`/documents/links`);
     } catch (error) {
       console.error("Error saving document:", error);
+      props.setError(error);
     }
   };
   
