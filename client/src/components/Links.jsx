@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import API from '../../API.js';
 import '../styles/Links.css';
 
-
 function Links(props) {
+  const [allDocuments,setAllDocuments] = useState([]);
   const [documents, setDocuments] = useState([]); 
   const [typeLink, setTypeLink] = useState([]); 
   const [showModal, setShowModal] = useState(false);
@@ -22,6 +22,7 @@ function Links(props) {
       try {
         const response = await API.getDocuments();
         setDocuments(response);
+        setAllDocuments(response);
         const response2 = await API.getTypeLinks();
         setTypeLink(response2);
       } catch (error) {
@@ -40,6 +41,7 @@ function Links(props) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(value)
     setLinkData((prevLinkData) => ({
       ...prevLinkData,
       [name]: value,
@@ -109,8 +111,8 @@ function Links(props) {
                     isInvalid={!!errors.document1}
                   >
                     {!props.newDoc && <option value="">Select Document 1</option>}
-                    {documents.map((doc, index) => (
-                      <option key={index} value={doc}>{doc.title}</option>
+                    {documents.map((doc) => (
+                      <option key={doc.id} value={doc.id}>{doc.title}</option>
                     ))}
               </Form.Select>
               <Form.Control.Feedback type="invalid">
@@ -127,8 +129,8 @@ function Links(props) {
                   isInvalid={!!errors.document2}
                 >
                   <option value="">Select Document 2</option>
-                  {documents.map((doc, index) => (
-                    <option key={index} value={doc}>{doc.title}</option>
+                  {documents.map((doc) => (
+                    <option key={doc.id} value={doc.id}>{doc.title}</option>
                   ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
