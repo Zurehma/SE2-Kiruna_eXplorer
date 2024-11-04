@@ -100,7 +100,7 @@ function Links(props) {
       <Container className="d-flex align-items-top justify-content-center min-vh-100">
         <Card className="card-link p-4 shadow-sm">
           <Card.Body>
-          <Card.Title className="links-card-title">ADD NEW LINK</Card.Title>
+          <Card.Title className="links-card-title">ADD NEW LINK </Card.Title>
           <Form>
             <Form.Group controlId="document1" className="links-form-group">
               <Form.Label className="links-form-label">Document 1</Form.Label>
@@ -111,7 +111,7 @@ function Links(props) {
                     isInvalid={!!errors.document1}
                   >
                     {!props.newDoc && <option value="">Select Document 1</option>}
-                    {documents.map((doc) => (
+                    {documents.filter((doc)=>doc.id !== Number(linkData.document2)).map((doc) => (
                       <option key={doc.id} value={doc.id}>{doc.title}</option>
                     ))}
               </Form.Select>
@@ -129,7 +129,7 @@ function Links(props) {
                   isInvalid={!!errors.document2}
                 >
                   <option value="">Select Document 2</option>
-                  {documents.map((doc) => (
+                  {documents.filter((doc)=>doc.id !== Number(linkData.document1)).map((doc) => (
                     <option key={doc.id} value={doc.id}>{doc.title}</option>
                   ))}
                 </Form.Select>
