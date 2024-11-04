@@ -128,7 +128,6 @@ function Documents(props) {
   useEffect(() => {
     document.latitude = position.lat;
     document.longitude = position.lng;
-    console.log(document.latitude,document.longitude);
   }, [position.lat,position.lng]);
 
   useEffect(() => {
@@ -154,7 +153,7 @@ function Documents(props) {
                     type="text" 
                     name="title" 
                     minLength={2} 
-                    value={document.title} 
+                    value={document.title || ""}  // Usa stringa vuota come valore predefinito
                     onChange={handleChange} 
                     placeholder="Enter document title"
                     className="input" 
@@ -172,7 +171,7 @@ function Documents(props) {
                     type="text" 
                     name="stakeholder" 
                     minLength={2} 
-                    value={document.stakeholder} 
+                    value={document.stakeholder || ""} 
                     onChange={handleChange} 
                     placeholder="e.g., Kiruna kommun/Residents"
                     className="input" 
@@ -192,16 +191,14 @@ function Documents(props) {
                   <Form.Select 
                     as="select"
                     name="scale"
-                    value={document.scale}
+                    value={document.scale || ""}
                     onChange={handleScaleChange}
                     className="input"    
                     isInvalid={!!errors.scale} 
                   >
                     <option value="">Select a scale</option>
-                    {scales.map((scale) => (
-                      <option key={scale.id} value={scale.id}>
-                        {scale}
-                      </option>
+                    {scales.map((scale, index) => (
+                      <option key={index} value={scale}>{scale}</option>
                     ))}
                   </Form.Select>
                   <Form.Control.Feedback type="invalid">
@@ -217,7 +214,7 @@ function Documents(props) {
                     <Form.Control 
                       type="number" 
                       name="nValue" 
-                      value={document.scale} 
+                      value={document.scale || ""} 
                       onChange={handleChange} 
                       placeholder="Enter n"
                       className="input"
@@ -236,16 +233,14 @@ function Documents(props) {
                   <Form.Select 
                     as="select"
                     name="type"
-                    value={document.type}
+                    value={document.type || ""}
                     onChange={handleChange}
                     className="input"
                     isInvalid={!!errors.type} 
                   >
                     <option value="">Select a type</option>
-                    {types.map((type) => (
-                      <option key={type.id} value={type.id}>
-                        {type}
-                      </option>
+                    {types.map((type, index) => (
+                      <option key={index} value={type}>{type}</option>
                     ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
@@ -260,7 +255,7 @@ function Documents(props) {
                   <Form.Control 
                     type="text" 
                     name="issuanceDate" 
-                    value={document.issuanceDate} 
+                    value={document.issuanceDate || ""} 
                     onChange={handleChange} 
                     placeholder="e.g., 2007"
                     className="input" 
@@ -281,7 +276,7 @@ function Documents(props) {
                   <Form.Control 
                     type="text" 
                     name="language" 
-                    value={document.language} 
+                    value={document.language || ""} 
                     onChange={handleChange} 
                     placeholder="e.g., Swedish"
                     className="input" 
@@ -298,7 +293,7 @@ function Documents(props) {
                   <Form.Control 
                     type="integer" 
                     name="pages" 
-                    value={document.pages} 
+                    value={document.pages || ""} 
                     onChange={handleChange} 
                     placeholder="Number of pages"
                     className="input" 
@@ -318,7 +313,7 @@ function Documents(props) {
                   <Form.Control 
                     type="text" 
                     name="latitude" 
-                    value={document.latitude} 
+                    value={document.latitude || ""} 
                     onChange={handleChange}
                     placeholder="e.g., 59.3293"
                     className="input" 
@@ -331,7 +326,7 @@ function Documents(props) {
                   <Form.Control 
                     type="text" 
                     name="longitude" 
-                    value={document.longitude} 
+                    value={document.longitude || ""} 
                     onChange={handleChange} 
                     placeholder="e.g., 18.0686"
                     className="input" 
@@ -347,7 +342,7 @@ function Documents(props) {
                 rows={5} 
                 name="description" 
                 minLength={2}  
-                value={document.description} 
+                value={document.description || ""} 
                 onChange={handleChange} 
                 placeholder="Enter a brief description"
                 className="input-textarea" 

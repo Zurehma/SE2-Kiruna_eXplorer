@@ -7,17 +7,15 @@ import '../styles/Links.css';
 
 function Links(props) {
   const [documents, setDocuments] = useState([]); 
-  const [typeLink, setTypeLink] = useState([]);  
-
+  const [typeLink, setTypeLink] = useState([]); 
+  const [showModal, setShowModal] = useState(false);
+  const [saveStatus, setSaveStatus] = useState(''); 
+  const navigate = useNavigate(); 
   const [linkData, setLinkData] = useState({
     document1: '',
     document2: '',
     linkType: ''
   });
-
-  const [showModal, setShowModal] = useState(false);
-  const [saveStatus, setSaveStatus] = useState(''); 
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -52,6 +50,7 @@ function Links(props) {
     document1: '',
     document2: '',
     linkType: '',
+    err: '',
   });
 
   const handleSaveLinks = async (e) => {  
@@ -79,7 +78,9 @@ function Links(props) {
       setLinkData({ document1: '', document2: '', linkType: '' });
       props.setNewDoc('');
     } catch (error) {
-      console.error("Error saving links:", error);
+      if(error.message === "Conflict") {
+        setErrors({ err: "The link already exists." });
+      }
       setSaveStatus('Not Completed');
       setShowModal(true);
     }
@@ -108,8 +109,8 @@ function Links(props) {
                     isInvalid={!!errors.document1}
                   >
                     {!props.newDoc && <option value="">Select Document 1</option>}
-                    {documents.map((doc) => (
-                      <option key={doc.id} value={doc.id}>{doc.title}</option>
+                    {documents.map((doc, index) => (
+                      <option key={index} value={doc}>{doc.title}</option>
                     ))}
               </Form.Select>
               <Form.Control.Feedback type="invalid">
@@ -126,8 +127,8 @@ function Links(props) {
                   isInvalid={!!errors.document2}
                 >
                   <option value="">Select Document 2</option>
-                  {documents.map((doc) => (
-                    <option key={doc.id} value={doc.id}>{doc.title}</option>
+                  {documents.map((doc, index) => (
+                    <option key={index} value={doc}>{doc.title}</option>
                   ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
@@ -144,8 +145,8 @@ function Links(props) {
                   isInvalid={!!errors.linkType}
                 >
                   <option value="">Select a type of Link</option>
-                  {typeLink.map((type) => (
-                    <option key={type.id} value={type.id}>{type}</option>
+                  {typeLink.map((type, index) => (
+                    <option key={index} value={type}>{type}</option>
                   ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
@@ -168,17 +169,25 @@ function Links(props) {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="links-modal-body">
-          {saveStatus === 'Completed'
-            ? 'Link saved successfully!'
-            : 'Failed to save the link.'}
+          {saveStatus === 'Completed' 
+            ? 'Link saved successfully!' 
+            : `Failed to save the link. ${errors.err || ''}`}
         </Modal.Body>
+
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Go to Home
           </Button>
-          {saveStatus === 'Completed' && (
+          {saveStatus === 'Completed' ? 
+          (
             <Button variant="primary" onClick={handleNewLink}>
               Save New Link
+            </Button>
+          )
+          :
+          (
+            <Button variant="primary" onClick={handleNewLink}>
+               Try again!
             </Button>
           )}
         </Modal.Footer>
