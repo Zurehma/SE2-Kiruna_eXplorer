@@ -177,9 +177,6 @@ function Links(props) {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Go to Home
-          </Button>
           {saveStatus === 'Completed' ? 
           (
             <Button variant="primary" onClick={handleNewLink}>
@@ -192,6 +189,9 @@ function Links(props) {
                Try again!
             </Button>
           )}
+          <Button variant="secondary" onClick={handleClose}>
+            Go to Home
+          </Button>
         </Modal.Footer>
       </Modal>
     </Container>
