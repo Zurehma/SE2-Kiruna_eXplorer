@@ -53,33 +53,38 @@ const getTypeLinks = async () => {
 
 // Function to save a document
 const saveDocument = async (doc) => {
+
+    const filteredDoc = Object.fromEntries(
+        Object.entries({
+            title: doc.title,
+            stakeholder: doc.stakeholder,
+            scale: doc.scale,
+            issuanceDate: doc.issuanceDate,
+            type: doc.type,
+            description: doc.description,
+            language: doc.language,
+            pages: doc.pages,
+            pageFrom: doc.pageFrom,
+            pageTo: doc.pageTo,
+            lat: doc.latitude, 
+            long: doc.longitude 
+        }).filter(([_, value]) => value !== '' && value !== null)
+    );
+
     try {
         const response = await fetch(`${SERVER_URL}/documents/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({
-                title: doc.title,
-                stakeholder: doc.stakeholder,
-                scale: doc.scale,
-                issuanceDate: doc.issuanceDate,
-                type: doc.type,
-                description: doc.description,
-                language: doc.language,
-                pages: doc.pages,
-
-                pageFrom: doc.pageFrom,
-                pageTo: doc.pageTo,
-                lat: doc.latitude,
-                long: doc.longitude,
-            }),
-            credentials: 'include',
+            body: JSON.stringify(filteredDoc),
         });
+        
         return handleInvalidResponse(response).json();
     } catch (error) {
         throw error;
     }
 };
+
 
 const setLink = async (linkData) => {
     try {
