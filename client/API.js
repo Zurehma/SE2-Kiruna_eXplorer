@@ -67,6 +67,9 @@ const saveDocument = async (doc) => {
                 description: doc.description,
                 language: doc.language,
                 pages: doc.pages,
+
+                pageFrom: doc.pageFrom,
+                pageTo: doc.pageTo,
                 lat: doc.latitude,
                 long: doc.longitude,
             }),

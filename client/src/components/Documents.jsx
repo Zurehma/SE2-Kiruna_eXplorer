@@ -14,14 +14,18 @@ function Documents(props) {
     title: '',
     stakeholder: '',
     scale: '',
+    nValue: '',
     issuanceDate: '',
     type: '',
     description: '',
     language: '',
     pages: '',
-    latitude:'',
+    latitude: '',
     longitude: '',
+    pageFrom: '', // Nuovo campo
+    pageTo: ''    // Nuovo campo
   });
+  
 
   useEffect(() => {
     const fetchTypes = async () => {
@@ -60,7 +64,7 @@ function Documents(props) {
     const { name, value } = e.target;
     setDocument((prevDocument) => ({
       ...prevDocument,
-      [name]: value,
+      [name]: name === 'nValue' ? parseInt(value, 10) || '' : value, // Converti nValue in numero
     }));
   };
 
@@ -68,10 +72,10 @@ function Documents(props) {
     title: '',
     stakeholder: '',
     scale: '',
+    nValue: '',
     issuanceDate: '',
     type: '',
     language: '',
-    pages: '',
     latitude: '',
     longitude: '',
     description: ''
@@ -102,10 +106,15 @@ function Documents(props) {
     if (!document.description || document.description.length < 2) {
       newErrors.description = "Description is required and cannot be empty.";
     }
+    
   
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
   
+    if(document.nValue && document.scale === '1:n') {  
+      document.scale = document.nValue;
+    }
+
     try {
       const response = await API.saveDocument(document);
       const doc = response;
@@ -212,13 +221,13 @@ function Documents(props) {
                   <Form.Group controlId="nValue">
                     <Form.Label>Value of n</Form.Label>
                     <Form.Control 
-                      type="number" 
+                      type="text" 
                       name="nValue" 
-                      value={document.scale || ""} 
+                      value={document.nValue || ""} 
                       onChange={handleChange} 
                       placeholder="Enter n"
                       className="input"
-                      isInvalid={!!errors.scale}
+                      //isInvalid={!!errors.scale}
                     />
                   </Form.Group>
                 </Col>
@@ -301,6 +310,36 @@ function Documents(props) {
                 </Form.Group>
               </Col>
             </Row>
+
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group controlId="pageFrom">
+                  <Form.Label>Page From</Form.Label>
+                  <Form.Control 
+                    type="integer" 
+                    name="pageFrom" 
+                    value={document.pageFrom || ""} 
+                    onChange={handleChange} 
+                    placeholder="Starting page" 
+                    className="input" 
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group controlId="pageTo">
+                  <Form.Label>Page To</Form.Label>
+                  <Form.Control 
+                    type="integer" 
+                    name="pageTo" 
+                    value={document.pageTo || ""} 
+                    onChange={handleChange} 
+                    placeholder="Ending page" 
+                    className="input" 
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
             <Row className="mb-3">
               <Form.Label>Select a point on the Map, if not selected, the entire municipality is considered</Form.Label>
               <Map handleMapClick={handleMapClick} setPosition={setPosition} latitude={position.lat} longitude={position.lng} />
