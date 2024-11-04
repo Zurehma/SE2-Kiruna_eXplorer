@@ -1,8 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap';
 import '../styles/Login.css';
 
 function Login({ handleLogin, username, password, setUsername, setPassword, loggedinError, setloggedinError }) {
+    
+    useEffect(() => {
+        // Set a timer to clear loggedinError after 5 seconds if there is an error
+        if (loggedinError) {
+            const timer = setTimeout(() => {
+                setloggedinError(null);
+            }, 5000);
+
+            // Clear the timer if loggedinError changes or if the component unmounts
+            return () => clearTimeout(timer);
+        }
+    }, [loggedinError]);
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         const credentials = { username, password };
