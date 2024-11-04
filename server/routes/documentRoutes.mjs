@@ -24,6 +24,7 @@ class DocumentRoutes {
 
     this.router.post(
       "/",
+      Utility.isLoggedIn,
       body("title").isString().notEmpty(),
       body("stakeholder").isString().notEmpty(),
       body("scale").isString().notEmpty(),
@@ -33,7 +34,6 @@ class DocumentRoutes {
       body("language").optional().isString().notEmpty(),
       oneOf([body("pages").optional().isInt({ gt: 0 }), [body("pageFrom").isInt({ gt: 0 }), body("pageTo").isInt({ gt: 0 })]]),
       Utility.validateRequest,
-      Utility.isLoggedIn,
       (req, res, next) => {
         this.documentController
           .addDocument(

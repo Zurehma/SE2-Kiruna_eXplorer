@@ -90,6 +90,7 @@ export const isDocumentType = (type) => {
 const SCALE_TYPES = {
   BLUEPRINT_EFFECTS: "Blueprint/effects",
   TEXT: "Text",
+  GENERIC: "1:n",
 };
 
 /**
@@ -134,7 +135,7 @@ const LINK_TYPES = {
  */
 export const getLinkTypes = () => {
   return Object.values(LINK_TYPES);
-}
+};
 
 /**
  * Check if the input type is a valid link type

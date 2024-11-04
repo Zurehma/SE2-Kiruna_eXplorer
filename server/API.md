@@ -100,7 +100,7 @@ Add a new document with the provided information.
 - Request Body Content: An object with the following parameters:
   - `title`: a string that must not be empty.
   - `stakeholder`: a string that must not be empty.
-  - `scale`: an integer that must be greater than 0 or a specific value between: [`Blueprint/effects`, `Text`]. It has to be sent as string value. It represent the relationship between the dimensions drawn on a plan or architectural drawing and the actual dimensions of the building.
+  - `scale`: an string value between: [`Blueprint/effects`, `Text`, `1:n`]. If the user choose `1:n`, it has to send only the value **n** in string format. It represent the relationship between the dimensions drawn on a plan or architectural drawing and the actual dimensions of the building.
   - `issuanceDate`: a string that represent the date. It must be in the format _YYYY-MM-DD_.
   - `type`: a string that represent the type. Can be a value between: [`Informative`, `Prescriptive`, `Material`, `Design`, `Technical`].
   - `language`: a string that must not be empty.
@@ -132,6 +132,7 @@ Add a new document with the provided information.
   - It should return a 400 error when `issuanceDate` is after the current date.
 
 #### GET `api/documents/link-types`
+
 Returns the list of all specific scale types.
 
 - Request Parameters: _None_
@@ -146,10 +147,10 @@ Returns the list of all specific scale types.
 - Access Constraints: Can only be called by a logged in user.
 - Additional Constraints: _None_
 
-
 #### POST `api/documents/link`
 
 - Request Body: An object with the following fields:
+
   - `id1`: an integer that is the ID of the first document (document being linked from...)
   - `id2`: an integer that is the ID of the second document (...document being linked to)
   - `type`: a string that represents the type of the link. Must be one of the following: [`Direct`, `Collateral`, `Projection`, `Update`]
