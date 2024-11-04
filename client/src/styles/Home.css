@@ -42,7 +42,7 @@ html, body {
 .home-title {
   font-size: 2.2rem; /* Increase size slightly for better emphasis */
   font-weight: bold;
-  color: #2c3e50;
+  color: #006d77;
   margin-bottom: 20px;
   animation: fadeInUp 1.5s ease forwards;
   line-height: 1.3; /* Improves readability for multi-line titles */
@@ -111,7 +111,7 @@ html, body {
   padding: 12px 25px;
   font-size: 1.1rem;
   color: #ffffff;
-  background-color: #2c3e50;
+  background-color: #006d77;
   border: none;
   border-radius: 25px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -187,3 +187,5 @@ html, body {
   top: 57%;
   position: absolute;
 }
+
+
