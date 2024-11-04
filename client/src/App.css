@@ -63,7 +63,7 @@
 }
 
 .custom-navbar {
-  background-color: #000000; 
+  background-color:white; 
   
 }
 
@@ -163,3 +163,5 @@ margin: 0;
 .alert-custom.show {
   opacity: 1;
 }
+
+
