@@ -45,9 +45,8 @@ function MyPopup(props) {
           <strong>Type:</strong> {props.doc.type} <br />
           <strong>Connections:</strong> {props.doc.connections} <br />
           <strong>Language:</strong> {props.doc.language} <br />
-          <strong>Pages:</strong> {displayValue(props.doc.pages)} <br />
-          <strong>From page:</strong> {displayValue(props.doc.pageFrom)} <br />
-          <strong>To page:</strong> {displayValue(props.doc.pageTo)} <br />
+          <strong>Number of pages:</strong> {displayValue(props.doc.pages)} <br />
+          <strong>Pages :</strong> {props.doc.pageFrom && props.doc.pageTo ? `${props.doc.pageFrom}-${props.doc.pageTo}` : displayValue(props.doc.pageFrom)} <br />
           <strong>Position:</strong> {props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'}
         </p>
       </Col>
