@@ -41,6 +41,7 @@ function MyPopup(props) {
         <p className='small'>
           <strong>Stakeholders:</strong> {props.doc.stakeholder} <br />
           <strong>Scale:</strong> {props.doc.scale} <br />
+          <strong>Scale:</strong> {props.doc.scale !== 'Text' && props.doc.scale !== 'Blueprint/effects' ? `1:${props.doc.scale}` : props.doc.scale} <br />
           <strong>Issuance Date:</strong> {props.doc.issuanceDate} <br />
           <strong>Type:</strong> {props.doc.type} <br />
           <strong>Connections:</strong> {props.doc.connections} <br />
