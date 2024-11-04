@@ -39,20 +39,19 @@ function MyPopup(props) {
       <Col xs={12} md={5} className='myPopup mb-3'>
         <h6>{props.doc.title}</h6>
         <p className='small'>
-          <strong>Stakeholders:</strong> {props.doc.stakeholder} <br />
-          <strong>Scale:</strong> {props.doc.scale && typeof props.doc.scale === 'string' && props.doc.scale.toUpperCase() !== 'TEXT' && props.doc.scale.toUpperCase() !== 'BLUEPRINT/EFFECTS' ? `1:${props.doc.scale}` : props.doc.scale} <br />
-          <strong>Issuance Date:</strong> {props.doc.issuanceDate} <br />
-          <strong>Type:</strong> {props.doc.type} <br />
-          <strong>Connections:</strong> {props.doc.connections} <br />
-          <strong>Language:</strong> {props.doc.language} <br />
-          <strong>Number of pages:</strong> {displayValue(props.doc.pages)} <br />
-          <strong>Pages :</strong> {props.doc.pageFrom && props.doc.pageTo ? `${props.doc.pageFrom}-${props.doc.pageTo}` : displayValue(props.doc.pageFrom)} <br />
-          <strong>Position:</strong> {props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'}
+          <strong>Stakeholders:   </strong> {props.doc.stakeholder} <br />
+          <strong>Scale:   </strong> {props.doc.scale && typeof props.doc.scale === 'string' && props.doc.scale.toUpperCase() !== 'TEXT' && props.doc.scale.toUpperCase() !== 'BLUEPRINT/EFFECTS' ? `1:${props.doc.scale}` : props.doc.scale} <br />
+          <strong>Issuance Date:   </strong> {props.doc.issuanceDate} <br />
+          <strong>Type:   </strong> {props.doc.type} <br />
+          <strong>Connections:   </strong> {props.doc.connections} <br />
+          <strong>Language:   </strong> {props.doc.language} <br />
+          <strong>Number of pages:   </strong> {displayValue(props.doc.pages)} <br />
+          <strong>Pages :   </strong> {props.doc.pageFrom && props.doc.pageTo ? `${props.doc.pageFrom}-${props.doc.pageTo}` : displayValue(props.doc.pageFrom)} <br />
+          <strong>Position:   </strong> {props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'}
         </p>
       </Col>
       <Col xs={12} md={5}>
         <p className='mt-3 small'><strong>Description:</strong> {props.doc.description}</p>
-        
       </Col>
     </Row>
   );

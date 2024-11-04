@@ -4,11 +4,13 @@
   border-right: 2px solid black;
   padding: 1.25rem;
   border-right: 0.125rem solid black;
+  overflow: hidden;
 }
 
 .leaflet-popup-content-wrapper {
   width: 100%;
   max-width: 90vw;
+  min-width: 90vh;
   max-height: 70vh;
   overflow-y: auto;
   background-color: rgba(255, 255, 255, 0.8);
@@ -45,6 +47,7 @@
   }
 
   .leaflet-popup-content-wrapper {
+    min-width: auto;
     max-width: 90vw;
     padding: 15px;
     max-height: 60vh;
