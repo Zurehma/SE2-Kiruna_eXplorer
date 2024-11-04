@@ -40,8 +40,7 @@ function MyPopup(props) {
         <h6>{props.doc.title}</h6>
         <p className='small'>
           <strong>Stakeholders:</strong> {props.doc.stakeholder} <br />
-          <strong>Scale:</strong> {props.doc.scale} <br />
-          <strong>Scale:</strong> {props.doc.scale !== 'Text' && props.doc.scale !== 'Blueprint/effects' ? `1:${props.doc.scale}` : props.doc.scale} <br />
+          <strong>Scale:</strong> {props.doc.scale && typeof props.doc.scale === 'string' && props.doc.scale.toUpperCase() !== 'TEXT' && props.doc.scale.toUpperCase() !== 'BLUEPRINT/EFFECTS' ? `1:${props.doc.scale}` : props.doc.scale} <br />
           <strong>Issuance Date:</strong> {props.doc.issuanceDate} <br />
           <strong>Type:</strong> {props.doc.type} <br />
           <strong>Connections:</strong> {props.doc.connections} <br />
