@@ -134,3 +134,7 @@
 .navbar-toggler{
   background-color:#006d77;
 }
+
+.custom-icon-color {
+  color: #006d77 !important; /* Replace with your desired color code */
+}

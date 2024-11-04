@@ -21,8 +21,8 @@ export function NavigationBar(props) {
         <Nav className="ms-auto">
           {props.role === 'Urban Planner' ? (
             <div className="d-flex align-items-center">
-              <i className="bi bi-person-circle text-white me-2"></i>
-              <h5 className="text-white mt-1 welcome-text me-2">
+            <i className="bi bi-person-circle me-2 custom-icon-color"></i>
+            <h5 className="mt-1 welcome-text me-2">
                 Welcome, {props.username}
               </h5>
 
