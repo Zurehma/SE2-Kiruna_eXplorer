@@ -7,7 +7,7 @@ class Document {
    * @param {Number} id
    * @param {String} title
    * @param {String} stakeholder
-   * @param {String} scale
+   * @param {String | Number} scale
    * @param {String} issuanceDate
    * @param {String} type
    * @param {Number} connections
@@ -38,13 +38,13 @@ class Document {
     this.id = id;
     this.title = title;
     this.stakeholder = stakeholder;
-    this.scale = scale;
+    this.scale = Number(scale) || scale;
     this.issuanceDate = issuanceDate;
     this.type = type;
     this.connections = connections;
     this.language = language;
     this.description = description;
-    this.pages = pages;
+    this.pages = Number(pages) || null;
     this.pageFrom = pageFrom;
     this.pageTo = pageTo;
     this.lat = lat;
@@ -90,6 +90,7 @@ export const isDocumentType = (type) => {
 const SCALE_TYPES = {
   BLUEPRINT_EFFECTS: "Blueprint/effects",
   TEXT: "Text",
+  GENERIC: "1:n",
 };
 
 /**
@@ -110,13 +111,9 @@ export const isScaleType = (scale) => {
     return undefined;
   }
 
-  const numberScale = Number(scale);
-
-  if (numberScale != undefined) {
-    return scale;
-  }
-
-  return Object.values(SCALE_TYPES).find((SCALE_TYPE) => SCALE_TYPE.toLowerCase().trim() === scale.toLowerCase().trim());
+  return Object.values(SCALE_TYPES).find(
+    (SCALE_TYPE) => SCALE_TYPE.toLowerCase().trim() === scale.toLowerCase().trim() && SCALE_TYPES.GENERIC !== SCALE_TYPE
+  );
 };
 
 /**
@@ -134,7 +131,7 @@ const LINK_TYPES = {
  */
 export const getLinkTypes = () => {
   return Object.values(LINK_TYPES);
-}
+};
 
 /**
  * Check if the input type is a valid link type

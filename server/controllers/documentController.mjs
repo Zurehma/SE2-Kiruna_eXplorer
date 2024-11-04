@@ -22,7 +22,7 @@ class DocumentController {
    * Add a new document with the provided information
    * @param {String} title
    * @param {String} stakeholder
-   * @param {Number} scale
+   * @param {String | Number} scale
    * @param {String} issuanceDate
    * @param {String} type
    * @param {String} language
@@ -62,11 +62,15 @@ class DocumentController {
           throw error;
         }
 
-        const scaleType = isScaleType(scale);
+        let scaleType = Number(scale);
 
-        if (scaleType === undefined) {
-          const error = { errCode: 400, errMessage: "Scale type error!" };
-          throw error;
+        if (typeof scale === "string") {
+          scaleType = isScaleType(scale);
+
+          if (scaleType === undefined) {
+            const error = { errCode: 400, errMessage: "Scale type error!" };
+            throw error;
+          }
         }
 
         let processedPages = pages;

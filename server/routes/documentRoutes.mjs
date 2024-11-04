@@ -24,16 +24,16 @@ class DocumentRoutes {
 
     this.router.post(
       "/",
+      Utility.isLoggedIn,
       body("title").isString().notEmpty(),
       body("stakeholder").isString().notEmpty(),
-      body("scale").isString().notEmpty(),
-      body("issuanceDate").isISO8601({ strict: true }),
+      oneOf([body("scale").isString().notEmpty(), body("scale").isInt({ gt: 0 })]),
+      oneOf([body("issuanceDate").isISO8601({ strict: true }), body("issuanceDate").custom(Utility.isValidYearMonthOrYear)]),
       body("type").isString().notEmpty(),
       body("description").isString().notEmpty(),
       body("language").optional().isString().notEmpty(),
       oneOf([body("pages").optional().isInt({ gt: 0 }), [body("pageFrom").isInt({ gt: 0 }), body("pageTo").isInt({ gt: 0 })]]),
       Utility.validateRequest,
-      Utility.isLoggedIn,
       (req, res, next) => {
         this.documentController
           .addDocument(
