@@ -1,10 +1,10 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
-import { Button } from 'react-bootstrap';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents,useMap } from 'react-leaflet';
+import 'leaflet-draw/dist/leaflet.draw.css';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
-
-const kirunaCoordinates = [67.8558, 20.2253];
+import 'leaflet-draw';
+import { Button } from 'react-bootstrap';
 
 const markerIcon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
@@ -14,94 +14,163 @@ const markerIcon = new L.Icon({
 });
 
 const RecenterMap = ({ position, zoom }) => {
-  const map = useMap();
+  const map = useMapEvents({});
   useEffect(() => {
-      map.setView(position, zoom); // Set the map view to the new position and zoom
-  }, [map, position, zoom]); // Run this effect when either `position` or `zoom` changes
+    map.setView(position, zoom);
+  }, [map, position, zoom]);
 
   return null;
-}
+};
 
-function Map({ handleMapClick,setPosition,latitude,longitude }) {
-  const initialPosition = [67.850, 20.217]; // Initial position
-  const [positionActual, setPositionActual] = useState(initialPosition); // State for current position
-  const [zoomLevel, setZoomLevel] = useState(12); // State for zoom level
-  const MapClickHandler = () => {
-    useMapEvents({
-      click: (e) => {
-        const newLat = e.latlng.lat;
-        const newLng = e.latlng.lng;
+const DrawingControl = ({ drawingMode, setDrawnShapes }) => {
+  const map = useMapEvents({});
 
-        setPosition({
-          lat: newLat,
-          lng: newLng,
-        });
+  useEffect(() => {
+    if (!map) return;
 
-        // Chiamata alla funzione handleMapClick con i nuovi valori di latitudine e longitudine
-        handleMapClick(newLat, newLng);
+    const drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+
+    const drawControl = new L.Control.Draw({
+      draw: {
+        circlemarker: false,
+        polyline: false,
+        circle: false, 
+        marker: true, 
+        rectangle: false,
+        polygon: {
+          allowIntersection: false,
+          showArea: true,
+          shapeOptions: {
+            color: '#6e6eff',
+          },
+        },
+      },
+      edit: {
+        featureGroup: drawnItems,
+        remove: true,
       },
     });
-    return null;
-  };
+
+    const handleDrawCreated = (e) => {
+      const layer = e.layer;
+      drawnItems.addLayer(layer);
+      setDrawnShapes((prevShapes) => [...prevShapes, layer.toGeoJSON()]);
+    };
+
+    if (drawingMode) {
+      map.addControl(drawControl);
+      map.on(L.Draw.Event.CREATED, handleDrawCreated);
+    } else {
+      map.removeControl(drawControl);
+      map.off(L.Draw.Event.CREATED, handleDrawCreated);
+    }
+
+    return () => {
+      map.removeControl(drawControl);
+      map.off(L.Draw.Event.CREATED, handleDrawCreated);
+    };
+  }, [map, drawingMode, setDrawnShapes]);
+
+  return null;
+};
+
+function Map() {
+  const initialPosition = [67.850, 20.217];
+  const [positionActual, setPositionActual] = useState(initialPosition);
+  const [zoomLevel, setZoomLevel] = useState(12);
+  const [drawingMode, setDrawingMode] = useState(false);
+  const [drawnShapes, setDrawnShapes] = useState([]);
+  const [markerPosition, setMarkerPosition] = useState(null); // Posizione del marcatore
+
   const recenterMap = () => {
-    setPositionActual(initialPosition); // Update state to trigger rerender
-    setZoomLevel(13); // Reset zoom level to 13
+    setPositionActual(initialPosition);
+    setZoomLevel(13);
   };
 
   const clearMarker = () => {
-    setPosition({ lat: null, lng: null });
-    handleMapClick('', ''); // Resetta anche nel componente padre
+    setMarkerPosition(null); // Rimuovi la posizione del marcatore
+    setDrawnShapes([]); // Rimuovi i disegni
+  };
+
+  const toggleDrawingMode = (e) => {
+    e.stopPropagation(); // Prevenire il click della mappa
+    setDrawingMode(!drawingMode);
+  };
+
+  const handleMarkerCreated = (lat, lng) => {
+    setMarkerPosition({ lat, lng }); // Imposta la posizione del marcatore
   };
 
   return (
-    <div className='text-center'>
-      <MapContainer
-        center={positionActual}
-        zoom={zoomLevel}
-        style={{ height: '50vh', width: '100%' }}
-      >
+    <div className="text-center" style={{ position: 'relative' }}>
+      <MapContainer center={positionActual} zoom={zoomLevel} style={{ height: '50vh', width: '100%' }}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <MapClickHandler />
+        
+        <RecenterMap position={positionActual} zoom={zoomLevel} />
+        
+        <DrawingControl drawingMode={drawingMode} setDrawnShapes={setDrawnShapes} />
 
-        {/* Mostra il marker se le coordinate sono definite */}
-        {latitude && longitude && (
-          <Marker position={[latitude, longitude]} icon={markerIcon} data-testid="map-marker">
+        {markerPosition && ( // Mostra il marcatore se presente
+          <Marker position={markerPosition} icon={markerIcon} data-testid="map-marker">
             <Popup>Selected Location</Popup>
           </Marker>
         )}
-        <RecenterMap position={positionActual} zoom={zoomLevel} />
-        <button 
-          onClick={recenterMap} 
-          style={{
-          position: 'absolute', 
-          top: '25%', 
-          left: '2%', 
-          background: 'white', 
-          border: 'none', 
-          width: '30px', 
-          height: '30px', 
-          borderRadius: '5px', 
-          boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
-          cursor: 'pointer',
-          zIndex: 1000, 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          padding: '0' 
-          }}
-        >
-        <i className="bi bi-compass" style={{ fontSize: '20px' }}></i>
-      </button>
+
+        {/* Container per i bottoni */}
+        <div style={{ position: 'absolute', top: '3%', left: '93%', zIndex: 1000 }}>
+          {/* Bottone per ricentrare la mappa */}
+          <button 
+            onClick={recenterMap} 
+            style={{
+              background: 'white', 
+              border: 'none', 
+              width: '25px', 
+              height: '25px', 
+              borderRadius: '5px', 
+              boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
+              cursor: 'pointer',
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              padding: '0',
+            }}
+          >
+            <i className="bi bi-compass" style={{ fontSize: '20px' }}></i>
+          </button>
+
+          {/* Bottone per attivare la modalità disegno */}
+          <button 
+            onClick={toggleDrawingMode} 
+            style={{
+              background: drawingMode ? '#d9534f' : 'white',
+              border: 'none',
+              width: '25px',
+              height: '25px',
+              borderRadius: '5px',
+              boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0',
+              marginTop: '5px', // Imposta un piccolo margine
+            }}
+          >
+            <i className="bi bi-pencil" style={{ fontSize: '20px', color: drawingMode ? 'white' : 'black' }}></i>
+          </button>
+        </div>
       </MapContainer>
 
-      {/* Pulsante per rimuovere il marker */}
-      {latitude && longitude && 
-      <Button onClick={clearMarker} variant="primary" type="button" className="btn-save mt-2 text-center">
-        Remove marker
-      </Button>}
+      {/* Bottone per rimuovere il marcatore */}
+      {markerPosition && ( // Mostra il bottone solo se il marcatore è presente
+        <Button onClick={clearMarker} variant="primary" type="button" className="btn-save mt-2 text-center">
+          Remove marker
+        </Button>
+      )}
     </div>
   );
 }
