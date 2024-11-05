@@ -29,7 +29,7 @@ describe("DocumentDAO", () => {
       const result = await documentDAO.addDocument(
         "example",
         "example",
-        "100",
+        100,
         "2024-02-12",
         "Informative",
         "english",
@@ -57,7 +57,7 @@ describe("DocumentDAO", () => {
       const result = documentDAO.addDocument(
         "example",
         "example",
-        "100",
+        100,
         "2024-02-12",
         "Informative",
         "english",
@@ -80,7 +80,7 @@ describe("DocumentDAO", () => {
         id: 1,
         title: "example",
         stakeholder: "example",
-        scale: 100,
+        scale: "100",
         issuanceDate: "2024-02-12",
         type: "Informative",
         connections: 3,
@@ -155,11 +155,11 @@ describe("DocumentDAO", () => {
         callback(null, []);
       });
 
-      const mockDBRun = jest.spyOn(db,"run").mockImplementation((sql, params, callback) => {
-        callback.call({ changes:1 }, null);
+      const mockDBRun = jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
+        callback.call({ changes: 1 }, null);
       });
 
-      const result = await documentDAO.addLink(1, 2,"Direct");
+      const result = await documentDAO.addLink(1, 2, "Direct");
       expect(result.changes).toBe(1);
       expect(mockDBRun).toHaveBeenCalled();
       expect(mockDBAll).toHaveBeenCalled();
@@ -172,7 +172,7 @@ describe("DocumentDAO", () => {
         callback(error, []);
       });
 
-      const result = documentDAO.addLink(1, 2,"Direct");
+      const result = documentDAO.addLink(1, 2, "Direct");
 
       await expect(result).rejects.toEqual(error);
       expect(mockDBAll).toHaveBeenCalled();
@@ -190,41 +190,35 @@ describe("DocumentDAO", () => {
         return {};
       });
 
-      const result = documentDAO.addLink(1, 2,"Direct");
+      const result = documentDAO.addLink(1, 2, "Direct");
 
       await expect(result).rejects.toEqual(error);
       expect(mockDBRun).toHaveBeenCalled();
       expect(mockDBAll).toHaveBeenCalled();
     });
 
-
-
     test("Link already exists in same order", async () => {
       const error = { errCode: 409, errMessage: "Link already exists" };
       const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
-        callback(null, [{docID1:1, docID2:2}]);
+        callback(null, [{ docID1: 1, docID2: 2 }]);
       });
 
-      const result = documentDAO.addLink(1, 2,"Direct");
+      const result = documentDAO.addLink(1, 2, "Direct");
 
       await expect(result).rejects.toEqual(error);
-      expect(mockDBAll).toHaveBeenCalled
+      expect(mockDBAll).toHaveBeenCalled;
     });
 
     test("Link already exists in reverse order", async () => {
       const error = { errCode: 409, errMessage: "Link already exists" };
       const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
-        callback(null, [{docID1:2, docID2:1}]);
+        callback(null, [{ docID1: 2, docID2: 1 }]);
       });
 
-      const result = documentDAO.addLink(1, 2,"Direct");
+      const result = documentDAO.addLink(1, 2, "Direct");
 
       await expect(result).rejects.toEqual(error);
-      expect(mockDBAll).toHaveBeenCalled
+      expect(mockDBAll).toHaveBeenCalled;
     });
-
-
   });
-
-
 });
