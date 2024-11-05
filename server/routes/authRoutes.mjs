@@ -69,7 +69,7 @@ function AuthRoutes(app) {
         res.status(401).json({ message: "Unauthorized" });
       }
     });
-  };
+   };
 }
 
 export default AuthRoutes;
