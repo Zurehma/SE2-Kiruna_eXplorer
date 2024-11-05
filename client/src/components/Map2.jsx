@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
+
 import '../App.css';
 import { MyPopup } from './MyPopup';
+import API from '../../API';
 
 // Custom icon for markers
 const icon = new L.Icon({
@@ -14,43 +17,7 @@ const icon = new L.Icon({
     popupAnchor: [1, -34],
 });
 
-// Sample data with latitude and longitude fields
-const data = [
-    {
-        type : "Action",
-        title: "Town Hall Demolition",
-        stakeholders: "LKAB",
-        scale: "Blueprints/Effects",
-        issuanceDate: "04/2019",
-        connections: 3,
-        description: "Demolition of old town hall. I need this description to be longer to simulate what will happen in the real case where descriptions could reach a length between 150 and 200 characters, or at least this is at I suppose. I hope this is enough.",
-        latitude: 67.850,
-        longitude: 20.217
-    },
-    {
-        type: "Design",
-        title: "New Building Construction",
-        stakeholders: "City of Kiruna",
-        scale: "Large",
-        issuanceDate: "06/2020",
-        connections: 5,
-        description: "Construction of new infrastructure. I need this description to be longer to simulate what will happen in the real case where descriptions could reach a length between 150 and 200 characters, or at least this is at I suppose. I hope this is enough.",
-        latitude: 67.853,
-        longitude: 20.220
-    },
-    {
-        type: "Conflict",
-        title: "Placeholder Example",
-        stakeholders: "Unknown",
-        scale: "N/A",
-        issuanceDate: "N/A",
-        connections: 0,
-        description: "This is a placeholder with null coordinates. I need this description to be longer to simulate what will happen in the real case where descriptions could reach a length between 150 and 200 characters, or at least this is at I suppose. I hope this is enough.",
-        latitude: null,
-        longitude: null
-    }
-];
-
+// Function to get random offsets for placeholder markers
 function getRandomOffset() {
     const offset = 0.002; // Adjusted for visible spread
     return [
@@ -59,28 +26,106 @@ function getRandomOffset() {
     ];
 }
 
-function Map2() {
-    const cornerPosition = [67.834, 20.135]; // Corner position
+// Custom hook to recenter the map
+const RecenterMap = ({ position, zoom }) => {
+    const map = useMap();
+    useEffect(() => {
+        map.setView(position, zoom); // Set the map view to the new position and zoom
+    }, [map, position, zoom]); // Run this effect when either `position` or `zoom` changes
+
+    return null;
+}
+
+function Map2(props) {
+    const cornerPosition = [67.840, 20.207]; // Corner position
+    const initialPosition = [67.850, 20.217]; // Initial position
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [positionActual, setPositionActual] = useState(initialPosition); // State for current position
+    const [zoomLevel, setZoomLevel] = useState(13); // State for zoom level
+
+    // Fetch data from the API
+    useEffect(() => {
+        setLoading(true);
+        const fetchData = async () => {
+            try {
+                const documents = await API.getDocuments();
+                setData(documents);
+            } catch (error) {
+                props.setError(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []); 
+
+    // Function to recenter the map on Kiruna with zoom reset to 13
+    const recenterMap = () => {
+        setPositionActual(initialPosition); // Update state to trigger rerender
+        setZoomLevel(13); // Reset zoom level to 13
+    };
 
     return (
-        <MapContainer center={[67.850, 20.217]} zoom={13} style={{ height: '100vh', width: '100%' }}>
-            <TileLayer
-                url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg"
-                attribution='&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {data.map((item, index) => {
-                const position = item.latitude !== null && item.longitude !== null 
-                    ? [item.latitude, item.longitude] 
-                    : [cornerPosition[0] + getRandomOffset()[0], cornerPosition[1] + getRandomOffset()[1]];
-                return (
-                    <Marker key={index} position={position} icon={icon}>
-                        <Popup maxWidth={600}>
-                            <MyPopup doc={item} />
-                        </Popup>
-                    </Marker>
-                );
-            })}
-        </MapContainer>
+        <>
+            {loading && (<p>Loading...</p>)}
+            {!loading && 
+            <MapContainer 
+                center={positionActual} // Use the state variable for the center position
+                zoom={zoomLevel} 
+                style={{ height: '91vh', width: '100%' }}
+            >
+                <TileLayer
+                    url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg"
+                    attribution='&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                {data.map((item) => {
+                    // Verifica se lat e long sono null; se sì, genera una posizione casuale
+                    const position = (item.lat != null && item.long != null)
+                        ? [item.lat, item.long]
+                        : [
+                            cornerPosition[0] + getRandomOffset()[0],
+                            cornerPosition[1] + getRandomOffset()[1]
+                        ];
+                    if(item.lat===null){
+                        console.log("Latitudine nulla");
+                    }
+                    return (
+                        <Marker key={item.id} position={position} icon={icon}>
+                            <Popup maxWidth={800}>
+                                <MyPopup doc={item} />
+                            </Popup>
+                        </Marker>
+                    );
+                })}
+
+                {/* Add the recenter map component */}
+                <RecenterMap position={positionActual} zoom={zoomLevel} />
+
+                <button 
+                    onClick={recenterMap} 
+                    style={{
+                        position: 'absolute', 
+                        top: '15%', 
+                        left: '0.8%', 
+                        background: 'white', 
+                        border: 'none', 
+                        width: '30px', 
+                        height: '30px', 
+                        borderRadius: '5px', 
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
+                        cursor: 'pointer',
+                        zIndex: 1000, 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        padding: '0' 
+                    }}
+                    >
+                    <i className="bi bi-compass" style={{ fontSize: '20px' }}></i>
+                </button>
+            </MapContainer>}
+        </>
     );
 }
 

@@ -1,21 +1,140 @@
-
-.navbar {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 2; 
-  }
-  
-  .container {
-    margin-top: 70px; /* Adjust based on the Navbar height */
-  }
-  
-  /* Add padding to the brand and navigation links */
-.navbar-brand {
-  padding-left: 20px; /* Adjust left padding for Kiruna */
-  cursor:pointer;
+/* Navbar styling */
+.custom-navbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1500;
+  background-color: #000000;
+  padding: 0.5rem 1rem;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+/* Main content padding */
+.main-content {
+  padding-top: 70px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Brand logo padding */
+.navbar-brand {
+  padding-left: 20px;
+  cursor: pointer;
+  color: #006d77;
+}
+
+/* Adjust nav-link padding for responsiveness */
 .navbar-nav .nav-link {
-  padding-right: 40px; /* Adjust right padding for login/logout links */
+  padding-right: 20px; /* Reduced padding for smaller screens */
+}
+
+/* Icon and text styling */
+.my-arrow-dropdown {
+  color: #ffffff;
+}
+
+.my-icons {
+  color: #ffffff;
+  font-size: 1.2em;
+}
+
+/* Hide welcome text on smaller screens */
+@media (max-width: 992px) {
+  .welcome-text {
+    display: none;
+  }
+}
+
+/* Stack buttons vertically and adjust spacing on smaller screens */
+@media (max-width: 768px) {
+  .navbar-nav .btn {
+    margin: 0.25rem 0;  
+    width: 100%;
+    text-align: center;
+  }
+  /* Additional styling for alignment on small screens */
+  .navbar-nav {
+    align-items: center;
+    flex-direction: column;
+  }
+}
+
+.dropdown-menu {
+  background-color: #000; /* Set background color */
+  border: none; /* Remove border */
+}
+
+.dropdown-item {
+  color: #fff; /* Change text color */
+}
+
+.dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.726); /* Change hover color */
+}
+
+/* Navbar background */
+.custom-navbar {
+  background-color: #ffffff !important;
+}
+
+/* Navbar brand and welcome text color */
+.custom-navbar .navbar-brand,
+.custom-navbar .welcome-text {
+  color: #006d77
+}
+
+/* Button styles for login */
+.custom-login-button {
+  background-color: #ffffff !important;
+  color: #006d77 !important;
+  border-style: hidden;
+}
+
+.custom-login-button:hover,
+.custom-login-button:focus {
+  border-color: #005c66 !important;
+}
+
+/* Dropdown toggle button styles */
+.menu-dropdown-toggle {
+  color: #ffffff !important;
+  border-color: #006d77 !important;
+  background-color: #006d77 !important;
+}
+
+.menu-dropdown-toggle:hover,
+.menu-dropdown-toggle:focus {
+  color: #ffffff !important;
+  background-color: #005c66 !important;
+  border-color: #005c66 !important;
+}
+
+/* Dropdown menu background and text color */
+.dropdown-menu-custom {
+  background-color: #ffffff !important; /* White background */
+  color: #006d77 !important; /* Text color */
+  border: none; /* Remove border if desired */
+}
+
+/* Dropdown item color and hover effect */
+.dropdown-menu-custom .dropdown-item {
+  color: #006d77 !important;
+}
+
+.dropdown-menu-custom .dropdown-item:hover {
+  background-color: #e0f4f3 !important; /* Light teal for hover effect */
+  color: #005c66 !important; /* Slightly darker teal on hover */
+}
+#home-button{
+  color: #006d77;
+  border-color: white;
+  border-style: hidden;
+}
+
+.navbar-toggler{
+  background-color:#006d77;
+}
+
+.custom-icon-color {
+  color: #006d77 !important; /* Replace with your desired color code */
 }

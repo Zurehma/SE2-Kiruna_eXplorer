@@ -1,13 +1,22 @@
+/* Personalizzazione popup della mappa */
 .myPopup {
   padding: 20px;
   border-right: 2px solid black;
+  padding: 1.25rem;
+  border-right: 0.125rem solid black;
+  overflow: hidden;
 }
 
 .leaflet-popup-content-wrapper {
   width: 100%;
   max-width: 90vw;
+  min-width: 90vh;
   max-height: 70vh;
   overflow-y: auto;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #000;
+  border-radius: 0.5rem;
+  padding: 0.625rem;
 }
 
 .leaflet-popup-content {
@@ -20,26 +29,139 @@
   border-radius: 8px;
   padding: 10px;
 }
-
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
   .myPopup {
     padding: 10px;
     border-right: none; /* Remove the right border */
     border-bottom: 2px solid black; /* Add a bottom border */
+      padding: 0.625rem;
+      border-right: none; /* Rimuovi bordo destro */
+      border-bottom: 0.125rem solid black; /* Aggiungi bordo inferiore */
   }
 
   .my-icons {
+    text-align: left;
     font-size: 2em;
+      font-size: 2rem;
   }
 
   .leaflet-popup-content-wrapper {
+    min-width: auto;
     max-width: 90vw;
     padding: 15px;
     max-height: 60vh;
+      max-width: 90vw;
+      padding: 0.9375rem;
+      max-height: 60vh;
   }
 }
 
 .my-icons {
   font-size: 3em;
+  font-size: 3rem;
 }
+
+.custom-navbar {
+  background-color:white; 
+  
+}
+
+.my-arrow-dropdown::after {
+  color: white !important; 
+}
+
+/* Mappa che occupa l'intero schermo, sotto la navbar */
+.map-content {
+  position: relative;
+  top: 56px; /* Altezza stimata della navbar */
+  width: 100vw;
+  height: calc(100vh - 56px); /* Altezza dello schermo meno la navbar */
+  overflow-y: auto; /* Permette lo scorrimento verticale */
+  padding-bottom: 1rem; /* Spazio per il contenuto */
+}
+.text-danger:focus, .text-danger:active {
+  color: red !important; 
+  background-color: transparent !important; 
+  outline: none !important; 
+  box-shadow: none !important;
+}
+
+.btn-black {
+  background-color: black !important; 
+  color: white !important;
+  border: none;
+}
+
+.btn-black:hover {
+  background-color: #333 !important; 
+}
+
+.service-container {
+display: flex;
+justify-content: space-around;
+padding: 20px;
+}
+
+.service-button {
+border: 2px solid black;
+background-color: white;
+border-radius: 10px;
+padding: 20px;
+width: 150px;
+text-align: center;
+cursor: pointer;
+transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-title {
+font-size: 32px;
+font-weight: bold; 
+color: #4a4a4a; 
+text-transform: uppercase; 
+margin-top: 40px; 
+letter-spacing: 2px; 
+margin-bottom: 50px; 
+border-bottom: 2px solid black; 
+display: inline-block; 
+padding-bottom: 10px; 
+position: relative; 
+left: 50%; 
+transform: translateX(-50%); 
+}
+
+.service-button:hover {
+background-color: #f0f0f0;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.service-icon {
+font-size: 48px;
+margin-bottom: 10px;
+}
+
+.service-button p {
+font-size: 16px;
+margin: 0;
+} 
+
+.alert-custom {
+  background-color: #f8d7da; /* Light red background */
+  border-color: #f5c6cb; /* Darker red border */
+  color: #721c24; /* Dark red text */
+  border-radius: 0.25rem; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  transition: all 0.3s ease; /* Smooth transition for visibility */
+}
+
+/* Optional: Add animation for when the alert appears */
+.alert-custom.fade {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.alert-custom.show {
+  opacity: 1;
+}
+
+

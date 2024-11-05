@@ -63,7 +63,7 @@ class DocumentDAO {
    * Insert a new document in the database
    * @param {String} title
    * @param {String} stakeholder
-   * @param {Number} scale
+   * @param {String | Number} scale
    * @param {String} issuanceDate
    * @param {String} type
    * @param {String} language
