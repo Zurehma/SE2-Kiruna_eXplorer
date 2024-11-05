@@ -228,9 +228,9 @@ describe("DocumentController", () => {
     test("Create a new link succesfully", async () => {
       const exampleLink = { id1: 1, id2: 2, type: "direct" };
 
-      const documentDAO = new DocumentDao();
-      documentDAO.getDocumentByID = jest.fn().mockResolvedValue({docID1: 1, docID2: 2});
-      documentDAO.addLink = jest.fn().mockResolvedValue({changes: 1});
+      const documentDAO = new DocumentDAO();
+      documentDAO.getDocumentByID = jest.fn().mockResolvedValue({ docID1: 1, docID2: 2 });
+      documentDAO.addLink = jest.fn().mockResolvedValue({ changes: 1 });
 
       const documentController = new DocumentController();
       documentController.documentDAO = documentDAO;
