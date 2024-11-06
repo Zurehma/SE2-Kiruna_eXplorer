@@ -118,6 +118,7 @@ Add a new document with the provided information.
     "stakeholder": "example",
     "scale": 100,
     "issuanceDate": "2024-10-28",
+    "type": "Informative",
     "connections": 0,
     "language": "english",
     "pages": 20,
@@ -129,7 +130,9 @@ Add a new document with the provided information.
 
 - Access Constraints: Can only be called by a logged in user whose role is Urban Planner.
 - Additional Constraints:
+  - It should return a 400 error when `scale` is not valid.
   - It should return a 400 error when `issuanceDate` is after the current date.
+  - It should return a 400 error when `type` is not valid.
 
 #### GET `api/documents/link-types`
 

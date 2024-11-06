@@ -32,7 +32,19 @@ class DocumentRoutes {
       body("type").isString().notEmpty(),
       body("description").isString().notEmpty(),
       body("language").optional().isString().notEmpty(),
-      oneOf([body("pages").optional().isInt({ gt: 0 }), [body("pageFrom").isInt({ gt: 0 }), body("pageTo").isInt({ gt: 0 })]]),
+      body("pages").optional().isInt({ gt: 0 }),
+      body("pageFrom").optional().isInt({ gt: 0 }),
+      body("pageTo").optional().isInt({ gt: 0 }),
+      body().custom((value, { req }) => {
+        const pageFrom = req.body.pageFrom;
+        const pageTo = req.body.pageTo;
+
+        if ((pageFrom || pageTo) && !(pageFrom && pageTo)) {
+          throw new Error("");
+        }
+
+        return true;
+      }),
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController

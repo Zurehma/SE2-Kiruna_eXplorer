@@ -32,22 +32,24 @@ function AuthRoutes(app) {
 
   this.initRoutes = () => {
     //Register a user
-    this.router.post("/register",
-    body("name").isString().notEmpty(),
-    body("surname").isString().notEmpty(),
-    body("role").isString().notEmpty(),
-    body("username").isString().notEmpty(),
-    body("password").isString().notEmpty(),
-    Utility.validateRequest,
-     (req, res,next) => {
-        this.UserController.registerUser(req.body.name,req.body.surname, req.body.role, req.body.username, req.body.password)
-        .then(()=>{
-          res.status(200).json({ message: "User created successfully" });
-        }
-        ).catch((error)=>{
-          res.status(500).json({ error: error.message });
-        });
-    });
+    this.router.post(
+      "/register",
+      body("name").isString().notEmpty(),
+      body("surname").isString().notEmpty(),
+      body("role").isString().notEmpty(),
+      body("username").isString().notEmpty(),
+      body("password").isString().notEmpty(),
+      Utility.validateRequest,
+      (req, res, next) => {
+        this.UserController.registerUser(req.body.name, req.body.surname, req.body.role, req.body.username, req.body.password)
+          .then(() => {
+            res.status(200).json({ message: "User created successfully" });
+          })
+          .catch((error) => {
+            res.status(500).json({ error: error.message });
+          });
+      }
+    );
 
     //Login
     this.router.post("/login", passport.authenticate("local"), (req, res) => {

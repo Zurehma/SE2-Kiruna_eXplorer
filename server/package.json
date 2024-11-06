@@ -4,7 +4,7 @@
   "description": "projectSEII",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.mjs",
+    "start": "set NODE_ENV=development && nodemon index.mjs",
     "test": "set NODE_ENV=test && node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage  --detectOpenHandles --forceExit",
     "test_unit": "set NODE_ENV=test && node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage  --detectOpenHandles --forceExit testPathPattern=test_unit",
     "test_integration": "set NODE_ENV=test && node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage  --detectOpenHandles --forceExit testPathPattern=test_integration"
