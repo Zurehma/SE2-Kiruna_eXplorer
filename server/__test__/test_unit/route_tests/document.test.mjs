@@ -34,7 +34,6 @@ describe("DocumentRoutes", () => {
     });
 
     it("It should return 200 status code and a list of all documents", async () => {
-      // mockDocumentController.mockResolvedValueOnce(new Document(1, 'Document 1', 'Stakeholder', 100, '2023-01-01', 'Informative', 5, 'english', 'Description', null, null, null, null, null));
 
       const response = await request(app)
         .get(baseURL);
