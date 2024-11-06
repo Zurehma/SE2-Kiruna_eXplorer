@@ -365,7 +365,44 @@ describe("DocumentRoutes", () => {
         .send(link)
         .expect(409);
     });
-
-
   });
+
+});
+
+describe("AuthRoutes", () => {
+  beforeAll(async () => {
+    await cleanup();
+    await createUser(userData);
+    userCookie = await loginUser(userData);
+  });
+
+  afterAll(async () => {
+    await cleanup();
+  });
+
+  describe("2. - POST /api/sessions/login", () => {
+    test("2.1 - It should return 200", async () => {
+      await request(app)
+        .post(basePath + "/sessions/login")
+        .send(userData)
+        .expect(200);
+    });
+
+    test("2.2 - It should return 401", async () => {
+      await request(app)
+        .post(basePath + "/sessions/login")
+        .send({ ...userData, password: "wrong" })
+        .expect(401);
+    });
+  });
+
+  describe("3. - DELETE /api/sessions/logout", () => {
+    test("3.1 - It should return 200", async () => {
+      await request(app)
+        .delete(basePath + "/sessions/logout")
+        .set("Cookie", userCookie)
+        .expect(200);
+    });
+  });
+
 });
