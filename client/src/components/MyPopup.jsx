@@ -13,7 +13,8 @@ function MyPopup(props) {
       Agreement: 'bi-people-fill',
       Conflict: 'bi-x-circle',
       Consultation: 'bi-chat-dots',
-      Action: 'bi-exclamation-triangle'
+      Action: 'bi-exclamation-triangle',
+      Material: 'bi-file-earmark-binary',
     };
     const iconClass = iconMap[props.doc.type] || '';
 
