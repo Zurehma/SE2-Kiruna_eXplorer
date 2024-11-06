@@ -14,6 +14,7 @@
   "dependencies": {
     "body-parser": "^2.0.1",
     "cors": "^2.8.5",
+    "cypress": "^13.15.2",
     "dayjs": "^1.11.13",
     "express": "^5.0.1",
     "express-session": "^1.18.1",
