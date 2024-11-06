@@ -19,7 +19,7 @@ const icon = new L.Icon({
 
 // Function to get random offsets for placeholder markers
 function getRandomOffset() {
-    const offset = 0.002; // Adjusted for visible spread
+    const offset = 0.005; // Adjusted for visible spread
     return [
         (Math.random() - 0.5) * offset, 
         (Math.random() - 0.5) * offset
