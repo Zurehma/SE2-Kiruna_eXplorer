@@ -158,7 +158,7 @@ function Documents(props) {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group controlId="title">
-                  <Form.Label>Title</Form.Label>
+                  <Form.Label>Title*</Form.Label>
                   <Form.Control 
                     type="text" 
                     name="title" 
@@ -176,7 +176,7 @@ function Documents(props) {
               </Col>
               <Col md={6}>
                 <Form.Group controlId="stakeholder">
-                  <Form.Label>Stakeholder</Form.Label>
+                  <Form.Label>Stakeholder*</Form.Label>
                   <Form.Control 
                     type="text" 
                     name="stakeholder" 
@@ -197,7 +197,7 @@ function Documents(props) {
              <Row className="mb-3">
               <Col md={6}>
                 <Form.Group controlId="scale">
-                  <Form.Label>Scale</Form.Label>
+                  <Form.Label>Scale*</Form.Label>
                   <Form.Select 
                     as="select"
                     name="scale"
@@ -220,7 +220,7 @@ function Documents(props) {
               {showNField && (
                 <Col md={6}>
                   <Form.Group controlId="nValue">
-                    <Form.Label>Value of n</Form.Label>
+                    <Form.Label>Value of n*</Form.Label>
                     <Form.Control 
                       type="text" 
                       name="nValue" 
@@ -239,7 +239,7 @@ function Documents(props) {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group controlId="type">
-                  <Form.Label>Type</Form.Label>
+                  <Form.Label>Type*</Form.Label>
                   <Form.Select 
                     as="select"
                     name="type"
@@ -261,7 +261,7 @@ function Documents(props) {
 
               <Col md={6}>
                 <Form.Group controlId="issuanceDate">
-                  <Form.Label>Issuance Date</Form.Label>
+                  <Form.Label>Issuance Date*</Form.Label>
                   <Form.Control 
                     type="text" 
                     name="issuanceDate" 
@@ -282,7 +282,7 @@ function Documents(props) {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group controlId="language">
-                  <Form.Label>Language</Form.Label>
+                  <Form.Label>Language*</Form.Label>
                   <Form.Control 
                     type="text" 
                     name="language" 
@@ -376,7 +376,7 @@ function Documents(props) {
             </Row>
 
             <Form.Group controlId="description" className="mb-4">
-            <Form.Label>Description</Form.Label>
+            <Form.Label>Description*</Form.Label>
             <Form.Control 
                 as="textarea" 
                 rows={5} 
