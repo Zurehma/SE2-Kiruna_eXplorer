@@ -63,6 +63,12 @@ body, html {
   transition: background-color 0.3s ease;
 }
 
+.btn-saveLink {
+  background-color: #006d77;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
 .btn-save:hover {
   background-color: #005f6b;
 }

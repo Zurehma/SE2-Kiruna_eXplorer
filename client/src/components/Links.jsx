@@ -179,13 +179,13 @@ function Links(props) {
         <Modal.Footer>
           {saveStatus === 'Completed' ? 
           (
-            <Button variant="primary" onClick={handleNewLink}>
+            <Button variant="primary" onClick={handleNewLink} className="btn-saveLink">
               Save New Link
             </Button>
           )
           :
           (
-            <Button variant="primary" onClick={handleNewLink}>
+            <Button variant="primary" onClick={handleNewLink } className="btn-saveLink">
                Try again!
             </Button>
           )}
