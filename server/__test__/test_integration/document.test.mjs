@@ -198,4 +198,174 @@ describe("DocumentRoutes", () => {
         .expect(400);
     });
   });
+
+
+  describe("3. - POST /api/documents/link", () => {  
+
+    test("3.1 - It should return 200", async() => {
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        pages: 16,
+        pageFrom: 1,
+        pageTo: 17,
+      };
+      const exampleDocumentData2 = {
+        title: "title2",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        pages: 16,
+        pageFrom: 1,
+        pageTo: 17,
+      };
+
+      let result = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData)
+        .expect(200);
+      
+      let result2 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData2)
+        .expect(200);
+
+      const link = {
+        id1: result.body.id,
+        id2: result2.body.id,
+        type: "direct"
+      }
+
+      let resultLink = await request(app)
+        .post(basePath + "/documents/link")
+        .set("Cookie", userCookie)
+        .send(link)
+        .expect(200);
+
+       expect(resultLink.body.id1).toEqual(result.body.id);
+       expect(resultLink.body.id2).toEqual(result2.body.id);
+       
+    });
+
+    test("3.2 - It should return 401-unauthorize", async() => {
+
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        pages: 16,
+        pageFrom: 1,
+        pageTo: 17,
+      };
+      const exampleDocumentData2 = {
+        title: "title2",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        pages: 16,
+        pageFrom: 1,
+        pageTo: 17,
+      };
+
+      let result = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData)
+        .expect(200);
+      
+      let result2 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData2)
+        .expect(200);
+
+      const link = {
+        id1: result.body.id,
+        id2: result2.body.id,
+        type: "direct"
+      }
+
+      await request(app)
+        .post(basePath + "/documents/link")
+        .send(link)
+        .expect(401);
+
+    });
+
+    test("3.3 - It should retun 409-link exists", async() => {
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        pages: 16,
+        pageFrom: 1,
+        pageTo: 17,
+      };
+      const exampleDocumentData2 = {
+        title: "title2",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        pages: 16,
+        pageFrom: 1,
+        pageTo: 17,
+      };
+
+      let result = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData)
+        .expect(200);
+      
+      let result2 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData2)
+        .expect(200);
+
+      const link = {
+        id1: result.body.id,
+        id2: result2.body.id,
+        type: "direct"
+      }
+
+      await request(app)
+        .post(basePath + "/documents/link")
+        .set("Cookie", userCookie)
+        .send(link)
+        .expect(200);
+      
+      await request(app)
+        .post(basePath + "/documents/link")
+        .set("Cookie", userCookie)
+        .send(link)
+        .expect(409);
+    });
+
+
+  });
 });
