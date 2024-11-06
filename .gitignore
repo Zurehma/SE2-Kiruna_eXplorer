@@ -116,6 +116,9 @@ dist
 # DynamoDB Local files
 .dynamodb/
 
+#db in the git ignore
+server/db/db.db 
+
 # TernJS port file
 .tern-port
 
@@ -133,4 +136,4 @@ dist
 .DS_Store
 
 # HTTP test files
-.http
+*.http

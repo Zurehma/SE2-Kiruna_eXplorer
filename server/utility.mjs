@@ -20,6 +20,16 @@ const isLoggedIn = (req, res, next) => {
 };
 
 /**
+ * Middleware to check if a string matches the date format YYYY-MM or YYYY
+ * @param {String} value
+ * @returns
+ */
+const isValidYearMonthOrYear = (value) => {
+  const regex = "^d{4}(-(0[1-9]|1[0-2]))?$";
+  return value.test(regex);
+};
+
+/**
  * Middleware to manage validation request errors
  * @param {*} req
  * @param {*} res
@@ -36,14 +46,7 @@ const validateRequest = (req, res, next) => {
   let errorMessage = "The parameters are not formatted properly\n\n";
 
   errors.array().forEach((error) => {
-    errorMessage +=
-      "- Parameter: **" +
-      error.value +
-      "** - Reason: **" +
-      error.msg +
-      "** - Location: **" +
-      error.location +
-      "*\n\n";
+    errorMessage += "- Parameter: **" + error.value + "** - Reason: **" + error.msg + "** - Location: **" + error.location + "*\n\n";
   });
 
   return res.status(422).json({ error: errorMessage, status: 422 });
@@ -66,6 +69,7 @@ const errorHandler = (err, req, res, next) => {
 
 const Utility = {
   isLoggedIn,
+  isValidYearMonthOrYear,
   validateRequest,
   errorHandler,
 };

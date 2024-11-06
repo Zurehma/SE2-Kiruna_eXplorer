@@ -1,11 +1,13 @@
 {
-  "name": "officemanagement",
+  "name": "kirunaexplorer",
   "version": "1.0.0",
   "description": "projectSEII",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.mjs",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage  --detectOpenHandles --forceExit"
+    "start": "set NODE_ENV=development && nodemon index.mjs",
+    "test": "set NODE_ENV=test && node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage  --detectOpenHandles --forceExit",
+    "test_unit": "set NODE_ENV=test && node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage  --detectOpenHandles --forceExit testPathPattern=test_unit",
+    "test_integration": "set NODE_ENV=test && node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage  --detectOpenHandles --forceExit testPathPattern=test_integration"
   },
   "author": "Stefano Fumero",
   "license": "ISC",
@@ -17,6 +19,7 @@
     "express-session": "^1.18.1",
     "express-validator": "^7.2.0",
     "morgan": "^1.10.0",
+    "officemanagement": "file:",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "sqlite3": "^5.1.7"
