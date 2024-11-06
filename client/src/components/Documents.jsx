@@ -43,12 +43,13 @@ function Documents(props) {
 
   const validateDate = (date) => {
     const validFormats = [
-      /^\d{2}\/\d{2}\/\d{4}$/, // DD/MM/YYYY
-      /^\d{2}\/\d{4}$/,       // MM/YYYY
-      /^\d{4}$/               // YYYY
+      /^\d{4}-\d{2}-\d{2}$/, // YYYY-MM-DD
+      /^\d{4}-\d{2}$/,       // YYYY-MM
+      /^\d{4}$/              // YYYY
     ];
     return validFormats.some((regex) => regex.test(date));
   };
+  
 
   const handleScaleChange = (e) => {
     const { value } = e.target;
@@ -98,7 +99,7 @@ function Documents(props) {
       newErrors.type = "You must select a type.";
     }
     if (!document.issuanceDate || !validateDate(document.issuanceDate)) {
-      newErrors.issuanceDate = "Issuance Date must be in a valid format (DD/MM/YYYY, MM/YYYY, or YYYY).";
+      newErrors.issuanceDate = "Issuance Date must be in a valid format (YYYY-MM-DD, YYYY-MM, or YYYY).";
     }
     if (!document.language) {
       newErrors.language = "Language is required and cannot be empty.";
