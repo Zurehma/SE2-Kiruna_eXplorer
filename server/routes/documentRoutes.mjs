@@ -28,7 +28,6 @@ class DocumentRoutes {
       body("title").isString().notEmpty(),
       body("stakeholder").isString().notEmpty(),
       oneOf([body("scale").isString().notEmpty(), body("scale").isInt({ gt: 0 })]),
-      oneOf([body("issuanceDate").isISO8601({ strict: true }), body("issuanceDate").custom(Utility.isValidYearMonthOrYear)]),
       body("type").isString().notEmpty(),
       body("description").isString().notEmpty(),
       body("language").optional().isString().notEmpty(),
