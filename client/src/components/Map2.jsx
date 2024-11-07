@@ -26,8 +26,8 @@ const iconMap = {
 const createCustomIcon = (type) => {
     const iconClass = iconMap[type] || 'bi-file-earmark';
     return L.divIcon({
-        html: `<div style="display: flex; align-items: center; justify-content: center; background: white; width: 30px; height: 30px; border-radius: 50%; border: 2px solid black;">
-                    <i class="bi ${iconClass}" style="color: black; font-size: 16px;"></i>
+        html: `<div style="display: flex; align-items: center; justify-content: center; background: white; width: 25px; height: 25px; border-radius: 50%; border: 2px solid black;">
+                    <i class="bi ${iconClass}" style="color: black; font-size: 12px;"></i>
                </div>`,
         className: '' // Clear default class
     });
@@ -88,7 +88,7 @@ function Map2(props) {
     // Function to recenter the map on Kiruna with zoom reset to 13
     const recenterMap = () => {
         setPositionActual(initialPosition);
-        setZoomLevel(13);
+        setZoomLevel(11);
     };
 
     // Filter documents without coordinates
@@ -118,7 +118,7 @@ function Map2(props) {
 
                 {/* Marker for the "+" button at the top vertex */}
                 <Marker position={plusButtonPosition} icon={plusIcon}>
-                    <Popup>
+                    <Popup className='popupPropPlus'>
                         <div>
                             <p>Entire municipality of Kiruna: </p>
                             {noCoordDocuments.length > 0 ? (
@@ -150,10 +150,7 @@ function Map2(props) {
                                                 <i 
                                                     className={`bi ${iconMap[item.type]}`} 
                                                     style={{ fontSize: '20px', color: '#555' }}
-                                                />
-                                            </div>
-                                            <div>
-                                                <p>{item.name}</p>
+                                                /><p className=' ms-3 small'>{item.title}</p>
                                             </div>
                                         </div>
                                     );
