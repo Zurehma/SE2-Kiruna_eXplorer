@@ -20,26 +20,26 @@ describe('Home Component', () => {
     );
 
     // Check initial title and buttons
-    expect(screen.getByText("Kiruna: The Heart of Sweden's Iron Legacy and Gateway to the Arctic")).toBeInTheDocument();
+    expect(screen.getByText("Kiruna: A Town in Motion – Relocating for a Sustainable Future")).toBeInTheDocument();
     expect(screen.getByText("Relocation of Kiruna")).toBeInTheDocument();
-    expect(screen.getByText("Why we need this relocation?")).toBeInTheDocument();
+    expect(screen.getByText("Why do we need this relocation?")).toBeInTheDocument();
   });
 
-  it('changes background and title when "Why we need this relocation?" is clicked', () => {
+  it('changes background and title when "Why do we need this relocation?" is clicked', () => {
     render(
       <Router>
         <Home />
       </Router>
     );
 
-    fireEvent.click(screen.getByText('Why we need this relocation?'));
+    fireEvent.click(screen.getByText('Why do we need this relocation?'));
 
     // Check for background image change (use querySelector for class-based selection)
     const homeBackground = document.querySelector('.home-background');
     expect(homeBackground).toHaveStyle('background-image: url("../public/kirunadocs.png")');
 
     // Check title text update
-    expect(screen.getByText('Why we do this?')).toBeInTheDocument();
+    expect(screen.getByText('Why we do the relocation of Kiruna?')).toBeInTheDocument();
   });
 
   it('shows "Back to Home" button after showing info', () => {
@@ -49,7 +49,7 @@ describe('Home Component', () => {
       </Router>
     );
 
-    fireEvent.click(screen.getByText('Why we need this relocation?'));
+    fireEvent.click(screen.getByText('Why do we need this relocation?'));
 
     expect(screen.getByText('Back to Home')).toBeInTheDocument();
   });
@@ -61,13 +61,13 @@ describe('Home Component', () => {
       </Router>
     );
 
-    fireEvent.click(screen.getByText('Why we need this relocation?'));
+    fireEvent.click(screen.getByText('Why do we need this relocation?'));
     fireEvent.click(screen.getByText('Back to Home'));
 
     // Check for return to initial state (background and title)
     const homeBackground = document.querySelector('.home-background');
     expect(homeBackground).toHaveStyle('background-image: url("../public/kiruna.jpg")');
-    expect(screen.getByText("Kiruna: The Heart of Sweden's Iron Legacy and Gateway to the Arctic")).toBeInTheDocument();
+    expect(screen.getByText("Kiruna: A Town in Motion – Relocating for a Sustainable Future")).toBeInTheDocument();
   });
 
   it('navigates to /map when "Relocation of Kiruna" is clicked', () => {
