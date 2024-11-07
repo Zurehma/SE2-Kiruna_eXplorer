@@ -51,7 +51,6 @@ describe('Home Component', () => {
 
     fireEvent.click(screen.getByText('Why we need this relocation?'));
 
-    // Check if "Back to Home" is shown
     expect(screen.getByText('Back to Home')).toBeInTheDocument();
   });
 
