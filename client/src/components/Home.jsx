@@ -5,9 +5,9 @@ import { Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
-  const [backgroundImage, setBackgroundImage] = useState("kiruna.jpg"); // Initial background image
-  const [titleText, setTitleText] = useState("Kiruna: The Heart of Sweden's Iron Legacy and Gateway to the Arctic");
-  const [showInfo, setShowInfo] = useState(false); // State to show/hide additional information
+  const [backgroundImage, setBackgroundImage] = useState("kiruna.jpg");
+  const [titleText, setTitleText] = useState("Kiruna: A Town in Motion – Relocating for a Sustainable Future");
+  const [showInfo, setShowInfo] = useState(false); 
   const navigate = useNavigate();
 
   const handleButtonClick = () => {
@@ -15,17 +15,16 @@ const Home = () => {
   };
 
   const readMore = () => {
-    // Toggle between the two background images and texts
     setBackgroundImage("kirunadocs.png");
-    setTitleText("Why we do this?");
-    setShowInfo(true); // Show additional information section
+    setTitleText("Why we do the relocation of Kiruna?");
+    setShowInfo(true); 
   };
 
   const goBackHome = () => {
-    // Reset to the original background and title
+
     setBackgroundImage("kiruna.jpg");
-    setTitleText("Kiruna: The Heart of Sweden's Iron Legacy and Gateway to the Arctic");
-    setShowInfo(false); // Hide additional information section
+    setTitleText("Kiruna: A Town in Motion – Relocating for a Sustainable Future");
+    setShowInfo(false); 
   };
 
   return (
@@ -42,7 +41,7 @@ const Home = () => {
               Relocation of Kiruna
             </button>
             <button className="read-more-button" onClick={readMore}>
-              Why we need this relocation? 
+              Why do we need this relocation? 
             </button>
           </>
         ) : (
