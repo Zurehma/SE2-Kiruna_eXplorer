@@ -3,25 +3,12 @@ import React, { useState } from 'react';
 import '../styles/Home.css';
 import { Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowRight } from 'react-icons/fa'; // Icon library for the button
 
 const Home = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [currentImage, setCurrentImage] = useState(null);
   const [backgroundImage, setBackgroundImage] = useState("kiruna.jpg"); // Initial background image
   const [titleText, setTitleText] = useState("Kiruna: The Heart of Sweden's Iron Legacy and Gateway to the Arctic");
   const [showInfo, setShowInfo] = useState(false); // State to show/hide additional information
   const navigate = useNavigate();
-
-  const openModal = (image) => {
-    setCurrentImage(image);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setCurrentImage(null);
-  };
 
   const handleButtonClick = () => {
     navigate('/map');
@@ -55,7 +42,7 @@ const Home = () => {
               Relocation of Kiruna
             </button>
             <button className="read-more-button" onClick={readMore}>
-              Why we need this relocation? <FaArrowRight className="read-more-icon" />
+              Why we need this relocation? 
             </button>
           </>
         ) : (
