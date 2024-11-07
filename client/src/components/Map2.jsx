@@ -18,7 +18,8 @@ const iconMap = {
     Agreement: 'bi-people-fill',
     Conflict: 'bi-x-circle',
     Consultation: 'bi-chat-dots',
-    Action: 'bi-exclamation-triangle'
+    Action: 'bi-exclamation-triangle',
+    Material: 'bi-file-earmark-binary',
 };
 
 // Function to create a custom divIcon with a specific icon inside
