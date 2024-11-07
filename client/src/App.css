@@ -7,10 +7,12 @@
   overflow: hidden;
 }
 
+.popupProp{
+  min-width: 90vh;
+}
 .leaflet-popup-content-wrapper {
   width: 100%;
   max-width: 90vw;
-  min-width: 90vh;
   max-height: 70vh;
   overflow-y: auto;
   background-color: rgba(255, 255, 255, 0.8);
