@@ -5,6 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import API from '../../API.js';
 import { Map } from './Map.jsx';
 
+import 'leaflet/dist/leaflet.css';
+import { Polygon } from 'react-leaflet';
+import L from 'leaflet';
+
+
 function Documents(props) { 
   const [types, setTypes] = useState([]);
   const [scales, setScales] = useState([]);
@@ -61,6 +66,18 @@ function Documents(props) {
     }
   };
 
+  //Polygon coordinates to check that the coordinates are inside it
+  const polygonCoordinates = [
+    [67.87328157366065, 20.20047943270466],
+    [67.84024426842895, 20.35839687019359],
+    [67.82082254726043, 20.181254701184297]
+  ];
+
+  const polygon = L.polygon(polygonCoordinates);
+  const validateCoordinates = (lat, lng) => {
+    const point = L.latLng(lat, lng);
+    return polygon.getBounds().contains(point);
+  }
   const handleChange = (e) => {
     const { name, value } = e.target;
     setDocument((prevDocument) => ({
@@ -137,14 +154,17 @@ function Documents(props) {
 
   const [position, setPosition] = useState({ lat: null, lng: null });
   useEffect(() => {
-    document.latitude = position.lat;
-    document.longitude = position.lng;
+    if(position.lat && position.lng){
+      document.latitude = position.lat;
+      document.longitude = position.lng;
+    }
   }, [position.lat,position.lng]);
 
   useEffect(() => {
-    if (document.latitude && document.longitude) {
+    if (document.latitude && document.longitude && validateCoordinates(Number(document.latitude),Number(document.longitude))) {
       setPosition({ lat: document.latitude, lng: document.longitude });
-      
+    }else if(document.latitude && document.longitude && !validateCoordinates(Number(document.latitude),Number(document.longitude))){
+      setPosition({ lat: null, lng: null });
     }
   }, [document.latitude, document.longitude]);
 
@@ -344,7 +364,7 @@ function Documents(props) {
 
             <Row className="mb-3">
               <Form.Label>Select a point on the Map, if not selected, the entire municipality is considered</Form.Label>
-              <Map handleMapClick={handleMapClick} setPosition={setPosition} latitude={position.lat} longitude={position.lng} />
+              <Map handleMapClick={handleMapClick} setPosition={setPosition} latitude={position.lat} longitude={position.lng} polygonCoordinates={polygonCoordinates} validateCoordinates={validateCoordinates} />
             </Row>
 
             <Row className="mb-3">
