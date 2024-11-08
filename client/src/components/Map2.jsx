@@ -8,6 +8,7 @@ import L from 'leaflet';
 import '../App.css';
 import { MyPopup } from './MyPopup';
 import API from '../../API';
+import { ShowDocuments } from './showDocuments';
 
 // Icon mapping based on document type
 const iconMap = {
@@ -163,17 +164,7 @@ function Map2(props) {
                 </Marker>
 
                 {/* Render coordinate documents as markers on the map */}
-                {coordDocuments.map((item) => {
-                    const position = [item.lat, item.long];
-                    const customIcon = createCustomIcon(item.type);
-                    return (
-                        <Marker key={item.id} position={position} icon={customIcon}>
-                            <Popup maxWidth={800} className='popupProp'>
-                                <MyPopup doc={item} />
-                            </Popup>
-                        </Marker>
-                    );
-                })}
+                {<ShowDocuments data={coordDocuments} createCustomIcon={createCustomIcon} />}
 
                 {/* If a document is selected, show MyPopup in a popup */}
                 {selectedDoc && (
