@@ -41,9 +41,10 @@ In this section, we have verified that the documents can be linked with each oth
 
 #### Test 1
 Steps:
-1. 
-2. 
-3. 
+1. Select a document. 
+2. Select the other document to link with the first one. 
+3. Click on `link` button.
+4. Ensure that the documents are linked.
 
 
 ### [3] Georeference a document 
