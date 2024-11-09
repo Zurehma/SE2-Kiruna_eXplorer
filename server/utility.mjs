@@ -30,6 +30,31 @@ const isValidYearMonthOrYear = (value) => {
 };
 
 /**
+ * Middleware to check if an object is a valid coordinates object
+ * @param {Object} value
+ * @returns
+ */
+const isValidCoordinatesObject = (value) => {
+  const lat = value.lat;
+  const long = value.long;
+  const numProperties = Object.keys(value).length;
+
+  if (lat == undefined || long == undefined || numProperties !== 2) {
+    throw new Error("Invalid coordinates object.");
+  }
+
+  if (typeof lat !== "number" && typeof long != "number") {
+    throw new Error("Invalid latitude and longitude types.");
+  }
+
+  if (lat > 90 || lat < -90 || long > 180 || long < -180) {
+    throw new Error("Invalid latitude and longitude values.");
+  }
+
+  return true;
+};
+
+/**
  * Middleware to manage validation request errors
  * @param {*} req
  * @param {*} res
@@ -70,10 +95,9 @@ const errorHandler = (err, req, res, next) => {
 const Utility = {
   isLoggedIn,
   isValidYearMonthOrYear,
+  isValidCoordinatesObject,
   validateRequest,
   errorHandler,
 };
-
-
 
 export default Utility;

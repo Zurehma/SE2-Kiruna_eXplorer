@@ -27,7 +27,7 @@ class DocumentController {
    * @param {String} type
    * @param {String} language
    * @param {String} description
-   * @param {JSON | null} coordinates
+   * @param {Object | null} coordinates
    * @param {Number | null} pages
    * @param {Number | null} pages
    * @param {Number | null} pages

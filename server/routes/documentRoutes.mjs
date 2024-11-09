@@ -28,45 +28,31 @@ class DocumentRoutes {
       body("title").isString().notEmpty(),
       body("stakeholder").isString().notEmpty(),
       oneOf([body("scale").isString().notEmpty(), body("scale").isInt({ gt: 0 })]),
+      oneOf([body("issuanceDate").isISO8601({ strict: true }), body("issuanceDate").isString().notEmpty().custom(Utility.isValidYearMonthOrYear)]),
       body("type").isString().notEmpty(),
       body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
-      body("coordinates")
+      body("coordinates").optional().isObject().custom(Utility.isValidCoordinatesObject),
+      body("pages")
         .optional()
-        .isJSON()
-        .custom((value) => {
-          const lat = value.lat;
-          const long = value.long;
-          const numProperties = Object.keys(value).length;
+        .isInt({ gt: 0 })
+        .custom((value, { req }) => {
+          const pages = value;
+          const pageFrom = req.body.pageFrom;
+          const pageTo = req.body.pageTo;
 
-          if (lat == undefined || long == undefined || numProperties !== 2) {
-            throw new Error("Invalid coordinates object!");
+          if ((pages && pageFrom) || (pages && pageTo)) {
+            throw new Error("");
           }
 
-          if (lat > 90 || lat < -90 || long > 180 || long < -180) {
-            throw new Error("Invalid latitude and longitude values!");
+          if ((pageFrom || pageTo) && !(pageFrom && pageTo)) {
+            throw new Error("");
           }
 
           return true;
         }),
-      body("pages").optional().isInt({ gt: 0 }),
       body("pageFrom").optional().isInt({ gt: 0 }),
       body("pageTo").optional().isInt({ gt: 0 }),
-      body().custom((value, { req }) => {
-        const pages = req.body.pages;
-        const pageFrom = req.body.pageFrom;
-        const pageTo = req.body.pageTo;
-
-        if ((pages && pageFrom) || (pages && pageTo)) {
-          throw new Error("");
-        }
-
-        if ((pageFrom || pageTo) && !(pageFrom && pageTo)) {
-          throw new Error("");
-        }
-
-        return true;
-      }),
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
