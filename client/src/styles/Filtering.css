@@ -1,0 +1,19 @@
+/* Custom styles for the layout */
+.sidebar-section {
+    border-right: 1px solid #ddd;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+  
+  .main-content {
+    padding-left: 20px;
+  }
+  
+  .filter-options {
+    margin-top: 20px;
+  }
+  
+  .content-section {
+    margin-top: 20px;
+  }
+  

@@ -138,3 +138,14 @@
 .custom-icon-color {
   color: #006d77 !important; /* Replace with your desired color code */
 }
+
+.custom-documents-button {
+  background-color: #ffffff !important;
+  color: #006d77 !important;
+  border-style: hidden;
+}
+
+.custom-documents-button:hover,
+.custom-documents-button:focus {
+  border-color: #005c66 !important;
+}

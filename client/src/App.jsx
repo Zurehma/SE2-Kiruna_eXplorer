@@ -13,6 +13,7 @@ import Documents from './components/Documents.jsx';
 import { NavigationBar } from './components/NavigationBar.jsx';
 import {Map2} from '../src/components/Map2.jsx';
 import API from '../API.js';
+import FilteringDocuments from './components/FilteringDocuments.jsx';
 
 
 function App() {
@@ -85,6 +86,7 @@ function App() {
               <Route path="/map" element={<Map2 setError={setError}/>}/>
               <Route path="/documents" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError}/>}/>
               <Route path="/documents/links" element={<Links newDoc={newDoc} setNewDoc={setNewDoc}  />}/>
+              <Route path="/documents/all" element={<FilteringDocuments />}/>
               </Routes>
           </Container>
         </div>

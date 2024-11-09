@@ -19,17 +19,17 @@ export function NavigationBar(props) {
       <Navbar.Toggle aria-controls="basic-navbar-nav" onClick={handleToggle} />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="ms-auto">
+          {/* Logged-in view for 'Urban Planner' role */}
           {props.role === 'Urban Planner' ? (
             <div className="d-flex align-items-center">
-            <i className="bi bi-person-circle me-2 custom-icon-color"></i>
-            <h5 className="mt-1 welcome-text me-2">
+              <i className="bi bi-person-circle me-2 custom-icon-color"></i>
+              <h5 className="mt-1 welcome-text me-2">
                 Welcome, {props.username}
               </h5>
 
               {/* Dropdown Menu */}
               <Dropdown align="end">
                 <Dropdown.Toggle
-                  // variant="outline-light"
                   id="dropdown-basic"
                   className="btn-dark menu-dropdown-toggle"
                 >
@@ -45,6 +45,10 @@ export function NavigationBar(props) {
                   <Dropdown.Item onClick={() => { navigate('/documents/links'); handleClose(); }}>
                     <i className="bi bi-link-45deg me-2"></i> Add Link
                   </Dropdown.Item>
+                  <Dropdown.Item onClick={() => { navigate('/documents/all'); handleClose(); }}>
+                    <i className="bi bi-collection me-2"></i> View All Documents
+                  </Dropdown.Item>
+
                   <Dropdown.Divider />
                   {location.pathname !== '/' && (
                     <Dropdown.Item onClick={() => { navigate('/'); handleClose(); }}>
@@ -58,25 +62,38 @@ export function NavigationBar(props) {
               </Dropdown>
             </div>
           ) : (
-            location.pathname === '/login' ? (
-              <Button
-                variant="outline-light"
-                id ='home-button'
-                className="ms-3"
-                onClick={() => { navigate('/'); handleClose(); }}
-              >
-                Home
-              </Button>
-            ) : (
-              <Button
-                variant="outline-light"
-                className="ms-3 custom-login-button"
-                id='login-button'
-                onClick={() => { navigate('/login'); handleClose(); }}
-              >
-                Login
-              </Button>
-            )
+            // Not logged-in view
+            <>
+              {location.pathname === '/login' ? (
+                <Button
+                  variant="outline-light"
+                  id="home-button"
+                  className="ms-3"
+                  onClick={() => { navigate('/'); handleClose(); }}
+                >
+                  <i className="bi bi-house-door me-2"></i> Home
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="outline-light"
+                    className="ms-3 custom-documents-button"
+                    id="view-documents-button"
+                    onClick={() => { navigate('/documents/all'); handleClose(); }}
+                  >
+                    <i className="bi bi-collection me-2"></i> View All Documents
+                  </Button>
+                  <Button
+                    variant="outline-light"
+                    className="ms-3 custom-login-button"
+                    id="login-button"
+                    onClick={() => { navigate('/login'); handleClose(); }}
+                  >
+                    <i className="bi bi-box-arrow-in-right me-2"></i> Login
+                  </Button>
+                </>
+              )}
+            </>
           )}
         </Nav>
       </Navbar.Collapse>
