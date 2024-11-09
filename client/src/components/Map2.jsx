@@ -8,7 +8,7 @@ import L from 'leaflet';
 import '../App.css';
 import { MyPopup } from './MyPopup';
 import API from '../../API';
-import { ShowDocuments } from './showDocuments';
+import { ShowDocuments } from '../components/ShowDocuments';
 
 // Icon mapping based on document type
 const iconMap = {
