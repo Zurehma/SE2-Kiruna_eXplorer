@@ -29,14 +29,37 @@ class DocumentRoutes {
       body("stakeholder").isString().notEmpty(),
       oneOf([body("scale").isString().notEmpty(), body("scale").isInt({ gt: 0 })]),
       body("type").isString().notEmpty(),
+      body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
-      body("language").optional().isString().notEmpty(),
+      body("coordinates")
+        .optional()
+        .isJSON()
+        .custom((value) => {
+          const lat = value.lat;
+          const long = value.long;
+          const numProperties = Object.keys(value).length;
+
+          if (lat == undefined || long == undefined || numProperties !== 2) {
+            throw new Error("Invalid coordinates object!");
+          }
+
+          if (lat > 90 || lat < -90 || long > 180 || long < -180) {
+            throw new Error("Invalid latitude and longitude values!");
+          }
+
+          return true;
+        }),
       body("pages").optional().isInt({ gt: 0 }),
       body("pageFrom").optional().isInt({ gt: 0 }),
       body("pageTo").optional().isInt({ gt: 0 }),
       body().custom((value, { req }) => {
+        const pages = req.body.pages;
         const pageFrom = req.body.pageFrom;
         const pageTo = req.body.pageTo;
+
+        if ((pages && pageFrom) || (pages && pageTo)) {
+          throw new Error("");
+        }
 
         if ((pageFrom || pageTo) && !(pageFrom && pageTo)) {
           throw new Error("");
@@ -53,13 +76,12 @@ class DocumentRoutes {
             req.body.scale,
             req.body.issuanceDate,
             req.body.type,
+            req.body.language,
             req.body.description,
-            req.body.language || null,
+            req.body.coordinates || null,
             req.body.pages || null,
             req.body.pageFrom || null,
-            req.body.pageTo || null,
-            req.body.lat || null,
-            req.body.long || null
+            req.body.pageTo || null
           )
           .then((document) => {
             res.status(200).json(document);
@@ -68,9 +90,19 @@ class DocumentRoutes {
       }
     );
 
-    this.router.get("/document-types", Utility.isLoggedIn, (req, res, next) => res.status(200).json(this.documentController.getDocumentTypes()));
+    this.router.get("/document-types", Utility.isLoggedIn, (req, res, next) => {
+      this.documentController
+        .getDocumentTypes()
+        .then((documentTypes) => res.status(200).json(documentTypes))
+        .catch((err) => next(err));
+    });
 
-    this.router.get("/scale-types", Utility.isLoggedIn, (req, res, next) => res.status(200).json(this.documentController.getScaleTypes()));
+    this.router.get("/scale-types", Utility.isLoggedIn, (req, res, next) => {
+      this.documentController
+        .getScaleTypes()
+        .then((scaleTypes) => res.status(200).json(scaleTypes))
+        .catch((err) => next(err));
+    });
 
     this.router.get("/link-types", Utility.isLoggedIn, (req, res, next) => res.status(200).json(this.documentController.getLinkTypes()));
 

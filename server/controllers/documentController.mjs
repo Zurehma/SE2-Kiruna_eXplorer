@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
-import { getDocumentTypes, getScaleTypes, isDocumentType, isScaleType, getLinkTypes, isLinkType } from "../models/document.mjs";
+import { getLinkTypes, isLinkType } from "../models/document.mjs";
 
 class DocumentController {
   constructor() {
@@ -27,11 +27,10 @@ class DocumentController {
    * @param {String} type
    * @param {String} language
    * @param {String} description
+   * @param {JSON | null} coordinates
    * @param {Number | null} pages
    * @param {Number | null} pages
    * @param {Number | null} pages
-   * @param {String | null} lat
-   * @param {String | null} long
    * @returns {Promise<Document>} A promise that resolves to the newly created object
    */
   addDocument = (
@@ -40,13 +39,12 @@ class DocumentController {
     scale,
     issuanceDate,
     type,
+    language,
     description,
-    language = null,
+    coordinates = null,
     pages = null,
     pageFrom = null,
-    pageTo = null,
-    lat = null,
-    long = null
+    pageTo = null
   ) => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -55,47 +53,18 @@ class DocumentController {
           throw error;
         }
 
-        const documentType = isDocumentType(type);
-
-        if (documentType === undefined) {
-          const error = { errCode: 400, errMessage: "Document type error!" };
-          throw error;
-        }
-
-        let scaleType = Number(scale);
-
-        if (typeof scale === "string") {
-          scaleType = isScaleType(scale);
-
-          if (scaleType === undefined) {
-            const error = { errCode: 400, errMessage: "Scale type error!" };
-            throw error;
-          }
-        }
-
-        let processedPages = pages;
-        let processedPageFrom = null;
-        let processedPageTo = null;
-
-        if (pageFrom && pageTo) {
-          pageFrom <= pageTo ? (processedPageFrom = pageFrom) : (processedPageFrom = pageTo);
-          pageFrom <= pageTo ? (processedPageTo = pageTo) : (processedPageTo = pageFrom);
-          processedPages = processedPageTo - processedPageFrom;
-        }
-
         const result = await this.documentDAO.addDocument(
           title,
           stakeholder,
-          scaleType,
+          scale,
           issuanceDate,
-          documentType,
-          description,
+          type,
           language,
-          processedPages,
-          processedPageFrom,
-          processedPageTo,
-          lat,
-          long
+          description,
+          coordinates ? JSON.stringify(coordinates) : null,
+          pages,
+          pageFrom,
+          pageTo
         );
 
         if (result.changes === 0) {
@@ -112,9 +81,9 @@ class DocumentController {
     });
   };
 
-  getDocumentTypes = () => getDocumentTypes();
+  getDocumentTypes = () => this.documentDAO.getDocumentTypes();
 
-  getScaleTypes = () => getScaleTypes();
+  getScaleTypes = () => this.documentDAO.getScaleTypes();
 
   getLinkTypes = () => getLinkTypes();
 

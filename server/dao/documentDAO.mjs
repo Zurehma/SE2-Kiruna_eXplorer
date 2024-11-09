@@ -14,11 +14,10 @@ const mapRowsToDocument = (rows) => {
         row.connections,
         row.language,
         row.description,
+        row.coordinates || null,
         row.pages || null,
         row.pageFrom || null,
-        row.pageTo || null,
-        row.lat || null,
-        row.long || null
+        row.pageTo || null
       )
   );
 };
@@ -60,6 +59,42 @@ class DocumentDAO {
   };
 
   /**
+   * Get already present document types
+   * @returns {Promise<String>} A promise that resolves to an array of strings
+   */
+  getDocumentTypes = () => {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM DOCUMENT_TYPES";
+
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  };
+
+  /**
+   * Get already present scale types
+   * @returns {Promise<String>} A promise that resolves to an array of strings
+   */
+  getScaleTypes = () => {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM SCALE_TYPES";
+
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  };
+
+  /**
    * Insert a new document in the database
    * @param {String} title
    * @param {String} stakeholder
@@ -68,11 +103,10 @@ class DocumentDAO {
    * @param {String} type
    * @param {String} language
    * @param {String} description
+   * @param {String | null} coordinates
    * @param {Number | null} pages
    * @param {Number | null} pageFrom
    * @param {Number | null} pageTo
-   * @param {String | null} lat
-   * @param {String | null} long
    * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the last document inserted and the number of lines changed
    */
   addDocument = (
@@ -81,19 +115,18 @@ class DocumentDAO {
     scale,
     issuanceDate,
     type,
+    language,
     description,
-    language = null,
+    coordinates = null,
     pages = null,
     pageFrom = null,
-    pageTo = null,
-    lat = null,
-    long = null
+    pageTo = null
   ) => {
     return new Promise((resolve, reject) => {
       const query =
-        "INSERT INTO DOCUMENT (title, stakeholder, scale, issuanceDate, type, connections, language, description, pages, pageFrom, pageTo, lat, long) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO DOCUMENT (title, stakeholder, scale, issuanceDate, type, connections, language, description, coordinates, pages, pageFrom, pageTo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-      db.run(query, [title, stakeholder, scale, issuanceDate, type, 0, language, description, pages, pageFrom, pageTo, lat, long], function (err) {
+      db.run(query, [title, stakeholder, scale, issuanceDate, type, 0, language, description, coordinates, pages, pageFrom, pageTo], function (err) {
         if (err) {
           reject(err);
         } else {
