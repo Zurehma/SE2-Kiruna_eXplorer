@@ -62,7 +62,7 @@ Returns the list of all documents.
 
 #### GET `api/documents/document-types`
 
-Returns the list of all document types.
+Returns the list of already existing document types.
 
 - Request Parameters: _None_
 - Request Body Content: _None_
@@ -76,9 +76,9 @@ Returns the list of all document types.
 - Access Constraints: Can only be called by a logged in user.
 - Additional Constraints: _None_
 
-#### GET `api/documents/scale-types`
+#### GET `api/documents/stakeholders`
 
-Returns the list of all specific scale types.
+Returns the list of already existing stakeholders.
 
 - Request Parameters: _None_
 - Request Body Content: _None_
@@ -86,7 +86,7 @@ Returns the list of all specific scale types.
 - Example:
 
 ```json
-["Blueprint/effects", "Text"]
+["KirunaKiruna kommun", "Kiruna kommun/White Arkitekter", "Kiruna kommun/Residents"]
 ```
 
 - Access Constraints: Can only be called by a logged in user.
@@ -104,10 +104,11 @@ Add a new document with the provided information.
   - `issuanceDate`: a string that represent the date. It must be in the format _YYYY-MM-DD_.
   - `type`: a string that represent the type. Can be a value between: [`Informative`, `Prescriptive`, `Material`, `Design`, `Technical`].
   - `language`: a string that must not be empty.
-  - `pages`: an integer that must be greater than 0. If `pageFrom` and `pageTo` are present, this parameter is ignored and computed as the difference between `pageTo` and `pageFrom`.
-  - `pageFrom`: an integer that must be greater than 0.
-  - `pageTo`: an integer that must be greater than 0.
   - `description`: a string that must not be empty. It represent a brief description of the document.
+  - `coordinates`: an object that must have only two properties: `lat` and `long` that must be valid latitude and longitude values.
+  - `pages`: an integer that must be greater than 0. If `pageFrom` or `pageTo` are present, this parameter should not be present.
+  - `pageFrom`: an integer that must be greater than 0. It need `pageTo` to be present.
+  - `pageTo`: an integer that must be greater than 0. It need `pageFrom` to be present.
 - Response Body Content: The newly created **Document** object.
 - Example:
 
@@ -130,9 +131,8 @@ Add a new document with the provided information.
 
 - Access Constraints: Can only be called by a logged in user whose role is Urban Planner.
 - Additional Constraints:
-  - It should return a 400 error when `scale` is not valid.
   - It should return a 400 error when `issuanceDate` is after the current date.
-  - It should return a 400 error when `type` is not valid.
+  - It should return a 400 error when `coordinates` is located in a different place than Kiruna.
 
 #### GET `api/documents/link-types`
 

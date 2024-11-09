@@ -83,30 +83,25 @@ class DocumentRoutes {
         .catch((err) => next(err));
     });
 
-    this.router.get("/scale-types", Utility.isLoggedIn, (req, res, next) => {
+    this.router.get("/stakeholders", Utility.isLoggedIn, (req, res, next) => {
       this.documentController
-        .getScaleTypes()
-        .then((scaleTypes) => res.status(200).json(scaleTypes))
+        .getStakeholders()
+        .then((stakeholders) => res.status(200).json(stakeholders))
         .catch((err) => next(err));
     });
 
     this.router.get("/link-types", Utility.isLoggedIn, (req, res, next) => res.status(200).json(this.documentController.getLinkTypes()));
 
-    this.router.get("/links/:id", 
-        param("id").isInt({ gt: 0 }), 
-        Utility.validateRequest, 
-        Utility.isLoggedIn, 
-        (req, res, next) => {
-          this.documentController
-            .getLinks(req.params.id)
-            .then((links) => {
-              res.status(200).json(links);
-            })
-            .catch((err) => {
-              next(err);
-            });
-        }
-    );
+    this.router.get("/links/:id", param("id").isInt({ gt: 0 }), Utility.validateRequest, Utility.isLoggedIn, (req, res, next) => {
+      this.documentController
+        .getLinks(req.params.id)
+        .then((links) => {
+          res.status(200).json(links);
+        })
+        .catch((err) => {
+          next(err);
+        });
+    });
 
     this.router.post(
       "/link",

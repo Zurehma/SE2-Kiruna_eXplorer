@@ -83,14 +83,14 @@ class DocumentController {
 
   getDocumentTypes = () => this.documentDAO.getDocumentTypes();
 
-  getScaleTypes = () => this.documentDAO.getScaleTypes();
+  getStakeholders = () => this.documentDAO.getStakeholders();
 
   getLinkTypes = () => getLinkTypes();
 
   /**
    * Get all links of a documents given its ID
    * @param {Number} id1
-   * @returns 
+   * @returns
    */
   getLinks = (id1) => {
     return new Promise(async (resolve, reject) => {
@@ -102,7 +102,7 @@ class DocumentController {
       }
     });
   };
-  
+
   addLink = (id1, id2, type) => {
     return new Promise(async (resolve, reject) => {
       try {
