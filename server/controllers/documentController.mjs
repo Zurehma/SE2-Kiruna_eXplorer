@@ -118,6 +118,22 @@ class DocumentController {
 
   getLinkTypes = () => getLinkTypes();
 
+  /**
+   * Get all links of a documents given its ID
+   * @param {Number} id1
+   * @returns 
+   */
+  getLinks = (id1) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const links = await this.documentDAO.getLinks(id1);
+        resolve(links);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+  
   addLink = (id1, id2, type) => {
     return new Promise(async (resolve, reject) => {
       try {

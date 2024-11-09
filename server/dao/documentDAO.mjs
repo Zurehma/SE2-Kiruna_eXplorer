@@ -103,6 +103,40 @@ class DocumentDAO {
     });
   };
 
+  /**
+   * Get all links of a documents given its ID
+   * @param {Number} id1
+   * @returns {Promise<{docID1: Number, docID2: Number, type: String}[]>} A promise that resolves to an array of objects with the keys linkedDocID and type
+   */
+  getLinks = (id1) =>{
+    return new Promise((resolve, reject) => {
+      const query = `
+      SELECT 
+        CASE 
+          WHEN docID1 = ? THEN docID2 
+          ELSE docID1 
+        END AS linkedDocID, 
+        type 
+      FROM LINK 
+      WHERE docID1 = ? OR docID2 = ?
+      ORDER BY linkedDocID ASC` ;
+      db.all(query, [id1, id1, id1], (err, rows) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(rows);
+      });
+    });
+  }
+
+
+  /**
+   * Insret a new link between two documents
+   * @param {Number} id1 
+   * @param {Number} id2 
+   * @param {String} type 
+   * 
+   */
   addLink = (id1, id2, type) => {
     return new Promise((resolve, reject) => {
       //Check if the link already exists in either direction
@@ -111,7 +145,7 @@ class DocumentDAO {
         if (err) {
           reject(err);
         } else if (rows.length > 0) {
-          reject({ errCode: 409, errMessage: "Link already exists" });
+          reject({ errCode: 409, errMessage:`Link already exists for ${id1} and ${id2}`  });
         } else {
           const query = "INSERT INTO LINK (docID1, docID2, type) VALUES (?, ?, ?)";
           db.run(query, [id1, id2, type], function (err) {
