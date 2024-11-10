@@ -94,7 +94,7 @@ class DocumentRoutes {
     this.router.post("/:docID/attachments", Utility.isLoggedIn, param("docID").isInt(), Utility.validateRequest, (req, res, next) => {
       this.documentController
         .addAttachment(req, req.params.docID)
-        .then(() => res.status(200).end())
+        .then((attachmentInfo) => res.status(200).json(attachmentInfo))
         .catch((err) => next(err));
     });
 

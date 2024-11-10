@@ -166,7 +166,7 @@ class DocumentDAO {
     return new Promise((resolve, reject) => {
       const query = "SELECT id, name, path, format FROM ATTACHMENT WHERE docID = ?";
 
-      db.run(query, [docID], (err, rows) => {
+      db.all(query, [docID], (err, rows) => {
         if (err) {
           reject(err);
         } else {
