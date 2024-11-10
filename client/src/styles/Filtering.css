@@ -1,19 +1,78 @@
 /* Custom styles for the layout */
-.sidebar-section {
+.container-fluid {
+    height: 100vh; /* Full viewport height */
+    display: flex;
+    flex-direction: row; /* Keep columns side by side */
+  }
+  
+  .sidebar-section {
     border-right: 1px solid #ddd;
     padding-right: 20px;
     padding-left: 20px;
+    position: sticky; /* Sticky positioning */
+    top: 0; /* Keep it at the top of the screen */
+    height: 100vh; /* Full height of the viewport */
+    overflow-y: auto; /* Enable vertical scroll if content overflows */
   }
   
   .main-content {
     padding-left: 20px;
+    flex: 1; /* Allow this column to take the remaining space */
+    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 100vh; /* Ensure it doesn't overflow the viewport height */
   }
   
-  .filter-options {
-    margin-top: 20px;
+  /* Optional: For the search section and filters, you can handle their overflow as well */
+  .search-section-modern {
+    overflow: hidden; /* Prevent horizontal scrolling */
   }
   
-  .content-section {
-    margin-top: 20px;
+  .documents-list {
+    max-height: calc(100vh - 100px); /* Adjust based on header/footer height */
+    overflow-y: auto; /* Enable scroll for documents */
   }
+
+.search-input-modern {
+    border-radius: 30px;
+    padding: 12px 50px 12px 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    font-size: 16px;
+    outline: none;
+}
+
+.search-input-modern:focus {
+    border-color: #007bff;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.icons-container {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 10px;
+    padding-bottom: 0.3cm;
+}
+
+.clear-icon,
+.search-icon {
+    cursor: pointer;
+    color: #555;
+    font-size: 24px; /* Increased the font size for bigger icons */
+    transition: color 0.2s;
+}
+
+/* Ensure icons are always visible */
+.icons-container .clear-icon {
+    display: inline-block;
+}
+
+.clear-icon:hover,
+.search-icon:hover {
+    color: #007bff;
+}
+
   

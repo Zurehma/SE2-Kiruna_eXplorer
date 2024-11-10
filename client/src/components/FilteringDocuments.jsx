@@ -4,6 +4,7 @@ import { MyPopup } from './MyPopup'; // Import MyPopup component
 import API from '../../API';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import '../styles/Filtering.css'
 
 const FilteringDocuments = () => {
   // State to hold search query, filtered documents, and loading state
@@ -125,21 +126,28 @@ const FilteringDocuments = () => {
 
         {/* Right Column (md=8) for Search Bar & Documents */}
         <Col md={8}>
-          {/* Top: Search Bar */}
-          <div className="search-section">
-            <h5>Search Documents</h5>
+          {/* Top: Modernized Search Bar */}
+          {/* Modernized Search Bar with Icons Inside */}
+            <div className="search-section-modern">
             <InputGroup className="mb-3">
-              <Form.Control
-                placeholder="Search documents..."
-                value={searchQuery}
-                onChange={handleSearch}
-                aria-label="Search documents"
-              />
-            <Button variant="primary" style={{ padding: '5px 10px', fontSize: '12px' }}>
-            <i className="bi bi-search"></i> Search
-            </Button>
+                <Form.Control
+                    placeholder="Search documents..."
+                    value={searchQuery}
+                    onChange={handleSearch}
+                    aria-label="Search documents"
+                    className="search-input-modern"
+                />
+                <div className="icons-container">
+                    {/* Clear icon is always visible, but only clears input when there is text */}
+                    <i
+                        className="bi bi-x-lg clear-icon"
+                        onClick={() => setSearchQuery('')}
+                    ></i>
+                    {/* Search icon is always visible */}
+                    <i className="bi bi-search search-icon"></i>
+                </div>
             </InputGroup>
-          </div>
+            </div>
 
           {/* Bottom: Display Documents */}
           <div className="documents-list mt-4">
