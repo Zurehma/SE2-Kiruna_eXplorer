@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { body, param, oneOf } from "express-validator";
-import Utility from "../utility.mjs";
+import Utility from "../utils/utility.mjs";
+import Storage from "../utils/storage.mjs";
 import DocumentController from "../controllers/documentController.mjs";
 
 class DocumentRoutes {
@@ -87,6 +88,13 @@ class DocumentRoutes {
       this.documentController
         .getStakeholders()
         .then((stakeholders) => res.status(200).json(stakeholders))
+        .catch((err) => next(err));
+    });
+
+    this.router.post("/:docID/attachments", Utility.isLoggedIn, param("docID").isInt(), Utility.validateRequest, (req, res, next) => {
+      this.documentController
+        .addAttachment(req, req.params.docID)
+        .then(() => res.status(200).end())
         .catch((err) => next(err));
     });
 

@@ -7,10 +7,14 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import bodyParser from "body-parser";
-
-import Utility from "./utility.mjs";
+import path from "path";
+import { fileURLToPath } from "url";
+import Utility from "./utils/utility.mjs";
 import DocumentRoutes from "./routes/documentRoutes.mjs";
 import AuthRoutes from "./routes/authRoutes.mjs";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = 3001;
@@ -32,6 +36,7 @@ documentRoutes.initRoutes();
 const authRoutes = new AuthRoutes(app);
 authRoutes.initRoutes();
 
+app.use(baseURL + "/uploads", Utility.isLoggedIn, express.static("./uploads"));
 app.use(baseURL + "/documents", documentRoutes.getRouter());
 app.use(baseURL + "/sessions", authRoutes.getRouter());
 

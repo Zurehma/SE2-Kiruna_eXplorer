@@ -137,6 +137,46 @@ class DocumentDAO {
   };
 
   /**
+   * Add info for a new attachment of an existing document
+   * @param {Number} docID
+   * @param {String} path
+   * @param {String} format
+   * @returns {Promise<{ changes: Number, lastID: Number }>}
+   */
+  addAttachment = (docID, name, path, format) => {
+    return new Promise((resolve, reject) => {
+      const query = "INSERT INTO ATTACHMENT (docID, name, path, format) VALUES (?, ?, ?, ?)";
+
+      db.run(query, [docID, name, path, format], function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ changes: this.changes, lastID: this.lastID });
+        }
+      });
+    });
+  };
+
+  /**
+   * Get all the attachments of a document by its ID
+   * @param {Number} docID
+   * @returns {Promise<Array<{ id: Number, name: String, path: String, format: String }>>}
+   */
+  getAttachmentsByDocumentID = (docID) => {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT id, name, path, format FROM ATTACHMENT WHERE docID = ?";
+
+      db.run(query, [docID], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  };
+
+  /**
    * Get all links of a documents given its ID
    * @param {Number} id1
    * @returns {Promise<{docID1: Number, docID2: Number, type: String}[]>} A promise that resolves to an array of objects with the keys linkedDocID and type

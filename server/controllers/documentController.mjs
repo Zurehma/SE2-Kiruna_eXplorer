@@ -1,6 +1,8 @@
 import dayjs from "dayjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
 import { getLinkTypes, isLinkType } from "../models/document.mjs";
+import Storage from "../utils/storage.mjs";
+import path from "path";
 
 class DocumentController {
   constructor() {
@@ -49,7 +51,7 @@ class DocumentController {
     return new Promise(async (resolve, reject) => {
       try {
         if (dayjs().isBefore(issuanceDate)) {
-          const error = { errCode: 400, errMessage: "Date error!" };
+          const error = { errCode: 400, errMessage: "Date error." };
           throw error;
         }
 
@@ -84,6 +86,40 @@ class DocumentController {
   getDocumentTypes = () => this.documentDAO.getDocumentTypes();
 
   getStakeholders = () => this.documentDAO.getStakeholders();
+
+  /**
+   *
+   * @param {*} req
+   * @param {Number} docID
+   * @returns {Promise<{ id: Number, name: String, path: String, format: String }>} A promise that resolves to an object
+   */
+  addAttachment = (req, docID) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const document = await this.documentDAO.getDocumentByID(docID);
+
+        if (document == undefined) {
+          const error = { errCode: 404, errMessage: "Document not found." };
+          throw error;
+        }
+
+        const fileInfo = await Storage.saveFile(req);
+
+        const result = await this.documentDAO.addAttachment(docID, fileInfo.originalname, path.join(".", fileInfo.path), fileInfo.mimetype);
+
+        if (result.changes === 0) {
+          const error = {};
+          throw error;
+        }
+
+        const attachments = await this.documentDAO.getAttachmentsByDocumentID(docID);
+
+        resolve(attachments.find((attachment) => attachment.id === result.lastID));
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
 
   getLinkTypes = () => getLinkTypes();
 

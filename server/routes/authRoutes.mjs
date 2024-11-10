@@ -6,7 +6,7 @@ import { body, check } from "express-validator";
 import passport from "passport";
 import session from "express-session";
 
-import Utility from "../utility.mjs";
+import Utility from "../utils/utility.mjs";
 
 import UserController from "../controllers/userController.mjs";
 
@@ -71,7 +71,7 @@ function AuthRoutes(app) {
         res.status(401).json({ message: "Unauthorized" });
       }
     });
-   };
+  };
 }
 
 export default AuthRoutes;
