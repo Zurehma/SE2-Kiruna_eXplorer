@@ -1,36 +1,28 @@
 /* Custom styles for the layout */
-.container-fluid {
-    height: 100vh; /* Full viewport height */
-    display: flex;
-    flex-direction: row; /* Keep columns side by side */
-  }
-  
-  .sidebar-section {
+.sidebar-section {
     border-right: 1px solid #ddd;
     padding-right: 20px;
     padding-left: 20px;
-    position: sticky; /* Sticky positioning */
-    top: 0; /* Keep it at the top of the screen */
-    height: 100vh; /* Full height of the viewport */
-    overflow-y: auto; /* Enable vertical scroll if content overflows */
+    overflow: hidden;
   }
   
   .main-content {
     padding-left: 20px;
-    flex: 1; /* Allow this column to take the remaining space */
-    overflow-y: auto; /* Enable vertical scrolling */
-    max-height: 100vh; /* Ensure it doesn't overflow the viewport height */
   }
   
-  /* Optional: For the search section and filters, you can handle their overflow as well */
-  .search-section-modern {
-    overflow: hidden; /* Prevent horizontal scrolling */
+  .filter-options {
+    margin-top: 20px;
   }
   
-  .documents-list {
-    max-height: calc(100vh - 100px); /* Adjust based on header/footer height */
-    overflow-y: auto; /* Enable scroll for documents */
+  .content-section {
+    margin-top: 20px;
   }
+  
+/* Modern search bar styles */
+.search-section-modern {
+    position: relative;
+    width: 100%;
+}
 
 .search-input-modern {
     border-radius: 30px;
