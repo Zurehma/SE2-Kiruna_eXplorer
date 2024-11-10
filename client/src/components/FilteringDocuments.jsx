@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, InputGroup, Button, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Form, InputGroup, Spinner } from 'react-bootstrap';
 import { MyPopup } from './MyPopup'; // Import MyPopup component
 import API from '../../API';
 import DatePicker from 'react-datepicker';
@@ -44,10 +44,10 @@ const FilteringDocuments = () => {
   });
 
   return (
-    <Container fluid className="mt-4">
-      <Row>
-        {/* Left Column (md=4) for Filters */}
-        <Col md={4} className="sidebar-section">
+    <Container fluid className="mt-4" style={{ height: '100vh', overflow: 'hidden' }}>
+      <Row style={{ height: '100%' }}>
+        {/* Left Column (md=3) for Filters */}
+        <Col md={3} className="sidebar-section" style={{ position: 'fixed', top: '2cm', bottom: 0, overflowY: 'auto', height: '100vh' }}>
           <h5>Filter Documents</h5>
           <Form>
             {/* Stakeholder Filter */}
@@ -87,6 +87,7 @@ const FilteringDocuments = () => {
                 as="select"
                 name="language"
               >
+                <option value="English">All</option>
                 <option value="English">English</option>
                 <option value="Swedish">Swedish</option>
                 {/* Add more languages as needed */}
@@ -100,6 +101,7 @@ const FilteringDocuments = () => {
                 as="select"
                 name="scale"
               >
+                <option value="All">All</option>
                 <option value="Blueprint/Effects">Blueprint/Effects</option>
                 <option value="Text">Text</option>
                 <option value="1:n">1:n</option>
@@ -124,30 +126,29 @@ const FilteringDocuments = () => {
           </Form>
         </Col>
 
-        {/* Right Column (md=8) for Search Bar & Documents */}
-        <Col md={8}>
+        {/* Right Column (md=9) for Search Bar & Documents */}
+        <Col md={9} className="filtered-result" style={{ marginLeft: '25%', paddingLeft: '15px', overflowY: 'auto', height: '100vh' }}>
           {/* Top: Modernized Search Bar */}
-          {/* Modernized Search Bar with Icons Inside */}
-            <div className="search-section-modern">
+          <div className="search-section-modern">
             <InputGroup className="mb-3">
-                <Form.Control
-                    placeholder="Search documents..."
-                    value={searchQuery}
-                    onChange={handleSearch}
-                    aria-label="Search documents"
-                    className="search-input-modern"
-                />
-                <div className="icons-container">
-                    {/* Clear icon is always visible, but only clears input when there is text */}
-                    <i
-                        className="bi bi-x-lg clear-icon"
-                        onClick={() => setSearchQuery('')}
-                    ></i>
-                    {/* Search icon is always visible */}
-                    <i className="bi bi-search search-icon"></i>
-                </div>
+              <Form.Control
+                placeholder="Search documents..."
+                value={searchQuery}
+                onChange={handleSearch}
+                aria-label="Search documents"
+                className="search-input-modern"
+              />
+              <div className="icons-container">
+                {/* Clear icon is always visible, but only clears input when there is text */}
+                <i
+                  className="bi bi-x-lg clear-icon"
+                  onClick={() => setSearchQuery('')}
+                ></i>
+                {/* Search icon is always visible */}
+                <i className="bi bi-search search-icon"></i>
+              </div>
             </InputGroup>
-            </div>
+          </div>
 
           {/* Bottom: Display Documents */}
           <div className="documents-list mt-4">

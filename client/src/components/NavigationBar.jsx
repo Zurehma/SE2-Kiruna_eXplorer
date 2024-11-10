@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Navbar, Nav, Dropdown, Button } from 'react-bootstrap';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Navbar.css'; // Ensure custom styles are in this file
@@ -7,6 +7,7 @@ export function NavigationBar(props) {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = React.useState(false);
+  const [viewDoc, setViewDoc] = useState(false);
 
   const handleToggle = () => setOpen(!open);
   const handleClose = () => setOpen(false);
