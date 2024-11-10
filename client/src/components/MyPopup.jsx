@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { Row, Col, Tooltip, OverlayTrigger, Button } from 'react-bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 function MyPopup(props) {
@@ -34,25 +34,47 @@ function MyPopup(props) {
   return (
     <Row>
       {/* Icon Column */}
-      <Col xs={12} md={2} className='myPopup text-center mb-3'>
+      <Col xs={12} md={2} className="myPopup text-center mb-3">
         {renderIcon()}
       </Col>
-      <Col xs={12} md={5} className='myPopup mb-3'>
+      <Col xs={12} md={5} className="myPopup mb-3">
         <h6>{props.doc.title}</h6>
-        <p className='small'>
+        <p className="small">
           <strong>Stakeholders: </strong> {props.doc.stakeholder} <br />
-          <strong>Scale: </strong> {props.doc.scale && typeof props.doc.scale === 'string' && props.doc.scale.toUpperCase() !== 'TEXT' && props.doc.scale.toUpperCase() !== 'BLUEPRINT/EFFECTS' ? `1:${props.doc.scale}` : props.doc.scale} <br />
+          <strong>Scale: </strong>{' '}
+          {props.doc.scale &&
+          typeof props.doc.scale === 'string' &&
+          props.doc.scale.toUpperCase() !== 'TEXT' &&
+          props.doc.scale.toUpperCase() !== 'BLUEPRINT/EFFECTS'
+            ? `1:${props.doc.scale}`
+            : props.doc.scale}{' '}
+          <br />
           <strong>Issuance Date: </strong> {props.doc.issuanceDate} <br />
           <strong>Type: </strong> {props.doc.type} <br />
           <strong>Connections: </strong> {props.doc.connections} <br />
           <strong>Language: </strong> {props.doc.language} <br />
           <strong>Number of pages: </strong> {displayValue(props.doc.pages)} <br />
-          <strong>Pages: </strong> {props.doc.pageFrom && props.doc.pageTo ? `${props.doc.pageFrom}-${props.doc.pageTo}` : displayValue(props.doc.pageFrom)} <br />
-          <strong>Position: </strong> {props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'}
+          <strong>Pages: </strong>{' '}
+          {props.doc.pageFrom && props.doc.pageTo
+            ? `${props.doc.pageFrom}-${props.doc.pageTo}`
+            : displayValue(props.doc.pageFrom)}{' '}
+          <br />
+          <strong>Position: </strong>{' '}
+          {props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'}
         </p>
       </Col>
-      <Col xs={12} md={5}>
-        <p className='mt-3 small'><strong>Description:</strong> {props.doc.description}</p>
+      <Col xs={12} md={5} className="position-relative">
+        <p className="mt-3 small">
+          <strong>Description:</strong> {props.doc.description}
+        </p>
+        {/* Edit Button in Bottom-Right Corner */}
+        <Button
+          variant="light"
+          className="position-absolute"
+          style={{ bottom: 0, right: 0 }}
+        >
+          <i className="bi bi-pencil-square text-primary"></i>
+        </Button>
       </Col>
     </Row>
   );

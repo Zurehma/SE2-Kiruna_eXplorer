@@ -21,7 +21,7 @@ const fetchIcon = (count, size) => {
   return icons[count];
 };
 
-function ShowDocuments({ data, createCustomIcon,setSelectedDoc }) {
+function ShowDocuments({ data, createCustomIcon,setSelectedDoc, setRenderNumeber,renderNumber }) {
   const maxZoom = 22;
   const [bounds, setBounds] = useState(null);
   const [zoom, setZoom] = useState(12);
@@ -101,6 +101,7 @@ function ShowDocuments({ data, createCustomIcon,setSelectedDoc }) {
             click: () => {
               // Quando un marker viene cliccato, aggiorniamo lo stato del documento selezionato
               setSelectedDoc(doc); // Passiamo il documento selezionato a Map2
+              setRenderNumeber((renderNumber) => renderNumber + 1); // Aggiorniamo il numero di render
             },
           }}
           >

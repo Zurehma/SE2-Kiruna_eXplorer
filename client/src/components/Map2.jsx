@@ -59,7 +59,7 @@ function Map2(props) {
     const [positionActual, setPositionActual] = useState(initialPosition);
     const [zoomLevel, setZoomLevel] = useState(11);
     const [selectedDoc, setSelectedDoc] = useState(null); // To manage the selected document for showing MyPopup
-
+    const [renderNumber,setRenderNumeber] = useState(0);
     // Coordinate per il poligono (angoli specificati)
     const polygonCoordinates = [
         [67.87328157366065, 20.20047943270466],
@@ -139,7 +139,7 @@ function Map2(props) {
                                                 border: '1px solid #ddd',
                                                 boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
                                             }}
-                                            onClick={() => setSelectedDoc(item)} // Set selected document on click
+                                            onClick={() => { setSelectedDoc(item); setRenderNumeber((renderNumber) => renderNumber + 1); }} // Set selected document on click
                                         >
                                             <div 
                                                 style={{
@@ -164,16 +164,18 @@ function Map2(props) {
                 </Marker>
 
                 {/* Render coordinate documents as markers on the map */}
-                {<ShowDocuments data={coordDocuments} createCustomIcon={createCustomIcon} setSelectedDoc={setSelectedDoc} />}
+                {<ShowDocuments data={coordDocuments} createCustomIcon={createCustomIcon} setSelectedDoc={setSelectedDoc} setRenderNumeber={setRenderNumeber} renderNumber={renderNumber} />}
 
                 {/* If a document is selected, show MyPopup in a popup */}
                 {selectedDoc && (
                     (() => {
                         const pos = selectedDoc.lat ? [selectedDoc.lat, selectedDoc.long] : plusButtonPosition;
+                        const myKey = selectedDoc.id+renderNumber;
                         return (
                             <Popup className='popupProp'
                                 position={pos} 
                                 maxWidth={800}
+                                key={myKey}
                                 onClose={() => setSelectedDoc(null)} // Clear selected document when popup is closed
                             >
                                 <MyPopup doc={selectedDoc} />
