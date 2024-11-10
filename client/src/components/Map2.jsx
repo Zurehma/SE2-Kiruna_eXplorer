@@ -164,17 +164,22 @@ function Map2(props) {
                 </Marker>
 
                 {/* Render coordinate documents as markers on the map */}
-                {<ShowDocuments data={coordDocuments} createCustomIcon={createCustomIcon} />}
+                {<ShowDocuments data={coordDocuments} createCustomIcon={createCustomIcon} setSelectedDoc={setSelectedDoc} />}
 
                 {/* If a document is selected, show MyPopup in a popup */}
                 {selectedDoc && (
-                    <Popup className='popupProp'
-                        position={plusButtonPosition} 
-                        maxWidth={800}
-                        onClose={() => setSelectedDoc(null)} // Clear selected document when popup is closed
-                    >
-                        <MyPopup doc={selectedDoc} />
-                    </Popup>
+                    (() => {
+                        const pos = selectedDoc.lat ? [selectedDoc.lat, selectedDoc.long] : plusButtonPosition;
+                        return (
+                            <Popup className='popupProp'
+                                position={pos} 
+                                maxWidth={800}
+                                onClose={() => setSelectedDoc(null)} // Clear selected document when popup is closed
+                            >
+                                <MyPopup doc={selectedDoc} />
+                            </Popup>
+                        );
+                    })()
                 )}
 
                 <RecenterMap position={positionActual} zoom={zoomLevel} />

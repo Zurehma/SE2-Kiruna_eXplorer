@@ -21,7 +21,7 @@ const fetchIcon = (count, size) => {
   return icons[count];
 };
 
-function ShowDocuments({ data, createCustomIcon }) {
+function ShowDocuments({ data, createCustomIcon,setSelectedDoc }) {
   const maxZoom = 22;
   const [bounds, setBounds] = useState(null);
   const [zoom, setZoom] = useState(12);
@@ -96,10 +96,14 @@ function ShowDocuments({ data, createCustomIcon }) {
         const doc = data.find((d) => d.id === cluster.properties.docId);
         const customIcon = createCustomIcon(doc.type);
         return (
-          <Marker key={doc.id} position={[doc.lat, doc.long]} icon={customIcon}>
-            <Popup maxWidth={800} className="popupProp">
-              <MyPopup doc={doc} />
-            </Popup>
+          <Marker key={doc.id} position={[doc.lat, doc.long]} icon={customIcon}
+          eventHandlers={{
+            click: () => {
+              // Quando un marker viene cliccato, aggiorniamo lo stato del documento selezionato
+              setSelectedDoc(doc); // Passiamo il documento selezionato a Map2
+            },
+          }}
+          >
           </Marker>
         );
       })}
