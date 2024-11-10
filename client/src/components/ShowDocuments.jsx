@@ -15,6 +15,7 @@ const fetchIcon = (count, size) => {
               border-radius: 50%; color: white; font-size: 14px;">
                 ${count}
              </div>`,
+      className: 'cluster-icon', // Make sure this matches your CSS or remove if not needed
     });
   }
   return icons[count];
@@ -35,7 +36,7 @@ function ShowDocuments({ data, createCustomIcon }) {
       b.getNorthEast().lng,
       b.getNorthEast().lat,
     ]);
-    setZoom(map.getZoom());
+    setZoom(map.getZoom()); 
   };
 
   const onMove = useCallback(updateMap, [map]);
