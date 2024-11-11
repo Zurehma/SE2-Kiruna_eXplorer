@@ -160,17 +160,57 @@ class DocumentDAO {
   /**
    * Get all the attachments of a document by its ID
    * @param {Number} docID
-   * @returns {Promise<Array<{ id: Number, name: String, path: String, format: String }>>}
+   * @returns {Promise<Array<{ id: Number, docID: Number, name: String, path: String, format: String }>>}
    */
   getAttachmentsByDocumentID = (docID) => {
     return new Promise((resolve, reject) => {
-      const query = "SELECT id, name, path, format FROM ATTACHMENT WHERE docID = ?";
+      const query = "SELECT * FROM ATTACHMENT WHERE docID = ?";
 
       db.all(query, [docID], (err, rows) => {
         if (err) {
           reject(err);
         } else {
           resolve(rows);
+        }
+      });
+    });
+  };
+
+  /**
+   * Get a single attachment by its ID
+   * @param {Number} attachmentID
+   * @returns {Promise<{ id: Number, docID: Number, name: String, path: String, format: String }>}
+   */
+  getAttachmentByID = (attachmentID) => {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM ATTACHMENT WHERE id = ?";
+
+      db.get(query, [attachmentID], (err, row) => {
+        if (err) {
+          reject(err);
+        } else if (row === undefined) {
+          resolve(undefined);
+        } else {
+          resolve(row);
+        }
+      });
+    });
+  };
+
+  /**
+   *
+   * @param {Number} attachmentID
+   * @returns {Promise<{ changes: Number, lastID: Number }>}
+   */
+  deleteAttachmentByID = (attachmentID) => {
+    return new Promise((resolve, reject) => {
+      const query = "DELETE FROM ATTACHMENT WHERE id = ?";
+
+      db.run(query, [attachmentID], function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ changes: this.changes, lastID: this.lastID });
         }
       });
     });

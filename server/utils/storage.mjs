@@ -71,10 +71,17 @@ const saveFile = (req) => {
   });
 };
 
-const deleteFile = () => {};
+/**
+ *
+ * @param {String} path
+ */
+const deleteFile = (filePath) => {
+  fs.rmSync(path.join(".", filePath));
+};
 
 const Storage = {
-  saveFile: saveFile,
+  saveFile,
+  deleteFile,
 };
 
 export default Storage;

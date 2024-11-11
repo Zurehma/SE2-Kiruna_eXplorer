@@ -55,6 +55,8 @@ class DocumentController {
           throw error;
         }
 
+        // TODO: validate kiruna coordinates
+
         const result = await this.documentDAO.addDocument(
           title,
           stakeholder,
@@ -69,11 +71,6 @@ class DocumentController {
           pageTo
         );
 
-        if (result.changes === 0) {
-          const error = {};
-          throw error;
-        }
-
         const document = await this.documentDAO.getDocumentByID(result.lastID);
 
         resolve(document);
@@ -83,12 +80,20 @@ class DocumentController {
     });
   };
 
+  /**
+   * Get the list of already available document types
+   * @returns {Promise<Array<String>>} A promise that resolves to an array of strings
+   */
   getDocumentTypes = () => this.documentDAO.getDocumentTypes();
 
+  /**
+   * Get the list of already available stakeholders
+   * @returns {Promise<Array<String>>} A promise that resolves to an array of strings
+   */
   getStakeholders = () => this.documentDAO.getStakeholders();
 
   /**
-   *
+   * Add a new attachment to an existing document
    * @param {*} req
    * @param {Number} docID
    * @returns {Promise<{ id: Number, name: String, path: String, format: String }>} A promise that resolves to an object
@@ -104,17 +109,39 @@ class DocumentController {
         }
 
         const fileInfo = await Storage.saveFile(req);
-
         const result = await this.documentDAO.addAttachment(docID, fileInfo.originalname, path.join(".", fileInfo.path), fileInfo.mimetype);
+        const attachment = await this.documentDAO.getAttachmentByID(result.lastID);
 
-        if (result.changes === 0) {
-          const error = {};
+        resolve(attachment);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
+  /**
+   * Delete an attachment of a document by its ID
+   * @param {Number} docID
+   * @param {Number} attachmentID
+   * @returns {Promise<>} A promise that resolves to nothing
+   */
+  deleteAttachment = (docID, attachmentID) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const attachment = await this.documentDAO.getAttachmentByID(attachmentID);
+
+        if (attachment == undefined) {
+          const error = { errCode: 404, errMessage: "Attachment not found." };
+          throw error;
+        } else if (attachment.docID !== docID) {
+          const error = { errCode: 409, errMessage: "Attachment not linked with the document provided." };
           throw error;
         }
 
-        const attachments = await this.documentDAO.getAttachmentsByDocumentID(docID);
+        Storage.deleteFile(attachment.path);
+        await this.documentDAO.deleteAttachmentByID(attachmentID);
 
-        resolve(attachments.find((attachment) => attachment.id === result.lastID));
+        resolve(null);
       } catch (err) {
         reject(err);
       }

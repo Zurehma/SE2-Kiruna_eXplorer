@@ -93,10 +93,24 @@ class DocumentRoutes {
 
     this.router.post("/:docID/attachments", Utility.isLoggedIn, param("docID").isInt(), Utility.validateRequest, (req, res, next) => {
       this.documentController
-        .addAttachment(req, req.params.docID)
+        .addAttachment(req, Number(req.params.docID))
         .then((attachmentInfo) => res.status(200).json(attachmentInfo))
         .catch((err) => next(err));
     });
+
+    this.router.delete(
+      "/:docID/attachments/:attachmentID",
+      Utility.isLoggedIn,
+      param("docID").isInt(),
+      param("attachmentID").isInt(),
+      Utility.validateRequest,
+      (req, res, next) => {
+        this.documentController
+          .deleteAttachment(Number(req.params.docID), Number(req.params.attachmentID))
+          .then(() => res.status(200).json())
+          .catch((err) => next(err));
+      }
+    );
 
     this.router.get("/link-types", Utility.isLoggedIn, (req, res, next) => res.status(200).json(this.documentController.getLinkTypes()));
 
