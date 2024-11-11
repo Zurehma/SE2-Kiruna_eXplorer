@@ -55,6 +55,27 @@ const isValidCoordinatesObject = (value) => {
 };
 
 /**
+ * Middleware to check if the body has the correct configuration for the page parameters
+ * @param {*} value
+ * @param {*} param1
+ */
+const isValidPageParameter = (value, { req }) => {
+  const pages = value;
+  const pageFrom = req.body.pageFrom;
+  const pageTo = req.body.pageTo;
+
+  if ((pages && pageFrom) || (pages && pageTo)) {
+    throw new Error("");
+  }
+
+  if ((pageFrom || pageTo) && !(pageFrom && pageTo)) {
+    throw new Error("");
+  }
+
+  return true;
+};
+
+/**
  * Middleware to manage validation request errors
  * @param {*} req
  * @param {*} res
@@ -97,6 +118,7 @@ const Utility = {
   isLoggedIn,
   isValidYearMonthOrYear,
   isValidCoordinatesObject,
+  isValidPageParameter,
   validateRequest,
   errorHandler,
 };

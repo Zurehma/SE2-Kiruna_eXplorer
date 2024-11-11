@@ -1,5 +1,6 @@
 import db from "../db/db.mjs";
 import Document from "../models/document.mjs";
+import AttachmentInfo from "../models/attachmentInfo.mjs";
 
 const mapRowsToDocument = (rows) => {
   return rows.map(
@@ -20,6 +21,10 @@ const mapRowsToDocument = (rows) => {
         row.pageTo || null
       )
   );
+};
+
+const mapRowsToAttachmentInfo = (rows) => {
+  return rows.map((row) => new AttachmentInfo(row.id, row.docID, row.name, row.path, row.format));
 };
 
 class DocumentDAO {
@@ -160,7 +165,7 @@ class DocumentDAO {
   /**
    * Get all the attachments of a document by its ID
    * @param {Number} docID
-   * @returns {Promise<Array<{ id: Number, docID: Number, name: String, path: String, format: String }>>}
+   * @returns {Promise<Array<AttachmentInfo>>}
    */
   getAttachmentsByDocumentID = (docID) => {
     return new Promise((resolve, reject) => {
@@ -170,7 +175,7 @@ class DocumentDAO {
         if (err) {
           reject(err);
         } else {
-          resolve(rows);
+          resolve(mapRowsToAttachmentInfo(rows));
         }
       });
     });
@@ -179,7 +184,7 @@ class DocumentDAO {
   /**
    * Get a single attachment by its ID
    * @param {Number} attachmentID
-   * @returns {Promise<{ id: Number, docID: Number, name: String, path: String, format: String }>}
+   * @returns {Promise<AttachmentInfo>}
    */
   getAttachmentByID = (attachmentID) => {
     return new Promise((resolve, reject) => {
@@ -191,7 +196,7 @@ class DocumentDAO {
         } else if (row === undefined) {
           resolve(undefined);
         } else {
-          resolve(row);
+          resolve(mapRowsToAttachmentInfo([row])[0]);
         }
       });
     });

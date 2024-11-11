@@ -3,6 +3,8 @@ import DocumentDAO from "../dao/documentDAO.mjs";
 import { getLinkTypes, isLinkType } from "../models/document.mjs";
 import Storage from "../utils/storage.mjs";
 import path from "path";
+import AttachmentInfo from "../models/attachmentInfo.mjs";
+import Document from "../models/document.mjs";
 
 class DocumentController {
   constructor() {
@@ -96,7 +98,7 @@ class DocumentController {
    * Add a new attachment to an existing document
    * @param {*} req
    * @param {Number} docID
-   * @returns {Promise<{ id: Number, name: String, path: String, format: String }>} A promise that resolves to an object
+   * @returns {Promise<AttachmentInfo>} A promise that resolves to the newly created object
    */
   addAttachment = (req, docID) => {
     return new Promise(async (resolve, reject) => {

@@ -13,14 +13,11 @@ class DocumentRoutes {
   getRouter = () => this.router;
 
   initRoutes = () => {
-    this.router.get("/", async (req, res, next) => {
-      try {
-        const doc = await this.documentController.getDocuments();
-
-        return res.status(200).json(doc);
-      } catch (err) {
-        return next(err);
-      }
+    this.router.get("/", (req, res, next) => {
+      this.documentController
+        .getDocuments()
+        .then((documents) => res.status(200).json(documents))
+        .catch((err) => next(err));
     });
 
     this.router.post(
@@ -34,24 +31,7 @@ class DocumentRoutes {
       body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
       body("coordinates").optional().isObject().custom(Utility.isValidCoordinatesObject),
-      body("pages")
-        .optional()
-        .isInt({ gt: 0 })
-        .custom((value, { req }) => {
-          const pages = value;
-          const pageFrom = req.body.pageFrom;
-          const pageTo = req.body.pageTo;
-
-          if ((pages && pageFrom) || (pages && pageTo)) {
-            throw new Error("");
-          }
-
-          if ((pageFrom || pageTo) && !(pageFrom && pageTo)) {
-            throw new Error("");
-          }
-
-          return true;
-        }),
+      body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
       body("pageFrom").optional().isInt({ gt: 0 }),
       body("pageTo").optional().isInt({ gt: 0 }),
       Utility.validateRequest,

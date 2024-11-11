@@ -129,10 +129,50 @@ Add a new document with the provided information.
   }
   ```
 
-- Access Constraints: Can only be called by a logged in user whose role is Urban Planner.
+- Access Constraints: Can only be called by a logged in user.
 - Additional Constraints:
   - It should return a 400 error when `issuanceDate` is after the current date.
   - It should return a 400 error when `coordinates` is located in a different place than Kiruna.
+
+#### POST `api/documents/:docID/attachments`
+
+- Request Parameters:
+  - `docID`: a number that represent the ID of the document.
+- Request Header Content Type: One of the following choices:
+  - `application/pdf`.
+  - `image/jpg`.
+  - `image/png`.
+  - `video/mp4`.
+- Request Body Content: The file associated with the request.
+- Response Body Content: The newly created **Attachment info** object.
+- Example:
+
+  ```json
+  {
+    "id": 1,
+    "docID": 1,
+    "name": "filename.pdf",
+    "path": "uploads/documents/randomfilename.pdf",
+    "format": "application/pdf"
+  }
+  ```
+
+- Access Constraints: Can only be called by a logged in user.
+- Additional Contraints:
+  - It should return a 400 error when the file mimetype does not match any of the supported mimetypes.
+  - It should return a 400 error when the file size exceed supported limits.
+
+#### DELETE `api/documents/:docID/attachments/:attachmentID`
+
+- Request Parameters:
+  - `docID`: a number that represent the ID of the document.
+  - `attachmentID`: a number that represent the ID of the attachment.
+- Request Body Content: _None_
+- Response Body Content: _None_
+- Access Constraints: Can only be called by a logged in user.
+- Additional Constraints:
+  - It should return a 404 error when the attachment does not exist.
+  - It should return a 409 error when the attachment is not linked with the document provided.
 
 #### GET `api/documents/link-types`
 
