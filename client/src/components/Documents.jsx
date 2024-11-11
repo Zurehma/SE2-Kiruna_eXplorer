@@ -435,15 +435,15 @@ function Documents(props) {
                 <Form.Control
                   type="file"
                   multiple
-                  onChange={handleFileChange}
-                  className="mb-0"  // Removes padding
+                  onChange={handleFileChange} 
+                  className="file-input"
                 />
                 <div className="file-preview mt-3">
                   {files.map((file, index) => (
-                    <div key={index} className="file-item d-flex justify-content-between align-items-center mb-3">
+                    <div key={index} className="file-item d-flex justify-content-between align-items-center mb-3 ms-2">
                       <span>{file.name}</span>
-                      <Button variant="danger" size="sm" onClick={() => removeFile(index)}>
-                        🗑️
+                      <Button variant="danger" size="sm" onClick={() => removeFile(index)} className="me-2">
+                        <i class="bi bi-trash-fill"></i>
                       </Button>
                     </div>
                   ))}
