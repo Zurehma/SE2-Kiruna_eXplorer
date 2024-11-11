@@ -158,7 +158,7 @@ function Documents(props) {
       if (files.length > 0) {
         files.forEach(async (file) => {
           const formData = new FormData();
-          formData.append(file.name.split('.').pop(), file);
+          formData.append('file', file);
           try {
             await API.uploadFiles(doc.id,formData);
           } catch (error) {
@@ -456,7 +456,7 @@ function Documents(props) {
                     <div key={index} className="file-item d-flex justify-content-between align-items-center mb-3 ms-2">
                       <span>{file.name}</span>
                       <Button variant="danger" size="sm" onClick={() => removeFile(index)} className="me-2">
-                        <i class="bi bi-trash-fill"></i>
+                        <i className="bi bi-trash-fill"></i>
                       </Button>
                     </div>
                   ))}
