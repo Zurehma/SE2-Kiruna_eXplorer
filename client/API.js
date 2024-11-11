@@ -18,6 +18,39 @@ const getDocuments = async () => {
         .then(handleInvalidResponse)
         .then(response => response.json());
 };
+ 
+//Upload files
+const uploadFiles = async (docID, formData) => {
+    try {
+      const response = await fetch(`${SERVER_URL}/documents/${docID}/attachments`, {
+        method: 'POST',
+        headers: {
+          
+        },
+        body: formData
+      });
+  
+      // Gestione degli errori di risposta
+      if (!response.ok) {
+        if (response.status === 400) {
+          const errorMessage = await response.text();
+          throw new Error(`File upload error: ${errorMessage}`);
+        } else {
+          throw new Error(`Unexpected error: ${response.statusText}`);
+        }
+      }
+  
+      // Se la risposta va a buon fine, restituiamo i dati dell'allegato creato
+      const data = await response.json();
+      return data;
+  
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      throw error; // Lancia di nuovo l'errore per gestirlo a un livello superiore
+    }
+};
+  
+
 
 const getTypeDocuments = async () => {
     return await fetch(`${SERVER_URL}/documents/document-types` , {
@@ -150,7 +183,8 @@ const API = {
     getTypeScale,
     getTypeLinks,
     setLink,
-    getUserInfo
+    getUserInfo,
+    uploadFiles
 };
   
 

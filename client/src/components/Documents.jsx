@@ -18,7 +18,7 @@ function Documents(props) {
   const [files, setFiles] = useState([]); //To manage uploaded files
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    const validFormats = ['.mp3', '.mp4', '.jpeg', '.pdf'];
+    const validFormats = ['.mp4', '.jpeg', '.pdf', '.png','jpg'];
 
     // Filter files by extension and add them only if they respect the correct format
     const newFiles = selectedFiles.filter(file => 
@@ -149,16 +149,28 @@ function Documents(props) {
     if(document.nValue && document.scale === '1:n') {  
       document.scale = document.nValue;
     }
-
+    let doc = {};
     try {
       const response = await API.saveDocument(document);
-      const doc = response;
+      doc = response;
+      //Try to submit files
+      if (files.length > 0) {
+        files.forEach(async (file) => {
+          const formData = new FormData();
+          formData.append(file.name.split('.').pop(), file);
+          try {
+            await API.uploadFiles(doc.id,formData);
+          } catch (error) {
+            props.setError(error);
+          }
+        } ); 
+      }
       props.setNewDoc(doc);
       navigate(`/documents/links`);
     } catch (error) {
       console.error("Error saving document:", error);
       props.setError(error);
-    }
+    }  
   };
   
   const handleMapClick = (lat, lng) => {
