@@ -23,7 +23,7 @@ function MyPopup(props) {
         placement="top"
         overlay={<Tooltip id={`tooltip-${props.doc.type}`}>{props.doc.type}</Tooltip>}
       >
-        <i className={`bi ${iconClass} my-icons text-black`} data-testid={`my-icon-${props.doc.type}`}></i>
+        <i className={`bi ${iconClass} my-icons text-secondary`} data-testid={`my-icon-${props.doc.type}`} style={{ fontSize: '2rem', color: '#555' }}></i>
       </OverlayTrigger>
     );
   };
@@ -32,16 +32,17 @@ function MyPopup(props) {
   const displayValue = (value) => (value !== null ? value : '-');
 
   return (
-    <Row>
+    <Row className="p-3 border rounded shadow-sm" style={{ backgroundColor: '#f9f9f9' }}>
       {/* Icon Column */}
-      <Col xs={12} md={2} className="myPopup text-center mb-3">
+      <Col xs={12} md={3} className="myPopup" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '0.5rem' }}>
         {renderIcon()}
       </Col>
-      <Col xs={12} md={5} className="myPopup mb-3">
-        <h6>{props.doc.title}</h6>
-        <p className="small">
-          <strong>Stakeholders: </strong> {props.doc.stakeholder} <br />
-          <strong>Scale: </strong>{' '}
+      {/* Details Column */}
+      <Col xs={12} md={4} className="myPopup">
+        <h6 className="fw-bold text-secondary mb-2">{props.doc.title}</h6>
+        <p className="small text-muted">
+          <strong className="text-dark">Stakeholders:</strong> {props.doc.stakeholder} <br />
+          <strong className="text-dark">Scale:</strong>{' '}
           {props.doc.scale &&
           typeof props.doc.scale === 'string' &&
           props.doc.scale.toUpperCase() !== 'TEXT' &&
@@ -49,31 +50,39 @@ function MyPopup(props) {
             ? `1:${props.doc.scale}`
             : props.doc.scale}{' '}
           <br />
-          <strong>Issuance Date: </strong> {props.doc.issuanceDate} <br />
-          <strong>Type: </strong> {props.doc.type} <br />
-          <strong>Connections: </strong> {props.doc.connections} <br />
-          <strong>Language: </strong> {props.doc.language} <br />
-          <strong>Number of pages: </strong> {displayValue(props.doc.pages)} <br />
-          <strong>Pages: </strong>{' '}
+          <strong className="text-dark">Issuance Date:</strong> {props.doc.issuanceDate} <br />
+          <strong className="text-dark">Type:</strong> {props.doc.type} <br />
+          <strong className="text-dark">Connections:</strong> {props.doc.connections} <br />
+          <strong className="text-dark">Language:</strong> {props.doc.language} <br />
+          <strong className="text-dark">Number of pages:</strong> {displayValue(props.doc.pages)} <br />
+          <strong className="text-dark">Pages:</strong>{' '}
           {props.doc.pageFrom && props.doc.pageTo
             ? `${props.doc.pageFrom}-${props.doc.pageTo}`
             : displayValue(props.doc.pageFrom)}{' '}
           <br />
-          <strong>Position: </strong>{' '}
+          <strong className="text-dark">Position:</strong>{' '}
           {props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'}
         </p>
       </Col>
-      <Col xs={12} md={5} className="position-relative">
-        <p className="mt-3 small">
-          <strong>Description:</strong> {props.doc.description}
+      {/* Description Column */}
+      <Col xs={12} md={4} className="position-relative">
+        <p className="mt-3 small text-muted">
+          <strong className="text-dark">Description:</strong> {props.doc.description}
         </p>
-        {/* Edit Button in Bottom-Right Corner */}
+      </Col>
+      {/* Edit Button Column */}
+      <Col xs={12} md={1} className="d-flex align-items-start justify-content-center">
         <Button
-          variant="light"
-          className="position-absolute"
-          style={{ bottom: 0, right: 0 }}
+          variant="outline-primary"
+          className="shadow-sm edit-button" // Added custom class for targeted CSS
+          style={{
+            padding: '0.5rem',
+            borderRadius: '50%',
+            width: '2.5rem',
+            height: '2.5rem',
+          }}
         >
-          <i className="bi bi-pencil-square text-primary"></i>
+          <i className="bi bi-pencil-square edit-icon" style={{ fontSize: '1.25rem' }}></i>
         </Button>
       </Col>
     </Row>
