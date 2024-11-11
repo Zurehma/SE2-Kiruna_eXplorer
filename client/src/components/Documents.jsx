@@ -4,10 +4,12 @@ import '../styles/Documents.css';
 import { useNavigate } from 'react-router-dom';
 import API from '../../API.js';
 import { Map } from './Map.jsx';
-
 import 'leaflet/dist/leaflet.css';
 import { Polygon } from 'react-leaflet';
 import L from 'leaflet';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ISO6391 from 'iso-639-1';
 
 
 function Documents(props) { 
@@ -296,45 +298,96 @@ function Documents(props) {
                   </Form.Control.Feedback>
                 </Form.Group>
               </Col>
-
+             
               <Col md={6}>
                 <Form.Group controlId="issuanceDate">
                   <Form.Label>Issuance Date*</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    name="issuanceDate" 
-                    value={document.issuanceDate || ""} 
-                    onChange={handleChange} 
-                    placeholder="e.g., 2007"
-                    className="input" 
-                    isInvalid={!!errors.issuanceDate} 
+                  <DatePicker
+                    selected={document.issuanceDate ? new Date(document.issuanceDate) : null}
+                    onChange={(date) => handleChange({ 
+                      target: { 
+                        name: "issuanceDate", 
+                        value: date.toISOString().split('T')[0]  // Converti in formato YYYY-MM-DD
+                      } 
+                    })}
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText="Select a date"
+                    className="input"
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.issuanceDate}
-                  </Form.Control.Feedback>
+                  {errors.issuanceDate && (
+                    <Form.Control.Feedback type="invalid">
+                      {errors.issuanceDate}
+                    </Form.Control.Feedback>
+                  )}
                 </Form.Group>
-              </Col>           
+              </Col>         
 
             </Row>
 
             <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group controlId="language">
-                  <Form.Label>Language*</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    name="language" 
-                    value={document.language || ""} 
-                    onChange={handleChange} 
-                    placeholder="e.g., Swedish"
-                    className="input" 
-                    isInvalid={!!errors.language}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.language}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
+
+
+            <Col md={6}>
+  <Form.Group controlId="language">
+    <Form.Label>Language*</Form.Label>
+    <Form.Select 
+      name="language" 
+      value={document.language || ""} 
+      onChange={handleChange} 
+      className="input" 
+      isInvalid={!!errors.language}
+    >
+      <option value="" disabled>Seleziona la lingua...</option>
+      {/* Lingue consigliate */}
+      <option value="Swedish">Svedese (consigliato)</option>
+      <option value="English">Inglese (consigliato)</option>
+      
+      {/* Altre lingue */}
+      <option value="Spanish">Spagnolo</option>
+      <option value="French">Francese</option>
+      <option value="German">Tedesco</option>
+      <option value="Italian">Italiano</option>
+      <option value="Chinese">Cinese</option>
+      <option value="Japanese">Giapponese</option>
+      <option value="Russian">Russo</option>
+      {/* Aggiungi altre lingue se necessario */}
+    </Form.Select>
+    <Form.Control.Feedback type="invalid">
+      {errors.language}
+    </Form.Control.Feedback>
+  </Form.Group>
+</Col>
+
+
+<Col md={6}>
+  <Form.Group controlId="language">
+    <Form.Label>Language*</Form.Label>
+    <Form.Select 
+      name="language" 
+      value={document.language || ""} 
+      onChange={handleChange} 
+      className="input" 
+      isInvalid={!!errors.language}
+    >
+      <option value="" disabled>Seleziona la lingua...</option>
+
+      {/* Lingue consigliate */}
+      <option value="sv">Svedese (consigliato)</option>
+      <option value="en">Inglese (consigliato)</option>
+
+      {/* Tutte le altre lingue */}
+      {ISO6391.getAllCodes().map((code) => (
+        <option key={code} value={code}>
+          {ISO6391.getNativeName(code)} ({ISO6391.getName(code)})
+        </option>
+      ))}
+    </Form.Select>
+    <Form.Control.Feedback type="invalid">
+      {errors.language}
+    </Form.Control.Feedback>
+  </Form.Group>
+</Col>
+
               <Col md={6}>
                 <Form.Group controlId="pages">
                   <Form.Label>Pages</Form.Label>
