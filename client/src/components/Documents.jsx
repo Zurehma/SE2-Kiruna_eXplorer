@@ -15,6 +15,23 @@ function Documents(props) {
   const [scales, setScales] = useState([]);
   const [showNField, setShowNField] = useState(false);
   const navigate = useNavigate();
+  const [files, setFiles] = useState([]); //To manage uploaded files
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    const validFormats = ['.mp3', '.mp4', '.jpeg', '.pdf'];
+
+    // Filter files by extension and add them only if they respect the correct format
+    const newFiles = selectedFiles.filter(file => 
+      validFormats.some(format => file.name.endsWith(format))
+    );
+
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+  };
+
+  const removeFile = (index) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
+
   const [document, setDocument] = useState({
     title: '',
     stakeholder: '',
@@ -413,6 +430,25 @@ function Documents(props) {
                 {errors.description}
             </Form.Control.Feedback>
             </Form.Group>
+            <Form.Group controlId="fileUpload">
+                <Form.Label>Upload Files</Form.Label>
+                <Form.Control
+                  type="file"
+                  multiple
+                  onChange={handleFileChange}
+                  className="mb-0"  // Removes padding
+                />
+                <div className="file-preview mt-3">
+                  {files.map((file, index) => (
+                    <div key={index} className="file-item d-flex justify-content-between align-items-center mb-3">
+                      <span>{file.name}</span>
+                      <Button variant="danger" size="sm" onClick={() => removeFile(index)}>
+                        🗑️
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </Form.Group>
 
             <div className="text-center mt-4">
                 <Button variant="primary" type="submit" onClick={handleSubmit} className="btn-save">Save Document</Button>
