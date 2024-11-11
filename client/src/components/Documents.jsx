@@ -154,6 +154,7 @@ function Documents(props) {
       const response = await API.saveDocument(document);
       doc = response;
       //Try to submit files
+      /*
       if (files.length > 0) {
         files.forEach(async (file) => {
           const formData = new FormData();
@@ -164,7 +165,7 @@ function Documents(props) {
             props.setError(error);
           }
         } ); 
-      }
+      }*/
       props.setNewDoc(doc);
       navigate(`/documents/links`);
     } catch (error) {
