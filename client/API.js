@@ -24,6 +24,7 @@ const uploadFiles = async (docID, formData) => {
     try {
       const response = await fetch(`${SERVER_URL}/documents/${docID}/attachments`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           
         },
