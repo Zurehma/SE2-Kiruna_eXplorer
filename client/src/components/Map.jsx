@@ -33,7 +33,6 @@ function Map({ handleMapClick,setPosition,latitude,longitude,polygonCoordinates,
       click: (e) => {
         const newLat = e.latlng.lat;
         const newLng = e.latlng.lng;
-        console.log(newLat,newLng);
         if(validateCoordinates(newLat,newLng)){
           setPosition({
             lat: newLat,
