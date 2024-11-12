@@ -80,34 +80,6 @@ const FilteringDocuments = () => {
               />
             </Form.Group>
 
-            {/* Language Filter */}
-            <Form.Group controlId="filterLanguage" className="mt-3">
-              <Form.Label>Language</Form.Label>
-              <Form.Control
-                as="select"
-                name="language"
-              >
-                <option value="English">All</option>
-                <option value="English">English</option>
-                <option value="Swedish">Swedish</option>
-                {/* Add more languages as needed */}
-              </Form.Control>
-            </Form.Group>
-
-            {/* Scale Filter */}
-            <Form.Group controlId="filterScale" className="mt-3">
-              <Form.Label>Scale</Form.Label>
-              <Form.Control
-                as="select"
-                name="scale"
-              >
-                <option value="All">All</option>
-                <option value="Blueprint/Effects">Blueprint/Effects</option>
-                <option value="Text">Text</option>
-                <option value="1:n">1:n</option>
-              </Form.Control>
-            </Form.Group>
-
             {/* Type Filter */}
             <Form.Group controlId="filterType" className="mt-3">
               <Form.Label>Type</Form.Label>
@@ -144,8 +116,7 @@ const FilteringDocuments = () => {
                   className="bi bi-x-lg clear-icon"
                   onClick={() => setSearchQuery('')}
                 ></i>
-                {/* Search icon is always visible */}
-                <i className="bi bi-search search-icon"></i>
+
               </div>
             </InputGroup>
           </div>
