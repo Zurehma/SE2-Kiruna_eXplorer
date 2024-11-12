@@ -49,7 +49,7 @@ Returns the list of all documents.
         "scale": 100,
         "issuanceDate": "2024-10-28",
         "connections": 3,
-        "language": "english",
+        "language": "English",
         "page": 2,
         "description": "Lore ipsum..."
     },
@@ -121,7 +121,7 @@ Add a new document with the provided information.
     "issuanceDate": "2024-10-28",
     "type": "Informative",
     "connections": 0,
-    "language": "english",
+    "language": "English",
     "pages": 20,
     "pageFrom": 12,
     "pageTo": 32,
@@ -190,21 +190,55 @@ Returns the list of all specific scale types.
 - Access Constraints: Can only be called by a logged in user.
 - Additional Constraints: _None_
 
+#### GET `api/documents/links:id`
+- Request Parameters:
+  - `id`: ID of the document for which the links are being requested
+- Request Body Content: _None_
+- Response Body Content: An array where each object is composed of the Document ID and the title of the existing link.
+- Example:
+
+```json
+[
+  {
+    "linkedDocID": 1,
+    "title": "Compilation of responses “So what the people of Kiruna think?” (15)"
+  },
+  {
+    "linkedDocID": 2,
+    "title": "Detail plan for Bolagsomradet Gruvstad-spark (18)"
+  }
+]
+```
+
+- Access Constraints: _None_
+- Additional Constraints: _None_
+
+
 #### POST `api/documents/link`
 
 - Request Body: An object with the following fields:
 
   - `id1`: an integer that is the ID of the first document (document being linked from...)
-  - `id2`: an integer that is the ID of the second document (...document being linked to)
+  - `ids`: an array of integers that are the ID of the documents (...documents being linked to)
   - `type`: a string that represents the type of the link. Must be one of the following: [`Direct`, `Collateral`, `Projection`, `Update`]
 
-- Response Body: The newly created link:
+- Response Body: The newly created links:
 - Example:
   ```json
   {
-    "docID1": 3,
-    "docID2": 4,
-    "type": "Direct"
+    "message": "Links added successfully",
+    "addedLinks": [
+      {
+        "id1": 3,
+        "id2": 1,
+        "type": "Direct"
+      },
+      {
+        "id1": 3,
+        "id2": 2,
+        "type": "Direct"
+      }
+  ]
   }
   ```
 - Access Constraints: Can only be called by a logged in user whose role is Urban Planner.

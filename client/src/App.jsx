@@ -13,6 +13,7 @@ import Documents from './components/Documents.jsx';
 import { NavigationBar } from './components/NavigationBar.jsx';
 import {Map2} from '../src/components/Map2.jsx';
 import API from '../API.js';
+import FilteringDocuments from './components/FilteringDocuments.jsx';
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
     const [loggedIn, setLoggedIn] = useState(false);
     const [role, setRole] = useState('');
     const [newDoc, setNewDoc] = useState('');
+    const [hideDocBar, sethideDocBar] = useState(false);
     const navigate = useNavigate();
     
     
@@ -72,7 +74,7 @@ function App() {
     
     return (
         <div className="min-vh-100 d-flex flex-column">
-          <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} role={role} />
+          <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} role={role} sethideDocBar= {sethideDocBar} hideDocBar ={sethideDocBar}/>
           <Container fluid className="flex-grow-1 d-flex flex-column px-0">
             {error && (
                 <Alert variant="danger" className="fixed-top mt-3" style={{zIndex:1500}} dismissible onClose={() => setError(null)}>
@@ -85,6 +87,7 @@ function App() {
               <Route path="/map" element={<Map2 setError={setError}/>}/>
               <Route path="/documents" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError}/>}/>
               <Route path="/documents/links" element={<Links newDoc={newDoc} setNewDoc={setNewDoc}  />}/>
+              <Route path="/documents/all" element={<FilteringDocuments />}/>
               </Routes>
           </Container>
         </div>
