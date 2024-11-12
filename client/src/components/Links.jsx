@@ -8,7 +8,7 @@ import '../styles/Links.css';
 function Links(props) {
   const [allDocuments, setAllDocuments] = useState([]);
   const [documents, setDocuments] = useState([]);
-  const [typeLink, setTypeLink] = useState([]);
+  const [typeLink, setTypeLink] = useState(["mah","boh"]);
   const [showModal, setShowModal] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [linkedDocuments, setLinkedDocuments] = useState([]); // aggiunto per documenti già collegati
@@ -25,8 +25,8 @@ function Links(props) {
         const response = await API.getDocuments();
         setDocuments(response);
         setAllDocuments(response);
-        const response2 = await API.getTypeLinks(); // se viene tolta dall db bisogna inserirli dal frontend
-        setTypeLink(response2);
+        // const response2 = await API.getTypeLinks(); // se viene tolta dall db bisogna inserirli dal frontend
+        // setTypeLink(response2);
       } catch (error) {
         console.error("Error fetching documents:", error);
       }

@@ -13,27 +13,12 @@ import ISO6391 from 'iso-639-1';
 
 
 function Documents(props) { 
-  const [types, setTypes] = useState(["Direct", "Indirect"]);  // valori statici per types
-  const [scales, setScales] = useState(["1:n", "Hexadecimal"]); // valori statici per scales
-
+  const [types, setTypes] = useState([]);  
+  const [scales, setScales] = useState(["Text", "Blueprints/Effects", "1:n",]); // valori statici per scales
   const [showNField, setShowNField] = useState(false);
   const navigate = useNavigate();
+  const { id } = useParams(); // Ottieni l'id dalla URL per la modalità modifica
   const [files, setFiles] = useState([]); //To manage uploaded files
-  const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    const validFormats = ['.mp4', '.jpeg', '.pdf', '.png','jpg'];
-
-    // Filter files by extension and add them only if they respect the correct format
-    const newFiles = selectedFiles.filter(file => 
-      validFormats.some(format => file.name.endsWith(format))
-    );
-
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-  };
-
-  const removeFile = (index) => {
-    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-  };
 
   const [document, setDocument] = useState({
     title: '',
@@ -45,53 +30,62 @@ function Documents(props) {
     description: '',
     language: '',
     pages: '',
-    latitude: '',
-    longitude: '',
-    pageFrom: '', // Nuovo campo
-    pageTo: ''    // Nuovo campo
+    coordinates: { lat: '', long: '' },  // Nuovo campo coordinates
+    pageFrom: '',
+    pageTo: ''
   });
   
+  const [errors, setErrors] = useState({
+    title: '',
+    stakeholder: '',
+    scale: '',
+    nValue: '',
+    issuanceDate: '',
+    type: '',
+    language: '',
+    coordinates: '',
+    description: '',
+    pages: ''
+  });
 
-  // useEffect(() => {
-  //   const fetchTypes = async () => {
-  //     try {
-  //       const response = await API.getTypeDocuments();
-  //       setTypes(response); 
-  //       const response2 = await API.getTypeScale();
-  //       setScales(response2); 
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-  //   fetchTypes();
-  // }, []);
-
-  // const validateDate = (date) => {
-  //   const validFormats = [
-  //     /^\d{4}-\d{2}-\d{2}$/, // YYYY-MM-DD
-  //     /^\d{4}-\d{2}$/,       // YYYY-MM
-  //     /^\d{4}$/              // YYYY
-  //   ];
-  //   return validFormats.some((regex) => regex.test(date));
-  // };
-  
-  const validatePages = (value) => {
-    // Regex per controllare se è un singolo numero o un range valido (es. "35-45" o "35 - 45")
-    const singleNumberRegex = /^\d+$/;
-    const rangeRegex = /^\d+\s*-\s*\d+$/;
-
-    if (singleNumberRegex.test(value)) {
-      return true; // Numero singolo valido
-    } else if (rangeRegex.test(value)) {
-      const [start, end] = value.split('-').map(num => parseInt(num.trim(), 10));
-      if (start < end) {
-        return true; // Range valido con inizio minore di fine
-      } else {
-        return "The starting page should be less than the ending page.";
+  useEffect(() => {
+    const fetchTypes = async () => {
+      try {
+        const response = await API.getTypeDocuments();
+        setTypes(response); 
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    } else {
-      return "Please enter a valid number or range (e.g., 35 or 35-45).";
+    };
+    fetchTypes();
+
+    if (id) {
+      fetchDocument(id); 
     }
+  }, [id]);
+
+  const fetchDocument = async (documentId) => {
+    try {
+      const doc = await API.getDocumentById(documentId);
+      setDocument(doc); // Popola il form con i dati esistenti
+      setShowNField(doc.scale === '1:n');
+    } catch (error) {
+      console.error("Error fetching document:", error);
+    }
+  };
+   
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    const validFormats = ['.mp4', '.jpeg', '.pdf', '.png','jpg'];
+    // Filter files by extension and add them only if they respect the correct format
+    const newFiles = selectedFiles.filter(file => 
+      validFormats.some(format => file.name.endsWith(format))
+    );
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+  };
+
+  const removeFile = (index) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
   const handleScaleChange = (e) => {
@@ -116,27 +110,25 @@ function Documents(props) {
     const point = L.latLng(lat, lng);
     return polygon.getBounds().contains(point);
   }
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setDocument((prevDocument) => ({
       ...prevDocument,
-      [name]: name === 'nValue' ? parseInt(value, 10) || '' : value, // Converti nValue in numero
+      [name]: name === 'nValue' ? parseInt(value, 10) || '' : value,
+      coordinates: {
+        ...prevDocument.coordinates,
+        [name]: value
+      }
     }));
   };
 
-  const [errors, setErrors] = useState({
-    title: '',
-    stakeholder: '',
-    scale: '',
-    nValue: '',
-    issuanceDate: '',
-    type: '',
-    language: '',
-    latitude: '',
-    longitude: '',
-    description: '',
-    pages: ''
-  });
+  const handleMapClick = (lat, lng) => {
+    setDocument((prevDocument) => ({
+      ...prevDocument,
+      coordinates: { lat, long: lng }
+    }));
+  };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -166,61 +158,79 @@ function Documents(props) {
     if (document.pages && !validatePages(document.pages)) {
       newErrors.pages = "Please enter a valid number or range (e.g., 35 or 35-45).";
     }
-  
+    if (!document.coordinates.lat && !document.coordinates.long && !validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))) {
+      newErrors.coordinates = "Please enter a valid number of LATITUDE and LONGITUDE or select from the map.";
+    }
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-  
-    if(document.nValue && document.scale === '1:n') {  
-      document.scale = document.nValue;
-    }
-    let doc = {};
+
     try {
-      const response = await API.saveDocument(document);
-      doc = response;
-      //Try to submit files
-      /*
-      if (files.length > 0) {
-        files.forEach(async (file) => {
-          const formData = new FormData();
-          formData.append('file', file);
-          try {
-            await API.uploadFiles(doc.id,formData);
-          } catch (error) {
-            props.setError(error);
-          }
-        } ); 
-      }*/
-      props.setNewDoc(doc);
+      const response = id 
+        ? await API.updateDocument(id, document)
+        : await API.saveDocument(document);
+      
+        //Try to submit files
+      // if (files.length > 0) {
+      //   files.forEach(async (file) => {
+      //     const formData = new FormData();
+      //     formData.append('file', file);
+      //     await API.uploadFiles(response.id, formData);
+      //   });
+      // }
+
+      props.setNewDoc(response);
       navigate(`/documents/links`);
     } catch (error) {
       console.error("Error saving document:", error);
       props.setError(error);
-    }  
-  };
+    }
   
-  const handleMapClick = (lat, lng) => {
-    setDocument((prevDocument) => ({
-      ...prevDocument,
-      latitude: lat,
-      longitude: lng,
-    }));
+    // boooh
+    // if(document.nValue && document.scale === '1:n') {  
+    //   document.scale = document.nValue;
+    // }
+    // let doc = {};
+    
+   
+   
   };
+
+
+  const validatePages = (value) => {
+    // Regex per controllare se è un singolo numero o un range valido (es. "35-45" o "35 - 45")
+    const singleNumberRegex = /^\d+$/;
+    const rangeRegex = /^\d+\s*-\s*\d+$/;
+
+    if (singleNumberRegex.test(value)) {
+      return true; // Numero singolo valido
+    } else if (rangeRegex.test(value)) {
+      const [start, end] = value.split('-').map(num => parseInt(num.trim(), 10));
+      if (start < end) {
+        return true; // Range valido con inizio minore di fine
+      } else {
+        return "The starting page should be less than the ending page.";
+      }
+    } else {
+      return "Please enter a valid number or range (e.g., 35 or 35-45).";
+    }
+  };
+
 
   const [position, setPosition] = useState({ lat: null, lng: null });
   useEffect(() => {
     if(position.lat && position.lng){
-      document.latitude = position.lat;
-      document.longitude = position.lng;
+      document.coordinates.lat = position.lat;
+      document.coordinates.long = position.lng;
     }
   }, [position.lat,position.lng]);
 
   useEffect(() => {
-    if (document.latitude && document.longitude && validateCoordinates(Number(document.latitude),Number(document.longitude))) {
-      setPosition({ lat: document.latitude, lng: document.longitude });
-    }else if(document.latitude && document.longitude && !validateCoordinates(Number(document.latitude),Number(document.longitude))){
+    if (document.coordinates.lat && document.coordinates.long && validateCoordinates(Number(document.coordinates.lat),Number(document.coordinates.lat))) {
+      setPosition({ lat: document.coordinates.lat, lng: document.coordinates.long });
+    }else if(document.coordinates.lat && document.coordinates.long && !validateCoordinates(Number(document.coordinates.lat),Number(document.coordinates.long))){
       setPosition({ lat: null, lng: null });
     }
-  }, [document.latitude, document.longitude]);
+  }, [document.coordinates.lat, document.coordinates.long]);
 
   return (
     <div className="documents-background">
@@ -420,8 +430,8 @@ function Documents(props) {
                   <Form.Label>Latitude</Form.Label>
                   <Form.Control 
                     type="text" 
-                    name="latitude" 
-                    value={document.latitude || ""} 
+                    name="lat" 
+                    value={document.coordinates.lat || ""} 
                     onChange={handleChange}
                     placeholder="e.g., 59.3293"
                     className="input" 
@@ -433,14 +443,17 @@ function Documents(props) {
                   <Form.Label>Longitude</Form.Label>
                   <Form.Control 
                     type="text" 
-                    name="longitude" 
-                    value={document.longitude || ""} 
+                    name="long" 
+                    value={document.coordinates.long || ""} 
                     onChange={handleChange} 
                     placeholder="e.g., 18.0686"
                     className="input" 
                   />
                 </Form.Group>
               </Col>
+              <Form.Control.Feedback type="invalid">
+                  {errors.coordinates}
+              </Form.Control.Feedback>
             </Row>
 
             <Form.Group controlId="description" className="mb-4">
