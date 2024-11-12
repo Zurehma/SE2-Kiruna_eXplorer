@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Card, Row, Col } from 'react-bootstrap';
 import '../styles/Documents.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import API from '../../API.js';
 import { Map } from './Map.jsx';
 import 'leaflet/dist/leaflet.css';
@@ -51,8 +51,8 @@ function Documents(props) {
   useEffect(() => {
     const fetchTypes = async () => {
       try {
-        const response = await API.getTypeDocuments();
-        setTypes(response); 
+        // const response = await API.getTypeDocuments();
+        // setTypes(response); 
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -112,16 +112,27 @@ function Documents(props) {
   }
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setDocument((prevDocument) => ({
-      ...prevDocument,
-      [name]: name === 'nValue' ? parseInt(value, 10) || '' : value,
-      coordinates: {
-        ...prevDocument.coordinates,
-        [name]: value
-      }
-    }));
-  };
+   // const { name, value } = e.target;
+    // setDocument((prevDocument) => {
+    //     if (name === 'lat' || name === 'long') {
+    //         // Se il nome è 'lat' o 'long', aggiorna solo coordinates
+    //         return {
+    //             ...prevDocument,
+    //             coordinates: {
+    //                 ...prevDocument.coordinates,
+    //                 [name]: parseFloat(value) || '' // Parsing in float per coordinate
+    //             }
+    //         };
+    //     } else {
+    //         // Altrimenti aggiorna la proprietà di document principale
+    //         return {
+    //             ...prevDocument,
+    //             [name]: name === 'nValue' ? parseInt(value, 10) || '' : value
+    //         };
+    //     }
+    // });
+};
+
 
   const handleMapClick = (lat, lng) => {
     setDocument((prevDocument) => ({
@@ -158,7 +169,7 @@ function Documents(props) {
     if (document.pages && !validatePages(document.pages)) {
       newErrors.pages = "Please enter a valid number or range (e.g., 35 or 35-45).";
     }
-    if (!document.coordinates.lat && !document.coordinates.long && !validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))) {
+    if (!document.coordinates.lat || !document.coordinates.long || !validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))) {
       newErrors.coordinates = "Please enter a valid number of LATITUDE and LONGITUDE or select from the map.";
     }
     setErrors(newErrors);
@@ -323,25 +334,25 @@ function Documents(props) {
             
             <Row className="mb-3">
               <Col md={6}>
-                <Form.Group controlId="type">
-                  <Form.Label>Type*</Form.Label>
-                  <Form.Select 
-                    as="select"
-                    name="type"
-                    value={document.type || ""}
-                    onChange={handleChange}
-                    className="input"
-                    isInvalid={!!errors.type} 
-                  >
-                    <option value="">Select a type</option>
-                    {types.map((type, index) => (
-                      <option key={index} value={type}>{type}</option>
-                    ))}
+              <Form.Group controlId="type">
+                <Form.Label>Type*</Form.Label>
+                <Form.Select 
+                  as="select"
+                  name="type"
+                  value={document.type || ""}
+                  onChange={handleChange}
+                  className="input"
+                  isInvalid={!!errors.type} 
+                >
+                  <option value="">Select a type</option>
+                  {types.map((type, index) => (
+                    <option key={index} value={type.name}>{type.name}</option>
+                  ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
-                    {errors.type}
-                  </Form.Control.Feedback>
-                </Form.Group>
+                  {errors.type}
+                </Form.Control.Feedback>
+              </Form.Group>
               </Col>
              
               <Col md={6}>
@@ -381,11 +392,8 @@ function Documents(props) {
                     isInvalid={!!errors.language}
                   >
                     <option value="" disabled>Select language...</option>
-                    {/* Recommended languages */}
                     <option value="Swedish">Swedish (recommended)</option>
                     <option value="English">English (recommended)</option>
-                    
-                    {/* Other languages */}
                     <option value="Spanish">Spanish</option>
                     <option value="French">French</option>
                     <option value="German">German</option>
@@ -393,7 +401,6 @@ function Documents(props) {
                     <option value="Chinese">Chinese</option>
                     <option value="Japanese">Japanese</option>
                     <option value="Russian">Russian</option>
-                    {/* Add more languages if needed */}
                   </Form.Select>
                   <Form.Control.Feedback type="invalid">
                     {errors.language}
@@ -449,11 +456,12 @@ function Documents(props) {
                     placeholder="e.g., 18.0686"
                     className="input" 
                   />
-                </Form.Group>
-              </Col>
-              <Form.Control.Feedback type="invalid">
+                             <Form.Control.Feedback type="invalid">
                   {errors.coordinates}
               </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+
             </Row>
 
             <Form.Group controlId="description" className="mb-4">
