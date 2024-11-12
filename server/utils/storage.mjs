@@ -25,6 +25,8 @@ const storage = multer.diskStorage({
         break;
     }
 
+    fs.mkdirSync(destination, { recursive: true });
+
     cb(null, destination);
   },
   filename: (req, file, cb) => {
@@ -71,10 +73,6 @@ const saveFile = (req) => {
   });
 };
 
-/**
- *
- * @param {String} path
- */
 const deleteFile = (filePath) => {
   fs.rmSync(path.join(".", filePath));
 };
