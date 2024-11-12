@@ -4,15 +4,18 @@ import '../styles/Documents.css';
 import { useNavigate } from 'react-router-dom';
 import API from '../../API.js';
 import { Map } from './Map.jsx';
-
 import 'leaflet/dist/leaflet.css';
 import { Polygon } from 'react-leaflet';
 import L from 'leaflet';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ISO6391 from 'iso-639-1';
 
 
 function Documents(props) { 
-  const [types, setTypes] = useState([]);
-  const [scales, setScales] = useState([]);
+  const [types, setTypes] = useState(["Direct", "Indirect"]);  // valori statici per types
+  const [scales, setScales] = useState(["1:n", "Hexadecimal"]); // valori statici per scales
+
   const [showNField, setShowNField] = useState(false);
   const navigate = useNavigate();
   const [files, setFiles] = useState([]); //To manage uploaded files
@@ -49,29 +52,47 @@ function Documents(props) {
   });
   
 
-  useEffect(() => {
-    const fetchTypes = async () => {
-      try {
-        const response = await API.getTypeDocuments();
-        setTypes(response); 
-        const response2 = await API.getTypeScale();
-        setScales(response2); 
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchTypes();
-  }, []);
+  // useEffect(() => {
+  //   const fetchTypes = async () => {
+  //     try {
+  //       const response = await API.getTypeDocuments();
+  //       setTypes(response); 
+  //       const response2 = await API.getTypeScale();
+  //       setScales(response2); 
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+  //   fetchTypes();
+  // }, []);
 
-  const validateDate = (date) => {
-    const validFormats = [
-      /^\d{4}-\d{2}-\d{2}$/, // YYYY-MM-DD
-      /^\d{4}-\d{2}$/,       // YYYY-MM
-      /^\d{4}$/              // YYYY
-    ];
-    return validFormats.some((regex) => regex.test(date));
-  };
+  // const validateDate = (date) => {
+  //   const validFormats = [
+  //     /^\d{4}-\d{2}-\d{2}$/, // YYYY-MM-DD
+  //     /^\d{4}-\d{2}$/,       // YYYY-MM
+  //     /^\d{4}$/              // YYYY
+  //   ];
+  //   return validFormats.some((regex) => regex.test(date));
+  // };
   
+  const validatePages = (value) => {
+    // Regex per controllare se è un singolo numero o un range valido (es. "35-45" o "35 - 45")
+    const singleNumberRegex = /^\d+$/;
+    const rangeRegex = /^\d+\s*-\s*\d+$/;
+
+    if (singleNumberRegex.test(value)) {
+      return true; // Numero singolo valido
+    } else if (rangeRegex.test(value)) {
+      const [start, end] = value.split('-').map(num => parseInt(num.trim(), 10));
+      if (start < end) {
+        return true; // Range valido con inizio minore di fine
+      } else {
+        return "The starting page should be less than the ending page.";
+      }
+    } else {
+      return "Please enter a valid number or range (e.g., 35 or 35-45).";
+    }
+  };
 
   const handleScaleChange = (e) => {
     const { value } = e.target;
@@ -113,7 +134,8 @@ function Documents(props) {
     language: '',
     latitude: '',
     longitude: '',
-    description: ''
+    description: '',
+    pages: ''
   });
   
   const handleSubmit = async (e) => {
@@ -141,7 +163,9 @@ function Documents(props) {
     if (!document.description || document.description.length < 2) {
       newErrors.description = "Description is required and cannot be empty.";
     }
-    
+    if (document.pages && !validatePages(document.pages)) {
+      newErrors.pages = "Please enter a valid number or range (e.g., 35 or 35-45).";
+    }
   
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -309,24 +333,29 @@ function Documents(props) {
                   </Form.Control.Feedback>
                 </Form.Group>
               </Col>
-
+             
               <Col md={6}>
                 <Form.Group controlId="issuanceDate">
                   <Form.Label>Issuance Date*</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    name="issuanceDate" 
-                    value={document.issuanceDate || ""} 
-                    onChange={handleChange} 
-                    placeholder="e.g., 2007"
-                    className="input" 
-                    isInvalid={!!errors.issuanceDate} 
+                  <DatePicker
+                    selected={document.issuanceDate ? new Date(document.issuanceDate) : null}
+                    onChange={(date) => handleChange({ 
+                      target: { 
+                        name: "issuanceDate", 
+                        value: date.toISOString().split('T')[0]  // Converti in formato YYYY-MM-DD
+                      } 
+                    })}
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText="Select a date"
+                    className="input"
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.issuanceDate}
-                  </Form.Control.Feedback>
+                  {errors.issuanceDate && (
+                    <Form.Control.Feedback type="invalid">
+                      {errors.issuanceDate}
+                    </Form.Control.Feedback>
+                  )}
                 </Form.Group>
-              </Col>           
+              </Col>         
 
             </Row>
 
@@ -334,60 +363,48 @@ function Documents(props) {
               <Col md={6}>
                 <Form.Group controlId="language">
                   <Form.Label>Language*</Form.Label>
-                  <Form.Control 
-                    type="text" 
+                  <Form.Select 
                     name="language" 
                     value={document.language || ""} 
                     onChange={handleChange} 
-                    placeholder="e.g., Swedish"
                     className="input" 
                     isInvalid={!!errors.language}
-                  />
+                  >
+                    <option value="" disabled>Select language...</option>
+                    {/* Recommended languages */}
+                    <option value="Swedish">Swedish (recommended)</option>
+                    <option value="English">English (recommended)</option>
+                    
+                    {/* Other languages */}
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Russian">Russian</option>
+                    {/* Add more languages if needed */}
+                  </Form.Select>
                   <Form.Control.Feedback type="invalid">
                     {errors.language}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Col>
+
               <Col md={6}>
                 <Form.Group controlId="pages">
                   <Form.Label>Pages</Form.Label>
                   <Form.Control 
-                    type="integer" 
+                    type="text" 
                     name="pages" 
                     value={document.pages || ""} 
                     onChange={handleChange} 
-                    placeholder="Number of pages"
+                    placeholder="Number of pages or range (e.g., 35 or 35-45)"
                     className="input" 
                   />
-                </Form.Group>
-              </Col>
-            </Row>
-
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group controlId="pageFrom">
-                  <Form.Label>Page From</Form.Label>
-                  <Form.Control 
-                    type="integer" 
-                    name="pageFrom" 
-                    value={document.pageFrom || ""} 
-                    onChange={handleChange} 
-                    placeholder="Starting page" 
-                    className="input" 
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group controlId="pageTo">
-                  <Form.Label>Page To</Form.Label>
-                  <Form.Control 
-                    type="integer" 
-                    name="pageTo" 
-                    value={document.pageTo || ""} 
-                    onChange={handleChange} 
-                    placeholder="Ending page" 
-                    className="input" 
-                  />
+                   <Form.Control.Feedback type="invalid">
+                    {errors.pages}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
             </Row>

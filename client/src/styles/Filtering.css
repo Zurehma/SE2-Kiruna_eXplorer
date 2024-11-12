@@ -1,0 +1,70 @@
+
+.sidebar-section {
+    border-right: 1px solid #ddd;
+    padding-right: 20px;
+    padding-left: 20px;
+    overflow: hidden;
+  }
+  
+  .main-content {
+    padding-left: 20px;
+  }
+  
+  .filter-options {
+    margin-top: 20px;
+  }
+  
+  .content-section {
+    margin-top: 20px;
+  }
+  
+/* Modern search bar styles */
+.search-section-modern {
+    position: relative;
+    width: 100%;
+}
+
+.search-input-modern {
+    border-radius: 30px;
+    padding: 12px 50px 12px 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    font-size: 16px;
+    outline: none;
+}
+
+.search-input-modern:focus {
+    border-color: #007bff;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.icons-container {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 10px;
+    padding-bottom: 0.3cm;
+}
+
+.clear-icon,
+.search-icon {
+    cursor: pointer;
+    color: #555;
+    font-size: 24px; /* Increased the font size for bigger icons */
+    transition: color 0.2s;
+}
+
+/* Ensure icons are always visible */
+.icons-container .clear-icon {
+    display: inline-block;
+}
+
+.clear-icon:hover,
+.search-icon:hover {
+    color: #007bff;
+}
+
+  

@@ -68,8 +68,8 @@ POST http://localhost:3001/api/documents/link HTTP/1.1
 Content-Type: application/json
 
 {
-    "id1":2,
-    "id2" : 1,
+    "id1":3,
+    "ids" : [1,2],
     "type" : "Direct"
 }
 
