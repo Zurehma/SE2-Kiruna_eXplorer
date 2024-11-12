@@ -49,7 +49,7 @@ Returns the list of all documents.
         "scale": 100,
         "issuanceDate": "2024-10-28",
         "connections": 3,
-        "language": "english",
+        "language": "English",
         "page": 2,
         "description": "Lore ipsum..."
     },
@@ -121,7 +121,7 @@ Add a new document with the provided information.
     "issuanceDate": "2024-10-28",
     "type": "Informative",
     "connections": 0,
-    "language": "english",
+    "language": "English",
     "pages": 20,
     "pageFrom": 12,
     "pageTo": 32,
