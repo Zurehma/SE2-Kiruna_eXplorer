@@ -35,7 +35,8 @@ class DocumentRoutes {
     this.router.get("/filter/by", [ 
       query("type").optional().isString().withMessage("Type must be a string"),
       query("stakeholder").optional().isString().withMessage("Stakeholder must be a string"),
-      query("issuanceDate").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
+      query("issuanceDateFrom").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
+      query("issuanceDateTo").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
     ],
       Utility.validateRequest,
       (req, res, next) => {
@@ -43,7 +44,8 @@ class DocumentRoutes {
         .filterDocuments(
           req.query.type,
           req.query.stakeholder,
-          req.query.issuanceDate,
+          req.query.issuanceDateFrom,
+          req.query.issuanceDateTo,
         )
         .then((document) => {
           res.status(200).json(document);

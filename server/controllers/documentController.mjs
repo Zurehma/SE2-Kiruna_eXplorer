@@ -33,10 +33,10 @@ class DocumentController {
     });
   };
 
-  filterDocuments = (type, stakeholder, issuanceDate) => {  
+  filterDocuments = (type, stakeholder, issuanceDateFrom, issuanceDateTo) => {  
     return new Promise(async (resolve, reject) => {
       try {
-        let queryParameter = { type, stakeholder, issuanceDate };
+        let queryParameter = { type, stakeholder, issuanceDateFrom, issuanceDateTo };
         const documents = await this.documentDAO.filterDocuments(queryParameter);
         resolve(documents);
       } catch (err) {

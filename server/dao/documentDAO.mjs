@@ -66,12 +66,12 @@ class DocumentDAO {
   filterDocuments = (queryParameter) => {
     return new Promise((resolve, reject) => {
       try{
-        let {type, stakeholder, issuanceDate} = queryParameter;
+        let {type, stakeholder, issuanceDateFrom, issuanceDateTo} = queryParameter;
         let sql = "SELECT * FROM DOCUMENT";
         let sqlConditions = [];
         let sqlParams = [];
 
-        if (type || stakeholder || issuanceDate) {
+        if (type || stakeholder || issuanceDateFrom || issuanceDateTo) {
             if (type) {
                 sqlConditions.push("type = ?")
                 sqlParams.push(type)
@@ -80,9 +80,13 @@ class DocumentDAO {
                 sqlConditions.push("stakeholder = ?")
                 sqlParams.push(stakeholder)
             }
-            if (issuanceDate) {
+            if (issuanceDateFrom && issuanceDateTo) {
+                sqlConditions.push("issuanceDate between ? AND ?")
+                sqlParams.push(issuanceDateFrom, issuanceDateTo)
+            }
+            if (issuanceDateFrom) {
                 sqlConditions.push("issuanceDate = ?")
-                sqlParams.push(issuanceDate)
+                sqlParams.push(issuanceDateFrom)
             }
         }
 
