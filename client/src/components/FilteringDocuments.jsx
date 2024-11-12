@@ -12,6 +12,11 @@ const FilteringDocuments = () => {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState([null, null]); // [startDate, endDate]
+  console.log(dateRange);
+  
+  
+  
+  
 
   useEffect(() => {
     // Fetch documents when the component is mounted
