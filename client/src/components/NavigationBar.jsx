@@ -49,10 +49,12 @@ export function NavigationBar(props) {
                   <Dropdown.Item onClick={() => { navigate('/documents/links'); handleClose(); }}>
                     <i className="bi bi-link-45deg me-2"></i> Add Link
                   </Dropdown.Item>
-                  <Dropdown.Item onClick={handleViewDocumentsClick}>
-                    <i className="bi bi-collection me-2"></i>
-                    {isViewingDocuments ? 'Home' : 'View All Documents'}
-                  </Dropdown.Item>
+                  {props.username && (
+                    <Dropdown.Item onClick={handleViewDocumentsClick}>
+                      <i className="bi bi-collection me-2"></i>
+                      {isViewingDocuments ? 'Home' : 'View All Documents'}
+                    </Dropdown.Item>
+                  )}
 
                   <Dropdown.Divider />
                   {location.pathname !== '/' && (
@@ -79,15 +81,17 @@ export function NavigationBar(props) {
                 </Button>
               ) : (
                 <>
-                  <Button
-                    variant="outline-light"
-                    className="ms-3 custom-documents-button"
-                    id="view-documents-button"
-                    onClick={handleViewDocumentsClick}
-                  >
-                    <i className="bi bi-collection me-2"></i>
-                    {isViewingDocuments ? 'Home' : 'View All Documents'}
-                  </Button>
+                  {props.username && (
+                    <Button
+                      variant="outline-light"
+                      className="ms-3 custom-documents-button"
+                      id="view-documents-button"
+                      onClick={handleViewDocumentsClick}
+                    >
+                      <i className="bi bi-collection me-2"></i>
+                      {isViewingDocuments ? 'Home' : 'View All Documents'}
+                    </Button>
+                  )}
                   <Button
                     variant="outline-light"
                     className="ms-3 custom-login-button"

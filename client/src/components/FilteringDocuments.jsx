@@ -109,7 +109,7 @@ const FilteringDocuments = () => {
           <div className="search-section-modern">
             <InputGroup className="mb-3">
               <Form.Control
-                placeholder="Search documents..."
+                placeholder="Search by title..."
                 value={searchQuery}
                 onChange={handleSearch}
                 aria-label="Search documents"
@@ -128,6 +128,7 @@ const FilteringDocuments = () => {
 
           {/* Bottom: Display Documents */}
           <div className="documents-list mt-4">
+          <h5>Documents:</h5>
             {loading ? (
               <div className="text-center">
                 <Spinner animation="border" variant="primary" />
