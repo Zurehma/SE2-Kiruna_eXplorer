@@ -15,12 +15,13 @@ const fetchIcon = (count, size) => {
               border-radius: 50%; color: white; font-size: 14px;">
                 ${count}
              </div>`,
+      className: 'cluster-icon', // Make sure this matches your CSS or remove if not needed
     });
   }
   return icons[count];
 };
 
-function ShowDocuments({ data, createCustomIcon }) {
+function ShowDocuments({ data, createCustomIcon,setSelectedDoc, setRenderNumeber,renderNumber }) {
   const maxZoom = 22;
   const [bounds, setBounds] = useState(null);
   const [zoom, setZoom] = useState(12);
@@ -35,7 +36,7 @@ function ShowDocuments({ data, createCustomIcon }) {
       b.getNorthEast().lng,
       b.getNorthEast().lat,
     ]);
-    setZoom(map.getZoom());
+    setZoom(map.getZoom()); 
   };
 
   const onMove = useCallback(updateMap, [map]);
@@ -95,10 +96,15 @@ function ShowDocuments({ data, createCustomIcon }) {
         const doc = data.find((d) => d.id === cluster.properties.docId);
         const customIcon = createCustomIcon(doc.type);
         return (
-          <Marker key={doc.id} position={[doc.lat, doc.long]} icon={customIcon}>
-            <Popup maxWidth={800} className="popupProp">
-              <MyPopup doc={doc} />
-            </Popup>
+          <Marker key={doc.id} position={[doc.lat, doc.long]} icon={customIcon}
+          eventHandlers={{
+            click: () => {
+              // Quando un marker viene cliccato, aggiorniamo lo stato del documento selezionato
+              setSelectedDoc(doc); // Passiamo il documento selezionato a Map2
+              setRenderNumeber((renderNumber) => renderNumber + 1); // Aggiorniamo il numero di render
+            },
+          }}
+          >
           </Marker>
         );
       })}

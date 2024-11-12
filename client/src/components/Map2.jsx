@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'leaflet/dist/leaflet.css';
 
-import { MapContainer, TileLayer, Marker, Popup, Polygon, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polygon, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 
 import '../App.css';
 import { MyPopup } from './MyPopup';
 import API from '../../API';
-import { ShowDocuments } from '../components/ShowDocuments';
+import { ShowDocuments } from './showDocuments';
 
 // Icon mapping based on document type
 const iconMap = {
@@ -59,7 +59,7 @@ function Map2(props) {
     const [positionActual, setPositionActual] = useState(initialPosition);
     const [zoomLevel, setZoomLevel] = useState(11);
     const [selectedDoc, setSelectedDoc] = useState(null); // To manage the selected document for showing MyPopup
-
+    const [renderNumber,setRenderNumeber] = useState(0);
     // Coordinate per il poligono (angoli specificati)
     const polygonCoordinates = [
         [67.87328157366065, 20.20047943270466],
@@ -67,8 +67,14 @@ function Map2(props) {
         [67.82082254726043, 20.181254701184297]
     ];
 
-    // Coordinate per il bottone "+"
-    const plusButtonPosition = [67.87328157366065, 20.20047943270466];
+    // Sposta il bottone "+" leggermente più su del vertice superiore del triangolo
+    const plusButtonPosition = [67.8825492583, 20.2059690000253713];
+
+    // Linea per collegare il bottone "+" al vertice superiore del poligono
+    const lineCoordinates = [
+        plusButtonPosition, // Coordinate del bottone "+"
+        polygonCoordinates[0] // Coordinate del vertice superiore del triangolo
+    ];
 
     // Fetch data from the API
     useEffect(() => {
@@ -114,8 +120,9 @@ function Map2(props) {
                 {/* Polygon component for the area */}
                 <Polygon 
                     positions={polygonCoordinates} 
-                    pathOptions={{ color: 'blue', fillColor: 'blue', fillOpacity: 0.2 }} 
+                    pathOptions={{ color: 'blue', fillColor: 'none'}} 
                 />
+                <Polyline positions={lineCoordinates} pathOptions={{ color: 'blue' }} />
 
                 {/* Marker for the "+" button at the top vertex */}
                 <Marker position={plusButtonPosition} icon={plusIcon}>
@@ -139,7 +146,7 @@ function Map2(props) {
                                                 border: '1px solid #ddd',
                                                 boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
                                             }}
-                                            onClick={() => setSelectedDoc(item)} // Set selected document on click
+                                            onClick={() => { setSelectedDoc(item); setRenderNumeber((renderNumber) => renderNumber + 1); }} // Set selected document on click
                                         >
                                             <div 
                                                 style={{
@@ -164,17 +171,24 @@ function Map2(props) {
                 </Marker>
 
                 {/* Render coordinate documents as markers on the map */}
-                {<ShowDocuments data={coordDocuments} createCustomIcon={createCustomIcon} />}
+                {<ShowDocuments data={coordDocuments} createCustomIcon={createCustomIcon} setSelectedDoc={setSelectedDoc} setRenderNumeber={setRenderNumeber} renderNumber={renderNumber} />}
 
                 {/* If a document is selected, show MyPopup in a popup */}
                 {selectedDoc && (
-                    <Popup className='popupProp'
-                        position={plusButtonPosition} 
-                        maxWidth={800}
-                        onClose={() => setSelectedDoc(null)} // Clear selected document when popup is closed
-                    >
-                        <MyPopup doc={selectedDoc} />
-                    </Popup>
+                    (() => {
+                        const pos = selectedDoc.lat ? [selectedDoc.lat, selectedDoc.long] : plusButtonPosition;
+                        const myKey = selectedDoc.id+renderNumber;
+                        return (
+                            <Popup className='popupProp'
+                                position={pos} 
+                                maxWidth={800}
+                                key={myKey}
+                                onClose={() => setSelectedDoc(null)} // Clear selected document when popup is closed
+                            >
+                                <MyPopup doc={selectedDoc} />
+                            </Popup>
+                        );
+                    })()
                 )}
 
                 <RecenterMap position={positionActual} zoom={zoomLevel} />

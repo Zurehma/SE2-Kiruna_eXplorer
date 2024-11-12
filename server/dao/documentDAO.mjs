@@ -14,11 +14,10 @@ const mapRowsToDocument = (rows) => {
         row.connections,
         row.language,
         row.description,
+        row.coordinates || null,
         row.pages || null,
         row.pageFrom || null,
-        row.pageTo || null,
-        row.lat || null,
-        row.long || null
+        row.pageTo || null
       )
   );
 };
@@ -60,6 +59,42 @@ class DocumentDAO {
   };
 
   /**
+   * Get already present document types
+   * @returns {Promise<String>} A promise that resolves to an array of strings
+   */
+  getDocumentTypes = () => {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM DOCUMENT_TYPE";
+
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  };
+
+  /**
+   * Get already present stakeholders
+   * @returns {Promise<String>} A promise that resolves to an array of strings
+   */
+  getStakeholders = () => {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM STAKEHOLDER";
+
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  };
+
+  /**
    * Insert a new document in the database
    * @param {String} title
    * @param {String} stakeholder
@@ -68,11 +103,10 @@ class DocumentDAO {
    * @param {String} type
    * @param {String} language
    * @param {String} description
+   * @param {String | null} coordinates
    * @param {Number | null} pages
    * @param {Number | null} pageFrom
    * @param {Number | null} pageTo
-   * @param {String | null} lat
-   * @param {String | null} long
    * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the last document inserted and the number of lines changed
    */
   addDocument = (
@@ -81,19 +115,18 @@ class DocumentDAO {
     scale,
     issuanceDate,
     type,
+    language,
     description,
-    language = null,
+    coordinates = null,
     pages = null,
     pageFrom = null,
-    pageTo = null,
-    lat = null,
-    long = null
+    pageTo = null
   ) => {
     return new Promise((resolve, reject) => {
       const query =
-        "INSERT INTO DOCUMENT (title, stakeholder, scale, issuanceDate, type, connections, language, description, pages, pageFrom, pageTo, lat, long) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO DOCUMENT (title, stakeholder, scale, issuanceDate, type, connections, language, description, coordinates, pages, pageFrom, pageTo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-      db.run(query, [title, stakeholder, scale, issuanceDate, type, 0, language, description, pages, pageFrom, pageTo, lat, long], function (err) {
+      db.run(query, [title, stakeholder, scale, issuanceDate, type, 0, language, description, coordinates, pages, pageFrom, pageTo], function (err) {
         if (err) {
           reject(err);
         } else {
@@ -103,6 +136,62 @@ class DocumentDAO {
     });
   };
 
+  updateDocument = (
+    id,
+    title,
+    stakeholder,
+    scale,
+    issuanceDate,
+    type,
+    language,
+    description,
+    coordinates = null,
+    pages = null,
+    pageFrom = null,
+    pageTo = null
+  ) => {
+    return new Promise((resolve, reject) => {});
+  };
+
+  /**
+   * Get all links of a documents given its ID
+   * @param {Number} id1
+   * @returns {Promise<{docID1: Number, docID2: Number, type: String}[]>} A promise that resolves to an array of objects with the keys linkedDocID and type
+   */
+  getLinks = (id1) => {
+    return new Promise((resolve, reject) => {
+      const query = `
+      SELECT 
+        CASE 
+          WHEN docID1 = ? THEN docID2 
+          ELSE docID1 
+        END AS linkedDocID, 
+        title 
+      FROM LINK
+      JOIN DOCUMENT ON linkedDocID = id
+      WHERE docID1 = ? OR docID2 = ?
+      ORDER BY linkedDocID ASC`;
+      db.all(query, [id1, id1, id1], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          const linkIDs = rows.map((row) => ({
+            linkedDocID: row.linkedDocID,
+            title: row.title,
+          }));
+          resolve(linkIDs);
+        }
+      });
+    });
+  };
+
+  /**
+   * Insert a new link between two documents
+   * @param {Number} id1
+   * @param {Number} id2
+   * @param {String} type
+   *
+   */
   addLink = (id1, id2, type) => {
     return new Promise((resolve, reject) => {
       //Check if the link already exists in either direction
@@ -111,7 +200,7 @@ class DocumentDAO {
         if (err) {
           reject(err);
         } else if (rows.length > 0) {
-          reject({ errCode: 409, errMessage: "Link already exists" });
+          reject({ errCode: 409, errMessage: `Link already exists for ${id1} and ${id2}` });
         } else {
           const query = "INSERT INTO LINK (docID1, docID2, type) VALUES (?, ?, ?)";
           db.run(query, [id1, id2, type], function (err) {

@@ -172,4 +172,18 @@ margin: 0;
   opacity: 1;
 }
 
+/* Mantiene il colore dell'icona del bottone anche durante l'hover */
+.edit-button:hover .edit-icon {
+  color: #d9e0eb !important; 
+}
+
+.edit-icon {
+  color: #0d6efd; /* Colore normale blu scuro */
+}
+
+.file-input {
+  height: auto;
+  
+}
+
 

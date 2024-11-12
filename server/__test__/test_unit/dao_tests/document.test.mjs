@@ -140,6 +140,79 @@ describe("DocumentDAO", () => {
     });
   });
 
+  describe("getDocuments", () => {
+    test("Get successful", async () => {
+      const documentsRow = [
+        {
+          id: 1,
+          title: "Document 1",
+          stakeholder: "Stakeholder",
+          scale: 100,
+          issuanceDate: "2023-01-01",
+          type: "Informative",
+          connections: 5,
+          language: "english",
+          description: "Description",
+          pages: null,
+          lat: null,
+          long: null,
+        },
+        {
+          id: 2,
+          title: "Document 2",
+          stakeholder: "Stakeholder",
+          scale: 100,
+          issuanceDate: "2023-01-01",
+          type: "Informative",
+          connections: 5,
+          language: "english",
+          description: "Description",
+          pages: null,
+          lat: null,
+          long: null,
+        }
+      ]
+
+      const documents = [
+        new Document(1, 'Document 1', 'Stakeholder', 100, '2023-01-01', 'Informative', 5, 'english', 'Description',null, null, null, null, null),
+        new Document(2, 'Document 2', 'Stakeholder', 100, '2023-01-01', 'Informative', 5, 'english', 'Description',null, null, null, null, null),
+      ];
+
+      const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
+        callback(null, documentsRow);
+      });
+
+      const result = await documentDAO.getDocuments();
+
+      let doc1 = new Document();
+
+      result.forEach((item) => {
+        expect(item).toBeInstanceOf(Document);
+        documents.forEach((doc) => {
+          if(JSON.stringify(item) === JSON.stringify(doc)) {
+              doc1 = doc;
+            }
+        });
+        expect(item).toStrictEqual(doc1)
+      });
+
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test("DB error", async () => {
+      const error = new Error("");
+
+      const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
+        callback(error);
+      });
+
+      const result = documentDAO.getDocuments();
+
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+  });
+
   describe("addLink", () => {
     beforeEach(() => {
       documentDAO = new DocumentDAO();

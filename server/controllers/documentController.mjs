@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
-import { getDocumentTypes, getScaleTypes, isDocumentType, isScaleType, getLinkTypes, isLinkType } from "../models/document.mjs";
+import { getLinkTypes, isLinkType } from "../models/document.mjs";
+import Document from "../models/document.mjs";
 
 class DocumentController {
   constructor() {
@@ -27,11 +28,10 @@ class DocumentController {
    * @param {String} type
    * @param {String} language
    * @param {String} description
+   * @param {Object | null} coordinates
    * @param {Number | null} pages
    * @param {Number | null} pages
    * @param {Number | null} pages
-   * @param {String | null} lat
-   * @param {String | null} long
    * @returns {Promise<Document>} A promise that resolves to the newly created object
    */
   addDocument = (
@@ -40,68 +40,35 @@ class DocumentController {
     scale,
     issuanceDate,
     type,
+    language,
     description,
-    language = null,
+    coordinates = null,
     pages = null,
     pageFrom = null,
-    pageTo = null,
-    lat = null,
-    long = null
+    pageTo = null
   ) => {
     return new Promise(async (resolve, reject) => {
       try {
         if (dayjs().isBefore(issuanceDate)) {
-          const error = { errCode: 400, errMessage: "Date error!" };
+          const error = { errCode: 400, errMessage: "Date error." };
           throw error;
         }
 
-        const documentType = isDocumentType(type);
-
-        if (documentType === undefined) {
-          const error = { errCode: 400, errMessage: "Document type error!" };
-          throw error;
-        }
-
-        let scaleType = Number(scale);
-
-        if (typeof scale === "string") {
-          scaleType = isScaleType(scale);
-
-          if (scaleType === undefined) {
-            const error = { errCode: 400, errMessage: "Scale type error!" };
-            throw error;
-          }
-        }
-
-        let processedPages = pages;
-        let processedPageFrom = null;
-        let processedPageTo = null;
-
-        if (pageFrom && pageTo) {
-          pageFrom <= pageTo ? (processedPageFrom = pageFrom) : (processedPageFrom = pageTo);
-          pageFrom <= pageTo ? (processedPageTo = pageTo) : (processedPageTo = pageFrom);
-          processedPages = processedPageTo - processedPageFrom;
-        }
+        // TODO: validate kiruna coordinates
 
         const result = await this.documentDAO.addDocument(
           title,
           stakeholder,
-          scaleType,
+          scale,
           issuanceDate,
-          documentType,
-          description,
+          type,
           language,
-          processedPages,
-          processedPageFrom,
-          processedPageTo,
-          lat,
-          long
+          description,
+          coordinates ? JSON.stringify(coordinates) : null,
+          pages,
+          pageFrom,
+          pageTo
         );
-
-        if (result.changes === 0) {
-          const error = {};
-          throw error;
-        }
 
         const document = await this.documentDAO.getDocumentByID(result.lastID);
 
@@ -112,11 +79,61 @@ class DocumentController {
     });
   };
 
-  getDocumentTypes = () => getDocumentTypes();
+  updateDocument = (
+    id,
+    title,
+    stakeholder,
+    scale,
+    issuanceDate,
+    type,
+    language,
+    description,
+    coordinates = null,
+    pages = null,
+    pageFrom = null,
+    pageTo = null
+  ) => {
+    try {
+      if (dayjs().isBefore(issuanceDate)) {
+        const error = { errCode: 400, errMessage: "Date error." };
+        throw error;
+      }
 
-  getScaleTypes = () => getScaleTypes();
+      // TODO: validate kiruna coordinates
+    } catch (err) {
+      reject(err);
+    }
+  };
+
+  /**
+   * Get the list of already available document types
+   * @returns {Promise<Array<String>>} A promise that resolves to an array of strings
+   */
+  getDocumentTypes = () => this.documentDAO.getDocumentTypes();
+
+  /**
+   * Get the list of already available stakeholders
+   * @returns {Promise<Array<String>>} A promise that resolves to an array of strings
+   */
+  getStakeholders = () => this.documentDAO.getStakeholders();
 
   getLinkTypes = () => getLinkTypes();
+
+  /**
+   * Get all links of a documents given its ID
+   * @param {Number} id1
+   * @returns
+   */
+  getLinks = (id1) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const links = await this.documentDAO.getLinks(id1);
+        resolve(links);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
 
   addLink = (id1, id2, type) => {
     return new Promise(async (resolve, reject) => {
@@ -138,6 +155,12 @@ class DocumentController {
 
         if (doc1 === undefined || doc2 === undefined) {
           const error = { errCode: 404, errMessage: "Document not found!" };
+          throw error;
+        }
+
+        const existingLinks = await this.documentDAO.getLinks(id1);
+        if (existingLinks.some((link) => link.id2 === id2 && link.type === type)) {
+          const error = { errCode: 409, errMessage: "Link already exists!" };
           throw error;
         }
 
