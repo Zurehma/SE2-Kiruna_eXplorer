@@ -95,6 +95,24 @@ class DocumentDAO {
   };
 
   /**
+   * Get already present link types
+   * @returns {Promise<String>} A promise that resolves to an array of strings
+   */
+  getLinkTypes = () => {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM LINK_TYPE";
+
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  };
+
+  /**
    * Insert a new document in the database
    * @param {String} title
    * @param {String} stakeholder
