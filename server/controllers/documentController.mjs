@@ -191,6 +191,12 @@ class DocumentController {
           throw error;
         }
 
+        const existingLinks = await this.documentDAO.getLinks(id1);
+        if (existingLinks.some((link) => link.id2 === id2 && link.type === type)) {
+          const error = { errCode: 409, errMessage: "Link already exists!" };
+          throw error;
+        }
+
         const result = await this.documentDAO.addLink(id1, id2, type);
         if (result.changes === 0) {
           const error = {};
