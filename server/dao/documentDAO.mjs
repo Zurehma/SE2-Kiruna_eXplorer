@@ -63,6 +63,48 @@ class DocumentDAO {
     });
   };
 
+  filterDocuments = (queryParameter) => {
+    return new Promise((resolve, reject) => {
+      try{
+        let {type, stakeholder, issuanceDate} = queryParameter;
+        let sql = "SELECT * FROM DOCUMENT";
+        let sqlConditions = [];
+        let sqlParams = [];
+
+        if (type || stakeholder || issuanceDate) {
+            if (type) {
+                sqlConditions.push("type = ?")
+                sqlParams.push(type)
+            }
+            if (stakeholder) {
+                sqlConditions.push("stakeholder = ?")
+                sqlParams.push(stakeholder)
+            }
+            if (issuanceDate) {
+                sqlConditions.push("issuanceDate = ?")
+                sqlParams.push(issuanceDate)
+            }
+        }
+
+        if (sqlConditions.length > 0) {
+            sql += " WHERE " + sqlConditions.join(" AND ")
+        }
+
+        db.all(sql, sqlParams, (err, rows) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(mapRowsToDocument(rows));
+        });
+      }
+      catch(err){
+        reject(err);
+      }
+    });
+  }
+
+
+
   /**
    * Get already present document types
    * @returns {Promise<String>} A promise that resolves to an array of strings

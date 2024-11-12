@@ -22,6 +22,29 @@ class DocumentController {
     });
   };
 
+  getDocumentById = (id) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const document = await this.documentDAO.getDocumentByID(id);
+        resolve(document);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
+  filterDocuments = (type, stakeholder, issuanceDate) => {  
+    return new Promise(async (resolve, reject) => {
+      try {
+        let queryParameter = { type, stakeholder, issuanceDate };
+        const documents = await this.documentDAO.filterDocuments(queryParameter);
+        resolve(documents);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   /**
    * Add a new document with the provided information
    * @param {String} title
