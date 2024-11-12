@@ -13,8 +13,9 @@ import ISO6391 from 'iso-639-1';
 
 
 function Documents(props) { 
-  const [types, setTypes] = useState([]);
-  const [scales, setScales] = useState([]);
+  const [types, setTypes] = useState(["Direct", "Indirect"]);  // valori statici per types
+  const [scales, setScales] = useState(["1:n", "Hexadecimal"]); // valori statici per scales
+
   const [showNField, setShowNField] = useState(false);
   const navigate = useNavigate();
   const [files, setFiles] = useState([]); //To manage uploaded files
@@ -51,19 +52,19 @@ function Documents(props) {
   });
   
 
-  useEffect(() => {
-    const fetchTypes = async () => {
-      try {
-        const response = await API.getTypeDocuments();
-        setTypes(response); 
-        const response2 = await API.getTypeScale();
-        setScales(response2); 
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchTypes();
-  }, []);
+  // useEffect(() => {
+  //   const fetchTypes = async () => {
+  //     try {
+  //       const response = await API.getTypeDocuments();
+  //       setTypes(response); 
+  //       const response2 = await API.getTypeScale();
+  //       setScales(response2); 
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+  //   fetchTypes();
+  // }, []);
 
   // const validateDate = (date) => {
   //   const validFormats = [

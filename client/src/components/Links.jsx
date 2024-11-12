@@ -25,7 +25,7 @@ function Links(props) {
         const response = await API.getDocuments();
         setDocuments(response);
         setAllDocuments(response);
-        const response2 = await API.getTypeLinks();
+        const response2 = await API.getTypeLinks(); // se viene tolta dall db bisogna inserirli dal frontend
         setTypeLink(response2);
       } catch (error) {
         console.error("Error fetching documents:", error);
@@ -78,7 +78,6 @@ function Links(props) {
     e.preventDefault();
 
     const newErrors = {};
-
     if (!linkData.document1) {
       newErrors.document1 = "You must select a document.";
     }
@@ -88,7 +87,6 @@ function Links(props) {
     if (!linkData.linkType) {
       newErrors.linkType = "You must select a type of link.";
     }
-
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
