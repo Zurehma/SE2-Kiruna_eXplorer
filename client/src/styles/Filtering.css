@@ -4,20 +4,35 @@
     padding-right: 20px;
     padding-left: 20px;
     overflow: hidden;
+
+    position: fixed;
+    top: 2cm;
+    bottom: 0;
+    overflow-y: auto;
+    height: 100vh;
+  }
+  @media (min-width: 768px) {
+    .filtered-result {
+      margin-left: 27%;
+      padding-left: 15px;
+      height: 100vh;
+      padding-right: 2cm;
+    }
   }
   
+
   .main-content {
     padding-left: 20px;
   }
-  
-  .filter-options {
+
+   .filter-options {
     margin-top: 20px;
   }
   
   .content-section {
     margin-top: 20px;
   }
-  
+   
 /* Modern search bar styles */
 .search-section-modern {
     position: relative;
@@ -67,4 +82,3 @@
     color: #007bff;
 }
 
-  
