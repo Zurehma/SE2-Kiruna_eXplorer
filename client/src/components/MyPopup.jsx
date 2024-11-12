@@ -1,8 +1,19 @@
-import React from 'react';
-import { Row, Col, Tooltip, OverlayTrigger, Button } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Row, Col, Tooltip, OverlayTrigger, Button, Dropdown } from 'react-bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import API from '../../API';
+
+// Fake links data
+const fakeLinks = [
+  { type: 'direct', docName: 'Document 1' },
+  { type: 'direct', docName: 'Document 2' },
+];
 
 function MyPopup(props) {
+  const [loading, setLoading] = useState(false);
+  const [links, setLinks] = useState([]);
+  const [showLinks, setShowLinks] = useState(false); // State to control visibility of the dropdown
+
   // Determine the icon based on the document type
   const renderIcon = () => {
     const iconMap = {
@@ -18,12 +29,33 @@ function MyPopup(props) {
     };
     const iconClass = iconMap[props.doc.type] || '';
 
+    useEffect(() => {
+      setLoading(true);
+      const fetchData = async () => {
+        try {
+          const links = await API.getLinks(props.doc.id);
+          setLinks(links);
+          console.log(props.doc.id);
+          console.log(links);
+        } catch (error) {
+          props.setError(error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchData();
+    }, [props.doc.id]);
+
     return (
       <OverlayTrigger
         placement="top"
         overlay={<Tooltip id={`tooltip-${props.doc.type}`}>{props.doc.type}</Tooltip>}
       >
-        <i className={`bi ${iconClass} my-icons text-secondary`} data-testid={`my-icon-${props.doc.type}`} style={{ fontSize: '2rem', color: '#555' }}></i>
+        <i
+          className={`bi ${iconClass} my-icons text-secondary`}
+          data-testid={`my-icon-${props.doc.type}`}
+          style={{ fontSize: '2rem', color: '#555' }}
+        ></i>
       </OverlayTrigger>
     );
   };
@@ -34,13 +66,24 @@ function MyPopup(props) {
   return (
     <Row className="p-3 border rounded shadow-sm" style={{ backgroundColor: '#f9f9f9' }}>
       {/* Icon Column */}
-      <Col xs={12} md={3} className="myPopup" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '0.5rem' }}>
+      <Col
+        xs={12}
+        md={3}
+        className="myPopup"
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          paddingTop: '0.5rem',
+        }}
+      >
         {renderIcon()}
       </Col>
+
       {/* Details Column */}
       <Col xs={12} md={4} className="myPopup">
         <h6 className="fw-bold text-secondary mb-2">{props.doc.title}</h6>
-        <p className="small text-muted">
+        <p className="small text-muted m-0">
           <strong className="text-dark">Stakeholders:</strong> {props.doc.stakeholder} <br />
           <strong className="text-dark">Scale:</strong>{' '}
           {props.doc.scale &&
@@ -52,7 +95,33 @@ function MyPopup(props) {
           <br />
           <strong className="text-dark">Issuance Date:</strong> {props.doc.issuanceDate} <br />
           <strong className="text-dark">Type:</strong> {props.doc.type} <br />
-          <strong className="text-dark">Connections:</strong> {props.doc.connections} <br />
+
+          {/* Display connections */}
+          <strong className="text-dark">Connections:</strong> {props.doc.connections}{' '}
+          {/* Only display the caret if there are connections */}
+          {props.doc.connections>0 && (
+            <Dropdown.Toggle
+              variant="link"
+              id="dropdown-toggle-connection"
+              className="ms-2 p-0"
+              onClick={() => setShowLinks(!showLinks)}
+              style={{ color: 'black', fontSize: '1rem' }}
+            >
+            </Dropdown.Toggle>
+          )}
+        </p>
+
+        {/* Display the dropdown list of connections if it's open */}
+        {showLinks && (
+          <ul className="list-unstyled small text-muted ms-3">
+            {fakeLinks.map((link, index) => (
+              <li key={index}>
+                {link.docName} - {link.type}
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className='text-muted small m-0'>
           <strong className="text-dark">Language:</strong> {props.doc.language} <br />
           <strong className="text-dark">Number of pages:</strong> {displayValue(props.doc.pages)} <br />
           <strong className="text-dark">Pages:</strong>{' '}
@@ -64,12 +133,14 @@ function MyPopup(props) {
           {props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'}
         </p>
       </Col>
+
       {/* Description Column */}
       <Col xs={12} md={4} className="position-relative">
         <p className="mt-3 small text-muted">
           <strong className="text-dark">Description:</strong> {props.doc.description}
         </p>
       </Col>
+
       {/* Edit Button Column */}
       <Col xs={12} md={1} className="d-flex align-items-start justify-content-center">
         <Button

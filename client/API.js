@@ -18,6 +18,13 @@ const getDocuments = async () => {
         .then(handleInvalidResponse)
         .then(response => response.json());
 };
+
+//Function to retrieve the list of links for a document
+const getLinks = async (docID) => {
+    return await fetch(`${SERVER_URL}/documents/links/${docID}`)
+        .then(handleInvalidResponse)
+        .then(response => response.json());
+};
  
 //Upload files
 const uploadFiles = async (docID, formData) => {
@@ -185,7 +192,8 @@ const API = {
     getTypeLinks,
     setLink,
     getUserInfo,
-    uploadFiles
+    uploadFiles,
+    getLinks
 };
   
 

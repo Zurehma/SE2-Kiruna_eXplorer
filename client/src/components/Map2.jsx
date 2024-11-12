@@ -82,7 +82,15 @@ function Map2(props) {
         const fetchData = async () => {
             try {
                 const documents = await API.getDocuments();
-                setData(documents);
+                const updatedDocuments = documents.map(doc => {
+                    if (!doc.coordinates) {
+                        return { ...doc, lat: null, long: null };
+                    } else {
+                        const { lat, long } = doc.coordinates;
+                        return { ...doc, lat, long };
+                    }
+                });
+                setData(updatedDocuments);
             } catch (error) {
                 props.setError(error);
             } finally {
@@ -90,7 +98,7 @@ function Map2(props) {
             }
         };
         fetchData();
-    }, []); 
+    }, []);
 
     // Function to recenter the map on Kiruna with zoom reset to 13
     const recenterMap = () => {
@@ -185,7 +193,7 @@ function Map2(props) {
                                 key={myKey}
                                 onClose={() => setSelectedDoc(null)} // Clear selected document when popup is closed
                             >
-                                <MyPopup doc={selectedDoc} />
+                                <MyPopup doc={selectedDoc} setError={props.setError} />
                             </Popup>
                         );
                     })()
