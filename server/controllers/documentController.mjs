@@ -1,9 +1,6 @@
 import dayjs from "dayjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
 import { getLinkTypes, isLinkType } from "../models/document.mjs";
-import Storage from "../utils/storage.mjs";
-import path from "path";
-import AttachmentInfo from "../models/attachmentInfo.mjs";
 import Document from "../models/document.mjs";
 
 class DocumentController {
@@ -82,6 +79,32 @@ class DocumentController {
     });
   };
 
+  updateDocument = (
+    id,
+    title,
+    stakeholder,
+    scale,
+    issuanceDate,
+    type,
+    language,
+    description,
+    coordinates = null,
+    pages = null,
+    pageFrom = null,
+    pageTo = null
+  ) => {
+    try {
+      if (dayjs().isBefore(issuanceDate)) {
+        const error = { errCode: 400, errMessage: "Date error." };
+        throw error;
+      }
+
+      // TODO: validate kiruna coordinates
+    } catch (err) {
+      reject(err);
+    }
+  };
+
   /**
    * Get the list of already available document types
    * @returns {Promise<Array<String>>} A promise that resolves to an array of strings
@@ -93,62 +116,6 @@ class DocumentController {
    * @returns {Promise<Array<String>>} A promise that resolves to an array of strings
    */
   getStakeholders = () => this.documentDAO.getStakeholders();
-
-  /**
-   * Add a new attachment to an existing document
-   * @param {*} req
-   * @param {Number} docID
-   * @returns {Promise<AttachmentInfo>} A promise that resolves to the newly created object
-   */
-  addAttachment = (req, docID) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const document = await this.documentDAO.getDocumentByID(docID);
-
-        if (document == undefined) {
-          const error = { errCode: 404, errMessage: "Document not found." };
-          throw error;
-        }
-
-        const fileInfo = await Storage.saveFile(req);
-        const result = await this.documentDAO.addAttachment(docID, fileInfo.originalname, path.join(".", fileInfo.path), fileInfo.mimetype);
-        const attachment = await this.documentDAO.getAttachmentByID(result.lastID);
-
-        resolve(attachment);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  };
-
-  /**
-   * Delete an attachment of a document by its ID
-   * @param {Number} docID
-   * @param {Number} attachmentID
-   * @returns {Promise<>} A promise that resolves to nothing
-   */
-  deleteAttachment = (docID, attachmentID) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const attachment = await this.documentDAO.getAttachmentByID(attachmentID);
-
-        if (attachment == undefined) {
-          const error = { errCode: 404, errMessage: "Attachment not found." };
-          throw error;
-        } else if (attachment.docID !== docID) {
-          const error = { errCode: 409, errMessage: "Attachment not linked with the document provided." };
-          throw error;
-        }
-
-        Storage.deleteFile(attachment.path);
-        await this.documentDAO.deleteAttachmentByID(attachmentID);
-
-        resolve(null);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  };
 
   getLinkTypes = () => getLinkTypes();
 

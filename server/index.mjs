@@ -4,11 +4,13 @@
 
 import { createServer } from "http";
 import express from "express";
+import { param } from "express-validator";
 import morgan from "morgan";
 import cors from "cors";
 import bodyParser from "body-parser";
 import Utility from "./utils/utility.mjs";
 import DocumentRoutes from "./routes/documentRoutes.mjs";
+import AttachmentRoutes from "./routes/attachmentRoutes.mjs";
 import AuthRoutes from "./routes/authRoutes.mjs";
 
 const app = express();
@@ -28,11 +30,15 @@ app.use(bodyParser.json());
 const documentRoutes = new DocumentRoutes();
 documentRoutes.initRoutes();
 
+const attachmentRoutes = new AttachmentRoutes();
+attachmentRoutes.initRoutes();
+
 const authRoutes = new AuthRoutes(app);
 authRoutes.initRoutes();
 
 app.use(baseURL + "/uploads", Utility.isLoggedIn, express.static("./uploads"));
 app.use(baseURL + "/documents", documentRoutes.getRouter());
+app.use(baseURL + "/documents", attachmentRoutes.getRouter());
 app.use(baseURL + "/sessions", authRoutes.getRouter());
 
 app.use(Utility.errorHandler);
