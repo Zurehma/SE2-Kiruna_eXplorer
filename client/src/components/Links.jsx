@@ -46,7 +46,7 @@ function Links(props) {
     if (linkData.document1) {
       const fetchLinkedDocuments = async () => {
         try {
-          const linkedResponse = await API.getLinksDoc(linkData.document1);
+          const linkedResponse = await API.getLinksDoc(linkData.document1.id);
           setLinkedDocuments(linkedResponse);
         } catch (error) {
           console.error("Error fetching linked documents:", error);
@@ -94,6 +94,7 @@ function Links(props) {
 
     try {
       await API.setLink(linkData);
+      console.log('Link saved successfully!', linkData);
       setShowModal(true);
       setSaveStatus('Completed');
       setLinkData({ document1: '', document2: [], linkType: '' });
