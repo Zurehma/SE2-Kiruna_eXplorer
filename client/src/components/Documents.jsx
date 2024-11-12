@@ -65,15 +65,33 @@ function Documents(props) {
     fetchTypes();
   }, []);
 
-  const validateDate = (date) => {
-    const validFormats = [
-      /^\d{4}-\d{2}-\d{2}$/, // YYYY-MM-DD
-      /^\d{4}-\d{2}$/,       // YYYY-MM
-      /^\d{4}$/              // YYYY
-    ];
-    return validFormats.some((regex) => regex.test(date));
-  };
+  // const validateDate = (date) => {
+  //   const validFormats = [
+  //     /^\d{4}-\d{2}-\d{2}$/, // YYYY-MM-DD
+  //     /^\d{4}-\d{2}$/,       // YYYY-MM
+  //     /^\d{4}$/              // YYYY
+  //   ];
+  //   return validFormats.some((regex) => regex.test(date));
+  // };
   
+  const validatePages = (value) => {
+    // Regex per controllare se è un singolo numero o un range valido (es. "35-45" o "35 - 45")
+    const singleNumberRegex = /^\d+$/;
+    const rangeRegex = /^\d+\s*-\s*\d+$/;
+
+    if (singleNumberRegex.test(value)) {
+      return true; // Numero singolo valido
+    } else if (rangeRegex.test(value)) {
+      const [start, end] = value.split('-').map(num => parseInt(num.trim(), 10));
+      if (start < end) {
+        return true; // Range valido con inizio minore di fine
+      } else {
+        return "The starting page should be less than the ending page.";
+      }
+    } else {
+      return "Please enter a valid number or range (e.g., 35 or 35-45).";
+    }
+  };
 
   const handleScaleChange = (e) => {
     const { value } = e.target;
@@ -115,7 +133,8 @@ function Documents(props) {
     language: '',
     latitude: '',
     longitude: '',
-    description: ''
+    description: '',
+    pages: ''
   });
   
   const handleSubmit = async (e) => {
@@ -143,7 +162,9 @@ function Documents(props) {
     if (!document.description || document.description.length < 2) {
       newErrors.description = "Description is required and cannot be empty.";
     }
-    
+    if (document.pages && !validatePages(document.pages)) {
+      newErrors.pages = "Please enter a valid number or range (e.g., 35 or 35-45).";
+    }
   
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -338,109 +359,51 @@ function Documents(props) {
             </Row>
 
             <Row className="mb-3">
-
-
-            <Col md={6}>
-  <Form.Group controlId="language">
-    <Form.Label>Language*</Form.Label>
-    <Form.Select 
-      name="language" 
-      value={document.language || ""} 
-      onChange={handleChange} 
-      className="input" 
-      isInvalid={!!errors.language}
-    >
-      <option value="" disabled>Seleziona la lingua...</option>
-      {/* Lingue consigliate */}
-      <option value="Swedish">Svedese (consigliato)</option>
-      <option value="English">Inglese (consigliato)</option>
-      
-      {/* Altre lingue */}
-      <option value="Spanish">Spagnolo</option>
-      <option value="French">Francese</option>
-      <option value="German">Tedesco</option>
-      <option value="Italian">Italiano</option>
-      <option value="Chinese">Cinese</option>
-      <option value="Japanese">Giapponese</option>
-      <option value="Russian">Russo</option>
-      {/* Aggiungi altre lingue se necessario */}
-    </Form.Select>
-    <Form.Control.Feedback type="invalid">
-      {errors.language}
-    </Form.Control.Feedback>
-  </Form.Group>
-</Col>
-
-
-<Col md={6}>
-  <Form.Group controlId="language">
-    <Form.Label>Language*</Form.Label>
-    <Form.Select 
-      name="language" 
-      value={document.language || ""} 
-      onChange={handleChange} 
-      className="input" 
-      isInvalid={!!errors.language}
-    >
-      <option value="" disabled>Seleziona la lingua...</option>
-
-      {/* Lingue consigliate */}
-      <option value="sv">Svedese (consigliato)</option>
-      <option value="en">Inglese (consigliato)</option>
-
-      {/* Tutte le altre lingue */}
-      {ISO6391.getAllCodes().map((code) => (
-        <option key={code} value={code}>
-          {ISO6391.getNativeName(code)} ({ISO6391.getName(code)})
-        </option>
-      ))}
-    </Form.Select>
-    <Form.Control.Feedback type="invalid">
-      {errors.language}
-    </Form.Control.Feedback>
-  </Form.Group>
-</Col>
+              <Col md={6}>
+                <Form.Group controlId="language">
+                  <Form.Label>Language*</Form.Label>
+                  <Form.Select 
+                    name="language" 
+                    value={document.language || ""} 
+                    onChange={handleChange} 
+                    className="input" 
+                    isInvalid={!!errors.language}
+                  >
+                    <option value="" disabled>Select language...</option>
+                    {/* Recommended languages */}
+                    <option value="Swedish">Swedish (recommended)</option>
+                    <option value="English">English (recommended)</option>
+                    
+                    {/* Other languages */}
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Russian">Russian</option>
+                    {/* Add more languages if needed */}
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.language}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
 
               <Col md={6}>
                 <Form.Group controlId="pages">
                   <Form.Label>Pages</Form.Label>
                   <Form.Control 
-                    type="integer" 
+                    type="text" 
                     name="pages" 
                     value={document.pages || ""} 
                     onChange={handleChange} 
-                    placeholder="Number of pages"
+                    placeholder="Number of pages or range (e.g., 35 or 35-45)"
                     className="input" 
                   />
-                </Form.Group>
-              </Col>
-            </Row>
-
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group controlId="pageFrom">
-                  <Form.Label>Page From</Form.Label>
-                  <Form.Control 
-                    type="integer" 
-                    name="pageFrom" 
-                    value={document.pageFrom || ""} 
-                    onChange={handleChange} 
-                    placeholder="Starting page" 
-                    className="input" 
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group controlId="pageTo">
-                  <Form.Label>Page To</Form.Label>
-                  <Form.Control 
-                    type="integer" 
-                    name="pageTo" 
-                    value={document.pageTo || ""} 
-                    onChange={handleChange} 
-                    placeholder="Ending page" 
-                    className="input" 
-                  />
+                   <Form.Control.Feedback type="invalid">
+                    {errors.pages}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
             </Row>
