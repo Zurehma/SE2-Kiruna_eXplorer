@@ -117,7 +117,11 @@ class DocumentController {
    */
   getStakeholders = () => this.documentDAO.getStakeholders();
 
-  getLinkTypes = () => getLinkTypes();
+  /**
+   * Get the list of already available link types
+   * @returns {Promise<Array<String>>} A promise that resolves to an array of strings
+   */
+  getLinkTypes = () => this.documentDAO.getLinkTypes();
 
   /**
    * Get all links of a documents given its ID
