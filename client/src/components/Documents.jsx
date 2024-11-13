@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Container, Card, Row, Col } from 'react-bootstrap';
+import { Form, Button,Dropdown, Container, Card, Row, Col } from 'react-bootstrap';
 import '../styles/Documents.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import API from '../../API.js';
@@ -10,16 +10,24 @@ import L from 'leaflet';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ISO6391 from 'iso-639-1';
+import Select from 'react-select';
+
 
 
 function Documents(props) { 
   const [types, setTypes] = useState([]);  
   const [scales, setScales] = useState(["Text", "Blueprints/Effects", "1:n",]); // valori statici per scales
   const [showNField, setShowNField] = useState(false);
+
   const navigate = useNavigate();
   const { id } = useParams(); // Ottieni l'id dalla URL per la modalità modifica
   const [files, setFiles] = useState([]); //To manage uploaded files
 
+  const [stakeholders, setStakeholders] = useState(["1ghj", "2hjkl", "3jkl", "4jkl", "5hjkl", "6hjkl", "7bhjk", "8nhjkl", "9nmjkl", "10mjkl"]); // valori statici per stakeholders
+  const [selectedStakeholderIds, setSelectedStakeholderIds] = useState([]);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [newStakeholder, setNewStakeholder] = useState("");
+  
   const [document, setDocument] = useState({
     title: '',
     stakeholder: '',
@@ -51,8 +59,9 @@ function Documents(props) {
   useEffect(() => {
     const fetchTypes = async () => {
       try {
-        // const response = await API.getTypeDocuments();
-        // setTypes(response); 
+        const response2= await API.getTypeDocuments();
+        setTypes(response2); 
+   
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -112,27 +121,25 @@ function Documents(props) {
   }
 
   const handleChange = (e) => {
-   // const { name, value } = e.target;
-    // setDocument((prevDocument) => {
-    //     if (name === 'lat' || name === 'long') {
-    //         // Se il nome è 'lat' o 'long', aggiorna solo coordinates
-    //         return {
-    //             ...prevDocument,
-    //             coordinates: {
-    //                 ...prevDocument.coordinates,
-    //                 [name]: parseFloat(value) || '' // Parsing in float per coordinate
-    //             }
-    //         };
-    //     } else {
-    //         // Altrimenti aggiorna la proprietà di document principale
-    //         return {
-    //             ...prevDocument,
-    //             [name]: name === 'nValue' ? parseInt(value, 10) || '' : value
-    //         };
-    //     }
-    // });
-};
-
+   const { name, value } = e.target;
+    setDocument((prevDocument) => {
+        if (name === 'lat' || name === 'long') {
+            // Se il nome è 'lat' o 'long', aggiorna solo coordinates
+            return {
+                ...prevDocument,
+                coordinates: {
+                    ...prevDocument.coordinates,
+                    [name]: parseFloat(value) || '' // Parsing in float per coordinate
+                }
+            };
+        } else {
+            return {
+                ...prevDocument,
+                [name]: name === 'nValue' ? parseInt(value, 10) || '' : value
+            };
+        }
+    });
+  };
 
   const handleMapClick = (lat, lng) => {
     setDocument((prevDocument) => ({
@@ -148,16 +155,16 @@ function Documents(props) {
     if (!document.title || document.title.length < 2) {
       newErrors.title = "Title is required and cannot be empty."
     }
-    if (!document.stakeholder || document.stakeholder.length < 2) {
-      newErrors.stakeholder = "Stakeholder is required and cannot be empty.";
-    }
+    // if (!document.stakeholder || document.stakeholder.length < 2) {
+    //   newErrors.stakeholder = "Stakeholder is required and cannot be empty.";
+    // }
     if (!document.scale) {
       newErrors.scale = "You must select a scale.";
     }
     if (!document.type) {
       newErrors.type = "You must select a type.";
     }
-    if (!document.issuanceDate || !validateDate(document.issuanceDate)) {
+    if (!document.issuanceDate) {
       newErrors.issuanceDate = "Issuance Date must be in a valid format (YYYY-MM-DD, YYYY-MM, or YYYY).";
     }
     if (!document.language) {
@@ -174,6 +181,7 @@ function Documents(props) {
     }
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
+      console.log("Document to saveeeee:", document);
 
     try {
       const response = id 
@@ -195,28 +203,25 @@ function Documents(props) {
       console.error("Error saving document:", error);
       props.setError(error);
     }
-  
-    // boooh
-    // if(document.nValue && document.scale === '1:n') {  
-    //   document.scale = document.nValue;
-    // }
-    // let doc = {};
-    
-   
-   
   };
 
 
   const validatePages = (value) => {
-    // Regex per controllare se è un singolo numero o un range valido (es. "35-45" o "35 - 45")
+    // Regex per controllare se è un singolo numero o un range valido
     const singleNumberRegex = /^\d+$/;
     const rangeRegex = /^\d+\s*-\s*\d+$/;
-
+  
     if (singleNumberRegex.test(value)) {
+      document.pages = value; // Assegna il numero singolo a pages
+      document.pageFrom = "";
+      document.pageTo = "";
       return true; // Numero singolo valido
     } else if (rangeRegex.test(value)) {
       const [start, end] = value.split('-').map(num => parseInt(num.trim(), 10));
       if (start < end) {
+        document.pages = ""; // Svuota pages per il range
+        document.pageFrom = start; // Assegna il primo numero a pageFrom
+        document.pageTo = end; // Assegna il secondo numero a pageTo
         return true; // Range valido con inizio minore di fine
       } else {
         return "The starting page should be less than the ending page.";
@@ -225,7 +230,7 @@ function Documents(props) {
       return "Please enter a valid number or range (e.g., 35 or 35-45).";
     }
   };
-
+  
 
   const [position, setPosition] = useState({ lat: null, lng: null });
   useEffect(() => {
@@ -242,6 +247,15 @@ function Documents(props) {
       setPosition({ lat: null, lng: null });
     }
   }, [document.coordinates.lat, document.coordinates.long]);
+
+
+
+
+ 
+  
+
+
+
 
   return (
     <div className="documents-background">
@@ -271,22 +285,27 @@ function Documents(props) {
                 </Form.Group>
               </Col>
               <Col md={6}>
-                <Form.Group controlId="stakeholder">
-                  <Form.Label>Stakeholder*</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    name="stakeholder" 
-                    minLength={2} 
-                    value={document.stakeholder || ""} 
-                    onChange={handleChange} 
-                    placeholder="e.g., Kiruna kommun/Residents"
-                    className="input" 
+              <Form.Group controlId="stakeholders">
+                <Form.Label>Stakeholders*</Form.Label>
+                <Form.Select 
+                    as="select"
+                    name="stakeholder"
+                    value={document.stakeholder || ""}
+                    onChange={handleChange}
+                    className="input"    
                     isInvalid={!!errors.stakeholder} 
-                  />
-                  <Form.Control.Feedback type="invalid">
+                  >
+                    <option value="">Select a stakeholder</option>
+                    {stakeholders.map((stakeholder, index) => (
+                      <option key={index} value={stakeholder}>{stakeholder}</option>
+                    ))}
+                  </Form.Select>
+                  {/* <Form.Control.Feedback type="invalid">
                     {errors.stakeholder}
-                  </Form.Control.Feedback>
-                </Form.Group>              
+                  </Form.Control.Feedback> */}
+
+      
+                </Form.Group>     
               </Col>
             </Row>
 
@@ -425,6 +444,12 @@ function Documents(props) {
                 </Form.Group>
               </Col>
             </Row>
+            <Row className="mb-3">
+              </Row>
+              <Row className="mb-3">
+              </Row><Row className="mb-3">
+              </Row><Row className="mb-3">
+              </Row>
 
             <Row className="mb-3">
               <Form.Label>Select a point on the Map, if not selected, the entire municipality is considered</Form.Label>

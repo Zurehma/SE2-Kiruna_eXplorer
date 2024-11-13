@@ -8,7 +8,7 @@ import '../styles/Links.css';
 function Links(props) {
   const [allDocuments, setAllDocuments] = useState([]);
   const [documents, setDocuments] = useState([]);
-  const [typeLink, setTypeLink] = useState(["mah","boh"]);
+  const [typeLink, setTypeLink] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [linkedDocuments, setLinkedDocuments] = useState([]); // aggiunto per documenti già collegati
@@ -25,8 +25,8 @@ function Links(props) {
         const response = await API.getDocuments();
         setDocuments(response);
         setAllDocuments(response);
-        // const response2 = await API.getTypeLinks(); // se viene tolta dall db bisogna inserirli dal frontend
-        // setTypeLink(response2);
+        const response2 = await API.getTypeLinks(); 
+        setTypeLink(response2);
       } catch (error) {
         console.error("Error fetching documents:", error);
       }
@@ -43,11 +43,14 @@ function Links(props) {
 
   // Effettua una chiamata API per ottenere i documenti già collegati quando cambia document1
   useEffect(() => {
+    console.log('sssssss:', linkData.document1);
+
     if (linkData.document1) {
       const fetchLinkedDocuments = async () => {
         try {
-          const linkedResponse = await API.getLinksDoc(linkData.document1.id);
-          setLinkedDocuments(linkedResponse);
+          const linkedResponse = await API.getLinksDoc(linkData.document1);
+          setLinkedDocuments(linkedResponse.map(doc => doc.linkedDocID));
+          console.log('Linked documentsssssss:', linkedResponse);
         } catch (error) {
           console.error("Error fetching linked documents:", error);
         }
@@ -89,8 +92,16 @@ function Links(props) {
     }
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
+    console.log('Linbbbbbbbb!', linkData);
 
     try {
+      console.log('Link saved successfully!', linkData);
+      console.log("Filtered options:", documents
+        .filter((doc) => doc.id !== linkData.document1 && !linkedDocuments.includes(doc.id))
+        .map((doc) => ({
+          value: doc.id,
+          label: doc.title
+        })));
       await API.setLink(linkData);
       console.log('Link saved successfully!', linkData);
       setShowModal(true);
@@ -153,6 +164,7 @@ function Links(props) {
                       value: doc.id,
                       label: doc.title
                     }))}
+                  
                   isMulti
                   className="basic-multi-select"
                   classNamePrefix="select"

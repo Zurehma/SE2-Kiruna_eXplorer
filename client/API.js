@@ -18,7 +18,7 @@ const getDocuments = async () => {
         .then(handleInvalidResponse)
         .then(response => response.json());
 };
- 
+
 //Upload files
 const uploadFiles = async (docID, formData) => {
     try {
@@ -85,6 +85,18 @@ const getTypeLinks = async () => {
         .then(response => response.json());
 };
 
+// Function to get linked documents
+const getLinksDoc = async (documentId) => {
+    return  await fetch(`${SERVER_URL}/documents/links/${documentId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+        })
+        .then(handleInvalidResponse)
+        .then(response => response.json());
+};
+
+
 // Function to save a document
 const saveDocument = async (doc) => {
 
@@ -128,7 +140,7 @@ const setLink = async (linkData) => {
             credentials: 'include',
             body: JSON.stringify({
                 id1: linkData.document1,
-                id2: linkData.document2,
+                ids: linkData.document2,
                 type: linkData.linkType
             }),
             credentials: 'include',
@@ -186,7 +198,8 @@ const API = {
     getTypeLinks,
     setLink,
     getUserInfo,
-    uploadFiles
+    uploadFiles,
+    getLinksDoc
 };
   
 
