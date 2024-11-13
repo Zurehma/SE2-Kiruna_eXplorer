@@ -127,19 +127,7 @@ class DocumentDAO {
    * @param {Number | null} pageTo
    * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the last document inserted and the number of lines changed
    */
-  addDocument = (
-    title,
-    stakeholder,
-    scale,
-    issuanceDate,
-    type,
-    language,
-    description,
-    coordinates = null,
-    pages = null,
-    pageFrom = null,
-    pageTo = null
-  ) => {
+  addDocument = (title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
     return new Promise((resolve, reject) => {
       const query =
         "INSERT INTO DOCUMENT (title, stakeholder, scale, issuanceDate, type, connections, language, description, coordinates, pages, pageFrom, pageTo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -154,21 +142,35 @@ class DocumentDAO {
     });
   };
 
-  updateDocument = (
-    id,
-    title,
-    stakeholder,
-    scale,
-    issuanceDate,
-    type,
-    language,
-    description,
-    coordinates = null,
-    pages = null,
-    pageFrom = null,
-    pageTo = null
-  ) => {
-    return new Promise((resolve, reject) => {});
+  /**
+   * Update an existing document in the database
+   * @param {Number} id
+   * @param {String} title
+   * @param {String} stakeholder
+   * @param {String | Number} scale
+   * @param {String} issuanceDate
+   * @param {String} type
+   * @param {String} language
+   * @param {String} description
+   * @param {String | null} coordinates
+   * @param {Number | null} pages
+   * @param {Number | null} pageFrom
+   * @param {Number | null} pageTo
+   * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the last document inserted and the number of lines changed
+   */
+  updateDocument = (id, title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
+    return new Promise((resolve, reject) => {
+      const query =
+        "UPDATE DOCUMENT SET title = ?, stakeholder = ?, scale = ?, issuanceDate = ?, type = ?, language = ?, description = ?, coordinates = ?, pages = ?, pageFrom = ?, pageTo = ? WHERE id = ?";
+
+      db.run(query, [title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo, id], function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ changes: this.changes, lastID: this.lastID });
+        }
+      });
+    });
   };
 
   /**
@@ -183,21 +185,15 @@ class DocumentDAO {
         CASE 
           WHEN docID1 = ? THEN docID2 
           ELSE docID1 
-        END AS linkedDocID, 
-        title 
+        END AS linkedDocID
       FROM LINK
-      JOIN DOCUMENT ON linkedDocID = id
       WHERE docID1 = ? OR docID2 = ?
       ORDER BY linkedDocID ASC`;
       db.all(query, [id1, id1, id1], (err, rows) => {
         if (err) {
           reject(err);
         } else {
-          const linkIDs = rows.map((row) => ({
-            linkedDocID: row.linkedDocID,
-            title: row.title,
-          }));
-          resolve(linkIDs);
+          resolve(rows);
         }
       });
     });

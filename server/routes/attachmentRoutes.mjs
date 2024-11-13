@@ -15,7 +15,7 @@ class AttachmentRoutes {
     this.router.post("/:docID/attachments/", Utility.isLoggedIn, param("docID").isInt(), Utility.validateRequest, (req, res, next) => {
       this.attachmentController
         .addAttachment(req, Number(req.params.docID))
-        .then((attachmentInfo) => res.status(200).json(attachmentInfo))
+        .then((attachmentInfo) => res.status(201).json(attachmentInfo))
         .catch((err) => next(err));
     });
 
@@ -28,7 +28,7 @@ class AttachmentRoutes {
       (req, res, next) => {
         this.attachmentController
           .deleteAttachment(Number(req.params.docID), Number(req.params.attachmentID))
-          .then(() => res.status(200).json())
+          .then(() => res.status(204).end())
           .catch((err) => next(err));
       }
     );
