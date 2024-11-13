@@ -50,8 +50,53 @@ class DocumentRoutes {
             req.body.pageTo || null
           )
           .then((document) => {
-            res.status(200).json(document);
+            res.status(201).json(document);
           })
+          .catch((err) => next(err));
+      }
+    );
+
+    this.router.put(
+      "/:docID",
+      Utility.isLoggedIn,
+      param("docID").isInt({ gt: 0 }),
+      body("title").optional().isString().notEmpty(),
+      body("stakeholder").optional().isString().notEmpty(),
+      oneOf([body("scale").optional().isString().notEmpty(), body("scale").optional().isInt({ gt: 0 })]),
+      oneOf([
+        body("issuanceDate").optional().isISO8601({ strict: true }),
+        body("issuanceDate").optional().isString().notEmpty().custom(Utility.isValidYearMonthOrYear),
+      ]),
+      body("type").optional().isString().notEmpty(),
+      body("language").optional().isString().notEmpty(),
+      body("description").optional().isString().notEmpty(),
+      body("coordinates").optional().isObject().custom(Utility.isValidCoordinatesObject),
+      body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
+      body("pageFrom").optional().isInt({ gt: 0 }),
+      body("pageTo").optional().isInt({ gt: 0 }),
+      body().custom(Utility.isBodyEmpty),
+      Utility.validateRequest,
+      (req, res, next) => {
+        this.documentController
+          .updateDocument(
+            Number(req.params.docID),
+            req.body.title || null,
+            req.body.stakeholder || null,
+            req.body.scale || null,
+            req.body.issuanceDate || null,
+            req.body.type || null,
+            req.body.language || null,
+            req.body.description || null,
+            req.body.coordinates || null,
+            req.body.hasOwnProperty("coordinates"),
+            req.body.pages || null,
+            req.body.hasOwnProperty("pages"),
+            req.body.pageFrom || null,
+            req.body.hasOwnProperty("pageFrom"),
+            req.body.pageTo || null,
+            req.body.hasOwnProperty("pageTo")
+          )
+          .then(() => res.status(204).end())
           .catch((err) => next(err));
       }
     );
