@@ -5,8 +5,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import API from '../../API.js';
 import { Map } from './Map.jsx';
 import 'leaflet/dist/leaflet.css';
-import { Polygon } from 'react-leaflet';
-import L from 'leaflet';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ISO6391 from 'iso-639-1';
