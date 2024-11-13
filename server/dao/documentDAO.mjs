@@ -183,21 +183,15 @@ class DocumentDAO {
         CASE 
           WHEN docID1 = ? THEN docID2 
           ELSE docID1 
-        END AS linkedDocID, 
-        title 
+        END AS linkedDocID
       FROM LINK
-      JOIN DOCUMENT ON linkedDocID = id
       WHERE docID1 = ? OR docID2 = ?
       ORDER BY linkedDocID ASC`;
       db.all(query, [id1, id1, id1], (err, rows) => {
         if (err) {
           reject(err);
         } else {
-          const linkIDs = rows.map((row) => ({
-            linkedDocID: row.linkedDocID,
-            title: row.title,
-          }));
-          resolve(linkIDs);
+          resolve(rows);
         }
       });
     });
