@@ -173,10 +173,61 @@ const setLink = async (linkData) => {
     .then(response => response.json());
   };
 
+  // Function to filter documents
+const filterDocuments = async (filters) => {
+    const queryParams = new URLSearchParams();
+
+    if (filters.type) queryParams.append('type', filters.type);
+    if (filters.stakeholder) queryParams.append('stakeholder', filters.stakeholder);
+    if (filters.issuanceDateFrom) queryParams.append('issuanceDateFrom', filters.issuanceDateFrom);
+    if (filters.issuanceDateTo) queryParams.append('issuanceDateTo', filters.issuanceDateTo);
+
+    const queryString = queryParams.toString();
+
+    try {
+        const response = await fetch(`${SERVER_URL}/documents/filter/by?${queryString}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+        });
+
+        return handleInvalidResponse(response).json();
+    } catch (error) {
+        console.error("Error filtering documents:", error);
+        throw error;
+    }
+};
+
+// Function to get all stakeholders
+const getStakeholders = async () => {
+    return await fetch(`${SERVER_URL}/documents/stakeholders`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+    })
+        .then(handleInvalidResponse)
+        .then((response) => response.json());
+};
+
+// Function to get all document types
+const getDocumentTypes = async () => {
+    return await fetch(`${SERVER_URL}/documents/document-types`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+    })
+        .then(handleInvalidResponse)
+        .then((response) => response.json());
+};
+
+
+
 
 
 //Export API methods
 const API = {
+    getStakeholders,
+    getDocumentTypes,
     getDocuments,
     saveDocument,
     logIn,
@@ -186,7 +237,8 @@ const API = {
     getTypeLinks,
     setLink,
     getUserInfo,
-    uploadFiles
+    uploadFiles,
+    filterDocuments
 };
   
 
