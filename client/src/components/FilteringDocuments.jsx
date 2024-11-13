@@ -11,6 +11,8 @@ const FilteringDocuments = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [stakeholder, setStakeholder] = useState('');
   const [documentType, setDocumentType] = useState('');
+  const [stakeholdersList, setStakeholdersList] = useState([]);
+  const [documentTypesList, setDocumentTypesList] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -20,6 +22,22 @@ const FilteringDocuments = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const formatDate = (date) => (date ? format(date, 'dd/MM/yyyy') : null);
+
+  // Fetch document types and stakeholders
+  useEffect(() => {
+    const fetchDropdownData = async () => {
+      try {
+        const stakeholders = await API.getStakeholders();
+        const documentTypes = await API.getDocumentTypes();
+        setStakeholdersList(stakeholders);
+        setDocumentTypesList(documentTypes);
+      } catch (error) {
+        console.error('Error fetching dropdown data:', error);
+      }
+    };
+
+    fetchDropdownData();
+  }, []);
 
   const fetchFilteredDocuments = async () => {
     setLoading(true);
@@ -49,8 +67,6 @@ const FilteringDocuments = () => {
   }, [stakeholder, documentType, selectedDate, startDate, endDate, isSingleDate]);
 
   const handleSearch = (e) => setSearchQuery(e.target.value);
-  const handleStakeholderChange = (e) => setStakeholder(e.target.value);
-  const handleTypeChange = (e) => setDocumentType(e.target.value);
 
   const handleDateToggle = () => {
     setIsSingleDate(!isSingleDate);
@@ -92,48 +108,45 @@ const FilteringDocuments = () => {
         <Col md={3} className="d-none d-md-block sidebar-section">
           <h5>Filter Documents</h5>
           <Form>
-            <Form.Group controlId="sidebarFilterStakeholder">
+            {/* Stakeholder Dropdown */}
+            <Form.Group controlId="sidebarFilterStakeholder" className="mt-3">
               <Form.Label>Stakeholder</Form.Label>
-              <div className="radio-group">
-                <Form.Check
-                  type="radio"
-                  label="All"
-                  name="sidebarStakeholder"
-                  value=""
-                  checked={stakeholder === ""}
-                  onChange={handleStakeholderChange}
-                />
-                <Form.Check
-                  type="radio"
-                  label="Stakeholder A"
-                  name="sidebarStakeholder"
-                  value="Stakeholder A"
-                  checked={stakeholder === "Stakeholder A"}
-                  onChange={handleStakeholderChange}
-                />
-                <Form.Check
-                  type="radio"
-                  label="Stakeholder B"
-                  name="sidebarStakeholder"
-                  value="Stakeholder B"
-                  checked={stakeholder === "Stakeholder B"}
-                  onChange={handleStakeholderChange}
-                />
-              </div>
+              <Form.Control 
+                as="select" 
+                value={stakeholder} 
+                onChange={(e) => setStakeholder(e.target.value)}
+              >
+                <option value="">All Stakeholders</option>
+                {stakeholdersList.map((stakeholderItem) => (
+                  <option key={stakeholderItem.id} value={stakeholderItem.id}>
+                    {stakeholderItem.name}
+                  </option>
+                ))}
+              </Form.Control>
             </Form.Group>
 
+            {/* Document Type Dropdown */}
+            <Form.Group controlId="sidebarFilterDocumentType" className="mt-3">
+              <Form.Label>Document Type</Form.Label>
+              <Form.Control 
+                as="select" 
+                value={documentType} 
+                onChange={(e) => setDocumentType(e.target.value)}
+              >
+                <option value="">All Document Types</option>
+                {documentTypesList.map((typeItem) => (
+                  <option key={typeItem.id} value={typeItem.id}>
+                    {typeItem.name}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+
+            {/* Date Selection */}
             <Form.Group controlId="sidebarFilterDateType" className="mt-3">
-              <Form.Check
-                type="radio"
-                label="Single Date"
-                checked={isSingleDate}
-                onChange={handleDateToggle}
+              <Form.Check type="radio" label="Single Date" checked={isSingleDate} onChange={handleDateToggle}
               />
-              <Form.Check
-                type="radio"
-                label="Date Range"
-                checked={!isSingleDate}
-                onChange={handleDateToggle}
+              <Form.Check type="radio" label="Date Range" checked={!isSingleDate} onChange={handleDateToggle}
               />
             </Form.Group>
 
@@ -168,211 +181,8 @@ const FilteringDocuments = () => {
               )}
             </Form.Group>
 
-            <Form.Group controlId="sidebarFilterType" className="mt-3">
-              <Form.Label>Type</Form.Label>
-              <div className="radio-group">
-                <Form.Check
-                  type="radio"
-                  label="All"
-                  name="sidebarDocumentType"
-                  value=""
-                  checked={documentType === ""}
-                  onChange={handleTypeChange}
-                />
-                <Form.Check
-                  type="radio"
-                  label="Material"
-                  name="sidebarDocumentType"
-                  value="Material"
-                  checked={documentType === "Material"}
-                  onChange={handleTypeChange}
-                />
-                <Form.Check
-                  type="radio"
-                  label="Informative"
-                  name="sidebarDocumentType"
-                  value="Informative"
-                  checked={documentType === "Informative"}
-                  onChange={handleTypeChange}
-                />
-                <Form.Check
-                  type="radio"
-                  label="Prescriptive"
-                  name="sidebarDocumentType"
-                  value="Prescriptive"
-                  checked={documentType === "Prescriptive"}
-                  onChange={handleTypeChange}
-                />
-                <Form.Check
-                  type="radio"
-                  label="Design"
-                  name="sidebarDocumentType"
-                  value="Design"
-                  checked={documentType === "Design"}
-                  onChange={handleTypeChange}
-                />
-                <Form.Check
-                  type="radio"
-                  label="Technical"
-                  name="sidebarDocumentType"
-                  value="Technical"
-                  checked={documentType === "Technical"}
-                  onChange={handleTypeChange}
-                />
-              </div>
-            </Form.Group>
           </Form>
         </Col>
-
-        {/* Offcanvas Filter Menu */}
-        <Offcanvas
-          show={showFilters}
-          onHide={() => setShowFilters(false)}
-          placement="end"
-          style={{ width: '80%', maxWidth: '350px' }}
-        >
-          <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Filter Documents</Offcanvas.Title>
-          </Offcanvas.Header>
-          <Offcanvas.Body>
-            <Form>
-              <Form.Group controlId="offcanvasFilterStakeholder">
-                <Form.Label>Stakeholder</Form.Label>
-                <div className="radio-group">
-                  <Form.Check
-                    type="radio"
-                    label="All"
-                    name="offcanvasStakeholder"
-                    value=""
-                    checked={stakeholder === ""}
-                    onChange={handleStakeholderChange}
-                  />
-                  <Form.Check
-                    type="radio"
-                    label="Stakeholder A"
-                    name="offcanvasStakeholder"
-                    value="Stakeholder A"
-                    checked={stakeholder === "Stakeholder A"}
-                    onChange={handleStakeholderChange}
-                  />
-                  <Form.Check
-                    type="radio"
-                    label="Stakeholder B"
-                    name="offcanvasStakeholder"
-                    value="Stakeholder B"
-                    checked={stakeholder === "Stakeholder B"}
-                    onChange={handleStakeholderChange}
-                  />
-                </div>
-              </Form.Group>
-
-              <Form.Group controlId="offcanvasFilterDateType" className="mt-3">
-                <Form.Check
-                  type="radio"
-                  label="Single Date"
-                  checked={isSingleDate}
-                  onChange={handleDateToggle}
-                />
-                <Form.Check
-                  type="radio"
-                  label="Date Range"
-                  checked={!isSingleDate}
-                  onChange={handleDateToggle}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="offcanvasFilterDate" className="mt-3">
-                <Form.Label>{isSingleDate ? 'Select Date' : 'Select Date Range'}</Form.Label>
-                {isSingleDate ? (
-                  <DatePicker
-                    selected={selectedDate}
-                    onChange={handleSingleDateChange}
-                    dateFormat="dd/MM/yyyy"
-                    className="form-control"
-                    placeholderText="Select Date"
-                    showMonthDropdown
-                    showYearDropdown
-                    dropdownMode="select"
-                  />
-                ) : (
-                  <DatePicker
-                    selected={startDate}
-                    onChange={handleDateRangeChange}
-                    startDate={startDate}
-                    endDate={endDate}
-                    selectsRange
-                    isClearable
-                    dateFormat="dd/MM/yyyy"
-                    className="form-control"
-                    placeholderText="Select Date Range"
-                    showMonthDropdown
-                    showYearDropdown
-                    dropdownMode="select"
-                  />
-                )}
-              </Form.Group>
-
-              <Form.Group controlId="offcanvasFilterType" className="mt-3">
-                <Form.Label>Type</Form.Label>
-                <div className="radio-group">
-                  <Form.Check
-                    type="radio"
-                    label="All"
-                    name="offcanvasDocumentType"
-                    value=""
-                    checked={documentType === ""}
-                    onChange={handleTypeChange}
-                  />
-                  <Form.Check
-                    type="radio"
-                    label="Material"
-                    name="offcanvasDocumentType"
-                    value="Material"
-                    checked={documentType === "Material"}
-                    onChange={handleTypeChange}
-                  />
-                  <Form.Check
-                    type="radio"
-                    label="Informative"
-                    name="offcanvasDocumentType"
-                    value="Informative"
-                    checked={documentType === "Informative"}
-                    onChange={handleTypeChange}
-                  />
-                  <Form.Check
-                    type="radio"
-                    label="Prescriptive"
-                    name="offcanvasDocumentType"
-                    value="Prescriptive"
-                    checked={documentType === "Prescriptive"}
-                    onChange={handleTypeChange}
-                  />
-                  <Form.Check
-                    type="radio"
-                    label="Design"
-                    name="offcanvasDocumentType"
-                    value="Design"
-                    checked={documentType === "Design"}
-                    onChange={handleTypeChange}
-                  />
-                  <Form.Check
-                    type="radio"
-                    label="Technical"
-                    name="offcanvasDocumentType"
-                    value="Technical"
-                    checked={documentType === "Technical"}
-                    onChange={handleTypeChange}
-                  />
-                </div>
-              </Form.Group>
-            </Form>
-            <div className="text-center mt-4">
-              <Button variant="secondary" onClick={() => setShowFilters(false)}>
-                Close Filters
-              </Button>
-            </div>
-          </Offcanvas.Body>
-        </Offcanvas>
 
         <Col xs={12} md={9} className="filtered-result">
           <div className="search-section-modern">
