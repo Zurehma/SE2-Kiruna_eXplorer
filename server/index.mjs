@@ -4,7 +4,6 @@
 
 import { createServer } from "http";
 import express from "express";
-import { param } from "express-validator";
 import morgan from "morgan";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -16,9 +15,11 @@ import AuthRoutes from "./routes/authRoutes.mjs";
 const app = express();
 const port = 3001;
 const baseURL = "/api";
+const ORIGIN_SOURCE = process?.env?.NODE_ENV?.trim() === "production" ? "http://localhost:3000" : "http://localhost:5173";
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: ORIGIN_SOURCE,
   optionsSuccessStatus: 200,
+  preflightContinue: false,
   credentials: true,
 };
 

@@ -176,7 +176,7 @@ Add a new document with the provided information.
 
 #### GET `api/documents/link-types`
 
-Returns the list of all specific scale types.
+Returns the list of all specific link types.
 
 - Request Parameters: _None_
 - Request Body Content: _None_
@@ -184,7 +184,20 @@ Returns the list of all specific scale types.
 - Example:
 
 ```json
-["Direct", "Collateral", "Projection", "Update"]
+[
+  {
+    "name": "Direct"
+  },
+  {
+    "name": "Collateral"
+  },
+  {
+    "name": "Projection"
+  },
+  {
+    "name": "Update"
+  }
+]
 ```
 
 - Access Constraints: Can only be called by a logged in user.

@@ -11,7 +11,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ISO6391 from 'iso-639-1';
 import Select from 'react-select';
-
+import * as turf from '@turf/turf';
 
 
 function Documents(props) { 
@@ -107,18 +107,26 @@ function Documents(props) {
     }
   };
 
-  //Polygon coordinates to check that the coordinates are inside it
+  // Polygon coordinates
   const polygonCoordinates = [
     [67.87328157366065, 20.20047943270466],
     [67.84024426842895, 20.35839687019359],
-    [67.82082254726043, 20.181254701184297]
+    [67.82082254726043, 20.181254701184297],
+    [67.87328157366065, 20.20047943270466] // Ritorno al primo punto per chiudere il poligono
   ];
 
-  const polygon = L.polygon(polygonCoordinates);
+  const polygonGeoJson = {
+    type: "Polygon",
+    coordinates: [polygonCoordinates] // GeoJSON richiede un array annidato
+  };
+
   const validateCoordinates = (lat, lng) => {
-    const point = L.latLng(lat, lng);
-    return polygon.getBounds().contains(point);
-  }
+    const point = [lat, lng]; // ordine GeoJSON: [lng, lat]
+    const isInside = turf.booleanPointInPolygon(point, polygonGeoJson);
+    return isInside;
+};
+
+
 
   const handleChange = (e) => {
    const { name, value } = e.target;
@@ -184,20 +192,21 @@ function Documents(props) {
       console.log("Document to saveeeee:", document);
 
     try {
-      const response = id 
-        ? await API.updateDocument(id, document)
-        : await API.saveDocument(document);
-      
-        //Try to submit files
-      // if (files.length > 0) {
-      //   files.forEach(async (file) => {
-      //     const formData = new FormData();
-      //     formData.append('file', file);
-      //     await API.uploadFiles(response.id, formData);
-      //   });
-      // }
-
-      props.setNewDoc(response);
+      const response = await API.saveDocument(document);
+      doc = response;
+      //Try to submit files
+      if (files.length > 0) {
+        files.forEach(async (file) => {
+          const formData = new FormData();
+          formData.append('file', file);
+          try {
+            await API.uploadFiles(doc.id,formData);
+          } catch (error) {
+            props.setError(error);
+          }
+        } ); 
+      }
+      props.setNewDoc(doc);
       navigate(`/documents/links`);
     } catch (error) {
       console.error("Error saving document:", error);

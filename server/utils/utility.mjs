@@ -3,6 +3,27 @@
  */
 
 import { validationResult } from "express-validator";
+import { polygon, point, booleanPointInPolygon } from "@turf/turf";
+
+/**
+ * Check if the provided coordinates are inside the area of Kiruna
+ * @param {Number} lat
+ * @param {Number} long
+ * @returns {Boolean} **true** if the coordinates provided are inside of Kiruna
+ */
+const isValidKirunaCoordinates = (lat, long) => {
+  const kirunaCoordinates = [
+    [67.87328157366065, 20.20047943270466],
+    [67.84024426842895, 20.35839687019359],
+    [67.82082254726043, 20.181254701184297],
+    [67.87328157366065, 20.20047943270466],
+  ];
+
+  const a = polygon([kirunaCoordinates]);
+  const p = point([lat, long]);
+
+  return booleanPointInPolygon(p, a);
+};
 
 /**
  * Middleware to check if a user has logged in
@@ -76,6 +97,30 @@ const isValidPageParameter = (value, { req }) => {
 };
 
 /**
+ * Middleware to check if the request body is empty
+ * @param {*} value
+ */
+const isBodyEmpty = (value) => {
+  if (
+    value.hasOwnProperty("title") ||
+    value.hasOwnProperty("stakeholder") ||
+    value.hasOwnProperty("scale") ||
+    value.hasOwnProperty("issuanceDate") ||
+    value.hasOwnProperty("type") ||
+    value.hasOwnProperty("language") ||
+    value.hasOwnProperty("description") ||
+    value.hasOwnProperty("coordinates") ||
+    value.hasOwnProperty("pages") ||
+    value.hasOwnProperty("pageFrom") ||
+    value.hasOwnProperty("pageTo")
+  ) {
+    return true;
+  }
+
+  throw new Error("");
+};
+
+/**
  * Middleware to manage validation request errors
  * @param {*} req
  * @param {*} res
@@ -115,10 +160,12 @@ const errorHandler = (err, req, res, next) => {
 };
 
 const Utility = {
+  isValidKirunaCoordinates,
   isLoggedIn,
   isValidYearMonthOrYear,
   isValidCoordinatesObject,
   isValidPageParameter,
+  isBodyEmpty,
   validateRequest,
   errorHandler,
 };
