@@ -19,6 +19,7 @@ const ORIGIN_SOURCE = process?.env?.NODE_ENV?.trim() === "production" ? "http://
 const corsOptions = {
   origin: ORIGIN_SOURCE,
   optionsSuccessStatus: 200,
+  preflightContinue: false,
   credentials: true,
 };
 
