@@ -34,10 +34,10 @@ function MyPopup(props) {
       setLoading(true);
       const fetchData = async () => {
         try {
-          const links = await API.getLinks(props.doc.id);
+          const links = await API.getLinksDoc(props.doc.id);
           setLinks(links);
           console.log(props.doc.id);
-          console.log(links);
+          console.log(links); //it should return id,title and type of link
         } catch (error) {
           props.setError(error);
         } finally {
