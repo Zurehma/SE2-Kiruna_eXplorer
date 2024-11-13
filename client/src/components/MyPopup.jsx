@@ -3,11 +3,7 @@ import { Row, Col, Tooltip, OverlayTrigger, Button, Dropdown } from 'react-boots
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import API from '../../API';
 
-// Fake links data
-const fakeLinks = [
-  { type: 'direct', docName: 'Document 1' },
-  { type: 'direct', docName: 'Document 2' },
-];
+
 
 function MyPopup(props) {
   const [loading, setLoading] = useState(false);
@@ -36,8 +32,6 @@ function MyPopup(props) {
         try {
           const links = await API.getLinksDoc(props.doc.id);
           setLinks(links);
-          console.log(props.doc.id);
-          console.log(links); //it should return id,title and type of link
         } catch (error) {
           props.setError(error);
         } finally {
@@ -70,7 +64,7 @@ function MyPopup(props) {
       <Col
         xs={12}
         md={3}
-        className="myPopup"
+        className="myPopup mt-1"
         style={{
           display: 'flex',
           alignItems: 'flex-start',
@@ -114,10 +108,10 @@ function MyPopup(props) {
 
         {/* Display the dropdown list of connections if it's open */}
         {showLinks && (
-          <ul className="list-unstyled small text-muted ms-3">
-            {fakeLinks.map((link, index) => (
-              <li key={index}>
-                {link.docName} - {link.type}
+          <ul className="small text-muted ms-3">
+            {links.map((link) => (
+              <li key={links.linkedDocID}>
+                {link.title} - {link.type}
               </li>
             ))}
           </ul>

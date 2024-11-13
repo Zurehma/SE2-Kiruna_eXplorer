@@ -20,6 +20,7 @@
 .leaflet-popup-content-wrapper {
   width: 100%;
   max-width: 90vw;
+  max-height: 50vh;
   overflow-y: auto;
   background-color: rgba(255, 255, 255, 0.8);
   color: #000;
@@ -182,8 +183,7 @@ margin: 0;
 }
 
 .file-input {
-  height: auto;
-  
+  height: auto;  
 }
 
 
