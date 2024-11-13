@@ -58,6 +58,52 @@ class DocumentDAO {
     });
   };
 
+  filterDocuments = (queryParameter) => {
+    return new Promise((resolve, reject) => {
+      try{
+        let {type, stakeholder, issuanceDateFrom, issuanceDateTo} = queryParameter;
+        let sql = "SELECT * FROM DOCUMENT";
+        let sqlConditions = [];
+        let sqlParams = [];
+
+        if (type || stakeholder || issuanceDateFrom || issuanceDateTo) {
+            if (type) {
+                sqlConditions.push("type = ?")
+                sqlParams.push(type)
+            }
+            if (stakeholder) {
+                sqlConditions.push("stakeholder = ?")
+                sqlParams.push(stakeholder)
+            }
+            if (issuanceDateFrom && issuanceDateTo) {
+                sqlConditions.push("issuanceDate between ? AND ?")
+                sqlParams.push(issuanceDateFrom, issuanceDateTo)
+            }
+            if (issuanceDateFrom) {
+                sqlConditions.push("issuanceDate = ?")
+                sqlParams.push(issuanceDateFrom)
+            }
+        }
+
+        if (sqlConditions.length > 0) {
+            sql += " WHERE " + sqlConditions.join(" AND ")
+        }
+
+        db.all(sql, sqlParams, (err, rows) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(mapRowsToDocument(rows));
+        });
+      }
+      catch(err){
+        reject(err);
+      }
+    });
+  }
+
+
+
   /**
    * Get already present document types
    * @returns {Promise<String>} A promise that resolves to an array of strings
@@ -95,24 +141,6 @@ class DocumentDAO {
   };
 
   /**
-   * Get already present link types
-   * @returns {Promise<String>} A promise that resolves to an array of strings
-   */
-  getLinkTypes = () => {
-    return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM LINK_TYPE";
-
-      db.all(query, [], (err, rows) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rows);
-        }
-      });
-    });
-  };
-
-  /**
    * Insert a new document in the database
    * @param {String} title
    * @param {String} stakeholder
@@ -127,7 +155,19 @@ class DocumentDAO {
    * @param {Number | null} pageTo
    * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the last document inserted and the number of lines changed
    */
-  addDocument = (title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
+  addDocument = (
+    title,
+    stakeholder,
+    scale,
+    issuanceDate,
+    type,
+    language,
+    description,
+    coordinates = null,
+    pages = null,
+    pageFrom = null,
+    pageTo = null
+  ) => {
     return new Promise((resolve, reject) => {
       const query =
         "INSERT INTO DOCUMENT (title, stakeholder, scale, issuanceDate, type, connections, language, description, coordinates, pages, pageFrom, pageTo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -142,35 +182,21 @@ class DocumentDAO {
     });
   };
 
-  /**
-   * Update an existing document in the database
-   * @param {Number} id
-   * @param {String} title
-   * @param {String} stakeholder
-   * @param {String | Number} scale
-   * @param {String} issuanceDate
-   * @param {String} type
-   * @param {String} language
-   * @param {String} description
-   * @param {String | null} coordinates
-   * @param {Number | null} pages
-   * @param {Number | null} pageFrom
-   * @param {Number | null} pageTo
-   * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the last document inserted and the number of lines changed
-   */
-  updateDocument = (id, title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
-    return new Promise((resolve, reject) => {
-      const query =
-        "UPDATE DOCUMENT SET title = ?, stakeholder = ?, scale = ?, issuanceDate = ?, type = ?, language = ?, description = ?, coordinates = ?, pages = ?, pageFrom = ?, pageTo = ? WHERE id = ?";
-
-      db.run(query, [title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo, id], function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ changes: this.changes, lastID: this.lastID });
-        }
-      });
-    });
+  updateDocument = (
+    id,
+    title,
+    stakeholder,
+    scale,
+    issuanceDate,
+    type,
+    language,
+    description,
+    coordinates = null,
+    pages = null,
+    pageFrom = null,
+    pageTo = null
+  ) => {
+    return new Promise((resolve, reject) => {});
   };
 
   /**
@@ -185,15 +211,22 @@ class DocumentDAO {
         CASE 
           WHEN docID1 = ? THEN docID2 
           ELSE docID1 
-        END AS linkedDocID
-      FROM LINK
+        END AS linkedDocID, 
+        title, l.type 
+      FROM LINK l
+      JOIN DOCUMENT ON linkedDocID = id
       WHERE docID1 = ? OR docID2 = ?
       ORDER BY linkedDocID ASC`;
       db.all(query, [id1, id1, id1], (err, rows) => {
         if (err) {
           reject(err);
         } else {
-          resolve(rows);
+          const linkIDs = rows.map((row) => ({
+            linkedDocID: row.linkedDocID,
+            title: row.title,
+            type: row.type,
+          }));
+          resolve(linkIDs);
         }
       });
     });
