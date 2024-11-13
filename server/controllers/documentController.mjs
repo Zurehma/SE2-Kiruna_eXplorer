@@ -1,10 +1,8 @@
 import dayjs from "dayjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
 import { getLinkTypes, isLinkType } from "../models/document.mjs";
-import Storage from "../utils/storage.mjs";
-import path from "path";
-import AttachmentInfo from "../models/attachmentInfo.mjs";
 import Document from "../models/document.mjs";
+import Utility from "../utils/utility.mjs";
 
 class DocumentController {
   constructor() {
@@ -46,7 +44,7 @@ class DocumentController {
   }
 
   /**
-   * Add a new document with the provided information
+   * Add a new document with the provided informations
    * @param {String} title
    * @param {String} stakeholder
    * @param {String | Number} scale
@@ -60,19 +58,7 @@ class DocumentController {
    * @param {Number | null} pages
    * @returns {Promise<Document>} A promise that resolves to the newly created object
    */
-  addDocument = (
-    title,
-    stakeholder,
-    scale,
-    issuanceDate,
-    type,
-    language,
-    description,
-    coordinates = null,
-    pages = null,
-    pageFrom = null,
-    pageTo = null
-  ) => {
+  addDocument = (title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
     return new Promise(async (resolve, reject) => {
       try {
         if (dayjs().isBefore(issuanceDate)) {
@@ -80,7 +66,10 @@ class DocumentController {
           throw error;
         }
 
-        // TODO: validate kiruna coordinates
+        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
+          const error = { errCode: 400, errMessage: "Coordinates error." };
+          throw error;
+        }
 
         const result = await this.documentDAO.addDocument(
           title,
@@ -106,6 +95,117 @@ class DocumentController {
   };
 
   /**
+   * Update an existing document with the provided informations
+   * @param {Number} id
+   * @param {String || null} title
+   * @param {String || null} stakeholder
+   * @param {String || Number || null} scale
+   * @param {String || null} issuanceDate
+   * @param {String || null} type
+   * @param {String || null} language
+   * @param {String || null} description
+   * @param {Object || null} coordinates
+   * @param {Boolean} isCoordinatesPresent
+   * @param {Number || null} pages
+   * @param {Boolean} isPagesPresent
+   * @param {Number || null} pageFrom
+   * @param {Boolean} isPageFromPresent
+   * @param {Number || null} pageTo
+   * @param {Boolean} isPageToPresent
+   * @returns {Promise<null>} A promise that resolves to null
+   */
+  updateDocument = (
+    id,
+    title,
+    stakeholder,
+    scale,
+    issuanceDate,
+    type,
+    language,
+    description,
+    coordinates,
+    isCoordinatesPresent,
+    pages,
+    isPagesPresent,
+    pageFrom,
+    isPageFromPresent,
+    pageTo,
+    isPageToPresent
+  ) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (dayjs().isBefore(issuanceDate)) {
+          const error = { errCode: 400, errMessage: "Date error." };
+          throw error;
+        }
+
+        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
+          const error = { errCode: 400, errMessage: "Coordinates error." };
+          throw error;
+        }
+
+        const oldDocument = await this.documentDAO.getDocumentByID(id);
+
+        if (oldDocument == undefined) {
+          const error = { errCode: 404, errMessage: "Document not found." };
+          throw error;
+        }
+
+        let processedCoordinates = null;
+
+        if (isCoordinatesPresent && coordinates) {
+          processedCoordinates = JSON.stringify(coordinates);
+        } else if (oldDocument.coordinates) {
+          processedCoordinates = JSON.stringify(oldDocument.coordinates);
+        }
+
+        let processedPages = null;
+
+        if (isPagesPresent && pages) {
+          processedPages = pages;
+        } else {
+          processedPages = oldDocument.pages;
+        }
+
+        let processedPageFrom = null;
+
+        if (isPageFromPresent && pageFrom) {
+          processedPageFrom = pageFrom;
+        } else {
+          processedPageFrom = oldDocument.pageFrom;
+        }
+
+        let processedPageTo = null;
+
+        if (isPageToPresent && pageTo) {
+          processedPageTo = pageTo;
+        } else {
+          processedPageTo = oldDocument.pageTo;
+        }
+
+        await this.documentDAO.updateDocument(
+          id,
+          title || oldDocument.title,
+          stakeholder || oldDocument.stakeholder,
+          scale || oldDocument.scale,
+          issuanceDate || oldDocument.issuanceDate,
+          type || oldDocument.type,
+          language || oldDocument.language,
+          description || oldDocument.description,
+          processedCoordinates,
+          processedPages,
+          processedPageFrom,
+          processedPageTo
+        );
+
+        resolve(null);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
+  /**
    * Get the list of already available document types
    * @returns {Promise<Array<String>>} A promise that resolves to an array of strings
    */
@@ -118,62 +218,10 @@ class DocumentController {
   getStakeholders = () => this.documentDAO.getStakeholders();
 
   /**
-   * Add a new attachment to an existing document
-   * @param {*} req
-   * @param {Number} docID
-   * @returns {Promise<AttachmentInfo>} A promise that resolves to the newly created object
+   * Get the list of already available link types
+   * @returns {Promise<Array<String>>} A promise that resolves to an array of strings
    */
-  addAttachment = (req, docID) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const document = await this.documentDAO.getDocumentByID(docID);
-
-        if (document == undefined) {
-          const error = { errCode: 404, errMessage: "Document not found." };
-          throw error;
-        }
-
-        const fileInfo = await Storage.saveFile(req);
-        const result = await this.documentDAO.addAttachment(docID, fileInfo.originalname, path.join(".", fileInfo.path), fileInfo.mimetype);
-        const attachment = await this.documentDAO.getAttachmentByID(result.lastID);
-
-        resolve(attachment);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  };
-
-  /**
-   * Delete an attachment of a document by its ID
-   * @param {Number} docID
-   * @param {Number} attachmentID
-   * @returns {Promise<>} A promise that resolves to nothing
-   */
-  deleteAttachment = (docID, attachmentID) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const attachment = await this.documentDAO.getAttachmentByID(attachmentID);
-
-        if (attachment == undefined) {
-          const error = { errCode: 404, errMessage: "Attachment not found." };
-          throw error;
-        } else if (attachment.docID !== docID) {
-          const error = { errCode: 409, errMessage: "Attachment not linked with the document provided." };
-          throw error;
-        }
-
-        Storage.deleteFile(attachment.path);
-        await this.documentDAO.deleteAttachmentByID(attachmentID);
-
-        resolve(null);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  };
-
-  getLinkTypes = () => getLinkTypes();
+  getLinkTypes = () => this.documentDAO.getLinkTypes();
 
   /**
    * Get all links of a documents given its ID

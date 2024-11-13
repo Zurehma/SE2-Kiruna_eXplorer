@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { body, param, oneOf, query } from "express-validator";
 import Utility from "../utils/utility.mjs";
-import Storage from "../utils/storage.mjs";
 import DocumentController from "../controllers/documentController.mjs";
 
 class DocumentRoutes {
@@ -86,8 +85,53 @@ class DocumentRoutes {
             req.body.pageTo || null
           )
           .then((document) => {
-            res.status(200).json(document);
+            res.status(201).json(document);
           })
+          .catch((err) => next(err));
+      }
+    );
+
+    this.router.put(
+      "/:docID",
+      Utility.isLoggedIn,
+      param("docID").isInt({ gt: 0 }),
+      body("title").optional().isString().notEmpty(),
+      body("stakeholder").optional().isString().notEmpty(),
+      oneOf([body("scale").optional().isString().notEmpty(), body("scale").optional().isInt({ gt: 0 })]),
+      oneOf([
+        body("issuanceDate").optional().isISO8601({ strict: true }),
+        body("issuanceDate").optional().isString().notEmpty().custom(Utility.isValidYearMonthOrYear),
+      ]),
+      body("type").optional().isString().notEmpty(),
+      body("language").optional().isString().notEmpty(),
+      body("description").optional().isString().notEmpty(),
+      body("coordinates").optional().isObject().custom(Utility.isValidCoordinatesObject),
+      body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
+      body("pageFrom").optional().isInt({ gt: 0 }),
+      body("pageTo").optional().isInt({ gt: 0 }),
+      body().custom(Utility.isBodyEmpty),
+      Utility.validateRequest,
+      (req, res, next) => {
+        this.documentController
+          .updateDocument(
+            Number(req.params.docID),
+            req.body.title || null,
+            req.body.stakeholder || null,
+            req.body.scale || null,
+            req.body.issuanceDate || null,
+            req.body.type || null,
+            req.body.language || null,
+            req.body.description || null,
+            req.body.coordinates || null,
+            req.body.hasOwnProperty("coordinates"),
+            req.body.pages || null,
+            req.body.hasOwnProperty("pages"),
+            req.body.pageFrom || null,
+            req.body.hasOwnProperty("pageFrom"),
+            req.body.pageTo || null,
+            req.body.hasOwnProperty("pageTo")
+          )
+          .then(() => res.status(204).end())
           .catch((err) => next(err));
       }
     );
@@ -106,28 +150,12 @@ class DocumentRoutes {
         .catch((err) => next(err));
     });
 
-    this.router.post("/:docID/attachments", Utility.isLoggedIn, param("docID").isInt(), Utility.validateRequest, (req, res, next) => {
+    this.router.get("/link-types", Utility.isLoggedIn, (req, res, next) => {
       this.documentController
-        .addAttachment(req, Number(req.params.docID))
-        .then((attachmentInfo) => res.status(200).json(attachmentInfo))
+        .getLinkTypes()
+        .then((linkTypes) => res.status(200).json(linkTypes))
         .catch((err) => next(err));
     });
-
-    this.router.delete(
-      "/:docID/attachments/:attachmentID",
-      Utility.isLoggedIn,
-      param("docID").isInt(),
-      param("attachmentID").isInt(),
-      Utility.validateRequest,
-      (req, res, next) => {
-        this.documentController
-          .deleteAttachment(Number(req.params.docID), Number(req.params.attachmentID))
-          .then(() => res.status(200).json())
-          .catch((err) => next(err));
-      }
-    );
-
-    this.router.get("/link-types", Utility.isLoggedIn, (req, res, next) => res.status(200).json(this.documentController.getLinkTypes()));
 
     this.router.get("/links/:id", param("id").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
       this.documentController
@@ -151,25 +179,25 @@ class DocumentRoutes {
       async (req, res, next) => {
         try {
           const { id1, ids, type } = req.body;
-    
+
           // Check if any of the provided IDs already have a link
           const existingLinks = await this.documentController.getLinks(id1);
           const existingIDs = existingLinks.map((link) => link.linkedDocID);
-    
+
           const duplicates = ids.filter((id) => existingIDs.includes(id));
           if (duplicates.length > 0) {
             return res.status(409).json({
               message: `Link already exists for ID(s): ${duplicates.join(", ")}`,
             });
           }
-    
+
           // Add links for all IDs sequentially
           const addedLinks = [];
           for (const id of ids) {
             const newLink = await this.documentController.addLink(id1, id, type);
             addedLinks.push({ id1, id2: id, type });
           }
-    
+
           // Respond with the added links
           res.status(200).json({
             message: "Links added successfully",
@@ -180,7 +208,6 @@ class DocumentRoutes {
         }
       }
     );
-    
   };
 }
 
