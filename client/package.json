@@ -11,6 +11,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@turf/turf": "^7.1.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "client": "file:",
