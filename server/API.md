@@ -214,11 +214,13 @@ Returns the list of all specific link types.
 [
   {
     "linkedDocID": 1,
-    "title": "Compilation of responses “So what the people of Kiruna think?” (15)"
+    "title": "Compilation of responses “So what the people of Kiruna think?” (15)",
+    "type": "Direct"
   },
   {
     "linkedDocID": 2,
-    "title": "Detail plan for Bolagsomradet Gruvstad-spark (18)"
+    "title": "Detail plan for Bolagsomradet Gruvstad-spark (18)",
+    "type": "Direct"
   }
 ]
 ```
