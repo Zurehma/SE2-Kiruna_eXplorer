@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
 import { getLinkTypes, isLinkType } from "../models/document.mjs";
 import Document from "../models/document.mjs";
+import Utility from "../utils/utility.mjs";
 
 class DocumentController {
   constructor() {
@@ -20,7 +21,7 @@ class DocumentController {
   };
 
   /**
-   * Add a new document with the provided information
+   * Add a new document with the provided informations
    * @param {String} title
    * @param {String} stakeholder
    * @param {String | Number} scale
@@ -34,19 +35,7 @@ class DocumentController {
    * @param {Number | null} pages
    * @returns {Promise<Document>} A promise that resolves to the newly created object
    */
-  addDocument = (
-    title,
-    stakeholder,
-    scale,
-    issuanceDate,
-    type,
-    language,
-    description,
-    coordinates = null,
-    pages = null,
-    pageFrom = null,
-    pageTo = null
-  ) => {
+  addDocument = (title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
     return new Promise(async (resolve, reject) => {
       try {
         if (dayjs().isBefore(issuanceDate)) {
@@ -54,7 +43,10 @@ class DocumentController {
           throw error;
         }
 
-        // TODO: validate kiruna coordinates
+        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
+          const error = { errCode: 400, errMessage: "Coordinates error." };
+          throw error;
+        }
 
         const result = await this.documentDAO.addDocument(
           title,
@@ -79,6 +71,26 @@ class DocumentController {
     });
   };
 
+  /**
+   * Update an existing document with the provided informations
+   * @param {Number} id
+   * @param {String || null} title
+   * @param {String || null} stakeholder
+   * @param {String || Number || null} scale
+   * @param {String || null} issuanceDate
+   * @param {String || null} type
+   * @param {String || null} language
+   * @param {String || null} description
+   * @param {Object || null} coordinates
+   * @param {Boolean} isCoordinatesPresent
+   * @param {Number || null} pages
+   * @param {Boolean} isPagesPresent
+   * @param {Number || null} pageFrom
+   * @param {Boolean} isPageFromPresent
+   * @param {Number || null} pageTo
+   * @param {Boolean} isPageToPresent
+   * @returns {Promise<null>} A promise that resolves to null
+   */
   updateDocument = (
     id,
     title,
@@ -88,21 +100,86 @@ class DocumentController {
     type,
     language,
     description,
-    coordinates = null,
-    pages = null,
-    pageFrom = null,
-    pageTo = null
+    coordinates,
+    isCoordinatesPresent,
+    pages,
+    isPagesPresent,
+    pageFrom,
+    isPageFromPresent,
+    pageTo,
+    isPageToPresent
   ) => {
-    try {
-      if (dayjs().isBefore(issuanceDate)) {
-        const error = { errCode: 400, errMessage: "Date error." };
-        throw error;
-      }
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (dayjs().isBefore(issuanceDate)) {
+          const error = { errCode: 400, errMessage: "Date error." };
+          throw error;
+        }
 
-      // TODO: validate kiruna coordinates
-    } catch (err) {
-      reject(err);
-    }
+        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
+          const error = { errCode: 400, errMessage: "Coordinates error." };
+          throw error;
+        }
+
+        const oldDocument = await this.documentDAO.getDocumentByID(id);
+
+        if (oldDocument == undefined) {
+          const error = { errCode: 404, errMessage: "Document not found." };
+          throw error;
+        }
+
+        let processedCoordinates = null;
+
+        if (isCoordinatesPresent && coordinates) {
+          processedCoordinates = JSON.stringify(coordinates);
+        } else if (oldDocument.coordinates) {
+          processedCoordinates = JSON.stringify(oldDocument.coordinates);
+        }
+
+        let processedPages = null;
+
+        if (isPagesPresent && pages) {
+          processedPages = pages;
+        } else {
+          processedPages = oldDocument.pages;
+        }
+
+        let processedPageFrom = null;
+
+        if (isPageFromPresent && pageFrom) {
+          processedPageFrom = pageFrom;
+        } else {
+          processedPageFrom = oldDocument.pageFrom;
+        }
+
+        let processedPageTo = null;
+
+        if (isPageToPresent && pageTo) {
+          processedPageTo = pageTo;
+        } else {
+          processedPageTo = oldDocument.pageTo;
+        }
+
+        await this.documentDAO.updateDocument(
+          id,
+          title || oldDocument.title,
+          stakeholder || oldDocument.stakeholder,
+          scale || oldDocument.scale,
+          issuanceDate || oldDocument.issuanceDate,
+          type || oldDocument.type,
+          language || oldDocument.language,
+          description || oldDocument.description,
+          processedCoordinates,
+          processedPages,
+          processedPageFrom,
+          processedPageTo
+        );
+
+        resolve(null);
+      } catch (err) {
+        reject(err);
+      }
+    });
   };
 
   /**
@@ -117,7 +194,11 @@ class DocumentController {
    */
   getStakeholders = () => this.documentDAO.getStakeholders();
 
-  getLinkTypes = () => getLinkTypes();
+  /**
+   * Get the list of already available link types
+   * @returns {Promise<Array<String>>} A promise that resolves to an array of strings
+   */
+  getLinkTypes = () => this.documentDAO.getLinkTypes();
 
   /**
    * Get all links of a documents given its ID

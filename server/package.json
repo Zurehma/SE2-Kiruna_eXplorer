@@ -12,6 +12,7 @@
   "author": "Stefano Fumero",
   "license": "ISC",
   "dependencies": {
+    "@turf/turf": "^7.1.0",
     "body-parser": "^2.0.1",
     "cors": "^2.8.5",
     "cypress": "^13.15.2",

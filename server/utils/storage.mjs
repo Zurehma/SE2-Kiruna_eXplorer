@@ -6,22 +6,22 @@ import fs from "fs";
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const fileType = file.mimetype.split("/")[1];
-    let destination = "./uploads";
+    let destination = path.join(".", "uploads");
 
     switch (fileType) {
       case "jpg":
       case "jpeg":
       case "png":
-        destination += "/images";
+        destination = path.join(destination, "images");
         break;
       case "pdf":
-        destination += "/documents";
+        destination = path.join(destination, "documents");
         break;
       case "mp4":
-        destination += "/videos";
+        destination = path.join(destination, "videos");
         break;
       default:
-        destination += "/others";
+        destination = path.join(destination, "others");
         break;
     }
 
