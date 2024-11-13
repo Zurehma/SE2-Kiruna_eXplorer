@@ -187,13 +187,13 @@ function Map2(props) {
                         const pos = selectedDoc.lat ? [selectedDoc.lat, selectedDoc.long] : plusButtonPosition;
                         const myKey = selectedDoc.id+renderNumber;
                         return (
-                            <Popup className='popupProp'
+                            <Popup 
                                 position={pos} 
                                 maxWidth={800}
                                 key={myKey}
                                 onClose={() => setSelectedDoc(null)} // Clear selected document when popup is closed
                             >
-                                <MyPopup doc={selectedDoc} setError={props.setError} />
+                                <MyPopup doc={selectedDoc} setError={props.setError} loggedIn={props.loggedIn} className='popupProp' />
                             </Popup>
                         );
                     })()

@@ -13,7 +13,8 @@ function MyPopup(props) {
   const [loading, setLoading] = useState(false);
   const [links, setLinks] = useState([]);
   const [showLinks, setShowLinks] = useState(false); // State to control visibility of the dropdown
-
+  const widthLastColumn = props.loggedIn ? 4 : 5;
+  const remainingWidth = 12 -3 -4 - widthLastColumn;
   // Determine the icon based on the document type
   const renderIcon = () => {
     const iconMap = {
@@ -135,14 +136,15 @@ function MyPopup(props) {
       </Col>
 
       {/* Description Column */}
-      <Col xs={12} md={4} className="position-relative">
+      <Col xs={12} md={widthLastColumn} className="position-relative">
         <p className="mt-3 small text-muted">
           <strong className="text-dark">Description:</strong> {props.doc.description}
         </p>
       </Col>
 
       {/* Edit Button Column */}
-      <Col xs={12} md={1} className="d-flex align-items-start justify-content-center">
+      {props.loggedIn && (
+      <Col xs={12} md={remainingWidth} className="d-flex align-items-start justify-content-center">
         <Button
           variant="outline-primary"
           className="shadow-sm edit-button" // Added custom class for targeted CSS
@@ -155,7 +157,7 @@ function MyPopup(props) {
         >
           <i className="bi bi-pencil-square edit-icon" style={{ fontSize: '1.25rem' }}></i>
         </Button>
-      </Col>
+      </Col>)}
     </Row>
   );
 }
