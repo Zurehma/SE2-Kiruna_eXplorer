@@ -7,8 +7,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { Map } from './Map.jsx';
 import '../styles/Documents.css';
 import 'leaflet/dist/leaflet.css';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { Polygon } from 'react-leaflet';
 import L from 'leaflet';
 import ISO6391 from 'iso-639-1';
