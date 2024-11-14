@@ -79,7 +79,7 @@ class DocumentDAO {
                 sqlConditions.push("issuanceDate between ? AND ?")
                 sqlParams.push(issuanceDateFrom, issuanceDateTo)
             }
-            if (issuanceDateFrom) {
+            if (issuanceDateFrom && !issuanceDateTo) {
                 sqlConditions.push("issuanceDate = ?")
                 sqlParams.push(issuanceDateFrom)
             }

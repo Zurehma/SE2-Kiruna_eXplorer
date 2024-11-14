@@ -247,13 +247,6 @@ class DocumentController {
           throw error;
         }
 
-        const linkType = isLinkType(type);
-
-        if (linkType === undefined) {
-          const error = { errCode: 400, errMessage: "Link type error!" };
-          throw error;
-        }
-
         const doc1 = await this.documentDAO.getDocumentByID(id1);
         const doc2 = await this.documentDAO.getDocumentByID(id2);
 
