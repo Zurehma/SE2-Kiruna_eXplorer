@@ -108,7 +108,7 @@ function MyPopup(props) {
         </div>
 
         <h6 className="fw-bold text-secondary mb-2 mt-2">Attachmets:</h6>
-
+        {!attachments && <p className="small text-muted mt-2">No attachments added yet</p>}
         <ul className="list-unstyled">
           {attachments.map((attachment) => (
             <li key={attachment.id} className="mb-2">
