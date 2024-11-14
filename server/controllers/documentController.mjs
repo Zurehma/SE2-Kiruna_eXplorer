@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
-import { getLinkTypes, isLinkType } from "../models/document.mjs";
+//import { getLinkTypes, isLinkType } from "../models/document.mjs";
 import Document from "../models/document.mjs";
 import Utility from "../utils/utility.mjs";
 
@@ -244,13 +244,6 @@ class DocumentController {
       try {
         if (id1 === id2) {
           const error = { errCode: 400, errMessage: "Document cannot be linked to itself!" };
-          throw error;
-        }
-
-        const linkType = isLinkType(type);
-
-        if (linkType === undefined) {
-          const error = { errCode: 400, errMessage: "Link type error!" };
           throw error;
         }
 
