@@ -1,70 +1,252 @@
+/* Filtering.css */
 
+/* General Container Styling */
 .sidebar-section {
-    border-right: 1px solid #ddd;
-    padding-right: 20px;
-    padding-left: 20px;
-    overflow: hidden;
+  border-right: 1px solid #ddd;
+  padding-right: 20px;
+  padding-left: 20px;
+  overflow: hidden;
+  position: fixed;
+  top: 2cm;
+  bottom: 0;
+  overflow-y: auto;
+  height: 100vh;
+  background-color: #f3f4f6; /* Slightly warmer grey for a modern look */
+}
+
+@media (min-width: 768px) {
+  .filtered-result {
+      margin-left: 27%;
+      padding-left: 15px;
+      height: 100vh;
+      padding-right: 2cm;
+      background-color: #ffffff;
   }
-  
-  .main-content {
-    padding-left: 20px;
-  }
-  
-  .filter-options {
-    margin-top: 20px;
-  }
-  
-  .content-section {
-    margin-top: 20px;
-  }
-  
+}
+
+.main-content {
+  padding-left: 20px;
+  background-color: #f7f8fa;
+}
+
+.filter-options {
+  margin-top: 20px;
+}
+
+.content-section {
+  margin-top: 20px;
+}
+
 /* Modern search bar styles */
 .search-section-modern {
-    position: relative;
-    width: 100%;
+  position: sticky;
+  top: 2cm;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.search-section-modern.scrolled {
+  transform: scale(0.8) translateX(80%); /* Make the search bar smaller and move it to the right when scrolling */
+  transition: all 0.3s ease;
 }
 
 .search-input-modern {
-    border-radius: 30px;
-    padding: 12px 50px 12px 20px;
-    border: 1px solid #ccc;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    font-size: 16px;
-    outline: none;
+  border-radius: 30px;
+  padding: 12px 50px 12px 20px;
+  border: 1px solid #d1d9e6;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  font-size: 16px;
+  outline: none;
+  color: #495057;
 }
 
 .search-input-modern:focus {
-    border-color: #007bff;
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  border-color: #007bff;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
 .icons-container {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    gap: 10px;
-    padding-bottom: 0.3cm;
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 10px;
+  padding-bottom: 0.3cm;
 }
 
 .clear-icon,
 .search-icon {
-    cursor: pointer;
-    color: #555;
-    font-size: 24px; /* Increased the font size for bigger icons */
-    transition: color 0.2s;
-}
-
-/* Ensure icons are always visible */
-.icons-container .clear-icon {
-    display: inline-block;
+  cursor: pointer;
+  color: #6c757d;
+  font-size: 24px;
+  transition: color 0.2s;
 }
 
 .clear-icon:hover,
 .search-icon:hover {
-    color: #007bff;
+  color: #007bff;
 }
 
-  
+/* Filter Card Styles */
+.filter-card {
+  border-radius: 15px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.05);
+  border: none;
+  background: #ffffff;
+}
+
+.filter-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #006d77;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* Custom Toggle for Single Date / Date Range */
+.custom-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.custom-toggle {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 30px;
+  background: #f0f0f0;
+  transition: background 0.3s ease;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.custom-toggle.active {
+  background-color: #006d77;
+}
+
+.custom-toggle.active .toggle-button {
+  transform: translateX(30px);
+  background-color: #fff;
+}
+
+.custom-toggle.active .toggle-label {
+  color: #fff;
+}
+
+.custom-toggle:hover  {
+  background-color: #006d77;
+}
+.toggle-label:hover{
+  color:#fff;
+}
+
+.custom-toggle.active:hover {
+  background-color: #006d99;
+}
+
+.toggle-label {
+  margin-left: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.filter-label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #006d77;
+}
+
+/* Document Cards */
+.documents-list {
+  margin-top: 20px;
+}
+
+.document-card {
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  cursor: pointer;
+  background-color: #ffffff;
+}
+
+.document-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.document-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.document-meta {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Button & Spinner Styling */
+.spinner-border {
+  color: #006d77;
+}
+
+/* General Styling Improvements */
+body {
+  background-color: #f5f5f5; /* Light grey background to reduce the stark white contrast */
+  font-family: 'Roboto', sans-serif; /* Modern font for better readability */
+}
+
+/* Filter Dropdown Input Enhancements */
+.filter-input {
+  border-radius: 15px;
+  border: 1px solid #d1d9e6;
+  padding: 10px;
+  transition: border 0.3s;
+  color: #495057;
+}
+
+.filter-input:focus {
+  border-color: #006d77;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Date Picker Customization */
+.date-picker-input {
+  border-radius: 15px;
+  border: 1px solid #d1d9e6;
+  padding: 10px;
+  transition: border 0.3s;
+}
+
+.date-picker-input:focus {
+  border-color: #006d77;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Card Styling for Responsiveness */
+@media (max-width: 767px) {
+  .filter-card {
+    margin-bottom: 20px;
+  }
+
+  .filtered-result {
+    margin-left: 0;
+    padding-left: 0;
+  }
+
+  .sidebar-section {
+    position: relative;
+    border-right: none;
+  }
+}
+

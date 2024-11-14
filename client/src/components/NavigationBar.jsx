@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Navbar, Nav, Dropdown, Button } from 'react-bootstrap';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Navbar.css';
 
 export function NavigationBar(props) {
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -23,7 +24,7 @@ export function NavigationBar(props) {
   };
 
   return (
-    <Navbar variant="dark" expand="lg" className="custom-navbar">
+    <Navbar variant="dark" expand="lg" className="custom-navbar" expanded={open}>
       <Navbar.Brand as={Link} to="/" onClick={handleClose}>
         Kiruna
       </Navbar.Brand>
@@ -79,15 +80,17 @@ export function NavigationBar(props) {
                 </Button>
               ) : (
                 <>
-                  <Button
-                    variant="outline-light"
-                    className="ms-3 custom-documents-button"
-                    id="view-documents-button"
-                    onClick={handleViewDocumentsClick}
-                  >
-                    <i className="bi bi-collection me-2"></i>
-                    {isViewingDocuments ? 'Home' : 'View All Documents'}
-                  </Button>
+                  {props.isLoggedIn && ( // Conditionally render if logged in
+                    <Button
+                      variant="outline-light"
+                      className="ms-3 custom-documents-button"
+                      id="view-documents-button"
+                      onClick={handleViewDocumentsClick}
+                    >
+                      <i className="bi bi-collection me-2"></i>
+                      {isViewingDocuments ? 'Home' : 'View All Documents'}
+                    </Button>
+                  )}
                   <Button
                     variant="outline-light"
                     className="ms-3 custom-login-button"

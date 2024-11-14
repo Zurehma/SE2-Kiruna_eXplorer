@@ -134,45 +134,29 @@ Add a new document with the provided information.
   - It should return a 400 error when `issuanceDate` is after the current date.
   - It should return a 400 error when `coordinates` is located in a different place than Kiruna.
 
-#### POST `api/documents/:docID/attachments`
+#### PUT `api/documents/:docID`
 
-- Request Parameters:
-  - `docID`: a number that represent the ID of the document.
-- Request Header Content Type: One of the following choices:
-  - `application/pdf`.
-  - `image/jpg`.
-  - `image/png`.
-  - `video/mp4`.
-- Request Body Content: The file associated with the request.
-- Response Body Content: The newly created **Attachment info** object.
-- Example:
+Update an existing document with the provided information.
 
-  ```json
-  {
-    "id": 1,
-    "docID": 1,
-    "name": "filename.pdf",
-    "path": "uploads/documents/randomfilename.pdf",
-    "format": "application/pdf"
-  }
-  ```
-
-- Access Constraints: Can only be called by a logged in user.
-- Additional Contraints:
-  - It should return a 400 error when the file mimetype does not match any of the supported mimetypes.
-  - It should return a 400 error when the file size exceed supported limits.
-
-#### DELETE `api/documents/:docID/attachments/:attachmentID`
-
-- Request Parameters:
-  - `docID`: a number that represent the ID of the document.
-  - `attachmentID`: a number that represent the ID of the attachment.
-- Request Body Content: _None_
+- Request Parameters: _None_
+- Request Body Content: An object with at least one of the following parameters:
+  - `title`: a string that must not be empty.
+  - `stakeholder`: a string that must not be empty.
+  - `scale`: an string value between: [`Blueprint/effects`, `Text`, `1:n`]. If the user choose `1:n`, it has to send only the value **n** in integer format. It represent the relationship between the dimensions drawn on a plan or architectural drawing and the actual dimensions of the building.
+  - `issuanceDate`: a string that represent the date. It must be in the format _YYYY-MM-DD_.
+  - `type`: a string that represent the type. Can be a value between: [`Informative`, `Prescriptive`, `Material`, `Design`, `Technical`].
+  - `language`: a string that must not be empty.
+  - `description`: a string that must not be empty. It represent a brief description of the document.
+  - `coordinates`: an object that must have only two properties: `lat` and `long` that must be valid latitude and longitude values.
+  - `pages`: an integer that must be greater than 0. If `pageFrom` or `pageTo` are present, this parameter should not be present.
+  - `pageFrom`: an integer that must be greater than 0. It need `pageTo` to be present.
+  - `pageTo`: an integer that must be greater than 0. It need `pageFrom` to be present.
 - Response Body Content: _None_
+
 - Access Constraints: Can only be called by a logged in user.
 - Additional Constraints:
-  - It should return a 404 error when the attachment does not exist.
-  - It should return a 409 error when the attachment is not linked with the document provided.
+  - It should return a 400 error when `issuanceDate` is after the current date.
+  - It should return a 400 error when `coordinates` is located in a different place than Kiruna.
 
 #### GET `api/documents/link-types`
 
@@ -204,6 +188,7 @@ Returns the list of all specific link types.
 - Additional Constraints: _None_
 
 #### GET `api/documents/links:id`
+
 - Request Parameters:
   - `id`: ID of the document for which the links are being requested
 - Request Body Content: _None_
@@ -214,18 +199,19 @@ Returns the list of all specific link types.
 [
   {
     "linkedDocID": 1,
-    "title": "Compilation of responses “So what the people of Kiruna think?” (15)"
+    "title": "Compilation of responses “So what the people of Kiruna think?” (15)",
+    "type": "Direct"
   },
   {
     "linkedDocID": 2,
-    "title": "Detail plan for Bolagsomradet Gruvstad-spark (18)"
+    "title": "Detail plan for Bolagsomradet Gruvstad-spark (18)",
+    "type": "Direct"
   }
 ]
 ```
 
 - Access Constraints: _None_
 - Additional Constraints: _None_
-
 
 #### POST `api/documents/link`
 
@@ -251,7 +237,7 @@ Returns the list of all specific link types.
         "id2": 2,
         "type": "Direct"
       }
-  ]
+    ]
   }
   ```
 - Access Constraints: Can only be called by a logged in user whose role is Urban Planner.
@@ -259,6 +245,93 @@ Returns the list of all specific link types.
   - It should return a `404` error when document ID does not exist
   - It should return a `409` error when the link already exists
   - It should return a `422` error if the link type is invalid
+
+### Attachment APIs
+
+#### GET `api/documents/:docID/attachments`
+
+Get all the attachment info objects of the document.
+
+- Request Parameters:
+  - `docID`: a number that represent the ID of the document.
+- Request Body Content: _None_
+- Response Body Content: An array of **Attachment info** objects:
+- Example:
+
+  ```json
+  [
+    {
+      "id": 1,
+      "docID": 1,
+      "name": "filename.pdf",
+      "path": "uploads/documents/randomfilename.pdf",
+      "format": "application/pdf"
+    },
+    ...
+  ]
+  ```
+
+- Access Constraints: Can only be called by a logged in user.
+- Additional Constraints:
+  - It should return a 404 error when the attachment does not exist.
+
+#### POST `api/documents/:docID/attachments`
+
+Add a new attachment to a document.
+
+- Request Parameters:
+  - `docID`: a number that represent the ID of the document.
+- Request Header Content Type: One of the following choices:
+  - `application/pdf`.
+  - `image/jpg`.
+  - `image/png`.
+  - `video/mp4`.
+- Request Body Content: The file associated with the request.
+- Response Body Content: The newly created **Attachment info** object.
+- Example:
+
+  ```json
+  {
+    "id": 1,
+    "docID": 1,
+    "name": "filename.pdf",
+    "path": "uploads/documents/randomfilename.pdf",
+    "format": "application/pdf"
+  }
+  ```
+
+- Access Constraints: Can only be called by a logged in user.
+- Additional Contraints:
+  - It should return a 400 error when the file mimetype does not match any of the supported mimetypes.
+  - It should return a 400 error when the file size exceed supported limits.
+
+#### DELETE `api/documents/:docID/attachments/:attachmentID`
+
+Delete an existing attachment to a document.
+
+- Request Parameters:
+  - `docID`: a number that represent the ID of the document.
+  - `attachmentID`: a number that represent the ID of the attachment.
+- Request Body Content: _None_
+- Response Body Content: _None_
+- Access Constraints: Can only be called by a logged in user.
+- Additional Constraints:
+  - It should return a 400 error when the attachment is not linked with the document provided.
+  - It should return a 404 error when the attachment does not exist.
+
+#### GET `api/documents/:docID/attachments/:attachmentID/download`
+
+Start the download of a specific attachment.
+
+- Request Parameters:
+  - `docID`: a number that represent the ID of the document.
+  - `attachmentID`: a number that represent the ID of the attachment.
+- Request Body Content: _None_
+- Response Body Content: _None_
+- Access Constraints: Can only be called by a logged in user.
+- Additional Constraints:
+  - It should return a 400 error when the attachment is not linked with the document provided.
+  - It should return a 404 error when the attachment does not exist.
 
 ## Database Tables
 
