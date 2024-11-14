@@ -97,31 +97,38 @@ function MyPopup(props) {
         className="myPopup mt-1"
         style={{
           display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
+          flexDirection: 'column',  // Disposizione verticale per gli altri elementi
+          alignItems: 'flex-start',  // Allineamento a sinistra per la lista
           paddingTop: '0.5rem',
         }}
-        >
-        {renderIcon()}
-        <h6 className="fw-bold text-secondary mb-2">Files: </h6>
+      >
+        {/* Icona centrata orizzontalmente */}
+        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          {renderIcon()}
+        </div>
+
+        <h6 className="fw-bold text-secondary mb-2 mt-2">Attachmets:</h6>
+
         <ul className="list-unstyled">
           {attachments.map((attachment) => (
-            <li key={attachment.id}>
+            <li key={attachment.id} className="mb-2">
               <a
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
                   handleDownload(props.doc.id, attachment.id);
                 }}
-                className="text-decoration-none"
+                className="text-decoration-none d-flex align-items-center ms-2"
               >
-                <i className="bi bi-file-earmark-arrow-down me-2"></i>
+                <i className="bi bi-file-earmark-arrow-down me-1"></i>
                 {attachment.name}
               </a>
             </li>
           ))}
         </ul>
       </Col>
+
+
 
       {/* Details Column */}
       <Col xs={12} md={4} className="myPopup">

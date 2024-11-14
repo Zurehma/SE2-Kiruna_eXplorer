@@ -144,10 +144,34 @@ const getAttachments = async (docID) => {
  * Function to download an attachment given its ID.
  */
 const downloadAttachment = async (docID, attachmentID) => {
-    return await fetch(`${SERVER_URL}/documents/${docID}/attachments/${attachmentID}/download`, {
-        method: 'GET',
-    }).then(handleInvalidResponse).then(response => response.blob());
+    try {
+        // EFetch request to the server
+        const response = await fetch(`${SERVER_URL}/documents/${docID}/attachments/${attachmentID}/download`, {
+            method: 'GET',
+        });
+
+        // 200 if the response is correct
+        if (!response.ok) {
+            throw new Error(`Failed to fetch file. Status: ${response.statusText}`);
+        }
+
+        
+
+        // Blob file gotten from the response
+        const blob = await response.blob();
+        if (!blob || blob.size === 0) {
+            throw new Error("The file is empty or invalid.");
+        }
+
+        // Return the blob object
+        return blob;
+    } catch (error) {
+        console.error("Download failed:", error);
+        throw error;  // Propagate the error to the caller
+    }
 };
+
+
 
 const setLink = async (linkData) => {
     try {
