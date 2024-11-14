@@ -319,6 +319,20 @@ Delete an existing attachment to a document.
   - It should return a 400 error when the attachment is not linked with the document provided.
   - It should return a 404 error when the attachment does not exist.
 
+#### GET `api/documents/:docID/attachments/:attachmentID/download`
+
+Start the download of a specific attachment.
+
+- Request Parameters:
+  - `docID`: a number that represent the ID of the document.
+  - `attachmentID`: a number that represent the ID of the attachment.
+- Request Body Content: _None_
+- Response Body Content: _None_
+- Access Constraints: Can only be called by a logged in user.
+- Additional Constraints:
+  - It should return a 400 error when the attachment is not linked with the document provided.
+  - It should return a 404 error when the attachment does not exist.
+
 ## Database Tables
 
 ### Table `User`

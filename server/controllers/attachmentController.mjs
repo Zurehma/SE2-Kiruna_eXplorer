@@ -62,6 +62,32 @@ class AttachmentController {
   };
 
   /**
+   * Get one attachment associated with the document
+   * @param {Number} docID
+   * @param {Number} attachmentID
+   * @returns {Promise<AttachmentInfo>} A promise that resolves to an attachment info object
+   */
+  getAttachment = (docID, attachmentID) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const attachment = await this.attachmentDAO.getAttachmentByID(attachmentID);
+
+        if (attachment == undefined) {
+          const error = { errCode: 404, errMessage: "Attachment not found." };
+          throw error;
+        } else if (attachment.docID !== docID) {
+          const error = { errCode: 400, errMessage: "Attachment not linked with the document provided." };
+          throw error;
+        }
+
+        resolve(attachment);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
+  /**
    * Delete an attachment of a document by its ID
    * @param {Number} docID
    * @param {Number} attachmentID
