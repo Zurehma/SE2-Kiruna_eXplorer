@@ -79,7 +79,7 @@ class DocumentDAO {
                 sqlConditions.push("issuanceDate between ? AND ?")
                 sqlParams.push(issuanceDateFrom, issuanceDateTo)
             }
-            if (issuanceDateFrom) {
+            if (issuanceDateFrom && !issuanceDateTo) {
                 sqlConditions.push("issuanceDate = ?")
                 sqlParams.push(issuanceDateFrom)
             }
@@ -110,7 +110,7 @@ class DocumentDAO {
    */
   getDocumentTypes = () => {
     return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM DOCUMENT_TYPE";
+      const query = "SELECT * FROM DOCUMENT_TYPE ORDER BY name ASC";
 
       db.all(query, [], (err, rows) => {
         if (err) {
@@ -128,7 +128,25 @@ class DocumentDAO {
    */
   getStakeholders = () => {
     return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM STAKEHOLDER";
+      const query = "SELECT * FROM STAKEHOLDER ORDER BY name ASC";
+
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  };
+
+  /**
+   * Get already present link types
+   * @returns {Promise<String>} A promise that resolves to an array of strings
+   */
+  getLinkTypes = () => {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM LINK_TYPE ORDER BY name ASC";
 
       db.all(query, [], (err, rows) => {
         if (err) {
