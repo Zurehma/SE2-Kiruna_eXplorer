@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body, param, oneOf } from "express-validator";
+import { body, param, oneOf, query } from "express-validator";
 import Utility from "../utils/utility.mjs";
 import DocumentController from "../controllers/documentController.mjs";
 
@@ -18,6 +18,27 @@ class DocumentRoutes {
         .then((documents) => res.status(200).json(documents))
         .catch((err) => next(err));
     });
+
+    this.router.get(
+      "/filter/by",
+      [
+        query("type").optional().isString().withMessage("Type must be a string"),
+        query("stakeholder").optional().isString().withMessage("Stakeholder must be a string"),
+        query("issuanceDateFrom").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
+        query("issuanceDateTo").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
+      ],
+      Utility.validateRequest,
+      (req, res, next) => {
+        this.documentController
+          .filterDocuments(req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo)
+          .then((document) => {
+            res.status(200).json(document);
+          })
+          .catch((err) => {
+            next(err);
+          });
+      }
+    );
 
     this.router.post(
       "/",
@@ -55,6 +76,38 @@ class DocumentRoutes {
           .catch((err) => next(err));
       }
     );
+
+    this.router.get("/document-types", Utility.isLoggedIn, (req, res, next) => {
+      this.documentController
+        .getDocumentTypes()
+        .then((documentTypes) => res.status(200).json(documentTypes))
+        .catch((err) => next(err));
+    });
+
+    this.router.get("/stakeholders", Utility.isLoggedIn, (req, res, next) => {
+      this.documentController
+        .getStakeholders()
+        .then((stakeholders) => res.status(200).json(stakeholders))
+        .catch((err) => next(err));
+    });
+
+    this.router.get("/link-types", Utility.isLoggedIn, (req, res, next) => {
+      this.documentController
+        .getLinkTypes()
+        .then((linkTypes) => res.status(200).json(linkTypes))
+        .catch((err) => next(err));
+    });
+
+    this.router.get("/:id", param("id").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
+      this.documentController
+        .getDocumentById(req.params.id)
+        .then((document) => {
+          res.status(200).json(document);
+        })
+        .catch((err) => {
+          next(err);
+        });
+    });
 
     this.router.put(
       "/:docID",
@@ -100,27 +153,6 @@ class DocumentRoutes {
           .catch((err) => next(err));
       }
     );
-
-    this.router.get("/document-types", Utility.isLoggedIn, (req, res, next) => {
-      this.documentController
-        .getDocumentTypes()
-        .then((documentTypes) => res.status(200).json(documentTypes))
-        .catch((err) => next(err));
-    });
-
-    this.router.get("/stakeholders", Utility.isLoggedIn, (req, res, next) => {
-      this.documentController
-        .getStakeholders()
-        .then((stakeholders) => res.status(200).json(stakeholders))
-        .catch((err) => next(err));
-    });
-
-    this.router.get("/link-types", Utility.isLoggedIn, (req, res, next) => {
-      this.documentController
-        .getLinkTypes()
-        .then((linkTypes) => res.status(200).json(linkTypes))
-        .catch((err) => next(err));
-    });
 
     this.router.get("/links/:id", param("id").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
       this.documentController

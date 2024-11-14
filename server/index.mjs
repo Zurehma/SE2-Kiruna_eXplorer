@@ -15,9 +15,9 @@ import AuthRoutes from "./routes/authRoutes.mjs";
 const app = express();
 const port = 3001;
 const baseURL = "/api";
-const ORIGIN_SOURCE = process?.env?.NODE_ENV?.trim() === "production" ? "http://localhost:3000" : "http://localhost:5173";
+const allowedOrigins = ["http://localhost:3000", "http://localhost:5173"];
 const corsOptions = {
-  origin: ORIGIN_SOURCE,
+  origin: allowedOrigins,
   optionsSuccessStatus: 200,
   preflightContinue: false,
   credentials: true,

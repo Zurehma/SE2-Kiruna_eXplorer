@@ -58,13 +58,59 @@ class DocumentDAO {
     });
   };
 
+  filterDocuments = (queryParameter) => {
+    return new Promise((resolve, reject) => {
+      try{
+        let {type, stakeholder, issuanceDateFrom, issuanceDateTo} = queryParameter;
+        let sql = "SELECT * FROM DOCUMENT";
+        let sqlConditions = [];
+        let sqlParams = [];
+
+        if (type || stakeholder || issuanceDateFrom || issuanceDateTo) {
+            if (type) {
+                sqlConditions.push("type = ?")
+                sqlParams.push(type)
+            }
+            if (stakeholder) {
+                sqlConditions.push("stakeholder = ?")
+                sqlParams.push(stakeholder)
+            }
+            if (issuanceDateFrom && issuanceDateTo) {
+                sqlConditions.push("issuanceDate between ? AND ?")
+                sqlParams.push(issuanceDateFrom, issuanceDateTo)
+            }
+            if (issuanceDateFrom && !issuanceDateTo) {
+                sqlConditions.push("issuanceDate = ?")
+                sqlParams.push(issuanceDateFrom)
+            }
+        }
+
+        if (sqlConditions.length > 0) {
+            sql += " WHERE " + sqlConditions.join(" AND ")
+        }
+
+        db.all(sql, sqlParams, (err, rows) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(mapRowsToDocument(rows));
+        });
+      }
+      catch(err){
+        reject(err);
+      }
+    });
+  }
+
+
+
   /**
    * Get already present document types
    * @returns {Promise<String>} A promise that resolves to an array of strings
    */
   getDocumentTypes = () => {
     return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM DOCUMENT_TYPE";
+      const query = "SELECT * FROM DOCUMENT_TYPE ORDER BY name ASC";
 
       db.all(query, [], (err, rows) => {
         if (err) {
@@ -82,7 +128,25 @@ class DocumentDAO {
    */
   getStakeholders = () => {
     return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM STAKEHOLDER";
+      const query = "SELECT * FROM STAKEHOLDER ORDER BY name ASC";
+
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  };
+
+  /**
+   * Get already present link types
+   * @returns {Promise<String>} A promise that resolves to an array of strings
+   */
+  getLinkTypes = () => {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM LINK_TYPE ORDER BY name ASC";
 
       db.all(query, [], (err, rows) => {
         if (err) {

@@ -271,7 +271,9 @@ describe("DocumentDAO", () => {
     });
 
     test("Link already exists in same order", async () => {
-      const error = { errCode: 409, errMessage: "Link already exists" };
+      const docID1 = 1;
+      const docID2 = 2;
+      const error = { errCode: 409, errMessage:`Link already exists for ${docID1} and ${docID2}` };
       const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
         callback(null, [{ docID1: 1, docID2: 2 }]);
       });
@@ -283,7 +285,9 @@ describe("DocumentDAO", () => {
     });
 
     test("Link already exists in reverse order", async () => {
-      const error = { errCode: 409, errMessage: "Link already exists" };
+      const docID1 = 1;
+      const docID2 = 2;
+      const error = { errCode: 409, errMessage:`Link already exists for ${docID1} and ${docID2}` };
       const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
         callback(null, [{ docID1: 2, docID2: 1 }]);
       });
