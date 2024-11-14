@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body, param, oneOf } from "express-validator";
+import { body, param, oneOf, query } from "express-validator";
 import Utility from "../utils/utility.mjs";
 import DocumentController from "../controllers/documentController.mjs";
 
@@ -17,6 +17,41 @@ class DocumentRoutes {
         .getDocuments()
         .then((documents) => res.status(200).json(documents))
         .catch((err) => next(err));
+    });
+
+    
+    this.router.get("/:id", param("id").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
+      this.documentController
+        .getDocumentById(req.params.id)
+        .then((document) => {
+          res.status(200).json(document);
+        })
+        .catch((err) => {
+          next(err);
+        });
+    });
+
+    this.router.get("/filter/by", [ 
+      query("type").optional().isString().withMessage("Type must be a string"),
+      query("stakeholder").optional().isString().withMessage("Stakeholder must be a string"),
+      query("issuanceDateFrom").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
+      query("issuanceDateTo").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
+    ],
+      Utility.validateRequest,
+      (req, res, next) => {
+      this.documentController
+        .filterDocuments(
+          req.query.type,
+          req.query.stakeholder,
+          req.query.issuanceDateFrom,
+          req.query.issuanceDateTo,
+        )
+        .then((document) => {
+          res.status(200).json(document);
+        })
+        .catch((err) => {
+          next(err);
+        });
     });
 
     this.router.post(
