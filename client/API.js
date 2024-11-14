@@ -132,6 +132,19 @@ const saveDocument = async (doc) => {
     }
 };
 
+//GET api/documents/:docID/attachments
+const getAttachments = async (docID) => {
+    return await fetch(`${SERVER_URL}/documents/${docID}/attachments`, {
+        method: 'GET',
+    }).then(handleInvalidResponse).then(response => response.json());
+};
+
+//GET api/documents/:docID/attachments/:attachmentID/download
+const downloadAttachment = async (docID, attachmentID) => {
+    return await fetch(`${SERVER_URL}/documents/${docID}/attachments/${attachmentID}/download`, {
+        method: 'GET',
+    }).then(handleInvalidResponse).then(response => response.blob());
+};
 
 const setLink = async (linkData) => {
     try {
@@ -200,7 +213,9 @@ const API = {
     setLink,
     getUserInfo,
     uploadFiles,
-    getLinksDoc
+    getLinksDoc,
+    getAttachments,
+    downloadAttachment
 };
   
 
