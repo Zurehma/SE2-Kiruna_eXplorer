@@ -19,6 +19,7 @@ const FilteringDocuments = () => {
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
 
+
   // Lists fetched from the backend
   const [stakeholdersList, setStakeholdersList] = useState([]);
   const [documentTypesList, setDocumentTypesList] = useState([]);
