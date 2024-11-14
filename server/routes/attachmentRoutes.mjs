@@ -13,7 +13,7 @@ class AttachmentRoutes {
   getRouter = () => this.router;
 
   initRoutes = () => {
-    this.router.get("/:docID/attachments", Utility.isLoggedIn, param("docID").isInt(), Utility.validateRequest, (req, res, next) => {
+    this.router.get("/:docID/attachments", param("docID").isInt(), Utility.validateRequest, (req, res, next) => {
       this.attachmentController
         .getAttachments(Number(req.params.docID))
         .then((attachments) => res.status(200).json(attachments))
@@ -43,7 +43,6 @@ class AttachmentRoutes {
 
     this.router.get(
       "/:docID/attachments/:attachmentID/download",
-      Utility.isLoggedIn,
       param("docID").isInt(),
       param("attachmentID").isInt(),
       Utility.validateRequest,
