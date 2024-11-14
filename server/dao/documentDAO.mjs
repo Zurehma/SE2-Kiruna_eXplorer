@@ -146,7 +146,7 @@ class DocumentDAO {
    */
   getLinkTypes = () => {
     return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM LINK_TYPE";
+      const query = "SELECT * FROM LINK_TYPE ORDER BY name ASC";
 
       db.all(query, [], (err, rows) => {
         if (err) {
