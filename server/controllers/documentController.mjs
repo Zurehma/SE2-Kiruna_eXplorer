@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
-import { getLinkTypes, isLinkType } from "../models/document.mjs";
+//import { getLinkTypes, isLinkType } from "../models/document.mjs";
 import Document from "../models/document.mjs";
 import Utility from "../utils/utility.mjs";
 
