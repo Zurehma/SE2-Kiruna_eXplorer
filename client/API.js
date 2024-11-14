@@ -19,8 +19,6 @@ const getDocuments = async () => {
         .then(response => response.json());
 };
 
-
- 
 //Upload files
 const uploadFiles = async (docID, formData) => {
     try {
@@ -132,14 +130,19 @@ const saveDocument = async (doc) => {
     }
 };
 
-//GET api/documents/:docID/attachments
+
+/** 
+ * Function to get the attachments of a document given its ID. 
+ */
 const getAttachments = async (docID) => {
     return await fetch(`${SERVER_URL}/documents/${docID}/attachments`, {
         method: 'GET',
     }).then(handleInvalidResponse).then(response => response.json());
 };
 
-//GET api/documents/:docID/attachments/:attachmentID/download
+/** 
+ * Function to download an attachment given its ID.
+ */
 const downloadAttachment = async (docID, attachmentID) => {
     return await fetch(`${SERVER_URL}/documents/${docID}/attachments/${attachmentID}/download`, {
         method: 'GET',
@@ -166,8 +169,10 @@ const setLink = async (linkData) => {
 };
 
 
-
-  const logIn = async (credentials) => {
+/** 
+ * This function logs in a user given the credentials.
+ */
+const logIn = async (credentials) => {
     try {
         const response = await fetch(SERVER_URL + '/sessions/login', {
             method: 'POST',
@@ -183,21 +188,25 @@ const setLink = async (linkData) => {
     }
 };
 
-  /**
-  * This function destroy the current user's session (executing the log-out).
-  */
-  const logOut = async() => {
+/**
+ * This function destroy the current user's session (executing the log-out).
+*/
+const logOut = async() => {
     return await fetch(SERVER_URL + '/sessions/logout', {
       method: 'DELETE',
       credentials: 'include'
     }).then(handleInvalidResponse);
-  }
-  const getUserInfo = async () => {
+}
+
+/**
+ * This function retrieves the information of the currently logged-in user.
+ */
+const getUserInfo = async () => {
     return await fetch(SERVER_URL + '/sessions/current', {
         credentials: 'include'
     }).then(handleInvalidResponse)
     .then(response => response.json());
-  };
+};
 
 
 
