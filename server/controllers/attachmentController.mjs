@@ -11,6 +11,30 @@ class AttachmentController {
   }
 
   /**
+   * Get all the attachments associated with the document
+   * @param {Number} docID
+   * @returns {Promise<Array<AttachmentInfo>>} A promise that resolves to an array of attachment info objects
+   */
+  getAttachments = (docID) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const document = await this.documentDAO.getDocumentByID(docID);
+
+        if (document == undefined) {
+          const error = { errCode: 404, errMessage: "Document not found." };
+          throw error;
+        }
+
+        const attachment = await this.attachmentDAO.getAttachmentsByDocumentID(docID);
+
+        resolve(attachment);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
+  /**
    * Add a new attachment to an existing document
    * @param {*} req
    * @param {Number} docID
@@ -52,7 +76,7 @@ class AttachmentController {
           const error = { errCode: 404, errMessage: "Attachment not found." };
           throw error;
         } else if (attachment.docID !== docID) {
-          const error = { errCode: 409, errMessage: "Attachment not linked with the document provided." };
+          const error = { errCode: 400, errMessage: "Attachment not linked with the document provided." };
           throw error;
         }
 

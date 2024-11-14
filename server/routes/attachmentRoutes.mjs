@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body, param, oneOf } from "express-validator";
+import { param } from "express-validator";
 import Utility from "../utils/utility.mjs";
 import AttachmentController from "../controllers/attachmentController.mjs";
 
@@ -12,7 +12,14 @@ class AttachmentRoutes {
   getRouter = () => this.router;
 
   initRoutes = () => {
-    this.router.post("/:docID/attachments/", Utility.isLoggedIn, param("docID").isInt(), Utility.validateRequest, (req, res, next) => {
+    this.router.get("/:docID/attachments", Utility.isLoggedIn, param("docID").isInt(), Utility.validateRequest, (req, res, next) => {
+      this.attachmentController
+        .getAttachments(Number(req.params.docID))
+        .then((attachments) => res.status(200).json(attachments))
+        .catch((err) => next(err));
+    });
+
+    this.router.post("/:docID/attachments", Utility.isLoggedIn, param("docID").isInt(), Utility.validateRequest, (req, res, next) => {
       this.attachmentController
         .addAttachment(req, Number(req.params.docID))
         .then((attachmentInfo) => res.status(201).json(attachmentInfo))
