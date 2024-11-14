@@ -110,7 +110,7 @@ class DocumentDAO {
    */
   getDocumentTypes = () => {
     return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM DOCUMENT_TYPE";
+      const query = "SELECT * FROM DOCUMENT_TYPE ORDER BY name ASC";
 
       db.all(query, [], (err, rows) => {
         if (err) {
@@ -128,7 +128,7 @@ class DocumentDAO {
    */
   getStakeholders = () => {
     return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM STAKEHOLDER";
+      const query = "SELECT * FROM STAKEHOLDER ORDER BY name ASC";
 
       db.all(query, [], (err, rows) => {
         if (err) {
