@@ -34,7 +34,7 @@ const FilteringDocuments = (props) => {
         API.getStakeholders(),
         API.getDocumentTypes(),
       ]);
-      setStakeholdersList(stakeholders);
+      setStakeholdersList(stakeholders);      
       setDocumentTypesList(documentTypes);
     } catch (error) {
       console.error('Error fetching stakeholders or document types:', error);
@@ -51,10 +51,15 @@ const FilteringDocuments = (props) => {
       issuanceDateFrom: isSingleDate ? formatDate(selectedDate) : formatDate(startDate),
       issuanceDateTo: isSingleDate ? formatDate(selectedDate) : formatDate(endDate),
     };
-
+  
+    console.log(filters);
+    
     const filteredParams = Object.fromEntries(
       Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
     );
+
+    console.log(filteredParams);
+    
 
     try {
       const response = await API.filterDocuments(filteredParams);
@@ -134,7 +139,7 @@ const FilteringDocuments = (props) => {
                     >
                       <option value="">All Stakeholders</option>
                       {stakeholdersList.map((stakeholderItem, index) => (
-                        <option key={index} value={index}>
+                        <option key={index} value={stakeholderItem.name}>
                           {stakeholderItem.name}
                         </option>
                       ))}
@@ -152,7 +157,7 @@ const FilteringDocuments = (props) => {
                     >
                       <option value="">All Document Types</option>
                       {documentTypesList.map((typeItem, index) => (
-                        <option key={index} value={index}>
+                        <option key={index} value={typeItem.name}>
                           {typeItem.name}
                         </option>
                       ))}
@@ -255,7 +260,7 @@ const FilteringDocuments = (props) => {
                        
                   <option value="">All Stakeholders</option>
                   {stakeholdersList.map((stakeholderItem,index) => (
-                    <option key={index} value={index}>
+                    <option key={index} value={stakeholderItem.name}>
                       {stakeholderItem.name}
                     </option>
                   ))}
@@ -273,7 +278,7 @@ const FilteringDocuments = (props) => {
                 >
                   <option value="">All Document Types</option>
                   {documentTypesList.map((typeItem,index) => (
-                    <option key={index} value={index}>
+                    <option key={index} value={typeItem.name}>
                       {typeItem.name}
                     </option>
                   ))}
