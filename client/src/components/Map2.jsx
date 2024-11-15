@@ -83,8 +83,10 @@ function Map2(props) {
         setLoading(true);
         const fetchTypes = async () =>{
             try{
-                const data = await API.getDocumentTypes();
-                setTypeDoc(data);                
+                if(props.loggedIn){
+                    const data = await API.getDocumentTypes();
+                    setTypeDoc(data);
+                }                 
             }
             catch(error){
                 props.setError(error);
