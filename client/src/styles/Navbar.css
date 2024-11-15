@@ -90,6 +90,15 @@
   border-style: hidden;
 }
 
+.home-button {
+  background-color: #ffffff !important;
+  color: #006d77 !important;
+  border-style: hidden;
+}
+.home-button:hover,
+.home-login-button:focus {
+  border-color: #005c66 !important;
+}
 .custom-login-button:hover,
 .custom-login-button:focus {
   border-color: #005c66 !important;

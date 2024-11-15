@@ -95,7 +95,7 @@ export function NavigationBar(props) {
                         !props.isLoggedIn && location.pathname === '/map' && (
                           <Button
                             variant="outline-light"
-                            className="ms-3"
+                            className="ms-3 home-button"
                             onClick={() => { navigate('/'); handleClose(); }}
                           >
                             <i className="bi bi-house-door me-2"></i> Home
