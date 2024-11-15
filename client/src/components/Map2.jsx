@@ -232,7 +232,7 @@ function Map2(props) {
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu style={{ backgroundColor: 'white' }}>
-                        <Dropdown.Header>Filter by document types</Dropdown.Header>
+                        <Dropdown.Header>Filter by document type</Dropdown.Header>
                         <Dropdown.Item eventKey="All">All</Dropdown.Item>
                         {typeDoc.map((type, index) => (
                             <Dropdown.Item key={index} eventKey={type.name}>{type.name}</Dropdown.Item>
