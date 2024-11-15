@@ -9,6 +9,7 @@ import '../App.css';
 import { MyPopup } from './MyPopup';
 import API from '../../API';
 import { ShowDocuments } from './showDocuments';
+import { Dropdown } from 'react-bootstrap';
 
 // Icon mapping based on document type
 const iconMap = {
@@ -60,6 +61,8 @@ function Map2(props) {
     const [zoomLevel, setZoomLevel] = useState(11);
     const [selectedDoc, setSelectedDoc] = useState(null); // To manage the selected document for showing MyPopup
     const [renderNumber,setRenderNumeber] = useState(0);
+    const [typeDoc,setTypeDoc] = useState([]);
+    const [selectedType, setSelectedType] = useState('All'); // New state for selected type
     // Coordinate per il poligono (angoli specificati)
     const polygonCoordinates = [
         [67.87328157366065, 20.20047943270466],
@@ -76,12 +79,31 @@ function Map2(props) {
         polygonCoordinates[0] // Coordinate del vertice superiore del triangolo
     ];
 
+    useEffect(()=>{
+        setLoading(true);
+        const fetchTypes = async () =>{
+            try{
+                const data = await API.getDocumentTypes();
+                setTypeDoc(data);                
+            }
+            catch(error){
+                props.setError(error);
+            }finally{
+                setLoading(false)
+            }
+        }
+        fetchTypes()
+    }, [])    
+
     // Fetch data from the API
     useEffect(() => {
         setLoading(true);
+        setSelectedDoc(null); // Clear the selected document whenever the filter changes
+    
         const fetchData = async () => {
             try {
-                const documents = await API.getDocuments();
+                const filters = selectedType === 'All' ? {} : { type: selectedType };
+                const documents = await API.filterDocuments(filters);
                 const updatedDocuments = documents.map(doc => {
                     if (!doc.coordinates) {
                         return { ...doc, lat: null, long: null };
@@ -98,7 +120,9 @@ function Map2(props) {
             }
         };
         fetchData();
-    }, []);
+    }, [selectedType]); // Fetch documents when selectedType changes
+    
+    
 
     // Function to recenter the map on Kiruna with zoom reset to 13
     const recenterMap = () => {
@@ -131,7 +155,7 @@ function Map2(props) {
                     pathOptions={{ color: 'blue', fillColor: 'none'}} 
                 />
                 <Polyline positions={lineCoordinates} pathOptions={{ color: 'blue' }} />
-
+                
                 {/* Marker for the "+" button at the top vertex */}
                 <Marker position={plusButtonPosition} icon={plusIcon}>
                     <Popup className='popupPropPlus'>
@@ -177,7 +201,43 @@ function Map2(props) {
                         </div>
                     </Popup>
                 </Marker>
+                {props.loggedIn && 
+                    <Dropdown
+                    style={{
+                        position: 'absolute',
+                        top: '15px',
+                        right: '15px',
+                        zIndex: 1000,
+                    }}
+                    onSelect={(eventKey) => setSelectedType(eventKey)} // Use setSelectedType to set the filter
+                >
+                    <Dropdown.Toggle
+                        variant="light"
+                        id="dropdown-filter-button"
+                        style={{
+                            boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
+                            borderRadius: '8px', // Changed to make it rectangular
+                            padding: '5px 15px', // Adjusted padding for rectangular look
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: 'none',
+                            color:'#006d77'
+                        }}
+                    >
+                        <i className="bi bi-filter" style={{ fontSize: '20px', marginRight: '8px' }}></i>
+                        Filter
+                    </Dropdown.Toggle>
 
+                    <Dropdown.Menu style={{ backgroundColor: 'white' }}>
+                        <Dropdown.Header>Filter by document types</Dropdown.Header>
+                        <Dropdown.Item eventKey="All">All</Dropdown.Item>
+                        {typeDoc.map((type, index) => (
+                            <Dropdown.Item key={index} eventKey={type.name}>{type.name}</Dropdown.Item>
+                        ))}
+                    </Dropdown.Menu>
+                </Dropdown>
+                }
                 {/* Render coordinate documents as markers on the map */}
                 {<ShowDocuments data={coordDocuments} createCustomIcon={createCustomIcon} setSelectedDoc={setSelectedDoc} setRenderNumeber={setRenderNumeber} renderNumber={renderNumber} />}
 
