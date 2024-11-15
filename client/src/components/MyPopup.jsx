@@ -165,7 +165,7 @@ function MyPopup(props) {
         {showLinks && (
           <ul className="small text-muted ms-3">
             {links.map((link) => (
-              <li key={links.linkedDocID}>
+              <li key={link.linkedDocID}>
                 {link.title} - {link.type}
               </li>
             ))}
