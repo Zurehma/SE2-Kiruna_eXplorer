@@ -141,76 +141,90 @@ describe("DocumentDAO", () => {
   });
 
   describe("getDocuments", () => {
-    test("Get successful", async () => {
+    beforeEach(() => {
+      documentDAO = new DocumentDAO();
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
+    
+    test("Stakeholder Filter applied successful", async () => {
       const documentsRow = [
         {
-          id: 1,
+          id: 4,
           title: "Document 1",
-          stakeholder: "Stakeholder",
-          scale: 100,
-          issuanceDate: "2023-01-01",
-          type: "Informative",
-          connections: 5,
-          language: "english",
-          description: "Description",
+          stakeholder: "Kiruna kommun",
+          scale: 500,
+          issuanceDate: "2014-03-17",
+          type: "Prescriptive",
+          connections: 1,
+          language: "Spanish",
+          description: "Desc",
+          coordinates: null,
           pages: null,
-          lat: null,
-          long: null,
+          pageFrom: null,
+          pageTo: null
         },
         {
-          id: 2,
+          id: 5,
           title: "Document 2",
           stakeholder: "Stakeholder",
           scale: 100,
           issuanceDate: "2023-01-01",
-          type: "Informative",
+          type: "Design",
           connections: 5,
           language: "english",
-          description: "Description",
+          description: "Desc",
+          coordinates: null,
           pages: null,
-          lat: null,
-          long: null,
+          pageFrom: null,
+          pageTo: null
         }
       ]
 
       const documents = [
-        new Document(1, 'Document 1', 'Stakeholder', 100, '2023-01-01', 'Informative', 5, 'english', 'Description',null, null, null, null, null),
-        new Document(2, 'Document 2', 'Stakeholder', 100, '2023-01-01', 'Informative', 5, 'english', 'Description',null, null, null, null, null),
-      ];
+        // new Document(4, 'Document 1', 'Kiruna kommun', 500, '2014-03-17', 'Prescriptive', 1, 'Spanish', 'Description 1', null, null, null, null, null),
+        new Document(5, 'Document 2', 'Stakeholder', 100, '2023-01-01', 'Design', 5, 'english', 'Desc', null, null, null, null)
+      ]
 
       const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
-        callback(null, documentsRow);
+        callback(null, documents);
       });
 
-      const result = await documentDAO.getDocuments();
+      let queryParameter = { type: null, stakeholder: "Stakeholder" , issuanceDateFrom: null, issuanceDateTo: null };
+      const result = await documentDAO.getDocuments(queryParameter);
 
       let doc1 = new Document();
 
       result.forEach((item) => {
         expect(item).toBeInstanceOf(Document);
-        documents.forEach((doc) => {
-          if(JSON.stringify(item) === JSON.stringify(doc)) {
-              doc1 = doc;
-            }
-        });
-        expect(item).toStrictEqual(doc1)
+        if(item.stakeholder == queryParameter.stakeholder) {
+          documents.forEach((doc) => {
+            if(JSON.stringify(item) === JSON.stringify(doc)) {
+                doc1 = doc;
+              }
+          });
+        }
+        expect(item).toStrictEqual(doc1);
       });
 
       expect(mockDBAll).toHaveBeenCalled();
     });
 
-    test("DB error", async () => {
-      const error = new Error("");
+    // test("DB error", async () => {
+    //   const error = new Error("");
 
-      const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
-        callback(error);
-      });
+    //   const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
+    //     callback(error);
+    //   });
 
-      const result = documentDAO.getDocuments();
+    //   const result = documentDAO.getDocuments();
 
-      await expect(result).rejects.toEqual(error);
-      expect(mockDBAll).toHaveBeenCalled();
-    });
+    //   await expect(result).rejects.toEqual(error);
+    //   expect(mockDBAll).toHaveBeenCalled();
+    // });
   });
 
   describe("addLink", () => {

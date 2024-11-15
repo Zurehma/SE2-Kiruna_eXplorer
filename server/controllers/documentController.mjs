@@ -9,16 +9,16 @@ class DocumentController {
     this.documentDAO = new DocumentDAO();
   }
 
-  getDocuments = () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const documents = await this.documentDAO.getDocuments();
-        resolve(documents);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  };
+  // getDocuments = () => {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       const documents = await this.documentDAO.getDocuments();
+  //       resolve(documents);
+  //     } catch (err) {
+  //       reject(err);
+  //     }
+  //   });
+  // };
 
   getDocumentById = (id) => {
     return new Promise(async (resolve, reject) => {
@@ -31,11 +31,11 @@ class DocumentController {
     });
   };
 
-  filterDocuments = (type, stakeholder, issuanceDateFrom, issuanceDateTo) => {  
+  getDocuments = (type, stakeholder, issuanceDateFrom, issuanceDateTo) => {  
     return new Promise(async (resolve, reject) => {
       try {
         let queryParameter = { type, stakeholder, issuanceDateFrom, issuanceDateTo };
-        const documents = await this.documentDAO.filterDocuments(queryParameter);
+        const documents = await this.documentDAO.getDocuments(queryParameter);
         resolve(documents);
       } catch (err) {
         reject(err);
