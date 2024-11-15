@@ -93,9 +93,7 @@ function Map2(props) {
             }
         }
         fetchTypes()
-    }, [])
-    console.log(typeDoc);
-    
+    }, [])    
 
     // Fetch data from the API
     useEffect(() => {
@@ -172,27 +170,26 @@ function Map2(props) {
                         style={{
                             boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
                             borderRadius: '8px', // Changed to make it rectangular
-                            padding: '10px 20px', // Added padding for rectangular look
+                            padding: '5px 15px', // Adjusted padding for rectangular look
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            border: 'none'
+                            border: 'none',
+                            color:'#006d77'
                         }}
                     >
                         <i className="bi bi-filter" style={{ fontSize: '20px', marginRight: '8px' }}></i>
                         Filter
                     </Dropdown.Toggle>
 
-                    <Dropdown.Menu>
+                    <Dropdown.Menu style={{ backgroundColor: 'white' }}>
+                        <Dropdown.Header>Filter by document types</Dropdown.Header>
                         <Dropdown.Item eventKey="All">All</Dropdown.Item>
                         {typeDoc.map((type, index) => (
                             <Dropdown.Item key={index} eventKey={type.name}>{type.name}</Dropdown.Item>
                         ))}
                     </Dropdown.Menu>
                 </Dropdown>
-
-
-
                 {/* Marker for the "+" button at the top vertex */}
                 <Marker position={plusButtonPosition} icon={plusIcon}>
                     <Popup className='popupPropPlus'>
