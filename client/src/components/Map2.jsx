@@ -9,6 +9,7 @@ import '../App.css';
 import { MyPopup } from './MyPopup';
 import API from '../../API';
 import { ShowDocuments } from './showDocuments';
+import FilterButtonMap from './FilterButtonMap';
 
 // Icon mapping based on document type
 const iconMap = {
@@ -131,7 +132,7 @@ function Map2(props) {
                     pathOptions={{ color: 'blue', fillColor: 'none'}} 
                 />
                 <Polyline positions={lineCoordinates} pathOptions={{ color: 'blue' }} />
-
+                <FilterButtonMap/>
                 {/* Marker for the "+" button at the top vertex */}
                 <Marker position={plusButtonPosition} icon={plusIcon}>
                     <Popup className='popupPropPlus'>
