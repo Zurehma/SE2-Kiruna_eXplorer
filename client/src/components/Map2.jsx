@@ -102,8 +102,18 @@ function Map2(props) {
 
     // Function to recenter the map on Kiruna with zoom reset to 13
     const recenterMap = () => {
-        setPositionActual(initialPosition);
-        setZoomLevel(11);
+        const validZoom = (zoom) => zoom >= 0;
+        const validPosition = (position) => 
+            Array.isArray(position) && 
+            position.length === 2 && 
+            position.every(coord => typeof coord === 'number' && coord >= -90 && coord <= 90);
+
+        if (validPosition(initialPosition) && validZoom(11)) {
+            setPositionActual(initialPosition);
+            setZoomLevel(11);
+        } else {
+            console.error('Invalid position or zoom level');
+        }
     };
 
     // Filter documents without coordinates
