@@ -41,7 +41,7 @@ function Links(props) {
     }
   }, [props.newDoc]);
 
-  // Effettua una chiamata API per ottenere i documenti già collegati quando cambia document1
+  //Effettua una chiamata API per ottenere i documenti già collegati quando cambia document1
   useEffect(() => {
     console.log('sssssss:', linkData.document1);
 
@@ -49,7 +49,7 @@ function Links(props) {
       const fetchLinkedDocuments = async () => {
         try {
           const linkedResponse = await API.getLinksDoc(linkData.document1);
-          setLinkedDocuments(linkedResponse.map(doc => doc.linkedDocID));
+          setLinkedDocuments(linkedResponse);
           console.log('Linked documentsssssss:', linkedResponse);
         } catch (error) {
           console.error("Error fetching linked documents:", error);
@@ -177,23 +177,23 @@ function Links(props) {
               </Form.Group>
 
               <Form.Group controlId="linkType" className="links-form-group">
-                <Form.Label className="links-form-label">Link Type</Form.Label>
-                <Form.Select
-                  name="linkType" 
-                  value={linkData.linkType} 
-                  onChange={handleChange}
-                  isInvalid={!!errors.linkType}
+  <Form.Label className="links-form-label">Link Type</Form.Label>
+  <Form.Select
+    name="linkType" 
+    value={linkData.linkType} 
+    onChange={handleChange}
+    isInvalid={!!errors.linkType}
+  >
+    <option value="">Select a type of Link</option>
+    {typeLink.map((type, index) => (
+      <option key={index} value={type.name}>{type.name}</option>
+    ))}
+  </Form.Select>
+  <Form.Control.Feedback type="invalid">
+    {errors.linkType}
+  </Form.Control.Feedback>
+</Form.Group>
 
-                >
-                  <option value="">Select a type of Link</option>
-                  {typeLink.map((type, index) => (
-                    <option key={index} value={type}>{type}</option>
-                  ))}
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.linkType}
-                </Form.Control.Feedback>
-              </Form.Group>
 
               <div className="text-center mt-5">
                 <Button variant="primary" onClick={handleSaveLinks} className="btn-save">Save Link</Button>

@@ -87,3 +87,26 @@ body, html {
     font-size: 1.5rem;
   }
 }
+
+
+
+
+.step-btn {
+  flex: 1;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.step-btn .icon {
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+}
+
+.step-btn .text-muted {
+  color: #6c757d;
+}
+
+.step-btn .text-primary {
+  color: #007bff;
+}

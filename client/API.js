@@ -19,8 +19,6 @@ const getDocuments = async () => {
         .then(response => response.json());
 };
 
-
- 
 //Upload files
 const uploadFiles = async (docID, formData) => {
     try {
@@ -133,6 +131,48 @@ const saveDocument = async (doc) => {
 };
 
 
+/** 
+ * Function to get the attachments of a document given its ID. 
+ */
+const getAttachments = async (docID) => {
+    return await fetch(`${SERVER_URL}/documents/${docID}/attachments`, {
+        method: 'GET',
+    }).then(handleInvalidResponse).then(response => response.json());
+};
+
+/** 
+ * Function to download an attachment given its ID.
+ */
+const downloadAttachment = async (docID, attachmentID) => {
+    try {
+        // EFetch request to the server
+        const response = await fetch(`${SERVER_URL}/documents/${docID}/attachments/${attachmentID}/download`, {
+            method: 'GET',
+        });
+
+        // 200 if the response is correct
+        if (!response.ok) {
+            throw new Error(`Failed to fetch file. Status: ${response.statusText}`);
+        }
+
+        
+
+        // Blob file gotten from the response
+        const blob = await response.blob();
+        if (!blob || blob.size === 0) {
+            throw new Error("The file is empty or invalid.");
+        }
+
+        // Return the blob object
+        return blob;
+    } catch (error) {
+        console.error("Download failed:", error);
+        throw error;  // Propagate the error to the caller
+    }
+};
+
+
+
 const setLink = async (linkData) => {
     try {
         const response = await fetch(`${SERVER_URL}/documents/link`, {
@@ -153,8 +193,10 @@ const setLink = async (linkData) => {
 };
 
 
-
-  const logIn = async (credentials) => {
+/** 
+ * This function logs in a user given the credentials.
+ */
+const logIn = async (credentials) => {
     try {
         const response = await fetch(SERVER_URL + '/sessions/login', {
             method: 'POST',
@@ -170,21 +212,25 @@ const setLink = async (linkData) => {
     }
 };
 
-  /**
-  * This function destroy the current user's session (executing the log-out).
-  */
-  const logOut = async() => {
+/**
+ * This function destroy the current user's session (executing the log-out).
+*/
+const logOut = async() => {
     return await fetch(SERVER_URL + '/sessions/logout', {
       method: 'DELETE',
       credentials: 'include'
     }).then(handleInvalidResponse);
-  }
-  const getUserInfo = async () => {
+}
+
+/**
+ * This function retrieves the information of the currently logged-in user.
+ */
+const getUserInfo = async () => {
     return await fetch(SERVER_URL + '/sessions/current', {
         credentials: 'include'
     }).then(handleInvalidResponse)
     .then(response => response.json());
-  };
+};
 
   // Function to filter documents
 const filterDocuments = async (filters) => {
@@ -234,9 +280,6 @@ const getDocumentTypes = async () => {
 };
 
 
-
-
-
 //Export API methods
 const API = {
     getStakeholders,
@@ -251,8 +294,10 @@ const API = {
     setLink,
     getUserInfo,
     uploadFiles,
-    filterDocuments,
-    getLinksDoc
+    getLinksDoc,
+    getAttachments,
+    downloadAttachment,
+    filterDocuments
 };
   
 

@@ -37,7 +37,7 @@ attachmentRoutes.initRoutes();
 const authRoutes = new AuthRoutes(app);
 authRoutes.initRoutes();
 
-app.use(baseURL + "/uploads", Utility.isLoggedIn, express.static("./uploads"));
+app.use(baseURL + "/uploads", express.static("./uploads"));
 app.use(baseURL + "/documents", documentRoutes.getRouter());
 app.use(baseURL + "/documents", attachmentRoutes.getRouter());
 app.use(baseURL + "/sessions", authRoutes.getRouter());

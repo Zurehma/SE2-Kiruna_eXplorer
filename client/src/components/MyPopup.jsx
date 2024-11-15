@@ -8,9 +8,55 @@ import API from '../../API';
 function MyPopup(props) {
   const [loading, setLoading] = useState(false);
   const [links, setLinks] = useState([]);
+  const [attachments, setAttachments] = useState([]);
   const [showLinks, setShowLinks] = useState(false); // State to control visibility of the dropdown
   const widthLastColumn = props.loggedIn ? 4 : 5;
   const remainingWidth = 12 -3 -4 - widthLastColumn;
+
+
+  //fetch links and available attachments for the document 
+  useEffect(() => { //As soon as the id of the doc changes, fetch its links and attachments
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const links = await API.getLinksDoc(props.doc.id);
+        setLinks(links);
+        //call the getAttachments API
+        const attachments = await API.getAttachments(props.doc.id);
+        setAttachments(attachments);
+      } catch (error) {
+        props.setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [props.doc.id]);
+
+
+  //Handle download of attachment
+  const handleDownload = async (docID, attachmentID) => {
+    try {
+        // Obtain the blob object from the server
+        const blob = await API.downloadAttachment(docID, attachmentID);
+        //find the name of the file from the attachmentID
+        const name = attachments.find(attachment => attachment.id === attachmentID).name;
+        // Create a URL object from the blob object
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${name}`; // Use the name of the file to make it the default name when the user downloads it 
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        // Clean the URL object after the download is complete
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        props.setError('Error downloading attachment');
+    }
+  };
+
   // Determine the icon based on the document type
   const renderIcon = () => {
     const iconMap = {
@@ -25,22 +71,6 @@ function MyPopup(props) {
       Material: 'bi-file-earmark-binary',
     };
     const iconClass = iconMap[props.doc.type] || '';
-
-    useEffect(() => {
-      setLoading(true);
-      const fetchData = async () => {
-        try {
-          const links = await API.getLinksDoc(props.doc.id);
-          setLinks(links);
-        } catch (error) {
-          props.setError(error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchData();
-    }, [props.doc.id]);
-
     return (
       <OverlayTrigger
         placement="top"
@@ -67,13 +97,38 @@ function MyPopup(props) {
         className="myPopup mt-1"
         style={{
           display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
+          flexDirection: 'column',  // Disposizione verticale per gli altri elementi
+          alignItems: 'flex-start',  // Allineamento a sinistra per la lista
           paddingTop: '0.5rem',
         }}
       >
-        {renderIcon()}
+        {/* Icona centrata orizzontalmente */}
+        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          {renderIcon()}
+        </div>
+
+        <h6 className="fw-bold text-secondary mb-2 mt-2">Attachmets:</h6>
+        {!attachments && <p className="small text-muted mt-2">No attachments added yet</p>}
+        <ul className="list-unstyled">
+          {attachments.map((attachment) => (
+            <li key={attachment.id} className="mb-2">
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleDownload(props.doc.id, attachment.id);
+                }}
+                className="text-decoration-none d-flex align-items-center ms-2"
+              >
+                <i className="bi bi-file-earmark-arrow-down me-1"></i>
+                {attachment.name}
+              </a>
+            </li>
+          ))}
+        </ul>
       </Col>
+
+
 
       {/* Details Column */}
       <Col xs={12} md={4} className="myPopup">
@@ -94,7 +149,7 @@ function MyPopup(props) {
           {/* Display connections */}
           <strong className="text-dark">Connections:</strong> {props.doc.connections}{' '}
           {/* Only display the caret if there are connections */}
-          {props.doc.connections>0 && (
+          {props.doc.connections>0 && !loading && (
             <Dropdown.Toggle
               variant="link"
               id="dropdown-toggle-connection"
