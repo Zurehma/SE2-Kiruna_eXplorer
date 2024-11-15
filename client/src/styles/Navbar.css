@@ -4,7 +4,7 @@
   top: 0;
   width: 100%;
   z-index: 1500;
-  background-color: #000000;
+  background-color: #ffffff ;
   padding: 0.5rem 1rem;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
@@ -72,10 +72,6 @@
   background-color: rgba(255, 255, 255, 0.726); /* Change hover color */
 }
 
-/* Navbar background */
-.custom-navbar {
-  background-color: #ffffff !important;
-}
 
 /* Navbar brand and welcome text color */
 .custom-navbar .navbar-brand,
@@ -85,54 +81,54 @@
 
 /* Button styles for login */
 .custom-login-button {
-  background-color: #ffffff !important;
-  color: #006d77 !important;
+  background-color: #ffffff ;
+  color: #006d77 ;
   border-style: hidden;
 }
 
 .home-button {
-  background-color: #ffffff !important;
-  color: #006d77 !important;
+  background-color: #ffffff ;
+  color: #006d77 ;
   border-style: hidden;
 }
 .home-button:hover,
 .home-login-button:focus {
-  border-color: #005c66 !important;
+  border-color: #005c66 ;
 }
 .custom-login-button:hover,
 .custom-login-button:focus {
-  border-color: #005c66 !important;
+  border-color: #005c66 ;
 }
 
 /* Dropdown toggle button styles */
 .menu-dropdown-toggle {
-  color: #ffffff !important;
-  border-color: #006d77 !important;
-  background-color: #006d77 !important;
+  color: #ffffff ;
+  border-color: #006d77 ;
+  background-color: #006d77 ;
 }
 
 .menu-dropdown-toggle:hover,
 .menu-dropdown-toggle:focus {
-  color: #ffffff !important;
-  background-color: #005c66 !important;
-  border-color: #005c66 !important;
+  color: #ffffff ;
+  background-color: #005c66 ;
+  border-color: #005c66 ;
 }
 
 /* Dropdown menu background and text color */
 .dropdown-menu-custom {
-  background-color: #ffffff !important; /* White background */
-  color: #006d77 !important; /* Text color */
+  background-color: #ffffff ; /* White background */
+  color: #006d77 ; /* Text color */
   border: none; /* Remove border if desired */
 }
 
 /* Dropdown item color and hover effect */
 .dropdown-menu-custom .dropdown-item {
-  color: #006d77 !important;
+  color: #006d77 ;
 }
 
 .dropdown-menu-custom .dropdown-item:hover {
-  background-color: #e0f4f3 !important; /* Light teal for hover effect */
-  color: #005c66 !important; /* Slightly darker teal on hover */
+  background-color: #e0f4f3 ; /* Light teal for hover effect */
+  color: #005c66 ; /* Slightly darker teal on hover */
 }
 #home-button{
   color: #006d77;
@@ -145,16 +141,16 @@
 }
 
 .custom-icon-color {
-  color: #006d77 !important; /* Replace with your desired color code */
+  color: #006d77 ; /* Replace with your desired color code */
 }
 
 .custom-documents-button {
-  background-color: #ffffff !important;
-  color: #006d77 !important;
+  background-color: #ffffff ;
+  color: #006d77 ;
   border-style: hidden;
 }
 
 .custom-documents-button:hover,
 .custom-documents-button:focus {
-  border-color: #005c66 !important;
+  border-color: #005c66 ;
 }

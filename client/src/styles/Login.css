@@ -40,7 +40,7 @@
 }
 
 /* Enhanced form container styling */
-.login-container {
+/* .login-container {
   position: relative;
   background: linear-gradient(to bottom right, #ffffff, #f0f0f0);
   padding: 20px;
@@ -49,8 +49,8 @@
   max-width: 800px;
   width: 100%;
   text-align: center;
-  z-index: 1; /* Ensure the form appears above the blurred background */
-}
+  z-index: 1;
+} */
 
 /* Typography enhancements */
 /* Enhanced form container styling */
