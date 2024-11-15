@@ -91,6 +91,18 @@ export function NavigationBar(props) {
                       {isViewingDocuments ? 'Home' : 'View All Documents'}
                     </Button>
                   )}
+                      {
+                        !props.isLoggedIn && location.pathname === '/map' && (
+                          <Button
+                            variant="outline-light"
+                            className="ms-3"
+                            onClick={() => { navigate('/'); handleClose(); }}
+                          >
+                            <i className="bi bi-house-door me-2"></i> Home
+                          </Button>
+                        )
+                      }
+
                   <Button
                     variant="outline-light"
                     className="ms-3 custom-login-button"
