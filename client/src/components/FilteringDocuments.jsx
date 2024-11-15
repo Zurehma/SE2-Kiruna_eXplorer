@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css'; // Import modern calendar s
 import '../styles/Filtering.css';
 import { format } from 'date-fns';
 
-const FilteringDocuments = () => {
+const FilteringDocuments = (props) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [stakeholder, setStakeholder] = useState('');
   const [documentType, setDocumentType] = useState('');
@@ -23,6 +23,7 @@ const FilteringDocuments = () => {
   // Lists fetched from the backend
   const [stakeholdersList, setStakeholdersList] = useState([]);
   const [documentTypesList, setDocumentTypesList] = useState([]);
+ 
 
   const formatDate = (date) => (date ? format(date, 'yyyy-MM-dd') : null);
 
@@ -132,8 +133,8 @@ const FilteringDocuments = () => {
                       className="filter-input"
                     >
                       <option value="">All Stakeholders</option>
-                      {stakeholdersList.map((stakeholderItem) => (
-                        <option key={stakeholderItem.id} value={stakeholderItem.id}>
+                      {stakeholdersList.map((stakeholderItem, index) => (
+                        <option key={index} value={index}>
                           {stakeholderItem.name}
                         </option>
                       ))}
@@ -150,8 +151,8 @@ const FilteringDocuments = () => {
                       className="filter-input"
                     >
                       <option value="">All Document Types</option>
-                      {documentTypesList.map((typeItem) => (
-                        <option key={typeItem.id} value={typeItem.id}>
+                      {documentTypesList.map((typeItem, index) => (
+                        <option key={index} value={index}>
                           {typeItem.name}
                         </option>
                       ))}
@@ -251,9 +252,10 @@ const FilteringDocuments = () => {
                   onChange={(e) => setStakeholder(e.target.value)}
                   className="filter-input"
                 >
+                       
                   <option value="">All Stakeholders</option>
-                  {stakeholdersList.map((stakeholderItem) => (
-                    <option key={stakeholderItem.id} value={stakeholderItem.id}>
+                  {stakeholdersList.map((stakeholderItem,index) => (
+                    <option key={index} value={index}>
                       {stakeholderItem.name}
                     </option>
                   ))}
@@ -270,8 +272,8 @@ const FilteringDocuments = () => {
                   className="filter-input"
                 >
                   <option value="">All Document Types</option>
-                  {documentTypesList.map((typeItem) => (
-                    <option key={typeItem.id} value={typeItem.id}>
+                  {documentTypesList.map((typeItem,index) => (
+                    <option key={index} value={index}>
                       {typeItem.name}
                     </option>
                   ))}
@@ -377,7 +379,7 @@ const FilteringDocuments = () => {
               </div>
             ) : (
               filteredDocs.length > 0 ? (
-                filteredDocs.map((doc, index) => <MyPopup key={index} doc={doc} />)
+                filteredDocs.map((doc, index) => <MyPopup key={index} doc={doc} loggedIn={props.loggedIn}/>)
               ) : (
                 <p>No documents found</p>
               )

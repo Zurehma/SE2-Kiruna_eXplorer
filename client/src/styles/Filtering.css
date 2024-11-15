@@ -39,7 +39,7 @@
 
 /* Modern search bar styles */
 .search-section-modern {
-  position: sticky;
+  /* position: sticky; */
   top: 2cm;
   left: 0;
   width: 100%;

@@ -87,7 +87,7 @@ function App() {
               <Route path="/map" element={<Map2 setError={setError} loggedIn={loggedIn}/>}/>
               <Route path="/documents" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError}/>}/>
               <Route path="/documents/links" element={<Links newDoc={newDoc} setNewDoc={setNewDoc}  />}/>
-              <Route path="/documents/all" element={<FilteringDocuments />}/>
+              <Route path="/documents/all" element={<FilteringDocuments loggedIn={loggedIn}/>}/>
               </Routes>
           </Container>
         </div>
