@@ -1,12 +1,80 @@
 import { describe, test, expect, beforeAll, beforeEach, afterAll, afterEach, jest } from "@jest/globals";
 import DocumentController from "../../../controllers/documentController.mjs";
-import Document, { isScaleType, isDocumentType } from "../../../models/document.mjs";
+// import Document, { isScaleType, isDocumentType } from "../../../models/document.mjs";
 import DocumentDAO from "../../../dao/documentDAO.mjs";
 import dayjs from "dayjs";
 
-jest.mock("../../../dao/documentDAO.mjs");
+jest.mock("../../../dao/documentDAO");
 
 describe("DocumentController", () => {
+    describe("getDocument", () => {
+      /**
+       * @type {DocumentController}
+       */
+      let documentController;
+      let documentDAO;
+
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: "Text",
+        issuanceDate: dayjs().add(1, "day").format("YYYY-MM-DD"),
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        pages: 16,
+        pageFrom: null,
+        pageTo: null,
+        lat: null,
+        long: null,
+      };
+  
+      beforeEach(() => {
+        documentDAO = new DocumentDAO();
+        documentController = new DocumentController();
+        documentDAO = documentController.documentDAO;
+      });
+  
+      afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
+      });
+  
+      test("All Documents retrieved successfully", async () => {
+        let queryParameter = { type: null, stakeholder: null, issuanceDateFrom: null, issuanceDateTo: null};
+        
+        jest.spyOn(documentDAO, "getDocuments").mockResolvedValue(exampleDocumentData);
+        let response = await documentController.getDocuments(null, null, null, null);
+  
+        // { type: "Informative", stakeholder: "stakeholder", issuanceDateFrom: '2010-10-10', issuanceDateTo: '2020-10-10'}
+        expect(documentDAO.getDocuments).toHaveBeenCalled();
+        expect(documentDAO.getDocuments).toHaveBeenCalledWith(queryParameter);
+
+        expect(response).toBe(exampleDocumentData);
+      });
+  
+      test("Wrong document type", async () => {
+        const result = documentController.addDocument(
+          exampleDocumentData.title,
+          exampleDocumentData.stakeholder,
+          exampleDocumentData.scale,
+          exampleDocumentData.issuanceDate,
+          exampleDocumentData.type,
+          exampleDocumentData.description,
+          exampleDocumentData.language,
+          exampleDocumentData.pages
+        );
+  
+        expect(result).rejects.toStrictEqual({ errCode: 400, errMessage: "Document type error!" });
+      });
+    });
+
+
+
+
+
+
+
   describe("addDocument", () => {
     /**
      * @type {DocumentController}

@@ -25,17 +25,17 @@ const mapRowsToDocument = (rows) => {
 class DocumentDAO {
   constructor() {}
 
-  getDocuments = () => {
-    return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM document";
-      db.all(query, [], (err, rows) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(mapRowsToDocument(rows));
-      });
-    });
-  };
+  // getDocuments = () => {
+  //   return new Promise((resolve, reject) => {
+  //     const query = "SELECT * FROM document";
+  //     db.all(query, [], (err, rows) => {
+  //       if (err) {
+  //         reject(err);
+  //       }
+  //       resolve(mapRowsToDocument(rows));
+  //     });
+  //   });
+  // };
 
   /**
    * Get a document by its ID
@@ -58,7 +58,7 @@ class DocumentDAO {
     });
   };
 
-  filterDocuments = (queryParameter) => {
+  getDocuments = (queryParameter) => {
     return new Promise((resolve, reject) => {
       try{
         let {type, stakeholder, issuanceDateFrom, issuanceDateTo} = queryParameter;

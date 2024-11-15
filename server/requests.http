@@ -26,13 +26,13 @@ DELETE http://localhost:3001/api/sessions/logout HTTP/1.1
 GET http://localhost:3001/api/sessions/current HTTP/1.1
 
 ### Get all documents
-GET http://localhost:3001/api/documents HTTP/1.1
+# GET http://localhost:3001/api/documents HTTP/1.1
 
 ### Get document by id
 GET http://localhost:3001/api/documents/5 HTTP/1.1
 
 ### Filter documents
-GET http://localhost:3001/api/documents/filter/by?type=Prescriptive&stakeholder=Kiruna%20kommun&issuanceDateFrom=2010-10-20&issuanceDateTo=2015-10-20 HTTP/1.1
+GET http://localhost:3001/api/documents?type=Prescriptive&stakeholder=Kiruna%20kommun&issuanceDateFrom=2010-10-20&issuanceDateTo=2015-10-20 HTTP/1.1
 
 ### Add a new document
 POST http://localhost:3001/api/documents HTTP/1.1
