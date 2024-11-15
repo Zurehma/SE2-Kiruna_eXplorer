@@ -155,41 +155,7 @@ function Map2(props) {
                     pathOptions={{ color: 'blue', fillColor: 'none'}} 
                 />
                 <Polyline positions={lineCoordinates} pathOptions={{ color: 'blue' }} />
-                <Dropdown
-                    style={{
-                        position: 'absolute',
-                        top: '15px',
-                        right: '15px',
-                        zIndex: 1000,
-                    }}
-                    onSelect={(eventKey) => setSelectedType(eventKey)} // Use setSelectedType to set the filter
-                >
-                    <Dropdown.Toggle
-                        variant="light"
-                        id="dropdown-filter-button"
-                        style={{
-                            boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
-                            borderRadius: '8px', // Changed to make it rectangular
-                            padding: '5px 15px', // Adjusted padding for rectangular look
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            border: 'none',
-                            color:'#006d77'
-                        }}
-                    >
-                        <i className="bi bi-filter" style={{ fontSize: '20px', marginRight: '8px' }}></i>
-                        Filter
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu style={{ backgroundColor: 'white' }}>
-                        <Dropdown.Header>Filter by document types</Dropdown.Header>
-                        <Dropdown.Item eventKey="All">All</Dropdown.Item>
-                        {typeDoc.map((type, index) => (
-                            <Dropdown.Item key={index} eventKey={type.name}>{type.name}</Dropdown.Item>
-                        ))}
-                    </Dropdown.Menu>
-                </Dropdown>
+                
                 {/* Marker for the "+" button at the top vertex */}
                 <Marker position={plusButtonPosition} icon={plusIcon}>
                     <Popup className='popupPropPlus'>
@@ -235,7 +201,43 @@ function Map2(props) {
                         </div>
                     </Popup>
                 </Marker>
+                {props.loggedIn && 
+                    <Dropdown
+                    style={{
+                        position: 'absolute',
+                        top: '15px',
+                        right: '15px',
+                        zIndex: 1000,
+                    }}
+                    onSelect={(eventKey) => setSelectedType(eventKey)} // Use setSelectedType to set the filter
+                >
+                    <Dropdown.Toggle
+                        variant="light"
+                        id="dropdown-filter-button"
+                        style={{
+                            boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
+                            borderRadius: '8px', // Changed to make it rectangular
+                            padding: '5px 15px', // Adjusted padding for rectangular look
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: 'none',
+                            color:'#006d77'
+                        }}
+                    >
+                        <i className="bi bi-filter" style={{ fontSize: '20px', marginRight: '8px' }}></i>
+                        Filter
+                    </Dropdown.Toggle>
 
+                    <Dropdown.Menu style={{ backgroundColor: 'white' }}>
+                        <Dropdown.Header>Filter by document types</Dropdown.Header>
+                        <Dropdown.Item eventKey="All">All</Dropdown.Item>
+                        {typeDoc.map((type, index) => (
+                            <Dropdown.Item key={index} eventKey={type.name}>{type.name}</Dropdown.Item>
+                        ))}
+                    </Dropdown.Menu>
+                </Dropdown>
+                }
                 {/* Render coordinate documents as markers on the map */}
                 {<ShowDocuments data={coordDocuments} createCustomIcon={createCustomIcon} setSelectedDoc={setSelectedDoc} setRenderNumeber={setRenderNumeber} renderNumber={renderNumber} />}
 
