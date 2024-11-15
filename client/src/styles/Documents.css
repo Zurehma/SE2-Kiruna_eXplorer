@@ -103,10 +103,59 @@ body, html {
   margin-bottom: 5px;
 }
 
-.step-btn .text-muted {
-  color: #6c757d;
+
+/* Menu dropdown con sfondo bianco e bordi leggeri */
+.dropdown-menu-white {
+  background-color: white !important;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Per un'ombra leggera */
+  padding: 8px;
+  max-height: 200px;
+  overflow-y: auto; /* Aggiungi uno scroll se il contenuto è lungo */
+  z-index: 1050; /* Assicura che il menu sia sopra gli altri elementi */
 }
 
-.step-btn .text-primary {
-  color: #007bff;
+/* Rimuove margini indesiderati */
+.dropdown-menu-white .dropdown-item {
+  background-color: transparent !important;
+  padding: 8px 16px;
+  border: none;
+  color: #333 !important;
 }
+
+/* Stile per checkbox */
+.dropdown-menu-white .form-check-input {
+  margin-right: 8px;
+}
+
+.dropdown-menu-white .form-check-label {
+  color: #333 !important;
+}
+
+/* Effetto hover sugli elementi */
+.dropdown-menu-white .dropdown-item:hover {
+  background-color: #a9abae !important;
+  border-radius: 3px;
+}
+
+/* Assicurati che il pulsante mantenga lo stile desiderato */
+.dropdown-toggle {
+
+  color: #333;
+  border-radius: 4px;
+  padding: 8px 12px;
+  width: 100%; /* Per uniformare la dimensione al campo */
+  text-align: left;
+}
+
+/* Effetto al passaggio del mouse sul pulsante */
+.dropdown-toggle:hover {
+  color: black;
+}
+
+/* Aggiusta il bordo per evitare neri */
+.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+}
+

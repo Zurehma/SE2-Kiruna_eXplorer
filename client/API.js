@@ -111,10 +111,11 @@ const saveDocument = async (doc) => {
             pages: doc.pages,
             pageFrom: doc.pageFrom,
             pageTo: doc.pageTo,
-            lat: doc.latitude, 
-            long: doc.longitude 
+            coordinates: { lat: doc.coordinates.lat, long: doc.coordinates.long },
         }).filter(([_, value]) => value !== '' && value !== null)
     );
+
+    console.log(filteredDoc);
 
     try {
         const response = await fetch(`${SERVER_URL}/documents/`, {
