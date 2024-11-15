@@ -41,35 +41,32 @@ const FilteringDocuments = (props) => {
     }
   };
 
-  // Fetch filtered documents from the backend
-  const fetchFilteredDocuments = async () => {
-    setLoading(true);
+// Fetch filtered documents from the backend
+const fetchFilteredDocuments = async () => {
+  setLoading(true);
 
-    const filters = {
-      type: documentType || undefined,
-      stakeholder: stakeholder || undefined,
-      issuanceDateFrom: isSingleDate ? formatDate(selectedDate) : formatDate(startDate),
-      issuanceDateTo: isSingleDate ? formatDate(selectedDate) : formatDate(endDate),
-    };
-  
-    console.log(filters);
-    
-    const filteredParams = Object.fromEntries(
-      Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
-    );
-
-    console.log(filteredParams);
-    
-
-    try {
-      const response = await API.filterDocuments(filteredParams);
-      setDocuments(response);
-    } catch (error) {
-      console.error('Error fetching filtered documents from backend:', error);
-    } finally {
-      setLoading(false);
-    }
+  const filters = {
+    type: documentType || undefined,
+    stakeholder: stakeholder || undefined,
+    issuanceDateFrom: isSingleDate ? formatDate(selectedDate) : formatDate(startDate),
+    issuanceDateTo: isSingleDate ? formatDate(selectedDate) : formatDate(endDate),
   };
+
+  // Remove undefined or empty filter values
+  const filteredParams = Object.fromEntries(
+    Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
+  );
+
+  try {
+    const response = await API.filterDocuments(filteredParams);
+    setDocuments(response);
+  } catch (error) {
+    console.error('Error fetching filtered documents from backend:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Fetch stakeholders, document types, and filtered documents on component mount
   useEffect(() => {

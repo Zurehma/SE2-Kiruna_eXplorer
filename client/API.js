@@ -233,29 +233,33 @@ const getUserInfo = async () => {
 };
 
   // Function to filter documents
-const filterDocuments = async (filters) => {
+  const filterDocuments = async (filters) => {
     const queryParams = new URLSearchParams();
-
+  
     if (filters.type) queryParams.append('type', filters.type);
     if (filters.stakeholder) queryParams.append('stakeholder', filters.stakeholder);
     if (filters.issuanceDateFrom) queryParams.append('issuanceDateFrom', filters.issuanceDateFrom);
     if (filters.issuanceDateTo) queryParams.append('issuanceDateTo', filters.issuanceDateTo);
-
+  
     const queryString = queryParams.toString();
-
+  
+    // Form the URL properly by adding `?` if there are query parameters
+    const url = `${SERVER_URL}/documents${queryString ? `?${queryString}` : ''}`;
+  
     try {
-        const response = await fetch(`${SERVER_URL}/documents/filter/by?${queryString}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-        });
-
-        return handleInvalidResponse(response).json();
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+  
+      return handleInvalidResponse(response).json();
     } catch (error) {
-        console.error("Error filtering documents:", error);
-        throw error;
+      console.error("Error filtering documents:", error);
+      throw error;
     }
-};
+  };
+  
 
 // Function to get all stakeholders
 const getStakeholders = async () => {
