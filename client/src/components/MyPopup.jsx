@@ -152,10 +152,12 @@ function MyPopup(props) {
           {props.doc.connections>0 && !loading && (
             <Dropdown.Toggle
               variant="link"
+              aria-label="connections" 
               id="dropdown-toggle-connection"
               className="ms-2 p-0"
               onClick={() => setShowLinks(!showLinks)}
               style={{ color: 'black', fontSize: '1rem' }}
+              data-testid="connections-toggle-button"
             >
             </Dropdown.Toggle>
           )}
@@ -197,6 +199,7 @@ function MyPopup(props) {
         <Button
           variant="outline-primary"
           className="shadow-sm edit-button" // Added custom class for targeted CSS
+          aria-label="edit" 
           style={{
             padding: '0.5rem',
             borderRadius: '50%',
