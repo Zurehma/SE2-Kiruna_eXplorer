@@ -12,15 +12,15 @@ class DocumentRoutes {
   getRouter = () => this.router;
 
   initRoutes = () => {
-    this.router.get("/", (req, res, next) => {
-      this.documentController
-        .getDocuments()
-        .then((documents) => res.status(200).json(documents))
-        .catch((err) => next(err));
-    });
+    // this.router.get("/", (req, res, next) => {
+    //   this.documentController
+    //     .getDocuments()
+    //     .then((documents) => res.status(200).json(documents))
+    //     .catch((err) => next(err));
+    // });
 
     this.router.get(
-      "/filter/by",
+      "/",
       [
         query("type").optional().isString().withMessage("Type must be a string"),
         query("stakeholder").optional().isString().withMessage("Stakeholder must be a string"),
@@ -30,7 +30,7 @@ class DocumentRoutes {
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
-          .filterDocuments(req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo)
+          .getDocuments(req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo)
           .then((document) => {
             res.status(200).json(document);
           })
