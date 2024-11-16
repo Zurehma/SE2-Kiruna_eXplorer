@@ -290,4 +290,4 @@ function Map2(props) {
     );
 }
 
-export { Map2 };
+export default Map2
