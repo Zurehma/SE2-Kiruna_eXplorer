@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Tooltip, OverlayTrigger, Button, Dropdown } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import API from '../../API';
 
@@ -83,6 +84,16 @@ function MyPopup(props) {
         ></i>
       </OverlayTrigger>
     );
+  };
+
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (props.doc && props.doc.id && props.doc.id > 0) {
+      navigate(`/editDocument`, { state: { docId: props.doc.id } });
+    } else {
+      props.setError('Invalid document data');
+    }
   };
 
   // Helper function to display "-" if value is null
@@ -206,6 +217,7 @@ function MyPopup(props) {
             width: '2.5rem',
             height: '2.5rem',
           }}
+          onClick={handleClick}
         >
           <i className="bi bi-pencil-square edit-icon" style={{ fontSize: '1.25rem' }}></i>
         </Button>

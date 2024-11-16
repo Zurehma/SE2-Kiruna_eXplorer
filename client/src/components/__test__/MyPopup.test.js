@@ -18,6 +18,12 @@ jest.mock('react-bootstrap', () => ({
     Tooltip: ({ children }) => <>{children}</>,
 }));
 
+// Mocking useNavigate from react-router-dom
+jest.mock('react-router-dom', () => ({
+    ...jest.requireActual('react-router-dom'), // Mantieni tutti gli altri hook da react-router-dom
+    useNavigate: jest.fn(),
+}));
+
 describe('MyPopup Component', () => {
     const mockDoc = {
         id: 1,
