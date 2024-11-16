@@ -77,6 +77,7 @@ function ShowDocuments({ data, createCustomIcon,setSelectedDoc, setRenderNumeber
               key={`cluster-${cluster.id}`}
               position={[latitude, longitude]}
               icon={fetchIcon(pointCount, 10 + (pointCount / points.length) * 30)}
+              data-testid={`cluster-marker-${cluster.id}`}
               eventHandlers={{
                 click: () => {
                   const expansionZoom = Math.min(
@@ -97,6 +98,7 @@ function ShowDocuments({ data, createCustomIcon,setSelectedDoc, setRenderNumeber
         const customIcon = createCustomIcon(doc.type);
         return (
           <Marker key={doc.id} position={[doc.lat, doc.long]} icon={customIcon}
+          data-testid={`document-marker-${doc.id}`}
           eventHandlers={{
             click: () => {
               // Quando un marker viene cliccato, aggiorniamo lo stato del documento selezionato

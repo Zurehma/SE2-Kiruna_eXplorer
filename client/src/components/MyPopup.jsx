@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Tooltip, OverlayTrigger, Button, Dropdown } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import API from '../../API';
 
@@ -85,6 +86,16 @@ function MyPopup(props) {
     );
   };
 
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (props.doc && props.doc.id && props.doc.id > 0) {
+      navigate(`/editDocument`, { state: { docId: props.doc.id } });
+    } else {
+      props.setError('Invalid document data');
+    }
+  };
+
   // Helper function to display "-" if value is null
   const displayValue = (value) => (value !== null ? value : '-');
 
@@ -152,10 +163,12 @@ function MyPopup(props) {
           {props.doc.connections>0 && !loading && (
             <Dropdown.Toggle
               variant="link"
+              aria-label="connections" 
               id="dropdown-toggle-connection"
               className="ms-2 p-0"
               onClick={() => setShowLinks(!showLinks)}
               style={{ color: 'black', fontSize: '1rem' }}
+              data-testid="connections-toggle-button"
             >
             </Dropdown.Toggle>
           )}
@@ -197,12 +210,14 @@ function MyPopup(props) {
         <Button
           variant="outline-primary"
           className="shadow-sm edit-button" // Added custom class for targeted CSS
+          aria-label="edit" 
           style={{
             padding: '0.5rem',
             borderRadius: '50%',
             width: '2.5rem',
             height: '2.5rem',
           }}
+          onClick={handleClick}
         >
           <i className="bi bi-pencil-square edit-icon" style={{ fontSize: '1.25rem' }}></i>
         </Button>
