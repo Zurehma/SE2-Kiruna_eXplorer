@@ -11,7 +11,7 @@ import { Login } from './components/Login';
 import Home from './components/Home';
 import Documents from './components/Documents.jsx';
 import { NavigationBar } from './components/NavigationBar.jsx';
-import {Map2} from '../src/components/Map2.jsx';
+import Map2 from '../src/components/Map2.jsx';
 import API from '../API.js';
 import FilteringDocuments from './components/FilteringDocuments.jsx';
 
