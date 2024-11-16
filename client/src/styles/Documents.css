@@ -61,6 +61,15 @@ body, html {
   border: none;
   padding: 0.6rem 2.5rem;
   transition: background-color 0.3s ease;
+  float: right; /* Allinea a destra */
+}
+
+
+.btn-back {
+  background-color: #626667;
+  border: none;
+  padding: 0.6rem 2.5rem;
+  transition: background-color 0.3s ease;
 }
 
 .btn-saveLink {
@@ -157,5 +166,19 @@ body, html {
 /* Aggiusta il bordo per evitare neri */
 .dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+}
+
+.input {
+  width: 100%; /* Assicura che l'input occupi tutta la larghezza disponibile */
+  padding: 0.375rem 0.75rem; /* Controlla che il padding sia simile a quello di altri campi */
+  font-size: 1rem;
+}
+
+.react-datepicker-wrapper {
+  width: 100%; /* Sincronizza la larghezza del wrapper */
+}
+
+.react-datepicker__input-container input {
+  width: 100%; /* Sincronizza la larghezza del campo interno */
 }
 
