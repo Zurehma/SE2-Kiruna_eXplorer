@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll, beforeEach, afterAll, afterEach, jest } from "@jest/globals";
 import DocumentController from "../../../controllers/documentController.mjs";
-// import Document, { isScaleType, isDocumentType } from "../../../models/document.mjs";
+import Document, { isScaleType, isDocumentType } from "../../../models/document.mjs";
 import DocumentDAO from "../../../dao/documentDAO.mjs";
 import dayjs from "dayjs";
 
