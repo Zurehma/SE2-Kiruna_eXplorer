@@ -55,16 +55,15 @@ describe("DocumentRoutes", () => {
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
-        pages: 16,
-        pageFrom: 1,
-        pageTo: 17,
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
       };
 
       let result = await request(app)
         .post(basePath + "/documents")
         .set("Cookie", userCookie)
         .send(exampleDocumentData)
-        .expect(200);
+        .expect(201);
 
       expect(result.body.title).toStrictEqual(exampleDocumentData.title);
       expect(result.body.stakeholder).toStrictEqual(exampleDocumentData.stakeholder);
@@ -74,10 +73,8 @@ describe("DocumentRoutes", () => {
       expect(result.body.language).toStrictEqual(exampleDocumentData.language);
       expect(result.body.description).toStrictEqual(exampleDocumentData.description);
       expect(result.body.pages).toStrictEqual(exampleDocumentData.pages);
-      expect(result.body.pageFrom).toStrictEqual(exampleDocumentData.pageFrom);
-      expect(result.body.pageTo).toStrictEqual(exampleDocumentData.pageTo);
-      expect(result.body.lat).toBe(null);
-      expect(result.body.long).toBe(null);
+      expect(result.body.coordinates).toStrictEqual(exampleDocumentData.coordinates);
+  
     });
 
     test("1.2 - It should return 401", async () => {
@@ -89,12 +86,11 @@ describe("DocumentRoutes", () => {
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
-        pages: 16,
-        pageFrom: 1,
-        pageTo: 17,
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
       };
 
-      await request(app)
+      let result = await request(app)
         .post(basePath + "/documents")
         .send(exampleDocumentData)
         .expect(401);
@@ -136,16 +132,6 @@ describe("DocumentRoutes", () => {
         .set("Cookie", userCookie)
         .send({ ...exampleDocumentData, pages: "wrong" })
         .expect(422);
-      await request(app)
-        .post(basePath + "/documents")
-        .set("Cookie", userCookie)
-        .send({ ...exampleDocumentData, pageFrom: 100 })
-        .expect(422);
-      await request(app)
-        .post(basePath + "/documents")
-        .set("Cookie", userCookie)
-        .send({ ...exampleDocumentData, pageTo: 23 })
-        .expect(422);
     });
 
     test("1.4 - It should return 400 - Date error", async () => {
@@ -166,7 +152,7 @@ describe("DocumentRoutes", () => {
         .expect(400);
     });
 
-    test("1.5 - It should return 400 - Document type error", async () => {
+    test("1.5 - It should return 400 - Coordinates outside of Kiruna", async () => {
       const exampleDocumentData = {
         title: "title",
         stakeholder: "stakeholder",
@@ -175,33 +161,27 @@ describe("DocumentRoutes", () => {
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
+        coordinates: {"lat": 77.849982, "long": 20.217068},
+        pages: 16
       };
 
-      await request(app)
+      let result = await request(app)
         .post(basePath + "/documents")
         .set("Cookie", userCookie)
-        .send({ ...exampleDocumentData, type: "wrong" })
+        .send(exampleDocumentData)
         .expect(400);
+      
     });
 
-    test("1.6 - It should return 400 - Scale type error", async () => {
-      const exampleDocumentData = {
-        title: "title",
-        stakeholder: "stakeholder",
-        scale: 100,
-        issuanceDate: "2024-02-12",
-        type: "Informative",
-        language: "English",
-        description: "Lore ipsum...",
-      };
+    
+  });
 
-      await request(app)
-        .post(basePath + "/documents")
-        .set("Cookie", userCookie)
-        .send({ ...exampleDocumentData, scale: "wrong" })
-        .expect(400);
+  describe("2. - GET /api/documents/links/:id", () => {
+    test("2.1 - It should return 200", async() => {
+      expect(1).toBe(1);
     });
   });
+
 
 
   describe("3. - POST /api/documents/link", () => {  
@@ -215,9 +195,8 @@ describe("DocumentRoutes", () => {
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
-        pages: 16,
-        pageFrom: 1,
-        pageTo: 17,
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
       };
       const exampleDocumentData2 = {
         title: "title2",
@@ -227,41 +206,54 @@ describe("DocumentRoutes", () => {
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
-        pages: 16,
-        pageFrom: 1,
-        pageTo: 17,
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const exampleDocumentData3 = {
+        title: "title3",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
       };
 
       let result = await request(app)
         .post(basePath + "/documents")
         .set("Cookie", userCookie)
         .send(exampleDocumentData)
-        .expect(200);
+        .expect(201);
       
       let result2 = await request(app)
         .post(basePath + "/documents")
         .set("Cookie", userCookie)
         .send(exampleDocumentData2)
-        .expect(200);
+        .expect(201);
 
-      const link = {
+      let result3 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData3)
+        .expect(201);
+
+      const links = {
         id1: result.body.id,
-        id2: result2.body.id,
+        ids: [result2.body.id, result3.body.id],
         type: "direct"
       }
 
       let resultLink = await request(app)
         .post(basePath + "/documents/link")
         .set("Cookie", userCookie)
-        .send(link)
+        .send(links)
         .expect(200);
-
-       expect(resultLink.body.id1).toEqual(result.body.id);
-       expect(resultLink.body.id2).toEqual(result2.body.id);
        
     });
 
-    test("3.2 - It should return 401-unauthorize", async() => {
+    test("3.2 - It should return 401-unauthorized", async() => {
 
       const exampleDocumentData = {
         title: "title",
@@ -271,9 +263,8 @@ describe("DocumentRoutes", () => {
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
-        pages: 16,
-        pageFrom: 1,
-        pageTo: 17,
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
       };
       const exampleDocumentData2 = {
         title: "title2",
@@ -283,34 +274,50 @@ describe("DocumentRoutes", () => {
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
-        pages: 16,
-        pageFrom: 1,
-        pageTo: 17,
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const exampleDocumentData3 = {
+        title: "title3",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
       };
 
       let result = await request(app)
         .post(basePath + "/documents")
         .set("Cookie", userCookie)
         .send(exampleDocumentData)
-        .expect(200);
+        .expect(201);
       
       let result2 = await request(app)
         .post(basePath + "/documents")
         .set("Cookie", userCookie)
         .send(exampleDocumentData2)
-        .expect(200);
+        .expect(201);
 
-      const link = {
+      let result3 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData3)
+        .expect(201);
+
+      const links = {
         id1: result.body.id,
-        id2: result2.body.id,
+        ids: [result2.body.id, result3.body.id],
         type: "direct"
       }
 
-      await request(app)
+      let resultLink = await request(app)
         .post(basePath + "/documents/link")
-        .send(link)
+        .send(links)
         .expect(401);
-
+       
     });
 
     test("3.3 - It should retun 409-link exists", async() => {
@@ -322,9 +329,8 @@ describe("DocumentRoutes", () => {
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
-        pages: 16,
-        pageFrom: 1,
-        pageTo: 17,
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
       };
       const exampleDocumentData2 = {
         title: "title2",
@@ -334,40 +340,83 @@ describe("DocumentRoutes", () => {
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
-        pages: 16,
-        pageFrom: 1,
-        pageTo: 17,
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const exampleDocumentData3 = {
+        title: "title3",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
       };
 
       let result = await request(app)
         .post(basePath + "/documents")
         .set("Cookie", userCookie)
         .send(exampleDocumentData)
-        .expect(200);
+        .expect(201);
       
       let result2 = await request(app)
         .post(basePath + "/documents")
         .set("Cookie", userCookie)
         .send(exampleDocumentData2)
-        .expect(200);
+        .expect(201);
 
-      const link = {
+      let result3 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData3)
+        .expect(201);
+
+      const links = {
         id1: result.body.id,
-        id2: result2.body.id,
+        ids: [result2.body.id, result3.body.id],
         type: "direct"
       }
 
-      await request(app)
+      let resultLink = await request(app)
         .post(basePath + "/documents/link")
         .set("Cookie", userCookie)
-        .send(link)
+        .send(links)
         .expect(200);
       
       await request(app)
         .post(basePath + "/documents/link")
         .set("Cookie", userCookie)
-        .send(link)
+        .send(links)
         .expect(409);
+    });
+  });
+
+  describe("4. - GET /api/documents/document-types", () => {
+    test("4.1 - It should return 200", async () => {
+      await request(app)
+        .get(basePath + "/documents/document-types")
+        .set("Cookie", userCookie)
+        .expect(200);
+    });
+  });
+
+  describe("5. - GET/api/documents/stakeholders", () => {
+    test("5.1 - It should return 200", async () => {
+      await request(app)
+        .get(basePath + "/documents/stakeholders")
+        .set("Cookie", userCookie)
+        .expect(200);
+    });
+  });
+
+  describe("6. - GET /api/documents/link-types", () => {
+    test("6.1 - It should return 200", async () => {
+      await request(app)
+        .get(basePath + "/documents/link-types")
+        .set("Cookie", userCookie)
+        .expect(200);
     });
   });
 

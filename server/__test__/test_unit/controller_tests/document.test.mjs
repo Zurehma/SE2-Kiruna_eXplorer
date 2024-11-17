@@ -103,9 +103,10 @@ describe("DocumentController", () => {
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
-        coordinates: {"lat": 67.8603,"long": 20.2251},
+        coordinates: {"lat": 67.849982, "long": 20.217068},
         pages: 16
       };
+
       const exampleDocument = new Document(
         exampleAddResult.lastID,
         exampleDocumentData.title,
