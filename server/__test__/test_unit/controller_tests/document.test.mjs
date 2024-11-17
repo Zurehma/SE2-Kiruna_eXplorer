@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll, beforeEach, afterAll, afterEach, jest } from "@jest/globals";
 import DocumentController from "../../../controllers/documentController.mjs";
-import Document, { isScaleType, isDocumentType } from "../../../models/document.mjs";
+import Document from "../../../models/document.mjs";
 import DocumentDAO from "../../../dao/documentDAO.mjs";
 import dayjs from "dayjs";
 
@@ -103,11 +103,8 @@ describe("DocumentController", () => {
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
-        pages: 16,
-        pageFrom: 1,
-        pageTo: 17,
-        lat: null,
-        long: null,
+        coordinates: {"lat": 67.8603,"long": 20.2251},
+        pages: 16
       };
       const exampleDocument = new Document(
         exampleAddResult.lastID,
@@ -119,11 +116,10 @@ describe("DocumentController", () => {
         0,
         exampleDocumentData.language,
         exampleDocumentData.description,
+        exampleDocumentData.coordinates,
         exampleDocumentData.pages,
         exampleDocumentData.pageFrom,
         exampleDocumentData.pageTo,
-        exampleDocumentData.lat,
-        exampleDocumentData.long
       );
 
       documentDAO.addDocument = jest.fn().mockResolvedValueOnce(exampleAddResult);
@@ -137,6 +133,7 @@ describe("DocumentController", () => {
         exampleDocumentData.type,
         exampleDocumentData.description,
         exampleDocumentData.language,
+        exampleDocumentData.coordinates,
         exampleDocumentData.pages,
         exampleDocument.pageFrom,
         exampleDocument.pageTo
@@ -153,11 +150,10 @@ describe("DocumentController", () => {
         exampleDocumentData.type,
         exampleDocumentData.description,
         exampleDocumentData.language,
+        exampleDocumentData.coordinates,
         exampleDocumentData.pages,
         exampleDocumentData.pageFrom,
         exampleDocumentData.pageTo,
-        exampleDocumentData.lat,
-        exampleDocumentData.long
       );
       expect(documentDAO.getDocumentByID).toHaveBeenCalled();
       expect(documentDAO.getDocumentByID).toHaveBeenCalledWith(exampleAddResult.lastID);
@@ -190,67 +186,23 @@ describe("DocumentController", () => {
         exampleDocumentData.pages
       );
 
-      expect(result).rejects.toStrictEqual({ errCode: 400, errMessage: "Date error!" });
+      expect(result).rejects.toStrictEqual({ errCode: 400, errMessage: "Date error." });
     });
 
-    test("Wrong document type", async () => {
+    test("Invalid Kiruna coordinates", async () => {
       const exampleDocumentData = {
         title: "title",
         stakeholder: "stakeholder",
-        scale: "Text",
-        issuanceDate: "2024-10-12",
-        type: "wrong",
-        language: "English",
-        description: "Lore ipsum...",
-        pages: 16,
-        pageFrom: null,
-        pageTo: null,
-        lat: null,
-        long: null,
-      };
-
-      const result = documentController.addDocument(
-        exampleDocumentData.title,
-        exampleDocumentData.stakeholder,
-        exampleDocumentData.scale,
-        exampleDocumentData.issuanceDate,
-        exampleDocumentData.type,
-        exampleDocumentData.description,
-        exampleDocumentData.language,
-        exampleDocumentData.pages
-      );
-
-      expect(result).rejects.toStrictEqual({ errCode: 400, errMessage: "Document type error!" });
-    });
-
-    test("Wrong scale type", async () => {
-      const exampleDocumentData = {
-        title: "title",
-        stakeholder: "stakeholder",
-        scale: "wrong",
-        issuanceDate: "2024-10-12",
+        scale: 100,
+        issuanceDate: "2024-02-12",
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
         pages: 16,
-        pageFrom: null,
-        pageTo: null,
-        lat: null,
-        long: null,
+        coordinates: {lat: 100.1 , long: 100.1}
       };
 
-      const result = documentController.addDocument(
-        exampleDocumentData.title,
-        exampleDocumentData.stakeholder,
-        exampleDocumentData.scale,
-        exampleDocumentData.issuanceDate,
-        exampleDocumentData.type,
-        exampleDocumentData.description,
-        exampleDocumentData.language,
-        exampleDocumentData.pages
-      );
 
-      expect(result).rejects.toStrictEqual({ errCode: 400, errMessage: "Scale type error!" });
     });
 
     test("Insert failed", async () => {
@@ -264,10 +216,7 @@ describe("DocumentController", () => {
         language: "English",
         description: "Lore ipsum...",
         pages: 16,
-        pageFrom: 1,
-        pageTo: 17,
-        lat: null,
-        long: null,
+        coordinates: { lat: 67.8603, long: 20.2251},
       };
 
       documentDAO.addDocument = jest.fn().mockResolvedValueOnce(exampleAddResult);
@@ -280,7 +229,7 @@ describe("DocumentController", () => {
         exampleDocumentData.type,
         exampleDocumentData.description,
         exampleDocumentData.language,
-        exampleDocumentData.pages
+        exampleDocumentData.pages,
       );
 
       expect(result).rejects.toStrictEqual({});
@@ -323,20 +272,7 @@ describe("DocumentController", () => {
       expect(result).rejects.toEqual({ errCode: 400, errMessage: "Document cannot be linked to itself!" });
     });
 
-    test("Link type error", async () => {
-      const exampleLink = { id1: 1, id2: 2, type: "wrong" };
-
-      const documentDAO = new DocumentDAO();
-      documentDAO.addLink = jest.fn().mockResolvedValue({ changes: 0 });
-
-      const documentController = new DocumentController();
-      documentController.documentDAO = documentDAO;
-      const result = documentController.addLink(exampleLink.id1, exampleLink.id2, exampleLink.type);
-
-      expect(documentDAO.addLink).not.toHaveBeenCalled();
-      expect(result).rejects.toEqual({ errCode: 400, errMessage: "Link type error!" });
-    });
-
+    
     test("Document not found", async () => {
       const exampleLink = { id1: 1, id2: 2, type: "direct" };
 

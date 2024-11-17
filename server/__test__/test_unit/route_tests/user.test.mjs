@@ -2,7 +2,7 @@ import { describe, test, expect, beforeAll, beforeEach, afterAll, afterEach, jes
 import UserController from "../../../controllers/userController.mjs";
 import User from "../../../models/user.mjs";
 import UserDao from "../../../dao/userDAO.mjs";
-import Utility from "../../../utility.mjs";
+//import Utility from "../../../utility.mjs";
 import request from "supertest";
 
 const baseURL = "/api/sessions"
