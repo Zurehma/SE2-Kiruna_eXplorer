@@ -69,6 +69,8 @@ function Documents(props) {
   const totalSteps = 4;
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
+  const [existingAttachments, setExistingAttachments] = useState([]);
+  const [filesToBeDeleted, setFilesToBeDeleted] = useState([]);
   const { id } = useParams();
   const [step, setStep] = useState(1);
   const [types, setTypes] = useState([]);
@@ -125,6 +127,8 @@ function Documents(props) {
 
     if (id) {
       fetchDocument(id); 
+      //here fetch existing attachments
+      fetchAttachments(id);
     }
   }, [id]);
 
@@ -138,6 +142,15 @@ function Documents(props) {
       }));      
     } catch (error) {
       console.error("Error fetching document:", error);
+      props.setError(error);
+    }
+  };
+  const fetchAttachments = async (documentId) => {
+    try {
+      const attachments = await API.getAttachments(documentId);
+      setExistingAttachments(attachments);
+    } catch (error) {
+      props.setError(error);
     }
   };
 
@@ -307,6 +320,25 @@ const handleNextStep = () => {
       setPosition({ lat: null, lng: null });
     }
   }, [document.coordinates.lat, document.coordinates.long]);
+  
+  const handleFileUpload = async (doc) => {
+    if (files.length > 0) {
+      files.forEach(async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+          await API.uploadFiles(doc.id, formData);
+        } catch (error) {
+          props.setError(error);
+        }
+      });
+    }
+  };
+
+  const removeExistingFile = (attachmentId) => {
+    setFilesToBeDeleted([...filesToBeDeleted, attachmentId]);
+    setExistingAttachments(existingAttachments.filter((file) => file.id !== attachmentId));
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -317,21 +349,21 @@ const handleNextStep = () => {
         console.log(updatedDoc);
         props.setUpdatedDoc(updatedDoc); // Se necessario
         console.log("Document updated successfully:", updatedDoc);
+        //Add new files and delete files
+        handleFileUpload(updatedDoc);
+        filesToBeDeleted.forEach(async (attachmentId) => {
+          try{
+            await API.deleteAttachment(id, attachmentId);
+          }catch(error){
+            console.error("Error deleting attachment:", error);
+            props.setError(error);
+          }     
+        });
         navigate(`/`);
       } else {
         const doc= await API.saveDocument(document);  
         //Try to submit files
-        if (files.length > 0) {
-          files.forEach(async (file) => {
-            const formData = new FormData();
-            formData.append('file', file);
-            try {
-              await API.uploadFiles(doc.id,formData);
-            } catch (error) {
-              props.setError(error);
-            }
-          } ); 
-        }
+        handleFileUpload(doc);
         props.setNewDoc(doc);
         navigate(`/documents/links`);
       }
@@ -712,6 +744,14 @@ const handleNextStep = () => {
                     <div key={index} className="file-item d-flex justify-content-between align-items-center mb-3 ms-2">
                       <span>{file.name}</span>
                       <Button variant="danger" size="sm" onClick={() => removeFile(index)} className="me-2">
+                        <i className="bi bi-trash-fill"></i>
+                      </Button>
+                    </div>
+                  ))}
+                  {existingAttachments.map((file) => (
+                    <div key={file.id+file.docID} className="file-item d-flex justify-content-between align-items-center mb-3 ms-2">
+                      <span>{file.name}</span>
+                      <Button variant="danger" size="sm" onClick={() => removeExistingFile(file.id)} className="me-2">
                         <i className="bi bi-trash-fill"></i>
                       </Button>
                     </div>
