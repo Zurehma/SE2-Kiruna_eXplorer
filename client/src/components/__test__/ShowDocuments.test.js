@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ShowDocuments } from '../showDocuments';
+import { ShowDocuments } from '../ShowDocuments';
 import '@testing-library/jest-dom';
 import { useMap } from 'react-leaflet'; // Per il mock della mappa
 import useSupercluster from 'use-supercluster';

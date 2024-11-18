@@ -80,47 +80,59 @@ describe('MyPopup Component', () => {
         ];
     
         // Mock della funzione API.getLinksDoc per restituire i collegamenti
+        const mockAttachments = [
+            { id: 1, name: 'Attachment1.pdf' },
+            { id: 2, name: 'Attachment2.docx' },
+        ];
+        await act(async () => {
+            API.getLinksDoc = jest.fn().mockResolvedValue(mockLinks);
+            API.getAttachments = jest.fn().mockResolvedValue(mockAttachments);
+            render(<MyPopup doc={mockDoc} setError={mockSetError} loggedIn={false} />);
+        });
+        const editButton = screen.queryByRole('button', { name: /edit/i });
+        expect(editButton).not.toBeInTheDocument();
+    });
+    
+    test('renders the edit button when loggedIn is true',async () => {
+        const mockLinks = [
+            { linkedDocID: 1, title: 'Link 1', type: 'Design' },
+            { linkedDocID: 2, title: 'Link 2', type: 'Technical' },
+        ];
+        const mockAttachments = [
+            { id: 1, name: 'Attachment1.pdf' },
+            { id: 2, name: 'Attachment2.docx' },
+        ];
+        // Mock della funzione API.getLinksDoc per restituire i collegamenti
+        await act(async () => {
+            API.getLinksDoc = jest.fn().mockResolvedValue(mockLinks);
+            API.getAttachments = jest.fn().mockResolvedValue(mockAttachments);
+            render(<MyPopup doc={mockDoc} setError={mockSetError} loggedIn={true} />);
+        });
+        const editButton = screen.getByRole('button', { name: /edit/i });
+        expect(editButton).toBeInTheDocument();
+
+        
+    });
+    
+    test('renders attachments correctly and triggers download', async () => {
+        const mockLinks = [
+            { linkedDocID: 1, title: 'Link 1', type: 'Design' },
+            { linkedDocID: 2, title: 'Link 2', type: 'Technical' },
+        ];
+    
+        // Mock della funzione API.getLinksDoc per restituire i collegamenti
         API.getLinksDoc = jest.fn().mockResolvedValue(mockLinks);
         const mockAttachments = [
             { id: 1, name: 'Attachment1.pdf' },
             { id: 2, name: 'Attachment2.docx' },
         ];
         API.getAttachments = jest.fn().mockResolvedValue(mockAttachments);
-        await act(async () => {
-            render(<MyPopup doc={mockDoc} setError={mockSetError} loggedIn={false} />);
-        });
-        const editButton = screen.queryByRole('button', { name: /edit/i });
-        expect(editButton).not.toBeInTheDocument();
-    });
-    /*
-    test('renders the edit button when loggedIn is true', () => {
-        act(() => {
-            render(<MyPopup doc={mockDoc} setError={mockSetError} loggedIn={true} />);
-        });
-        
-
-        const editButton = screen.getByRole('button', { name: /edit/i });
-        expect(editButton).toBeInTheDocument();
-    });*/
-    /*
-    test('renders attachments correctly and triggers download', async () => {
-        const mockAttachments = [
-            { id: 1, name: 'Attachment1.pdf' },
-            { id: 2, name: 'Attachment2.docx' },
-        ];
-    
-        // Mock delle funzioni API
-        API.getAttachments = jest.fn().mockResolvedValue(mockAttachments);
         const mockDownloadAttachment = jest.fn(() => Promise.resolve(new Blob()));
         API.downloadAttachment = mockDownloadAttachment;
     
-        render(
-            <MyPopup 
-                doc={mockDoc} 
-                setError={mockSetError} 
-                loggedIn={true} 
-            />
-        );
+        await act(async () => {
+            render(<MyPopup doc={mockDoc} setError={mockSetError} loggedIn={true} />);
+        });
     
         // Aspetta che gli allegati vengano caricati (se necessario)
         await screen.findByText('Attachment1.pdf'); // Aspetta che il primo allegato appaia
@@ -136,56 +148,5 @@ describe('MyPopup Component', () => {
     
         // Verifica che la funzione di download sia stata chiamata per ogni allegato
         expect(mockDownloadAttachment).toHaveBeenCalledTimes(mockAttachments.length);
-    });*/
-    /*
-    test('renders connections dropdown and toggles visibility with API', async () => {
-    
-        // Mock della risposta dell'API getLinksDoc
-        const mockLinks = [
-            { linkedDocID: 1, title: 'Link 1', type: 'Design' },
-            { linkedDocID: 2, title: 'Link 2', type: 'Technical' },
-        ];
-    
-        // Mock della funzione API.getLinksDoc per restituire i collegamenti
-        API.getLinksDoc = jest.fn().mockResolvedValue(mockLinks);
-    
-        // Rende il componente con il documento che ha collegamenti
-        render(
-            <MyPopup 
-                doc={mockDoc} 
-                setError={mockSetError} 
-                loggedIn={true} 
-            />
-        );
-        console.log(screen.debug());
-        const toggleButton = screen.getByTestId('connections-toggle-button');
-        expect(toggleButton).toBeInTheDocument();
-        fireEvent.click(toggleButton);
-        // Verifica che i collegamenti siano stati caricati
-        await waitFor(() => {
-            // Qui aspettiamo che i collegamenti siano presenti nel DOM
-            expect(screen.getByText('Link 1')).toBeInTheDocument();
-            expect(screen.getByText('Link 2')).toBeInTheDocument();
-        });
-    
-        // Controlla che il pulsante per aprire la dropdown esista
-        
-    
-        // Verifica che la lista dei collegamenti non sia visibile inizialmente
-        let linkList = screen.queryByText('Link 1');
-        expect(linkList).not.toBeInTheDocument();
-    
-        // Clicca sul pulsante per aprire la dropdown
-        fireEvent.click(toggleButton);
-    
-        // Verifica che i collegamenti siano visibili dopo il click
-        linkList = screen.getByText('Link 1');
-        expect(linkList).toBeInTheDocument();
-    
-        expect(screen.getByText('Link 2')).toBeInTheDocument();
-    });*/
-    
-    
-    
-      
+    });  
 });
