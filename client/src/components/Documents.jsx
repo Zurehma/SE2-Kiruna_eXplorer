@@ -68,8 +68,8 @@ function Documents(props) {
   const [showNField, setShowNField] = useState(false);
   const totalSteps = 4;
   const navigate = useNavigate();
-  const { id } = useParams(); 
   const [files, setFiles] = useState([]);
+  const { id } = useParams();
   const [step, setStep] = useState(1);
   const [types, setTypes] = useState([]);
   const [currentTypes, setCurrentTypes] = useState([]);
@@ -132,7 +132,10 @@ function Documents(props) {
     try {
       const doc = await API.getDocumentById(documentId);
       setDocument(doc); 
-      setShowNField(doc.scale === '1:n');
+      setDocument((prevDocument) => ({
+        ...prevDocument,
+        coordinates: doc.coordinates || { lat: '', long: '' }, 
+      }));      
     } catch (error) {
       console.error("Error fetching document:", error);
     }
@@ -308,21 +311,30 @@ const handleNextStep = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const doc= await API.saveDocument(document);  
-      //Try to submit files
-      if (files.length > 0) {
-        files.forEach(async (file) => {
-          const formData = new FormData();
-          formData.append('file', file);
-          try {
-            await API.uploadFiles(doc.id,formData);
-          } catch (error) {
-            props.setError(error);
-          }
-        } ); 
+      if (id) {
+        // Modalità Edit: aggiorna documento esistente
+        const updatedDoc = await API.updateDocument(id, document);
+        console.log(updatedDoc);
+        props.setUpdatedDoc(updatedDoc); // Se necessario
+        console.log("Document updated successfully:", updatedDoc);
+        navigate(`/`);
+      } else {
+        const doc= await API.saveDocument(document);  
+        //Try to submit files
+        if (files.length > 0) {
+          files.forEach(async (file) => {
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+              await API.uploadFiles(doc.id,formData);
+            } catch (error) {
+              props.setError(error);
+            }
+          } ); 
+        }
+        props.setNewDoc(doc);
+        navigate(`/documents/links`);
       }
-      props.setNewDoc(doc);
-      navigate(`/documents/links`);
     } catch (error) {
       console.error("Error saving document:", error);
       props.setError(error);
@@ -762,6 +774,4 @@ const handleNextStep = () => {
 }
 
 export default Documents;
-
-
 

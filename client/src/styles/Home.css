@@ -1,5 +1,3 @@
-/* Updated Home.css */
-
 /* Animations */
 @keyframes fadeIn {
   0% { opacity: 0; }
@@ -21,37 +19,60 @@
   100% { transform: translateY(20px); opacity: 0; }
 }
 
-/* Home Background Animations */
+/* Vendor-prefixed animations for older browsers */
+@-webkit-keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@-webkit-keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@-moz-keyframes slideUp {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@-moz-keyframes slideDown {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(20px); opacity: 0; }
+}
+
+/* Animation Classes */
 .fade-in {
   animation: fadeIn 1.5s ease-in forwards;
-  pointer-events: none; /* Prevent rapid clicks */
+  pointer-events: none;
+  will-change: opacity;
 }
 
 .fade-out {
   animation: fadeOut 1.5s ease-out forwards;
-  pointer-events: none; /* Prevent rapid clicks */
+  pointer-events: none;
+  will-change: opacity;
 }
 
-/* Home Container Animations */
 .slide-up {
   animation: slideUp 1.5s ease-in-out forwards;
-  pointer-events: none; /* Prevent rapid clicks */
+  pointer-events: none;
+  will-change: transform, opacity;
 }
 
 .slide-down {
   animation: slideDown 1.5s ease-in-out forwards;
-  pointer-events: none; /* Prevent rapid clicks */
+  pointer-events: none;
+  will-change: transform, opacity;
 }
 
 /* Base Styles */
-/* Ensures the background covers the full viewport */
 html, body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* Prevents horizontal scrolling */
+  overflow-x: hidden;
 }
 
-/* Background for the home page with fade transition */
+/* Home Background */
 .home-background {
   background-size: cover;
   background-position: center;
@@ -61,29 +82,34 @@ html, body {
   position: absolute;
   top: 0;
   left: 0;
-  transition: background-image 1.5s ease; /* Smooth transition effect */
-  pointer-events: none; /* Prevent rapid clicks */
+  transition: background-image 1.5s ease;
+  -webkit-transition: background-image 1.5s ease;
+  -moz-transition: background-image 1.5s ease;
+  -o-transition: background-image 1.5s ease;
+  pointer-events: none;
 }
 
-/* Main Container */
+/* Home Container */
 .home-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(255, 255, 255, 0.486);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px); /* WebKit support */
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
   max-width: 600px;
-  width: 90%; /* To make it responsive */
+  width: 90%;
   position: absolute;
   left: 50%;
   top: 55%;
   transform: translate(-50%, -50%);
   z-index: 1;
-  pointer-events: all; /* Re-enable clicks within container */
+  pointer-events: all;
+  will-change: backdrop-filter;
 }
 
 /* Title Styles */
@@ -92,12 +118,13 @@ html, body {
   font-weight: bold;
   color: #006d77;
   margin-bottom: 20px;
-  line-height: 1.3;
   text-align: center;
 }
 
 /* Buttons */
-.redirect-button, .read-more-button, .back-home-button {
+.redirect-button,
+.read-more-button,
+.back-home-button {
   display: inline-block;
   margin-top: 20px;
   padding: 12px 25px;
@@ -140,8 +167,7 @@ html, body {
   animation: fadeIn 1.5s ease-in forwards;
 }
 
-/* Responsive Adjustments */
-/* For tablets and smaller laptops */
+/* Responsive Styles */
 @media (max-width: 768px) {
   .home-container {
     padding: 20px;
@@ -152,7 +178,9 @@ html, body {
     font-size: 1.8rem;
   }
 
-  .redirect-button, .read-more-button, .back-home-button {
+  .redirect-button,
+  .read-more-button,
+  .back-home-button {
     padding: 10px 20px;
     font-size: 1rem;
   }
@@ -162,7 +190,6 @@ html, body {
   }
 }
 
-/* For mobile devices */
 @media (max-width: 480px) {
   .home-title {
     font-size: 1.5rem;
@@ -174,7 +201,9 @@ html, body {
     width: 90%;
   }
 
-  .redirect-button, .read-more-button, .back-home-button {
+  .redirect-button,
+  .read-more-button,
+  .back-home-button {
     padding: 8px 15px;
     font-size: 0.9rem;
   }
@@ -184,7 +213,6 @@ html, body {
   }
 }
 
-/* For very small mobile screens */
 @media (max-width: 350px) {
   .home-title {
     font-size: 1.2rem;
@@ -195,7 +223,9 @@ html, body {
     width: 95%;
   }
 
-  .redirect-button, .read-more-button, .back-home-button {
+  .redirect-button,
+  .read-more-button,
+  .back-home-button {
     padding: 6px 10px;
     font-size: 0.8rem;
   }
@@ -205,8 +235,9 @@ html, body {
   }
 }
 
-@media (max-width:250px) {
-  .home-container{
+/* For very small mobile screens */
+@media (max-width: 250px) {
+  .home-container {
     display: none;
   }
 }

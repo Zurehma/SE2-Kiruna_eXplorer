@@ -26,6 +26,7 @@ function App() {
     const [role, setRole] = useState('');
     const [newDoc, setNewDoc] = useState('');
     const [hideDocBar, sethideDocBar] = useState(false);
+    const [editDoc, setEditDoc] = useState('');
     const navigate = useNavigate();
     
     
@@ -88,6 +89,8 @@ function App() {
               <Route path="/documents" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError}/>}/>
               <Route path="/documents/links" element={<Links newDoc={newDoc} setNewDoc={setNewDoc}  />}/>
               <Route path="/documents/all" element={<FilteringDocuments loggedIn={loggedIn}/>}/>
+              <Route path="/documents/:id" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />} 
+/>
               </Routes>
           </Container>
         </div>

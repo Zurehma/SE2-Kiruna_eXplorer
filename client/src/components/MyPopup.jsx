@@ -90,12 +90,12 @@ function MyPopup(props) {
 
   const handleClick = () => {
     if (props.doc && props.doc.id && props.doc.id > 0) {
-      navigate(`/editDocument`, { state: { docId: props.doc.id } });
+      navigate(`/documents/${props.doc.id}`, { state: { docId: props.doc.id } });
     } else {
       props.setError('Invalid document data');
     }
   };
-
+  
   // Helper function to display "-" if value is null
   const displayValue = (value) => (value !== null ? value : '-');
 
