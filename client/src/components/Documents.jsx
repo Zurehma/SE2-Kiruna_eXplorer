@@ -68,8 +68,8 @@ function Documents(props) {
   const [showNField, setShowNField] = useState(false);
   const totalSteps = 4;
   const navigate = useNavigate();
-  const { id } = useParams(); 
   const [files, setFiles] = useState([]);
+  const { id } = useParams();
   const [step, setStep] = useState(1);
   const [types, setTypes] = useState([]);
   const [currentTypes, setCurrentTypes] = useState([]);
@@ -132,7 +132,10 @@ function Documents(props) {
     try {
       const doc = await API.getDocumentById(documentId);
       setDocument(doc); 
-      setShowNField(doc.scale === '1:n');
+      setDocument((prevDocument) => ({
+        ...prevDocument,
+        coordinates: doc.coordinates || { lat: '', long: '' }, 
+      }));      
     } catch (error) {
       console.error("Error fetching document:", error);
     }
