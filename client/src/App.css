@@ -15,7 +15,6 @@
 /* As soon as the form works, try to place the min-width to MyPopup instead of the Popup-> it seems working, you have to try with a smaller description */
 .popupProp{
   min-width: 90vh; 
-  max-height: 70vh;
 }
 .leaflet-popup-content-wrapper {
   width: 100%;
