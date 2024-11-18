@@ -109,6 +109,21 @@ function Documents(props) {
     description: '',
     pages: ''
   });
+
+  const resetState = () => {
+    setDocument(() => ({
+      title: '',
+      stakeholder: '',
+      scale: '',
+      nValue: '',
+      issuanceDate: '',
+      type: '',
+      language: '',
+      coordinates: '',
+      description: '',
+      pages: ''
+    }));
+  };
   
   useEffect(() => {
     const fetchTypes = async () => {
@@ -129,23 +144,49 @@ function Documents(props) {
       fetchDocument(id); 
       //here fetch existing attachments, so that you can give the possibility to modify them 
       fetchAttachments(id);
+    }else{
+      resetState();
     }
   }, [id]);
 
   const fetchDocument = async (documentId) => {
     try {
       const doc = await API.getDocumentById(documentId);
-      setDocument(doc); 
+      
+      // Assicurati che `coordinates` sia un oggetto con valori predefiniti se è nullo
+      const coordinates = doc.coordinates || { lat: '', long: '' };
+  
+      // Calcola `pages` in base ai valori ricevuti
+      let pages = doc.pages; // Mantieni il valore esistente di `pages`
+      if (!doc.pages && doc.pageFrom && doc.pageTo) {
+        pages = `${doc.pageFrom}-${doc.pageTo}`; // Genera "10-20" se entrambi sono presenti
+      } 
+  
+      // Gestisci il valore di `scale`
+      let scale = doc.scale;
+      let nValue = null; // Campo da aggiungere a `document`
+      if (scale !== 'Text' && scale !== 'Blueprints/Effects' ) {
+        nValue = Number(scale); // Imposta nValue con il valore numerico di scale
+        scale = `1:n`;  // Imposta scale come "1:n"
+        setShowNField(true);
+      }
+  
       setDocument((prevDocument) => ({
-        ...prevDocument,
-        coordinates: doc.coordinates || { lat: '', long: '' }, 
-      }));    
-      setPosition(doc.coordinates.lat? {lat:doc.coordinates.lat,lng:doc.coordinates.long} : { lat: null, lng: null });
+        ...doc,
+        coordinates, // Imposta le coordinate predefinite
+        pages,       // Imposta il campo pages calcolato
+        scale,       // Imposta il campo scale aggiornato
+        nValue,      // Aggiungi il campo nValue
+      }));
+  
+      console.log(doc);
     } catch (error) {
       console.error("Error fetching document:", error);
       props.setError(error);
     }
   };
+  
+  
 
   const fetchAttachments = async (documentId) => {
     try {
@@ -362,12 +403,14 @@ const handleNextStep = () => {
             props.setError(error);
           }     
         });
+        resetState();
         navigate(`/`);
       } else {
         const doc= await API.saveDocument(document);  
         //Try to submit files
         handleFileUpload(doc);
         props.setNewDoc(doc);
+        resetState();
         navigate(`/documents/links`);
       }
     } catch (error) {
@@ -771,8 +814,7 @@ const handleNextStep = () => {
        <Container className="d-flex align-items-center justify-content-center min-vh-100">
          <Card className="p-4 shadow-lg w-100" style={{ maxWidth: '700px' }}>
            <Card.Body>
-             <Card.Title className="mb-4 text-center">ADD NEW DOCUMENT</Card.Title>
-
+           <Card.Title className="mb-4 text-center">{id ? `EDIT DOCUMENT: ${id}` : "ADD NEW DOCUMENT"}</Card.Title>
              {/* Step Indicator with Clickable Buttons */}
              <StepIndicator step={step}  totalSteps={4}  setStep={setStep}
                 validateStep={(currentStep) => {
