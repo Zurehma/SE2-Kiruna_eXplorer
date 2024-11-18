@@ -7,11 +7,19 @@
   overflow: hidden;
 }
 
+.popupPropPlus {
+  max-height: 30vh; 
+  overflow-y: auto; 
+}
+
+/* As soon as the form works, try to place the min-width to MyPopup instead of the Popup-> it seems working, you have to try with a smaller description */
+.popupProp{
+  min-width: 90vh; 
+}
 .leaflet-popup-content-wrapper {
   width: 100%;
   max-width: 90vw;
-  min-width: 90vh;
-  max-height: 70vh;
+  max-height: 50vh;
   overflow-y: auto;
   background-color: rgba(255, 255, 255, 0.8);
   color: #000;
@@ -164,4 +172,30 @@ margin: 0;
   opacity: 1;
 }
 
+/* Mantiene il colore dell'icona del bottone anche durante l'hover */
+.edit-button:hover .edit-icon {
+  color: #d9e0eb !important; 
+}
+
+.edit-icon {
+  color: #0d6efd; /* Colore normale blu scuro */
+}
+
+.file-input {
+  height: auto;  
+}
+
+.myPopup ul {
+  overflow-wrap: break-word; /* Permette la divisione delle parole troppo lunghe */
+  word-break: break-word; /* Specifica come gestire le parole troppo lunghe */
+  white-space: normal; /* Imposta il testo per andare a capo */
+}
+
+.myPopup ul li {
+  margin-bottom: 0.5rem; /* Aggiunge spazio tra gli elementi */
+  line-height: 1.5; /* Migliora la leggibilità */
+}
+.myPopup ul li a {
+  font-size: 0.675rem; /* Riduce la dimensione del testo (14px) */
+}
 

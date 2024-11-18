@@ -11,8 +11,9 @@ import { Login } from './components/Login';
 import Home from './components/Home';
 import Documents from './components/Documents.jsx';
 import { NavigationBar } from './components/NavigationBar.jsx';
-import {Map2} from '../src/components/Map2.jsx';
+import Map2 from '../src/components/Map2.jsx';
 import API from '../API.js';
+import FilteringDocuments from './components/FilteringDocuments.jsx';
 
 
 function App() {
@@ -24,6 +25,8 @@ function App() {
     const [loggedIn, setLoggedIn] = useState(false);
     const [role, setRole] = useState('');
     const [newDoc, setNewDoc] = useState('');
+    const [hideDocBar, sethideDocBar] = useState(false);
+    const [editDoc, setEditDoc] = useState('');
     const navigate = useNavigate();
     
     
@@ -72,7 +75,7 @@ function App() {
     
     return (
         <div className="min-vh-100 d-flex flex-column">
-          <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} role={role} />
+          <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} role={role} sethideDocBar= {sethideDocBar} hideDocBar ={sethideDocBar}/>
           <Container fluid className="flex-grow-1 d-flex flex-column px-0">
             {error && (
                 <Alert variant="danger" className="fixed-top mt-3" style={{zIndex:1500}} dismissible onClose={() => setError(null)}>
@@ -82,9 +85,12 @@ function App() {
             <Routes>
               <Route path="/" element={<Home setError={setError} />} />
               <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} loggedinError={loggedinError} setloggedinError={setloggedinError}/>}/>
-              <Route path="/map" element={<Map2 setError={setError}/>}/>
+              <Route path="/map" element={<Map2 setError={setError} loggedIn={loggedIn}/>}/>
               <Route path="/documents" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError}/>}/>
               <Route path="/documents/links" element={<Links newDoc={newDoc} setNewDoc={setNewDoc}  />}/>
+              <Route path="/documents/all" element={<FilteringDocuments loggedIn={loggedIn}/>}/>
+              <Route path="/documents/:id" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />} 
+/>
               </Routes>
           </Container>
         </div>

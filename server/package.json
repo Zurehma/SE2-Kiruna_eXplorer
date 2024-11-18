@@ -20,6 +20,7 @@
     "express": "^5.0.1",
     "express-session": "^1.18.1",
     "express-validator": "^7.2.0",
+    "kirunaexplorer": "file:",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "officemanagement": "file:",
