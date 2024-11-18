@@ -74,6 +74,72 @@ describe("DocumentDAO", () => {
     });
   });
 
+  describe("updateDocument", () => {
+    beforeEach(() => {
+      documentDAO = new DocumentDAO();
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
+
+    test("Update successful", async () => {
+      const mockDBRun = jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
+        callback.call({ changes: 1, lastID: 1}, null);
+      });
+
+      const result = await documentDAO.updateDocument(
+        1,
+        "example",
+        "example",
+        100,
+        "2024-02-12",
+        "Informative",
+        "english",
+        "Lore ipsum...",
+        null,
+        null,
+        null,
+        null,
+        null
+      );
+
+      expect(result.lastID).toBe(1);
+      expect(result.changes).toBe(1);
+
+    });
+
+    test("DB error", async () => {
+      const error = new Error("");
+
+      const mockDBRun = jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
+        callback(error);
+        return {};
+      });
+
+      const result = documentDAO.updateDocument(
+        1,
+        "example",
+        "example",
+        100,
+        "2024-02-12",
+        "Informative",
+        "english",
+        "Lore ipsum...",
+        null,
+        null,
+        null,
+        null,
+        null
+      );
+
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBRun).toHaveBeenCalled();
+    });
+
+  });
+
   describe("getDocumentById", () => {
     test("Get successful", async () => {
       const exampleDocumentRow = {
