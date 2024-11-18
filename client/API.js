@@ -284,6 +284,18 @@ const getDocumentTypes = async () => {
         .then((response) => response.json());
 };
 
+//Function to delete an attachment
+const deleteAttachment = async (docID, attachmentID) => {
+    try {
+        const response = await fetch(`${SERVER_URL}/documents/${docID}/attachments/${attachmentID}`, {
+            method: 'DELETE',
+            credentials: 'include',
+        });
+        return handleInvalidResponse(response).json();
+    } catch (error) {
+        throw error;
+    }
+};
 
 //Export API methods
 const API = {
@@ -302,7 +314,8 @@ const API = {
     getLinksDoc,
     getAttachments,
     downloadAttachment,
-    filterDocuments
+    filterDocuments,
+    deleteAttachment
 };
   
 
