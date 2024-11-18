@@ -139,12 +139,14 @@ function Documents(props) {
       setDocument((prevDocument) => ({
         ...prevDocument,
         coordinates: doc.coordinates || { lat: '', long: '' }, 
-      }));      
+      }));    
+      setPosition(doc.coordinates.lat? {lat:doc.coordinates.lat,lng:doc.coordinates.long} : { lat: null, lng: null });
     } catch (error) {
       console.error("Error fetching document:", error);
       props.setError(error);
     }
   };
+
   const fetchAttachments = async (documentId) => {
     try {
       const attachments = await API.getAttachments(documentId);
@@ -192,6 +194,7 @@ function Documents(props) {
 
   const validateCoordinates = (lat, lng) => {
     const point = [lat, lng]; // ordine GeoJSON: [lng, lat]
+
     const isInside = turf.booleanPointInPolygon(point, polygonGeoJson);
     return isInside;
   };
@@ -314,7 +317,7 @@ const handleNextStep = () => {
   }, [position.lat,position.lng]);
 
   useEffect(() => {
-    if (document.coordinates.lat && document.coordinates.long && validateCoordinates(Number(document.coordinates.lat),Number(document.coordinates.lat))) {
+    if (document.coordinates.lat && document.coordinates.long && validateCoordinates(Number(document.coordinates.lat),Number(document.coordinates.long))) {
       setPosition({ lat: document.coordinates.lat, lng: document.coordinates.long });
     }else if(document.coordinates.lat && document.coordinates.long && !validateCoordinates(Number(document.coordinates.lat),Number(document.coordinates.long))){
       setPosition({ lat: null, lng: null });
@@ -344,13 +347,7 @@ const handleNextStep = () => {
     e.preventDefault();
     try {
       if (id) {
-        // Modalità Edit: aggiorna documento esistente
-        const updatedDoc = await API.updateDocument(id, document);
-        console.log(updatedDoc);
-        props.setUpdatedDoc(updatedDoc); // Se necessario
-        console.log("Document updated successfully:", updatedDoc);
-        //Add new files and delete files
-        handleFileUpload(doc);
+        handleFileUpload(document.id);
         filesToBeDeleted.forEach(async (attachmentId) => {
           try{
             await API.deleteAttachment(id, attachmentId);
@@ -359,6 +356,13 @@ const handleNextStep = () => {
             props.setError(error);
           }     
         });
+        // Modalità Edit: aggiorna documento esistente
+        const updatedDoc = await API.updateDocument(id, document);
+        console.log(updatedDoc);
+        props.setUpdatedDoc(updatedDoc); // Se necessario
+        console.log("Document updated successfully:", updatedDoc);
+        //Add new files and delete files
+        
         navigate(`/`);
       } else {
         const doc= await API.saveDocument(document);  
