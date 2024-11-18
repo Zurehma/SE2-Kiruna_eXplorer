@@ -268,16 +268,6 @@ const deleteAttachment = async (docID, attachmentID) => {
         throw error;
     }
 }
-const updateDocument = async (documentId, documentData) =>{
-    const response = await fetch(`/api/documents/${documentId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(documentData),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to update document");
 
 // Function to save a document
 const saveDocument = async (doc) => {
