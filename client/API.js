@@ -301,7 +301,6 @@ const deleteAttachment = async (docID, attachmentID) => {
             method: 'DELETE',
             credentials: 'include',
         });
-        return handleInvalidResponse(response).json();
     } catch (error) {
         throw error;
     }

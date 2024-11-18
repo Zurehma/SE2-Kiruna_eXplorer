@@ -347,7 +347,13 @@ const handleNextStep = () => {
     e.preventDefault();
     try {
       if (id) {
-        handleFileUpload(document.id);
+        // Modalità Edit: aggiorna documento esistente
+        const updatedDoc = await API.updateDocument(id, document);
+        console.log(updatedDoc);
+        props.setUpdatedDoc(updatedDoc); // Se necessario
+        console.log("Document updated successfully:", updatedDoc);
+        //Add new files and delete files
+        handleFileUpload(updatedDoc);
         filesToBeDeleted.forEach(async (attachmentId) => {
           try{
             await API.deleteAttachment(id, attachmentId);
@@ -356,13 +362,6 @@ const handleNextStep = () => {
             props.setError(error);
           }     
         });
-        // Modalità Edit: aggiorna documento esistente
-        const updatedDoc = await API.updateDocument(id, document);
-        console.log(updatedDoc);
-        props.setUpdatedDoc(updatedDoc); // Se necessario
-        console.log("Document updated successfully:", updatedDoc);
-        //Add new files and delete files
-        
         navigate(`/`);
       } else {
         const doc= await API.saveDocument(document);  
