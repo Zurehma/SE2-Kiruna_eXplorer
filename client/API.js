@@ -105,43 +105,6 @@ const getLinksDoc = async (documentId) => {
         .then(response => response.json());
 };
 
-
-// Function to save a document
-const saveDocument = async (doc) => {
-
-    const filteredDoc = Object.fromEntries(
-        Object.entries({
-            title: doc.title,
-            stakeholder: doc.stakeholder,
-            scale: doc.scale,
-            issuanceDate: doc.issuanceDate,
-            type: doc.type,
-            description: doc.description,
-            language: doc.language,
-            pages: doc.pages,
-            pageFrom: doc.pageFrom,
-            pageTo: doc.pageTo,
-            coordinates: { lat: doc.coordinates.lat, long: doc.coordinates.long },
-        }).filter(([_, value]) => value !== '' && value !== null)
-    );
-
-    console.log(filteredDoc);
-
-    try {
-        const response = await fetch(`${SERVER_URL}/documents/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(filteredDoc),
-        });
-        
-        return handleInvalidResponse(response).json();
-    } catch (error) {
-        throw error;
-    }
-};
-
-
 /** 
  * Function to get the attachments of a document given its ID. 
  */
@@ -294,18 +257,75 @@ const getDocumentTypes = async () => {
         .then((response) => response.json());
 };
 
-const updateDocument = async (documentId, documentData) =>{
-    const response = await fetch(`/api/documents/${documentId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(documentData),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to update document");
+
+// Function to save a document
+const saveDocument = async (doc) => {
+
+    const filteredDoc = Object.fromEntries(
+        Object.entries({
+            title: doc.title,
+            stakeholder: doc.stakeholder,
+            scale: doc.scale,
+            issuanceDate: doc.issuanceDate,
+            type: doc.type,
+            description: doc.description,
+            language: doc.language,
+            pages: doc.pages,
+            pageFrom: doc.pageFrom,
+            pageTo: doc.pageTo,
+            coordinates: { lat: doc.coordinates.lat, long: doc.coordinates.long },
+        }).filter(([_, value]) => value !== '' && value !== null)
+    );
+
+    console.log(filteredDoc);
+
+    try {
+        const response = await fetch(`${SERVER_URL}/documents/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(filteredDoc),
+        });
+        
+        return handleInvalidResponse(response).json();
+    } catch (error) {
+        throw error;
     }
-    return await response.json();
+};
+
+const updateDocument = async (documentId, doc) =>{
+
+    const filteredDoc = Object.fromEntries(
+        Object.entries({
+            title: doc.title,
+            stakeholder: doc.stakeholder,
+            scale: doc.scale,
+            issuanceDate: doc.issuanceDate,
+            type: doc.type,
+            description: doc.description,
+            language: doc.language,
+            pages: doc.pages,
+            pageFrom: doc.pageFrom,
+            pageTo: doc.pageTo,
+            coordinates: { lat: doc.coordinates.lat, long: doc.coordinates.long },
+        }).filter(([_, value]) => value !== '' && value !== null)
+    );
+
+    console.log(filteredDoc);
+    try {
+        const response = await fetch(`${SERVER_URL}/documents/${documentId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: 'include',
+            body: JSON.stringify(filteredDoc),
+        });
+        return await response.json();
+
+    } catch (error) {
+        throw error;
+    }
 };
 
 //Export API methods
