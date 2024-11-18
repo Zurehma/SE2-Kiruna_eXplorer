@@ -127,7 +127,7 @@ function Documents(props) {
 
     if (id) {
       fetchDocument(id); 
-      //here fetch existing attachments
+      //here fetch existing attachments, so that you can give the possibility to modify them 
       fetchAttachments(id);
     }
   }, [id]);
@@ -350,7 +350,7 @@ const handleNextStep = () => {
         props.setUpdatedDoc(updatedDoc); // Se necessario
         console.log("Document updated successfully:", updatedDoc);
         //Add new files and delete files
-        handleFileUpload(updatedDoc);
+        handleFileUpload(doc);
         filesToBeDeleted.forEach(async (attachmentId) => {
           try{
             await API.deleteAttachment(id, attachmentId);
