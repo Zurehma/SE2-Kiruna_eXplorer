@@ -145,6 +145,7 @@ class DocumentController {
         }
 
         const oldDocument = await this.documentDAO.getDocumentByID(id);
+        console.log(oldDocument);
 
         if (oldDocument == undefined) {
           const error = { errCode: 404, errMessage: "Document not found." };
@@ -182,6 +183,8 @@ class DocumentController {
         } else {
           processedPageTo = oldDocument.pageTo;
         }
+
+        console.log(oldDocument);
 
         await this.documentDAO.updateDocument(
           id,
