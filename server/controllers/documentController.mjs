@@ -9,17 +9,6 @@ class DocumentController {
     this.documentDAO = new DocumentDAO();
   }
 
-  // getDocuments = () => {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       const documents = await this.documentDAO.getDocuments();
-  //       resolve(documents);
-  //     } catch (err) {
-  //       reject(err);
-  //     }
-  //   });
-  // };
-
   getDocumentById = (id) => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -145,7 +134,6 @@ class DocumentController {
         }
 
         const oldDocument = await this.documentDAO.getDocumentByID(id);
-        console.log(oldDocument);
 
         if (oldDocument == undefined) {
           const error = { errCode: 404, errMessage: "Document not found." };
@@ -183,8 +171,6 @@ class DocumentController {
         } else {
           processedPageTo = oldDocument.pageTo;
         }
-
-        console.log(oldDocument);
 
         await this.documentDAO.updateDocument(
           id,

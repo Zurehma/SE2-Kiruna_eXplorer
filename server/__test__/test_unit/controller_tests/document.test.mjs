@@ -3,11 +3,12 @@ import DocumentController from "../../../controllers/documentController.mjs";
 import Document from "../../../models/document.mjs";
 import DocumentDAO from "../../../dao/documentDAO.mjs";
 import dayjs from "dayjs";
+import { mapRowsToDocument } from "../../../dao/documentDAO.mjs";
 
 jest.mock("../../../dao/documentDAO");
 
 describe("DocumentController", () => {
-    describe("getDocument", () => {
+    describe("getDocuments", () => {
       /**
        * @type {DocumentController}
        */
@@ -15,19 +16,38 @@ describe("DocumentController", () => {
       let documentDAO;
 
       const exampleDocumentData = {
-        title: "title",
-        stakeholder: "stakeholder",
-        scale: "Text",
-        issuanceDate: dayjs().add(1, "day").format("YYYY-MM-DD"),
-        type: "Informative",
-        language: "English",
-        description: "Lore ipsum...",
-        pages: 16,
-        pageFrom: null,
-        pageTo: null,
-        lat: null,
-        long: null,
-      };
+        "filerOut": [{
+          id: 5,
+          title: "Document 2",
+          stakeholder: "Stakeholder",
+          scale: 100,
+          issuanceDate: "2023-01-01",
+          type: "Design",
+          connections: 5,
+          language: "english",
+          description: "Desc",
+          coordinates: null,
+          pages: null,
+          pageFrom: null,
+          pageTo: null
+        },
+        {
+          id: 6,
+          title: "Document 2",
+          stakeholder: "Stakeholder",
+          scale: 100,
+          issuanceDate: "2023-01-01",
+          type: "Design",
+          connections: 5,
+          language: "english",
+          description: "Desc",
+          coordinates: null,
+          pages: null,
+          pageFrom: null,
+          pageTo: null
+        }
+      ]
+      }
   
       beforeEach(() => {
         documentDAO = new DocumentDAO();
@@ -40,40 +60,64 @@ describe("DocumentController", () => {
         jest.restoreAllMocks();
       });
   
-      test("All Documents retrieved successfully", async () => {
-        let queryParameter = { type: null, stakeholder: null, issuanceDateFrom: null, issuanceDateTo: null};
-        
+      test("All Documents retrieved successfully", async () => {        
         jest.spyOn(documentDAO, "getDocuments").mockResolvedValue(exampleDocumentData);
-        let response = await documentController.getDocuments(null, null, null, null);
+        let response = await documentController.getDocuments("Design", "Stakeholder", null, null);
   
-        // { type: "Informative", stakeholder: "stakeholder", issuanceDateFrom: '2010-10-10', issuanceDateTo: '2020-10-10'}
         expect(documentDAO.getDocuments).toHaveBeenCalled();
+        let queryParameter = { type: "Design", stakeholder: "Stakeholder", issuanceDateFrom: null, issuanceDateTo: null};
         expect(documentDAO.getDocuments).toHaveBeenCalledWith(queryParameter);
 
-        expect(response).toBe(exampleDocumentData);
+        for (let i = 0; i < exampleDocumentData.length; i++) {
+          expect(response[i]).toBe(mapRowsToDocument(exampleDocumentData[i]));
+        }
       });
   
-      test("Wrong document type", async () => {
-        const result = documentController.addDocument(
-          exampleDocumentData.title,
-          exampleDocumentData.stakeholder,
-          exampleDocumentData.scale,
-          exampleDocumentData.issuanceDate,
-          exampleDocumentData.type,
-          exampleDocumentData.description,
-          exampleDocumentData.language,
-          exampleDocumentData.pages
-        );
-  
-        expect(result).rejects.toStrictEqual({ errCode: 400, errMessage: "Document type error!" });
-      });
+      // test("Wrong filter applied", async () => {
+      //   expect(result).rejects.toStrictEqual({ errCode: 400, errMessage: "Document filter error!" });
+      // });
     });
 
 
+    describe("getDocumentById", () => {
+      /**
+       * @type {DocumentController}
+       */
+      let documentController;
+      let documentDAO;
+    
+      const exampleDocument = new Document(5, "Document 2", "Stakeholder", 100, "2023-01-01", "Design", 5, "english", "Desc", null, null, null, null);
 
+      beforeEach(() => {
+        documentDAO = new DocumentDAO();
+        documentController = new DocumentController();
+        documentDAO = documentController.documentDAO;
+      });
+  
+      afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
+      });
+  
+      test("Document retrieved successfully", async () => {        
+        jest.spyOn(documentDAO, "getDocumentByID").mockResolvedValue(exampleDocument);
+        let response = await documentController.getDocumentById(5);
+  
+        expect(documentDAO.getDocumentByID).toHaveBeenCalled();
+        expect(documentDAO.getDocumentByID).toHaveBeenCalledWith(5);
 
+        expect(response).toBe(exampleDocument);
+      });
+  
+      test("ID doesn't exist", async () => {
+        const error = new Error("");
 
+        jest.spyOn(documentDAO, "getDocumentByID").mockResolvedValue(error);
+        let result = documentController.getDocumentById(5);
 
+        expect(result).rejects.toStrictEqual(error);
+      });
+    });
 
   describe("addDocument", () => {
     /**

@@ -10,6 +10,27 @@ jest.mock("../../../db/db.mjs");
  */
 let documentDAO;
 
+const mapRowsToDocument = (rows) => {
+  return rows.map(
+    (row) =>
+      new Document(
+        row.id,
+        row.title,
+        row.stakeholder,
+        row.scale,
+        row.issuanceDate,
+        row.type,
+        row.connections,
+        row.language,
+        row.description,
+        row.coordinates || null,
+        row.pages || null,
+        row.pageFrom || null,
+        row.pageTo || null
+      )
+  );
+};
+
 describe("DocumentDAO", () => {
   describe("addDocument", () => {
     beforeEach(() => {
@@ -72,6 +93,72 @@ describe("DocumentDAO", () => {
       await expect(result).rejects.toEqual(error);
       expect(mockDBRun).toHaveBeenCalled();
     });
+  });
+
+  describe("updateDocument", () => {
+    beforeEach(() => {
+      documentDAO = new DocumentDAO();
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
+
+    test("Update successful", async () => {
+      const mockDBRun = jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
+        callback.call({ changes: 1, lastID: 1}, null);
+      });
+
+      const result = await documentDAO.updateDocument(
+        1,
+        "example",
+        "example",
+        100,
+        "2024-02-12",
+        "Informative",
+        "english",
+        "Lore ipsum...",
+        null,
+        null,
+        null,
+        null,
+        null
+      );
+
+      expect(result.lastID).toBe(1);
+      expect(result.changes).toBe(1);
+
+    });
+
+    test("DB error", async () => {
+      const error = new Error("");
+
+      const mockDBRun = jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
+        callback(error);
+        return {};
+      });
+
+      const result = documentDAO.updateDocument(
+        1,
+        "example",
+        "example",
+        100,
+        "2024-02-12",
+        "Informative",
+        "english",
+        "Lore ipsum...",
+        null,
+        null,
+        null,
+        null,
+        null
+      );
+
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBRun).toHaveBeenCalled();
+    });
+
   });
 
   describe("getDocumentById", () => {
@@ -141,6 +228,40 @@ describe("DocumentDAO", () => {
   });
 
   describe("getDocuments", () => {
+    const documentsTestData = {
+      "filerOut": [{
+        id: 5,
+        title: "Document 2",
+        stakeholder: "Stakeholder",
+        scale: 100,
+        issuanceDate: "2023-01-01",
+        type: "Design",
+        connections: 5,
+        language: "english",
+        description: "Desc",
+        coordinates: null,
+        pages: null,
+        pageFrom: null,
+        pageTo: null
+      },
+      {
+        id: 6,
+        title: "Document 2",
+        stakeholder: "Stakeholder",
+        scale: 100,
+        issuanceDate: "2023-01-01",
+        type: "Design",
+        connections: 5,
+        language: "english",
+        description: "Desc",
+        coordinates: null,
+        pages: null,
+        pageFrom: null,
+        pageTo: null
+      }
+    ]
+    }
+
     beforeEach(() => {
       documentDAO = new DocumentDAO();
     });
@@ -149,82 +270,36 @@ describe("DocumentDAO", () => {
       jest.clearAllMocks();
       jest.restoreAllMocks();
     });
-    
-    test("Stakeholder Filter applied successful", async () => {
-      const documentsRow = [
-        {
-          id: 4,
-          title: "Document 1",
-          stakeholder: "Kiruna kommun",
-          scale: 500,
-          issuanceDate: "2014-03-17",
-          type: "Prescriptive",
-          connections: 1,
-          language: "Spanish",
-          description: "Desc",
-          coordinates: null,
-          pages: null,
-          pageFrom: null,
-          pageTo: null
-        },
-        {
-          id: 5,
-          title: "Document 2",
-          stakeholder: "Stakeholder",
-          scale: 100,
-          issuanceDate: "2023-01-01",
-          type: "Design",
-          connections: 5,
-          language: "english",
-          description: "Desc",
-          coordinates: null,
-          pages: null,
-          pageFrom: null,
-          pageTo: null
-        }
-      ]
 
-      const documents = [
-        // new Document(4, 'Document 1', 'Kiruna kommun', 500, '2014-03-17', 'Prescriptive', 1, 'Spanish', 'Description 1', null, null, null, null, null),
-        new Document(5, 'Document 2', 'Stakeholder', 100, '2023-01-01', 'Design', 5, 'english', 'Desc', null, null, null, null)
-      ]
+    test("All documents retrieved", async () => {
+      let stakeholderApplied = mapRowsToDocument(documentsTestData.filerOut);
 
       const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
-        callback(null, documents);
+        callback(null, stakeholderApplied);
       });
 
-      let queryParameter = { type: null, stakeholder: "Stakeholder" , issuanceDateFrom: null, issuanceDateTo: null };
-      const result = await documentDAO.getDocuments(queryParameter);
+      const result = await documentDAO.getDocuments({ stakeholder: "Stakeholder" });
 
-      let doc1 = new Document();
-
-      result.forEach((item) => {
-        expect(item).toBeInstanceOf(Document);
-        if(item.stakeholder == queryParameter.stakeholder) {
-          documents.forEach((doc) => {
-            if(JSON.stringify(item) === JSON.stringify(doc)) {
-                doc1 = doc;
-              }
-          });
-        }
-        expect(item).toStrictEqual(doc1);
-      });
+      for(let i = 0; i < result.length; i++) {
+        expect(result[i]).toStrictEqual(stakeholderApplied[i]);
+      }
 
       expect(mockDBAll).toHaveBeenCalled();
     });
 
-    // test("DB error", async () => {
-    //   const error = new Error("");
 
-    //   const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
-    //     callback(error);
-    //   });
+    test("DB error, no documents found", async () => {
+      const error = new Error("");
 
-    //   const result = documentDAO.getDocuments();
+      const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
+        callback(error);
+      });
 
-    //   await expect(result).rejects.toEqual(error);
-    //   expect(mockDBAll).toHaveBeenCalled();
-    // });
+      const result = documentDAO.getDocuments();
+
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
   });
 
   describe("addLink", () => {
@@ -287,7 +362,7 @@ describe("DocumentDAO", () => {
     test("Link already exists in same order", async () => {
       const docID1 = 1;
       const docID2 = 2;
-      const error = { errCode: 409, errMessage:`Link already exists for ${docID1} and ${docID2}` };
+      const error = { errCode: 409, errMessage: `Link already exists for ${docID1} and ${docID2}` };
       const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
         callback(null, [{ docID1: 1, docID2: 2 }]);
       });
@@ -301,7 +376,7 @@ describe("DocumentDAO", () => {
     test("Link already exists in reverse order", async () => {
       const docID1 = 1;
       const docID2 = 2;
-      const error = { errCode: 409, errMessage:`Link already exists for ${docID1} and ${docID2}` };
+      const error = { errCode: 409, errMessage: `Link already exists for ${docID1} and ${docID2}` };
       const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
         callback(null, [{ docID1: 2, docID2: 1 }]);
       });
@@ -401,8 +476,8 @@ describe("DocumentDAO", () => {
 
     test("getLinks successful", async () => {
       const links = [
-        {linkedDocID: 2, title: 'Document 2', type: 'Direct'},
-        {linkedDocID: 3, title: 'Document 3', type: 'Projection'}
+        { linkedDocID: 2, title: 'Document 2', type: 'Direct' },
+        { linkedDocID: 3, title: 'Document 3', type: 'Projection' }
       ];
 
       const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
@@ -424,7 +499,7 @@ describe("DocumentDAO", () => {
       await expect(result).rejects.toEqual(error);
       expect(mockDBAll).toHaveBeenCalled();
     });
-    
+
   });
 
 

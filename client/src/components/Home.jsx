@@ -1,79 +1,63 @@
+// Home.js
 import React, { useState } from 'react';
 import '../styles/Home.css';
 import { Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [currentImage, setCurrentImage] = useState(null);
+  const [backgroundImage, setBackgroundImage] = useState("kiruna.jpg");
+  const [titleText, setTitleText] = useState("Kiruna: A Town in Motion – Relocating for a Sustainable Future");
+  const [showInfo, setShowInfo] = useState(false); 
   const navigate = useNavigate();
-
-  const images = [
-    {
-      id: 1,
-      src: '/kirunaSinking.jpg',
-      description: 'Kiruna is sinking due to underground iron ore mining, threatening its infrastructure. As a result, the town is being relocated 3 kilometers away to ensure residents safety and preserve its cultural heritage.',
-      className: 'image-one',
-    },
-    {
-      id: 2,
-      src: '/New_Kiruna_01.jpg',
-      description: 'Kiruna faces transportation issues due to its remote location and harsh weather conditions, which can disrupt travel and logistics. Limited public transport options and dependence on road networks complicate access to and from the town. Additionally, ongoing construction related to the town`s relocation further impacts transportation efficiency.',
-      className: 'image-two',
-    },
-    {
-      id: 3,
-      src: '/swed.jpg',
-      description: 'Kiruna is a town in northern Sweden known for its rich iron ore deposits and stunning Arctic landscapes. Founded in the late 19th century, it became the largest town in Lapland and is famous for attractions like the Icehotel and the Northern Lights. Currently, Kiruna is undergoing a significant relocation project due to subsidence from mining, reflecting its adaptability and commitment to preserving its cultural heritage.',
-      className: 'image-three',
-    },
-  ];
-
-  const openModal = (image, event) => {
-    setCurrentImage(image);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setCurrentImage(null);
-  };
 
   const handleButtonClick = () => {
     navigate('/map');
   };
 
+  const readMore = () => {
+    setBackgroundImage("kirunadocs.png");
+    setTitleText("Why we do the relocation of Kiruna?");
+    setShowInfo(true); 
+  };
+
+  const goBackHome = () => {
+
+    setBackgroundImage("kiruna.jpg");
+    setTitleText("Kiruna: A Town in Motion – Relocating for a Sustainable Future");
+    setShowInfo(false); 
+  };
+
   return (
-    <div className="home-background">
-      <div className="home-images">
-        {images.map((image) => (
-          <img
-            key={image.id}
-            src={image.src}
-            alt={`Image ${image.id}`}
-            className={`static-image animated-image ${image.className}`}
-            onClick={(event) => openModal(image, event)}
-          />
-        ))}
-      </div>
-
+    <div
+      className="home-background"
+      style={{ backgroundImage: `url("/${backgroundImage}")` }}
+    >
       <div className="home-container">
-        <h1 className="home-title">
-          "Kiruna: The Heart of Sweden's Iron Legacy and Gateway to the Arctic"
-        </h1>
-        <button className="redirect-button" onClick={handleButtonClick}>
-          Relocation of Kiruna
-        </button>
+        <h1 className="home-title">{titleText}</h1>
+        
+        {!showInfo ? (
+          <>
+            <button className="redirect-button" onClick={handleButtonClick}>
+              Relocation of Kiruna
+            </button>
+            <button className="read-more-button" onClick={readMore}>
+              Why do we need this relocation? 
+            </button>
+          </>
+        ) : (
+          <>
+            {/* Information Containers */}
+            <div className="info-containers">
+              <div className="info-box">The relocation of Kiruna is essential due to land subsidence caused by decades of extensive mining operations beneath the town. As the world’s largest underground iron ore mine expands, the ground has become unstable, posing serious risks to buildings and infrastructure. Without relocation, residents and essential services would be at risk from sinkholes and structural damage. Moving the town ensures the safety of its community while allowing mining to continue, which is vital for the local economy. This ambitious project also aims to preserve Kiruna’s historical landmarks and community identity.</div>
+            </div>
+            
+            {/* Back to Home Button */}
+            <button className="back-home-button" onClick={goBackHome}>
+              Back to Home
+            </button>
+          </>
+        )}
       </div>
-
-      {currentImage && (
-        <Modal show={showModal} onHide={closeModal} centered={false} className="custom-modal">
-          <Modal.Body className="custom-modal-body" style={{ position: 'relative' }}>
-            <h2 className="modal-description">{currentImage.description}</h2>
-            <img src={currentImage.src} alt={`Image ${currentImage.id}`} className="modal-image" />
-          </Modal.Body>
-        </Modal>
-      )}
     </div>
   );
 };
