@@ -100,7 +100,7 @@ function MyPopup(props) {
   const displayValue = (value) => (value !== null ? value : '-');
 
   return (
-    <Row className="p-3 border rounded shadow-sm" style={{ backgroundColor: '#f9f9f9' }}>
+    <Row className="p-3 border rounded shadow-sm popupProp" style={{ backgroundColor: '#f9f9f9' }}>
       {/* Icon Column */}
       <Col
         xs={12}

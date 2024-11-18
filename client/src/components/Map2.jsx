@@ -104,20 +104,17 @@ function Map2(props) {
     
         const fetchData = async () => {
             try {
-                if (props.loggedIn) {
-                    const filters = selectedType === 'All' ? {} : { type: selectedType };
-                    const documents = await API.filterDocuments(filters);
-                    const updatedDocuments = documents.map(doc => {
-                        if (!doc.coordinates) {
-                            return { ...doc, lat: null, long: null };
-                        } else {
-                            const { lat, long } = doc.coordinates;
-                            return { ...doc, lat, long };
-                        }
-                    });
-                    setData(updatedDocuments);
-
-                }
+                const filters = selectedType === 'All' ? {} : { type: selectedType };
+                const documents = await API.filterDocuments(filters);
+                const updatedDocuments = documents.map(doc => {
+                    if (!doc.coordinates) {
+                        return { ...doc, lat: null, long: null };
+                    } else {
+                        const { lat, long } = doc.coordinates;
+                        return { ...doc, lat, long };
+                    }
+                });
+                setData(updatedDocuments);
             } catch (error) {
                 props.setError(error);
             } finally {
@@ -293,4 +290,4 @@ function Map2(props) {
     );
 }
 
-export { Map2 };
+export default Map2

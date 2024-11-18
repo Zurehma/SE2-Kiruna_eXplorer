@@ -186,4 +186,17 @@ margin: 0;
   height: auto;  
 }
 
+.myPopup ul {
+  overflow-wrap: break-word; /* Permette la divisione delle parole troppo lunghe */
+  word-break: break-word; /* Specifica come gestire le parole troppo lunghe */
+  white-space: normal; /* Imposta il testo per andare a capo */
+}
+
+.myPopup ul li {
+  margin-bottom: 0.5rem; /* Aggiunge spazio tra gli elementi */
+  line-height: 1.5; /* Migliora la leggibilità */
+}
+.myPopup ul li a {
+  font-size: 0.675rem; /* Riduce la dimensione del testo (14px) */
+}
 
