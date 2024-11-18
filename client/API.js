@@ -19,6 +19,16 @@ const getDocuments = async () => {
         .then(response => response.json());
 };
 
+const getDocumentById = async (id) => {
+    return await fetch(`${SERVER_URL}/documents/${id}`)
+      .then(handleInvalidResponse)
+      .then(response => response.json())
+      .catch(error => {
+        console.error(`Error fetching document with id ${id}:`, error);
+        throw error; // Rilancia l'errore per gestirlo a un livello superiore
+      });
+  };
+
 //Upload files
 const uploadFiles = async (docID, formData) => {
     try {
@@ -284,9 +294,23 @@ const getDocumentTypes = async () => {
         .then((response) => response.json());
 };
 
+const updateDocument = async (documentId, documentData) =>{
+    const response = await fetch(`/api/documents/${documentId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(documentData),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to update document");
+    }
+    return await response.json();
+};
 
 //Export API methods
 const API = {
+    updateDocument,
     getStakeholders,
     getDocumentTypes,
     getDocuments,
@@ -302,7 +326,8 @@ const API = {
     getLinksDoc,
     getAttachments,
     downloadAttachment,
-    filterDocuments
+    filterDocuments,
+    getDocumentById
 };
   
 

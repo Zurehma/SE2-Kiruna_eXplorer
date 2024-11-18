@@ -88,6 +88,7 @@ function App() {
               <Route path="/documents" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError}/>}/>
               <Route path="/documents/links" element={<Links newDoc={newDoc} setNewDoc={setNewDoc}  />}/>
               <Route path="/documents/all" element={<FilteringDocuments loggedIn={loggedIn}/>}/>
+              <Route path="/documents/:id" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError}/>} />
               </Routes>
           </Container>
         </div>
