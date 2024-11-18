@@ -10,7 +10,7 @@ function NotFound() {
                     <h1 className="display-1">404</h1>
                     <p className="lead">Not Found</p>
                     <p>The page you are looking for does not exist.</p>
-                    <Button variant="primary" href="/home">Go Home</Button>
+                    <Button variant="primary" href="/">Go Home</Button>
                 </Col>
             </Row>
         </Container>
