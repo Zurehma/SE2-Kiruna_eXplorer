@@ -2,10 +2,8 @@ FROM node:20-alpine AS build_image
 
 WORKDIR /app
 
-ARG VITE_API_URL
-ARG PORT
-ENV VITE_API_URL=${VITE_API_URL}
-ENV PORT=${PORT}
+ENV VITE_API_URL="http://localhost:3001"
+ENV PORT=3000
 
 COPY package*.json .
 
