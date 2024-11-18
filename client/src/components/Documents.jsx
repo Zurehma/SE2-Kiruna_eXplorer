@@ -261,7 +261,7 @@ const validateStep2 = () => {
 
 const validateStep3 = () => {
   const newErrors = {};
-  if (!position.lat || !position.lng || !validateCoordinates(Number(position.lat), Number(position.lng))) {
+  if ((document.coordinates.lat || document.coordinates.long) && !validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))) {
     newErrors.coordinates = "Please enter a valid LATITUDE and LONGITUDE or select from the map.";
   }
   setErrors(newErrors);
