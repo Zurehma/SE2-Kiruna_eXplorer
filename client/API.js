@@ -305,6 +305,7 @@ const deleteAttachment = async (docID, attachmentID) => {
     } catch (error) {
         throw error;
     }
+}
 const updateDocument = async (documentId, documentData) =>{
     const response = await fetch(`/api/documents/${documentId}`, {
       method: "PUT",
@@ -339,7 +340,8 @@ const API = {
     downloadAttachment,
     filterDocuments,
     deleteAttachment,
-    getDocumentById
+    getDocumentById,
+    updateDocument
 };
   
 
