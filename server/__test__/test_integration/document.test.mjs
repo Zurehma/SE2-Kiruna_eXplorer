@@ -177,12 +177,99 @@ describe("DocumentRoutes", () => {
   });
 
   describe("2. - GET /api/documents/links/:id", () => {
-    test("2.1 - It should return 200", async() => {
-      expect(1).toBe(1);
+    test("2.1 - It should return 200 and array of links", async() => {
+
+      //add documents
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const exampleDocumentData2 = {
+        title: "title2",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const exampleDocumentData3 = {
+        title: "title3",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+
+      let result = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData)
+        .expect(201);
+      
+      let result2 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData2)
+        .expect(201);
+
+      let result3 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData3)
+        .expect(201);
+
+      //create links
+      const links = {
+        id1: result.body.id,
+        ids: [result2.body.id, result3.body.id],
+        type: "direct"
+      }
+
+      let resultLink = await request(app)
+        .post(basePath + "/documents/link")
+        .set("Cookie", userCookie)
+        .send(links)
+        .expect(200);
+
+      const exampleLinksResponse = [
+            {
+              "linkedDocID": result2.body.id,
+              "title": "title2",
+              "type": "direct"
+            },
+            {
+              "linkedDocID": result3.body.id,
+              "title": "title3",
+              "type": "direct"
+            }
+          ]
+      
+
+      //get links
+      let resultGetLinks = await request(app)
+        .get(basePath + "/documents/links/" + result.body.id)
+        .set("Cookie", userCookie)
+        .expect(200);
+
+      expect(resultGetLinks.body).toMatchObject(exampleLinksResponse);
+
     });
+  
   });
-
-
 
   describe("3. - POST /api/documents/link", () => {  
 
@@ -418,7 +505,131 @@ describe("DocumentRoutes", () => {
         .set("Cookie", userCookie)
         .expect(200);
     });
+    test("6.2 - It should return 401", async () => {
+      await request(app)
+        .get(basePath + "/documents/link-types")
+        .expect(401);
+    });
   });
+
+  describe("7. - PUT /api/documents/:docID", () => {
+    test("7.1 - It should return 204", async () => {
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+
+      let result = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData)
+        .expect(201);
+
+      const modifiedDocumentData = {
+        title: "title2",
+        scale: 200,
+        issuanceDate: "2024-02-10",
+        language: "Swedish",
+        description: "Lorem ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 20
+      };
+
+      await request(app)
+        .put(basePath + "/documents/" + result.body.id)
+        .set("Cookie", userCookie)
+        .send(modifiedDocumentData)
+        .expect(204);
+
+    });
+
+    test("7.2 - It should return 422 if issuance date later than today", async () => {
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+
+      let result = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData)
+        .expect(201);
+
+      const modifiedDocumentData = {
+        title: "title2",
+        scale: 200,
+        issuanceDate: "2024-02-10",
+        language: "Swedish",
+        description: "Lorem ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 20
+      };
+
+      await request(app)
+        .put(basePath + "/documents/" + result.body.id)
+        .set("Cookie", userCookie)
+        .send({ ...exampleDocumentData, issuanceDate: dayjs().add(2, "day").format("YYYY-MM-DD") })
+        .expect(400);
+
+    });
+
+    test("7.3 - It should return 400 if coordinates outside of Kiruna", async () => {
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+
+      let result = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData)
+        .expect(201);
+
+      const modifiedDocumentData = {
+        title: "title2",
+        scale: 200,
+        issuanceDate: "2024-02-10",
+        language: "Swedish",
+        description: "Lorem ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 20
+      };
+
+      await request(app)
+        .put(basePath + "/documents/" + result.body.id)
+        .set("Cookie", userCookie)
+        .send({ ...exampleDocumentData, coordinates: {"lat": 68.849982, "long": 20.217068} })
+        .expect(400);
+
+    });
+
+      
+
+  });
+      
+
+
 
 });
 

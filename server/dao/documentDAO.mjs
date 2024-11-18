@@ -67,42 +67,39 @@ class DocumentDAO {
         let sqlParams = [];
 
         if (type || stakeholder || issuanceDateFrom || issuanceDateTo) {
-            if (type) {
-                sqlConditions.push("type = ?")
-                sqlParams.push(type)
-            }
-            if (stakeholder) {
-                sqlConditions.push("stakeholder = ?")
-                sqlParams.push(stakeholder)
-            }
-            if (issuanceDateFrom && issuanceDateTo) {
-                sqlConditions.push("issuanceDate between ? AND ?")
-                sqlParams.push(issuanceDateFrom, issuanceDateTo)
-            }
-            if (issuanceDateFrom && !issuanceDateTo) {
-                sqlConditions.push("issuanceDate = ?")
-                sqlParams.push(issuanceDateFrom)
-            }
+          if (type) {
+            sqlConditions.push("type = ?");
+            sqlParams.push(type);
+          }
+          if (stakeholder) {
+            sqlConditions.push("stakeholder = ?");
+            sqlParams.push(stakeholder);
+          }
+          if (issuanceDateFrom && issuanceDateTo) {
+            sqlConditions.push("issuanceDate between ? AND ?");
+            sqlParams.push(issuanceDateFrom, issuanceDateTo);
+          }
+          if (issuanceDateFrom && !issuanceDateTo) {
+            sqlConditions.push("issuanceDate = ?");
+            sqlParams.push(issuanceDateFrom);
+          }
         }
 
         if (sqlConditions.length > 0) {
-            sql += " WHERE " + sqlConditions.join(" AND ")
+          sql += " WHERE " + sqlConditions.join(" AND ");
         }
 
         db.all(sql, sqlParams, (err, rows) => {
-            if (err) {
-                reject(err);
-            }
-            resolve(mapRowsToDocument(rows));
+          if (err) {
+            reject(err);
+          }
+          resolve(mapRowsToDocument(rows));
         });
-      }
-      catch(err){
+      } catch (err) {
         reject(err);
       }
     });
-  }
-
-
+  };
 
   /**
    * Get already present document types
@@ -214,7 +211,18 @@ class DocumentDAO {
     pageFrom = null,
     pageTo = null
   ) => {
-    return new Promise((resolve, reject) => {});
+    return new Promise((resolve, reject) => {
+      const query =
+        "UPDATE DOCUMENT SET title = ?, stakeholder = ?, scale = ?, issuanceDate = ?, type = ?, language = ?, description = ?, coordinates = ?, pages = ?, pageFrom = ?, pageTo = ? WHERE id = ?";
+
+      db.run(query, [title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo, id], function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ changes: this.changes, lastID: this.lastID });
+        }
+      });
+    });
   };
 
   /**

@@ -1,0 +1,36 @@
+services:
+  backend:
+    build:
+      context: ./server
+      args:
+        NODE_ENV: production
+        PORT: 3001
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server/db:/app/src/server/db
+    networks:
+      - kx-network
+  frontend:
+    build:
+      context: ./client
+      args:
+        VITE_API_URL: http://backend:3001
+        PORT: 3000
+    environment:
+      VITE_API_URL: http://backend:3001
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    networks:
+      - kx-network
+    depends_on:
+      backend:
+        condition: service_healthy
+
+networks:
+  kx-network:
+    driver: bridge
