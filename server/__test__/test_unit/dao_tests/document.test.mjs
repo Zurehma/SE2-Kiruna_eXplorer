@@ -312,4 +312,120 @@ describe("DocumentDAO", () => {
       expect(mockDBAll).toHaveBeenCalled;
     });
   });
+
+  describe('getting types', () => {
+    beforeEach(() => {
+      documentDAO = new DocumentDAO();
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
+
+    test('getStakeholders', async () => {
+      const stakeholders = ['stakeholder1', 'stakeholder2'];
+      const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
+        callback(null, stakeholders);
+      });
+
+      const result = await documentDAO.getStakeholders();
+      expect(result).toStrictEqual(stakeholders);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test("error on DB getStakeholders", async () => {
+      const error = new Error("");
+      const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
+        callback(error);
+      });
+
+      const result = documentDAO.getStakeholders();
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test('getDocumentTypes', async () => {
+      const types = ['type1', 'type2'];
+      const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
+        callback(null, types);
+      });
+
+      const result = await documentDAO.getDocumentTypes();
+      expect(result).toStrictEqual(types);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test("error on DB getDocumentTypes", async () => {
+      const error = new Error("");
+      const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
+        callback(error);
+      });
+
+      const result = documentDAO.getDocumentTypes();
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test('getLinkTypes', async () => {
+      const types = ['type1', 'type2'];
+      const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
+        callback(null, types);
+      });
+
+      const result = await documentDAO.getLinkTypes();
+      expect(result).toStrictEqual(types);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test("error on DB getLinkTypes", async () => {
+      const error = new Error("");
+      const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
+        callback(error);
+      });
+
+      const result = documentDAO.getLinkTypes();
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+  });
+
+
+  describe('getLinks', () => {
+    beforeEach(() => {
+      documentDAO = new DocumentDAO();
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
+
+    test("getLinks successful", async () => {
+      const links = [
+        {linkedDocID: 2, title: 'Document 2', type: 'Direct'},
+        {linkedDocID: 3, title: 'Document 3', type: 'Projection'}
+      ];
+
+      const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
+        callback(null, links);
+      });
+
+      const result = await documentDAO.getLinks(1);
+      expect(result).toStrictEqual(links);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test("error on DB getLinks", async () => {
+      const error = new Error("");
+      const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
+        callback(error);
+      });
+
+      const result = documentDAO.getLinks(1);
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+    
+  });
+
+
 });

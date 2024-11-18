@@ -1,22 +1,24 @@
-const SERVER_URL = 'http://localhost:3001/api';
+const VITE_API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
 
 /**
  * Utility function to check if an answer from the server is invalid.
  */
 function handleInvalidResponse(response) {
-    if (!response.ok) { throw Error(response.statusText) }
-    let type = response.headers.get('Content-Type');
-    if (type !== null && type.indexOf('application/json') === -1){
-        throw new TypeError(`Expected JSON, got ${type}`)
-    }
-    return response;
+  if (!response.ok) {
+    throw Error(response.statusText);
+  }
+  let type = response.headers.get("Content-Type");
+  if (type !== null && type.indexOf("application/json") === -1) {
+    throw new TypeError(`Expected JSON, got ${type}`);
+  }
+  return response;
 }
 
 // Function to get all documents
 const getDocuments = async () => {
-    return await fetch(`${SERVER_URL}/documents`)
-        .then(handleInvalidResponse)
-        .then(response => response.json());
+  return await fetch(`${VITE_API_URL}/documents`)
+    .then(handleInvalidResponse)
+    .then((response) => response.json());
 };
 
 const getDocumentById = async (id) => {
@@ -64,35 +66,35 @@ const uploadFiles = async (docID, formData) => {
 
 
 const getTypeDocuments = async () => {
-    return await fetch(`${SERVER_URL}/documents/document-types` , {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-    })
-        .then(handleInvalidResponse)
-        .then(response => response.json());
+  return await fetch(`${VITE_API_URL}/documents/document-types`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  })
+    .then(handleInvalidResponse)
+    .then((response) => response.json());
 };
-  
+
 // Function to get types of scales
 const getTypeScale = async () => {
-    return await fetch(`${SERVER_URL}/documents/scale-types`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-    })
-        .then(handleInvalidResponse)
-        .then(response => response.json());
+  return await fetch(`${VITE_API_URL}/documents/scale-types`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  })
+    .then(handleInvalidResponse)
+    .then((response) => response.json());
 };
 
 // Function to get types of links
 const getTypeLinks = async () => {
-    return await fetch(`${SERVER_URL}/documents/link-types`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-    })
-        .then(handleInvalidResponse)
-        .then(response => response.json());
+  return await fetch(`${VITE_API_URL}/documents/link-types`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  })
+    .then(handleInvalidResponse)
+    .then((response) => response.json());
 };
 
 // Function to get linked documents
@@ -362,7 +364,5 @@ const API = {
     getDocumentById,
     updateDocument
 };
-  
 
 export default API;
-  

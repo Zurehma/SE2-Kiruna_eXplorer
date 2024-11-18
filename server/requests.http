@@ -46,9 +46,8 @@ Content-Type: application/json
     "type": "Design",
     "language": "Swedish",
     "description": "The development plan shapes the form of the new city. The document, unlike previous competition documents, is written entirely in Swedish, which reflects the target audience: the citizens of Kiruna. The plan obviously contains many elements of the winning masterplan from the competition, some recommended by the jury, and others that were deemed appropriate to integrate later. The docment is divided into four parts, with the third part, spanning 80 pages, describing the shape the new city will take and the strategies to be implemented for its relocation through plans, sections, images, diagrams, and texts. The document also includes numerous studies aimed at demonstrating the future success of the project.",
-    "pages": 111,
-    "lat": "67.852922",
-    "long": "20.281398"
+    "coordinates": {"lat": 67.849982, "long": 20.217068},
+    "pages": 111
 }
 
 ### Add a new document
