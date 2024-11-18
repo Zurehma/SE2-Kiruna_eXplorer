@@ -61,7 +61,7 @@ class DocumentDAO {
   getDocuments = (queryParameter) => {
     return new Promise((resolve, reject) => {
       try{
-        let {type, stakeholder, issuanceDateFrom, issuanceDateTo} = queryParameter;
+        let {type, stakeholder, issuanceDateFrom, issuanceDateTo} = queryParameter ? queryParameter : {};
         let sql = "SELECT * FROM DOCUMENT";
         let sqlConditions = [];
         let sqlParams = [];
@@ -282,3 +282,4 @@ class DocumentDAO {
 }
 
 export default DocumentDAO;
+export { mapRowsToDocument };

@@ -33,9 +33,16 @@ Specific error scenarios will have their corresponding error code.
 
 #### GET `api/documents`
 
-Returns the list of all documents.
+Returns the list of all documents (if filters applied it returns the list of all documents filtered).
 
-- Request Parameters: _None_
+- Request Parameters (optional):
+  - `type`: a string that represent the type of the document.
+  - Request Parameters:
+  - `stakeholder`: a string that represent the stakeholder of the document.
+  - Request Parameters:
+  - `issuanceDateFrom`: a date that represent the starting date of the filtered document.
+  - Request Parameters:
+  - `issuanceDateTo`: a date that represent the last date in the range.
 - Request Body Content: _None_
 - Response Body Content: An array of **Document** objects.
 - Example:

@@ -12,12 +12,6 @@ class DocumentRoutes {
   getRouter = () => this.router;
 
   initRoutes = () => {
-    // this.router.get("/", (req, res, next) => {
-    //   this.documentController
-    //     .getDocuments()
-    //     .then((documents) => res.status(200).json(documents))
-    //     .catch((err) => next(err));
-    // });
 
     this.router.get(
       "/",

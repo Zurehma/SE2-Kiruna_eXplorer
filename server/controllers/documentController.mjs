@@ -9,17 +9,6 @@ class DocumentController {
     this.documentDAO = new DocumentDAO();
   }
 
-  // getDocuments = () => {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       const documents = await this.documentDAO.getDocuments();
-  //       resolve(documents);
-  //     } catch (err) {
-  //       reject(err);
-  //     }
-  //   });
-  // };
-
   getDocumentById = (id) => {
     return new Promise(async (resolve, reject) => {
       try {
