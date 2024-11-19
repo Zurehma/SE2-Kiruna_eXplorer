@@ -65,7 +65,7 @@ Steps:
 1. Log in to the application with valid credentials.
 2. Navigate to the map by either:
    - Selecting "Relocation of Kiruna" from the home page.
-   - Using the dropdown menu in the menu bar and selecting "Relocation of Kiruna."
+   - Using the dropdown menu in the menu bar and selecting "Map."
 3. Locate the blue triangle on the map that contains several document markers.
 4. Click on a document marker within the triangle.
 5. Observe the document details displayed on the right-hand side panel.
@@ -80,7 +80,7 @@ Steps:
 1. Log in to the application with valid credentials.
 2. Navigate to the map by either:
    - Selecting "Relocation of Kiruna" from the home page.
-   - Using the dropdown menu in the menu bar and selecting "Relocation of Kiruna."
+   - Using the dropdown menu in the menu bar and selecting "Map."
 3. Locate document markers that are outside the blue triangle.
 4. Click on these general document markers to view their details.
 
@@ -93,7 +93,7 @@ Steps:
 1. Log in to the application.
 2. Navigate to the map by either:
    - Selecting "Relocation of Kiruna" from the home page.
-   - Using the dropdown menu in the menu bar and selecting "Relocation of Kiruna."
+   - Using the dropdown menu in the menu bar and selecting "Map."
 3. Apply a filter using the "Filter" dropdown to select a specific document type (e.g., "Design").
 4. Observe the markers on the map after applying the filter.
 5. Zoom in or out and check the visibility of filtered markers.
@@ -108,7 +108,7 @@ Steps:
 1. Log in to the application.
 2. Navigate to the map by either:
    - Selecting "Relocation of Kiruna" from the home page.
-   - Using the dropdown menu in the menu bar and selecting "Relocation of Kiruna."
+   - Using the dropdown menu in the menu bar and selecting "Map."
 3. Click on a document marker within the blue triangle.
 4. Observe the popup displaying document details.
 5. Click on the "x" button to close the popup.
@@ -117,26 +117,12 @@ Steps:
 - The document details should be displayed in a popup after clicking the marker.
 - Clicking the "x" button should close the popup smoothly without affecting the map view or other markers.
 
-#### Test 9: Document Assignment to Specific Location (Logged-in User)
-Steps:
-1. Log in to the application with valid credentials.
-2. Navigate to the map by either:
-   - Selecting "Relocation of Kiruna" from the home page.
-   - Using the dropdown menu in the menu bar and selecting "Relocation of Kiruna."
-3. Select a point within the blue triangle to add a new document.
-4. Fill in the document information and save it.
-5. Observe whether the new document is assigned to the location within the blue triangle.
-
-**Expected Results:**
-- The new document marker should appear at the selected location within the blue triangle.
-- The document should be listed when clicking on the triangle region or applying the corresponding filter.
-
-#### Test 10: Accessibility and Responsiveness of Map Elements
+#### Test 9: Accessibility and Responsiveness of Map Elements
 Steps:
 1. Log in to the application.
 2. Navigate to the map by either:
    - Selecting "Relocation of Kiruna" from the home page.
-   - Using the dropdown menu in the menu bar and selecting "Relocation of Kiruna."
+   - Using the dropdown menu in the menu bar and selecting "Map."
 3. Resize the browser window to different dimensions (e.g., mobile, tablet, desktop).
 4. Ensure all map functionalities (filter, zoom, document selection) remain accessible.
 5. Use a screen reader (e.g., NVDA) to navigate the map.
@@ -146,12 +132,12 @@ Steps:
 - The "Filter" button and zoom controls should be easily accessible on all devices.
 - The screen reader should be able to read out map features, including buttons, markers, and popups.
 
-#### Test 11: No Documents Assigned in a Filtered Search
+#### Test 10: No Documents Assigned in a Filtered Search
 Steps:
 1. Log in to the application with valid credentials.
 2. Navigate to the map by either:
    - Selecting "Relocation of Kiruna" from the home page.
-   - Using the dropdown menu in the menu bar and selecting "Relocation of Kiruna."
+   - Using the dropdown menu in the menu bar and selecting "Map."
 3. Apply a filter that results in no documents being displayed (e.g., a document type that doesn’t exist in the current selection).
 4. Observe the map behavior.
 
