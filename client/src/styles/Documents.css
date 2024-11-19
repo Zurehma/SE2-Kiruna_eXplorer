@@ -44,17 +44,19 @@ body, html {
   color: #006d77;
 }
 
-.input, .input-textarea, select {
+.input, .input-textarea, .input-multi {
   border-radius: 5px;
   border: 1px solid #006d77;
   padding: 0.75rem;
   transition: all 0.2s ease-in-out;
+  font-size: 1rem; /* Assicura una buona leggibilità */
 }
 
 .input:focus, .input-textarea:focus, select:focus {
   border-color: #006d77;
   box-shadow: 0 0 5px rgba(0, 109, 119, 0.5);
 }
+
 
 .btn-save {
   background-color: #006d77;
@@ -63,6 +65,7 @@ body, html {
   transition: background-color 0.3s ease;
   float: right; /* Allinea a destra */
 }
+
 
 
 .btn-back {
@@ -94,6 +97,21 @@ body, html {
 
   .card-title {
     font-size: 1.5rem;
+  }
+
+  .button-group {
+    flex-direction: column; /* Bottoni impilati */
+    align-items: center;
+  }
+
+  .btn-back, .btn-save {
+    width: 100%; /* Bottoni larghi quanto il contenitore */
+    padding: 0.6rem; /* Uniforme su dispositivi mobili */
+    margin-bottom: 0.5rem; /* Spazio tra i bottoni */
+  }
+
+  .input, .input-textarea, select {
+    padding: 0.5rem; /* Riduce padding su schermi piccoli */
   }
 }
 

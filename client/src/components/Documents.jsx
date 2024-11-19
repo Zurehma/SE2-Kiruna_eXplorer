@@ -17,10 +17,10 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 function StepIndicator({ step, totalSteps, setStep, validateStep }) {
   const steps = [
-    { label: 'STEP 1', icon: <i className="bi bi-lock"></i> },
+    { label: 'STEP 1', icon: <i class="bi bi-file-earmark-text"></i> },
     { label: 'STEP 2', icon: <i className="bi bi-person-circle"></i> },
-    { label: 'STEP 3', icon: <i className="bi bi-credit-card"></i> },
-    { label: 'STEP 4', icon: <i className="bi bi-check-circle"></i> }
+    { label: 'STEP 3', icon: <i class="bi bi-geo-alt"></i> },
+    { label: 'STEP 4', icon: <i class="bi bi-cloud-arrow-up"></i> }
   ];
 
   const handleStepChange = (newStep) => {
@@ -491,7 +491,7 @@ function Documents(props) {
                 name="stakeholder"
                 value={document.stakeholder || ""}
                 onChange={handleSelectChange}
-                className="input"
+                className="input-multi"
                 isInvalid={!!errors.stakeholder}
               >
                 <option value="">Select a stakeholder</option>
@@ -547,7 +547,7 @@ function Documents(props) {
                   showYearDropdown
                   yearDropdownItemNumber={15}
                   scrollableYearDropdown
-                  className="input"
+                  className="input-multi"
                 />
               </div>
               {errors.issuanceDate && (
@@ -592,7 +592,7 @@ function Documents(props) {
                 name="scale"
                 value={document.scale || ""}
                 onChange={handleScaleChange}
-                className="input"
+                className="input-multi"
                 isInvalid={!!errors.scale}
               >
                 <option value="">Select a scale</option>
@@ -631,7 +631,7 @@ function Documents(props) {
                 name="type"
                 value={document.type || ""}
                 onChange={handleSelectChange}
-                className="input"
+                className="input-multi"
                 isInvalid={!!errors.type}
               >
                 <option value="">Select a type</option>
@@ -674,7 +674,7 @@ function Documents(props) {
                 name="language" 
                 value={document.language || ""} 
                 onChange={handleChange} 
-                className="input" 
+                className="input-multi" 
                 isInvalid={!!errors.language}
               >
                 <option value="" disabled>Select language...</option>
