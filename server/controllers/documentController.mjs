@@ -167,6 +167,11 @@ class DocumentController {
   getLinks = (id1) => {
     return new Promise(async (resolve, reject) => {
       try {
+        const doc = await this.documentDAO.getDocumentByID(id1);
+        if (doc === undefined) {
+          const error = { errCode: 404, errMessage: "Document not found!" };
+          throw error;
+        }
         const links = await this.documentDAO.getLinks(id1);
         resolve(links);
       } catch (err) {
