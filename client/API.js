@@ -1,4 +1,4 @@
-const VITE_API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
+const SERVER_URL =  "http://localhost:3001" + "/api";
 
 /**
  * Utility function to check if an answer from the server is invalid.
@@ -16,7 +16,7 @@ function handleInvalidResponse(response) {
 
 // Function to get all documents
 const getDocuments = async () => {
-  return await fetch(`${VITE_API_URL}/documents`)
+  return await fetch(`${SERVER_URL}/documents`)
     .then(handleInvalidResponse)
     .then((response) => response.json());
 };
@@ -66,7 +66,7 @@ const uploadFiles = async (docID, formData) => {
 
 
 const getTypeDocuments = async () => {
-  return await fetch(`${VITE_API_URL}/documents/document-types`, {
+  return await fetch(`${SERVER_URL}/documents/document-types`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -77,7 +77,7 @@ const getTypeDocuments = async () => {
 
 // Function to get types of scales
 const getTypeScale = async () => {
-  return await fetch(`${VITE_API_URL}/documents/scale-types`, {
+  return await fetch(`${SERVER_URL}/documents/scale-types`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -88,7 +88,7 @@ const getTypeScale = async () => {
 
 // Function to get types of links
 const getTypeLinks = async () => {
-  return await fetch(`${VITE_API_URL}/documents/link-types`, {
+  return await fetch(`${SERVER_URL}/documents/link-types`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",

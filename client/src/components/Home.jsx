@@ -30,7 +30,7 @@ const Home = () => {
   return (
     <div
       className="home-background"
-      style={{ backgroundImage: `url("../public/${backgroundImage}")` }}
+      style={{ backgroundImage: `url("/${backgroundImage}")` }}
     >
       <div className="home-container">
         <h1 className="home-title">{titleText}</h1>

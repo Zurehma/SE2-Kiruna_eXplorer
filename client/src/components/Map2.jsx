@@ -8,7 +8,7 @@ import L from 'leaflet';
 import '../App.css';
 import { MyPopup } from './MyPopup';
 import API from '../../API';
-import { ShowDocuments } from './showDocuments';
+import { ShowDocuments } from './ShowDocuments';
 import { Dropdown } from 'react-bootstrap';
 
 // Icon mapping based on document type
