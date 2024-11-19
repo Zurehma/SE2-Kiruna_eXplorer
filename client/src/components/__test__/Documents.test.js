@@ -10,7 +10,6 @@ jest.mock('../../../API', () => ({
   getTypeDocuments: jest.fn(),
   getTypeScale: jest.fn(),
   saveDocument: jest.fn(),
-  getStakeholders: jest.fn(),
 }));
 
 // Mock react-router-dom
@@ -59,8 +58,6 @@ describe('Documents Component', () => {
     });
   });
   test('sets all fields and validates them correctly', async () => {
-    const stakeholder = [{ name: 'Some stakeholder' }];
-    API.getStakeholders.mockResolvedValue(stakeholder);
     render(<Documents />);
 
     // Test: Impostiamo il campo "Title"
