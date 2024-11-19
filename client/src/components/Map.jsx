@@ -60,6 +60,7 @@ function Map({ handleMapClick,setPosition,latitude,longitude,polygonCoordinates,
       <MapContainer
         center={positionActual}
         zoom={zoomLevel}
+        data-testid="map"
         style={{ height: '50vh', width: '100%' }}
       >
         <TileLayer

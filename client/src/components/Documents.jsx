@@ -15,18 +15,15 @@ import * as turf from '@turf/turf';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
-
-
 function StepIndicator({ step, totalSteps, setStep, validateStep }) {
   const steps = [
-    { label: 'STEP 1', icon: <i className="bi bi-lock"></i> },
+    { label: 'STEP 1', icon: <i class="bi bi-file-earmark-text"></i> },
     { label: 'STEP 2', icon: <i className="bi bi-person-circle"></i> },
-    { label: 'STEP 3', icon: <i className="bi bi-credit-card"></i> },
-    { label: 'STEP 4', icon: <i className="bi bi-check-circle"></i> }
+    { label: 'STEP 3', icon: <i class="bi bi-geo-alt"></i> },
+    { label: 'STEP 4', icon: <i class="bi bi-cloud-arrow-up"></i> }
   ];
 
   const handleStepChange = (newStep) => {
-    // Validazione per consentire il cambio di step solo se i campi sono corretti
     if (newStep > step) {
       let isValid = false;
       if (step === 1) {
@@ -41,7 +38,6 @@ function StepIndicator({ step, totalSteps, setStep, validateStep }) {
         setStep(newStep);
       }
     } else {
-      // Permetti il ritorno agli step precedenti senza validazione
       setStep(newStep);
     }
   };
@@ -68,21 +64,19 @@ function StepIndicator({ step, totalSteps, setStep, validateStep }) {
 
 
 function Documents(props) {
-  const [scales, setScales] = useState(["Text", "Blueprints/Effects", "1:n",]); // valori statici per scales
+  const [scales, setScales] = useState(["Text", "Blueprints/Effects", "1:n",]); 
   const [showNField, setShowNField] = useState(false);
   const totalSteps = 4;
   const navigate = useNavigate();
-  const { id } = useParams(); // Ottieni l'id dalla URL per la modalità modifica
-  const [files, setFiles] = useState([]); //To manage uploaded files
-  
-  
+  const [files, setFiles] = useState([]);
+  const [existingAttachments, setExistingAttachments] = useState([]);
+  const [filesToBeDeleted, setFilesToBeDeleted] = useState([]);
+  const { id } = useParams();
   const [step, setStep] = useState(1);
-
   const [types, setTypes] = useState([]);
   const [currentTypes, setCurrentTypes] = useState([]);
   const [isAddingNewType, setIsAddingNewType] = useState(false);
   const [newType, setNewType] = useState("");
-
   const [stakeholders, setStakeholders] = useState([]);
   const [currentStakeholders, setCurrentStakeholders] = useState([]);
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -115,6 +109,23 @@ function Documents(props) {
     description: '',
     pages: ''
   });
+
+  const resetState = () => {
+    setDocument(() => ({
+      title: '',
+      stakeholder: '',
+      scale: '',
+      nValue: '',
+      issuanceDate: '',
+      type: '',
+      description: '',
+      language: '',
+      pages: '',
+      coordinates: { lat: '', long: '' },
+      pageFrom: '',
+      pageTo: ''
+    }));
+  };
   
   useEffect(() => {
     const fetchTypes = async () => {
@@ -133,16 +144,52 @@ function Documents(props) {
 
     if (id) {
       fetchDocument(id); 
+      //here fetch existing attachments, so that you can give the possibility to modify them 
+      fetchAttachments(id);
+    }else{
+      resetState();
     }
   }, [id]);
 
   const fetchDocument = async (documentId) => {
     try {
       const doc = await API.getDocumentById(documentId);
-      setDocument(doc); // Popola il form con i dati esistenti
-      setShowNField(doc.scale === '1:n');
+      const coordinates = doc.coordinates || { lat: '', long: '' };
+      let pages = doc.pages;
+      if (!doc.pages && doc.pageFrom && doc.pageTo) {
+        pages = `${doc.pageFrom}-${doc.pageTo}`;
+      }
+  
+      let scale = doc.scale;
+      let nValue = '';
+      let showNField = false; // Variabile temporanea per gestire la visualizzazione del campo  
+      if (scale !== 'Text' && scale !== 'Blueprints/Effects') {
+        nValue = Number(scale); // Converti scale in numero
+        scale = `1:n`; // Imposta scale come `1:n`
+        showNField = true; // Mostra il campo nValue
+      }
+      // Aggiorna lo stato del documento e del campo di visualizzazione
+      setDocument((prevDocument) => ({
+        ...doc,
+        coordinates,
+        pages,
+        scale,
+        nValue,
+      }));  
+      setShowNField(showNField); // Aggiorna la visibilità del campo nValue
     } catch (error) {
-      console.error("Error fetching document:", error);
+      console.error('Error fetching document:', error);
+      props.setError(error);
+    }
+  };
+  
+
+  const fetchAttachments = async (documentId) => {
+    try {
+      const attachments = await API.getAttachments(documentId);
+      setExistingAttachments(attachments);
+    } catch (error) {
+      props.setError(error);
     }
   };
 
@@ -162,172 +209,137 @@ function Documents(props) {
 
   const handleScaleChange = (e) => {
     const { value } = e.target;
-    handleChange(e);
-    if (value === '1:n') {
-      setShowNField(true);
-    } else {
-      setShowNField(false);
-    }
+    setDocument((prevDocument) => ({
+      ...prevDocument,
+      scale: value,
+      nValue: value === '1:n' ? prevDocument.nValue || '' : undefined, // Resetta nValue se non è `1:n`
+    }));
+    setShowNField(value === '1:n'); // Mostra o nascondi il campo nValue
+  };
+  
+  const polygonCoordinates = [
+    [67.87328157366065, 20.20047943270466],
+    [67.84024426842895, 20.35839687019359],
+    [67.82082254726043, 20.181254701184297],
+    [67.87328157366065, 20.20047943270466] 
+  ];
+
+  const polygonGeoJson = {
+    type: "Polygon",
+    coordinates: [polygonCoordinates] // GeoJSON richiede un array annidato
   };
 
-    // Polygon coordinates
-    const polygonCoordinates = [
-      [67.87328157366065, 20.20047943270466],
-      [67.84024426842895, 20.35839687019359],
-      [67.82082254726043, 20.181254701184297],
-      [67.87328157366065, 20.20047943270466] // Ritorno al primo punto per chiudere il poligono
-    ];
-  
-    const polygonGeoJson = {
-      type: "Polygon",
-      coordinates: [polygonCoordinates] // GeoJSON richiede un array annidato
-    };
-  
-    const validateCoordinates = (lat, lng) => {
-      const point = [lat, lng]; // ordine GeoJSON: [lng, lat]
-      const isInside = turf.booleanPointInPolygon(point, polygonGeoJson);
-      return isInside;
+  const validateCoordinates = (lat, lng) => {
+    const point = [lat, lng]; // ordine GeoJSON: [lng, lat]
+    const isInside = turf.booleanPointInPolygon(point, polygonGeoJson);
+    return isInside;
   };
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-     setDocument((prevDocument) => {
-         if (name === 'lat' || name === 'long') {
-             // Se il nome è 'lat' o 'long', aggiorna solo coordinates
-             return {
-                 ...prevDocument,
-                 coordinates: {
-                     ...prevDocument.coordinates,
-                     [name]: parseFloat(value) || '' // Parsing in float per coordinate
-                 }
-             };
-         } else {
-             return {
-                 ...prevDocument,
-                 [name]: name === 'nValue' ? parseInt(value, 10) || '' : value
-             };
-         }
-     });
-   };
+    setDocument((prevDocument) => {
+      if (name === 'lat' || name === 'long') {
+        return {
+          ...prevDocument,
+          coordinates: {
+            ...prevDocument.coordinates,
+            [name]: parseFloat(value) || ''
+          }
+        };
+      } else {
+        return {
+          ...prevDocument,
+          [name]: name === 'nValue' ? parseInt(value, 10) || '' : value
+        };
+      }
+    });
+  };
 
-   const handleMapClick = (lat, lng) => {
+  const handleMapClick = (lat, lng) => {
     setPosition({ lat, lng });
     setDocument((prevDocument) => ({
       ...prevDocument,
       coordinates: { lat, long: lng }
     }));
   };
-  
-  // Aggiungi funzioni di validazione per ciascuno step
-const validateStep1 = () => {
-  const newErrors = {};
-  if (!document.title || document.title.length < 2) {
-    newErrors.title = "Title is required and cannot be empty.";
-  }
-  if (!document.stakeholder) {
-    newErrors.stakeholder = "You must select a stakeholder.";
-  }
-  if (!document.issuanceDate) {
-    newErrors.issuanceDate = "You must select a Date in a valid format (YYYY-MM-DD).";
-  }
-  if (!document.description || document.description.length < 2) {
-    newErrors.description = "Description is required and cannot be empty.";
-  }
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0; // True se non ci sono errori
-};
-
-const validateStep2 = () => {
-  const newErrors = {};
-  if (!document.scale) {
-    newErrors.scale = "You must select a scale.";
-  }
-  if (!document.type) {
-    newErrors.type = "You must select a type.";
-  }
-  if (!document.language) {
-    newErrors.language = "You must select a language.";
-  }
-  if (document.pages && !validatePages(document.pages)) {
-    newErrors.pages = "Please enter a valid number or range (e.g., 35 or 35-45).";
-  }
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
-
-const validateStep3 = () => {
-  const newErrors = {};
-  if (!position.lat || !position.lng || !validateCoordinates(Number(position.lat), Number(position.lng))) {
-    newErrors.coordinates = "Please enter a valid LATITUDE and LONGITUDE or select from the map.";
-  }
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
-
-
-const handleNextStep = () => {
-  let isValid = false;
-  if (step === 1) {
-    isValid = validateStep1();
-  } else if (step === 2) {
-    isValid = validateStep2();
-  } else if (step === 3) {
-    isValid = validateStep3();
-  }
-
-  if (isValid) {
-    setStep(prev => prev + 1);
-  }
-};
-
-  const handlePreviousStep = () => setStep(prev => prev - 1);
-
-   const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    try {
     
+  const validateStep1 = () => {
+    const newErrors = {};
+    if (!document.title || document.title.length < 2) {
+      newErrors.title = "Title is required and cannot be empty.";
+    }
+    if (!document.stakeholder) {
+      newErrors.stakeholder = "You must select a stakeholder.";
+    }
+    if (!document.issuanceDate) {
+      newErrors.issuanceDate = "You must select a Date in a valid format (YYYY-MM-DD).";
+    }
+    if (!document.description || document.description.length < 2) {
+      newErrors.description = "Description is required and cannot be empty.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; 
+  };
 
-       await API.saveDocument(document);
-      // doc = response;
-      // //Try to submit files
-      // if (files.length > 0) {
-      //   files.forEach(async (file) => {
-      //     const formData = new FormData();
-      //     formData.append('file', file);
-      //     try {
-      //       await API.uploadFiles(doc.id,formData);
-      //     } catch (error) {
-      //       props.setError(error);
-      //     }
-      //   } ); 
-      // }
-      //props.setNewDoc(doc);
-      navigate(`/documents/links`);
-    } catch (error) {
-      console.error("Error saving document:", error);
-      props.setError(error);
+  const validateStep2 = () => {
+    const newErrors = {};
+    if (!document.scale) {
+      newErrors.scale = "You must select a scale.";
+    }
+    if (!document.type) {
+      newErrors.type = "You must select a type.";
+    }
+    if (!document.language) {
+      newErrors.language = "You must select a language.";
+    }
+    if (document.pages && !validatePages(document.pages)) {
+      newErrors.pages = "Please enter a valid number or range (e.g., 35 or 35-45).";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep3 = () => {
+    const newErrors = {};
+    if ((document.coordinates.lat || document.coordinates.long) && !validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))) {
+      newErrors.coordinates = "Please enter a valid LATITUDE and LONGITUDE or select from the map.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNextStep = () => {
+    let isValid = false;
+    if (step === 1) {
+      isValid = validateStep1();
+    } else if (step === 2) {
+      isValid = validateStep2();
+    } else if (step === 3) {
+      isValid = validateStep3();
+    }
+
+    if (isValid) {
+      setStep(prev => prev + 1);
     }
   };
 
+  const handlePreviousStep = () => setStep(prev => prev - 1);
+
   const validatePages = (value) => {
-    // Regex per controllare se è un singolo numero o un range valido
     const singleNumberRegex = /^\d+$/;
-    const rangeRegex = /^\d+\s*-\s*\d+$/;
-  
+    const rangeRegex = /^\d+\s*-\s*\d+$/;  
     if (singleNumberRegex.test(value)) {
-      document.pages = value; // Assegna il numero singolo a pages
+      document.pages = value; 
       document.pageFrom = "";
       document.pageTo = "";
-      return true; // Numero singolo valido
+      return true; 
     } else if (rangeRegex.test(value)) {
       const [start, end] = value.split('-').map(num => parseInt(num.trim(), 10));
       if (start < end) {
-        document.pages = ""; // Svuota pages per il range
-        document.pageFrom = start; // Assegna il primo numero a pageFrom
-        document.pageTo = end; // Assegna il secondo numero a pageTo
-        return true; // Range valido con inizio minore di fine
+        document.pages = ""; 
+        document.pageFrom = start; 
+        document.pageTo = end; 
+        return true; 
       } else {
         return "The starting page should be less than the ending page.";
       }
@@ -335,7 +347,6 @@ const handleNextStep = () => {
       return "Please enter a valid number or range (e.g., 35 or 35-45).";
     }
   };
-  
 
   const [position, setPosition] = useState({ lat: null, lng: null });
   useEffect(() => {
@@ -346,35 +357,106 @@ const handleNextStep = () => {
   }, [position.lat,position.lng]);
 
   useEffect(() => {
-    if (document.coordinates.lat && document.coordinates.long && validateCoordinates(Number(document.coordinates.lat),Number(document.coordinates.lat))) {
+    if (document.coordinates.lat && document.coordinates.long && validateCoordinates(Number(document.coordinates.lat),Number(document.coordinates.long))) {
       setPosition({ lat: document.coordinates.lat, lng: document.coordinates.long });
     }else if(document.coordinates.lat && document.coordinates.long && !validateCoordinates(Number(document.coordinates.lat),Number(document.coordinates.long))){
       setPosition({ lat: null, lng: null });
     }
   }, [document.coordinates.lat, document.coordinates.long]);
-
-
-  const handleSelectChange = (e) => {
-    const value = e.target.value;
-    if (value === "add_new") {
-      setIsAddingNew(true); // Mostra il campo di input
-    } else {
-      handleChange(e); // Aggiorna il documento
+  
+  const handleFileUpload = async (doc) => {
+    if (files.length > 0) {
+      files.forEach(async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+          await API.uploadFiles(doc.id, formData);
+        } catch (error) {
+          props.setError(error);
+        }
+      });
     }
   };
 
-  // Handle new stakeholder input
+  const removeExistingFile = (attachmentId) => {
+    setFilesToBeDeleted([...filesToBeDeleted, attachmentId]);
+    setExistingAttachments(existingAttachments.filter((file) => file.id !== attachmentId));
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if(document.scale === '1:n'){
+        document.scale = document.nValue;
+      }else{
+        document.nValue = '';
+      }
+      if (id) {
+        console.log("Document to be updateeeeeed:", document);
+        // Modalità Edit: aggiorna documento esistente
+        await API.updateDocument(id, document);
+        //Add new files and delete files
+        handleFileUpload(document);
+        filesToBeDeleted.forEach(async (attachmentId) => {
+          try{
+            await API.deleteAttachment(id, attachmentId);
+          }catch(error){
+            console.error("Error deleting attachment:", error);
+            props.setError(error);
+          }     
+        });
+        resetState();
+        navigate(`/`);
+      } else {
+        console.log("Document to be saveddddd:", document);
+        const doc= await API.saveDocument(document);  
+        console.log("Dohhhhh:", doc);
+        //Try to submit files
+        handleFileUpload(doc);
+        props.setNewDoc(doc);
+        resetState();
+        navigate(`/documents/links`);
+      }
+    } catch (error) {
+      console.error("Error saving document:", error);
+      props.setError(error);
+    }
+  };
+
+//add_new Stakeholder and Type management
+  const handleSelectChange = (e) => {
+    const value = e.target.value;
+    if (value === "add_new") {
+      setIsAddingNew(true);
+    } else if (value === "add_new_type") {
+      setIsAddingNewType(true);
+    } else {
+      handleChange(e); 
+    }
+  };
+
   const handleNewStakeholderChange = (e) => {
     setNewStakeholder(e.target.value);
   };
 
-  const handleNewStakeholderBlur = () => {
+  const handleNewTypeChange = (e) => {
+    setNewType(e.target.value);
+  };
+
+  const handleNewBlur = () => {
     if (newStakeholder.trim() !== "") {
       const newEntry = { name: newStakeholder };
-      setCurrentStakeholders([...currentStakeholders, newEntry]); // Aggiunge il nuovo stakeholder
-      setIsAddingNew(false); // Nasconde il campo di input
-      handleChange({ target: { name: "stakeholder", value: newStakeholder } }); // Aggiorna il valore selezionato
-      setNewStakeholder(""); // Resetta il campo di input
+      setCurrentStakeholders([...currentStakeholders, newEntry]); 
+      setIsAddingNew(false); 
+      handleChange({ target: { name: "stakeholder", value: newStakeholder } }); 
+      setNewStakeholder("");
+    } 
+    if (newType.trim() !== "") {
+      const newEntry = { name: newType };
+      setCurrentTypes([...currentTypes, newEntry]); // Aggiungi il nuovo tipo
+      setIsAddingNewType(false); // Nascondi il campo di input
+      handleChange({ target: { name: "type", value: newType } }); // Aggiorna il valore selezionato
+      setNewType(""); // Resetta il campo di input
     }
   };
 
@@ -409,7 +491,7 @@ const handleNextStep = () => {
                 name="stakeholder"
                 value={document.stakeholder || ""}
                 onChange={handleSelectChange}
-                className="input"
+                className="input-multi"
                 isInvalid={!!errors.stakeholder}
               >
                 <option value="">Select a stakeholder</option>
@@ -436,7 +518,7 @@ const handleNextStep = () => {
                   name="newStakeholder"
                   value={newStakeholder}
                   onChange={handleNewStakeholderChange}
-                  onBlur={handleNewStakeholderBlur} // Salva automaticamente al perdere il focus
+                  onBlur={handleNewBlur} // Salva automaticamente al perdere il focus
                   placeholder="Enter new stakeholder"
                   className="input"
                 />
@@ -456,7 +538,7 @@ const handleNextStep = () => {
                     handleChange({
                       target: {
                         name: "issuanceDate",
-                        value: date.toISOString().split("T")[0], // Converti in formato YYYY-MM-DD
+                        value: date.toISOString().split("T")[0],
                       },
                     })
                   }
@@ -465,7 +547,7 @@ const handleNextStep = () => {
                   showYearDropdown
                   yearDropdownItemNumber={15}
                   scrollableYearDropdown
-                  className="input"
+                  className="input-multi"
                 />
               </div>
               {errors.issuanceDate && (
@@ -498,32 +580,6 @@ const handleNextStep = () => {
     </Card>
   );
 
-
-
-   // Handle changes in the select field
-   const handleSelectChange2 = (e) => {
-    const value = e.target.value;
-    if (value === "add_new") {
-      setIsAddingNewType(true); // Mostra il campo di input
-    } else {
-      handleChange(e); // Gestisci il cambio di valore normalmente
-    }
-  };
-
-  // Handle new type input
-  const handleNewTypeChange = (e) => {
-    setNewType(e.target.value);
-  };
-
-  const handleNewTypeBlur = () => {
-    if (newType.trim() !== "") {
-      const newEntry = { name: newType };
-      setCurrentTypes([...currentTypes, newEntry]); // Aggiungi il nuovo tipo
-      setIsAddingNewType(false); // Nascondi il campo di input
-      handleChange({ target: { name: "type", value: newType } }); // Aggiorna il valore selezionato
-      setNewType(""); // Resetta il campo di input
-    }
-  };
   const renderStep2 = () => (
     <Card className="mb-4">
       <Card.Body>
@@ -532,13 +588,12 @@ const handleNextStep = () => {
           <Col md={6}>
             <Form.Group controlId="scale">
               <Form.Label>Scale*</Form.Label>
-              <Form.Select 
-                as="select"
+              <Form.Select
                 name="scale"
                 value={document.scale || ""}
                 onChange={handleScaleChange}
-                className="input"    
-                isInvalid={!!errors.scale} 
+                className="input-multi"
+                isInvalid={!!errors.scale}
               >
                 <option value="">Select a scale</option>
                 {scales.map((scale, index) => (
@@ -554,14 +609,13 @@ const handleNextStep = () => {
             <Col md={6}>
               <Form.Group controlId="nValue">
                 <Form.Label>Value of n*</Form.Label>
-                <Form.Control 
-                  type="text" 
-                  name="nValue" 
-                  value={document.nValue || ""} 
-                  onChange={handleChange} 
+                <Form.Control
+                  type="text"
+                  name="nValue"
+                  value={document.nValue || ""}
+                  onChange={handleChange}
                   placeholder="Enter n"
                   className="input"
-                  //isInvalid={!!errors.scale}
                 />
               </Form.Group>
             </Col>
@@ -576,8 +630,8 @@ const handleNextStep = () => {
                 as="select"
                 name="type"
                 value={document.type || ""}
-                onChange={handleSelectChange2}
-                className="input"
+                onChange={handleSelectChange}
+                className="input-multi"
                 isInvalid={!!errors.type}
               >
                 <option value="">Select a type</option>
@@ -586,7 +640,7 @@ const handleNextStep = () => {
                     {type.name}
                   </option>
                 ))}
-                <option value="add_new">+ Add new type</option>
+                <option value="add_new_type">+ Add new type</option>
               </Form.Select>
               <Form.Control.Feedback type="invalid">
                 {errors.type}
@@ -603,7 +657,7 @@ const handleNextStep = () => {
                   name="newType"
                   value={newType}
                   onChange={handleNewTypeChange}
-                  onBlur={handleNewTypeBlur} // Salva automaticamente quando perde il focus
+                  onBlur={handleNewBlur} // Salva automaticamente quando perde il focus
                   placeholder="Enter new type"
                   className="input"
                 />
@@ -620,7 +674,7 @@ const handleNextStep = () => {
                 name="language" 
                 value={document.language || ""} 
                 onChange={handleChange} 
-                className="input" 
+                className="input-multi" 
                 isInvalid={!!errors.language}
               >
                 <option value="" disabled>Select language...</option>
@@ -664,49 +718,63 @@ const handleNextStep = () => {
   const renderStep3 = () => (
     <Card className="mb-4">
       <Card.Body>
-      <Col> 
-      <Row className="mb-3">
-              <Form.Label>Select a point on the Map, if not selected, the entire municipality is considered</Form.Label>
-              <Map handleMapClick={handleMapClick} setPosition={setPosition} latitude={position.lat} longitude={position.lng} polygonCoordinates={polygonCoordinates} validateCoordinates={validateCoordinates} />
-            </Row>
-
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group controlId="latitude">
-                  <Form.Label>Latitude</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    name="lat" 
-                    value={document.coordinates.lat || ""} 
-                    onChange={handleChange}
-                    placeholder="e.g., 59.3293"
-                    isInvalid={!!errors.coordinates}
-                    className="input" 
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group controlId="longitude">
-                  <Form.Label>Longitude</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    name="long" 
-                    value={document.coordinates.long || ""} 
-                    onChange={handleChange} 
-                    placeholder="e.g., 18.0686"
-                    isInvalid={!!errors.coordinates}
-                    className="input" 
-                  />
-                <Form.Control.Feedback type="invalid">
-                    {errors.coordinates}
-                </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-            </Row>
+        <Col>
+          <Row className="mb-3">
+            <Form.Label>
+              Select a point on the Map, if not selected, the entire municipality is considered
+            </Form.Label>
+            <Map
+              handleMapClick={handleMapClick}
+              setPosition={setPosition}
+              latitude={position.lat}
+              longitude={position.lng}
+              polygonCoordinates={polygonCoordinates}
+              validateCoordinates={validateCoordinates}
+            />
+          </Row>
+  
+          <Row className="mb-3">
+            <Col md={6}>
+              <Form.Group controlId="latitude">
+                <Form.Label>Latitude</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="lat"
+                  value={document.coordinates.lat || ""}
+                  onChange={handleChange}
+                  placeholder="e.g., 59.3293"
+                  isInvalid={!!errors.coordinates}
+                  className="input"
+                />
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="longitude">
+                <Form.Label>Longitude</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="long"
+                  value={document.coordinates.long || ""}
+                  onChange={handleChange}
+                  placeholder="e.g., 18.0686"
+                  isInvalid={!!errors.coordinates}
+                  className="input"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          
+          {/* Messaggio di errore per l'intera riga */}
+          {errors.coordinates && (
+            <div className="invalid-feedback d-block text-center">
+              {errors.coordinates}
+            </div>
+          )}
         </Col>
       </Card.Body>
     </Card>
   );
+  
 
   const renderStep4 = () => (
     <Card className="mb-4">
@@ -728,6 +796,14 @@ const handleNextStep = () => {
                       </Button>
                     </div>
                   ))}
+                  {existingAttachments.map((file) => (
+                    <div key={file.id+file.docID} className="file-item d-flex justify-content-between align-items-center mb-3 ms-2">
+                      <span>{file.name}</span>
+                      <Button variant="danger" size="sm" onClick={() => removeExistingFile(file.id)} className="me-2">
+                        <i className="bi bi-trash-fill"></i>
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               </Form.Group>
       </Card.Body>
@@ -740,8 +816,7 @@ const handleNextStep = () => {
        <Container className="d-flex align-items-center justify-content-center min-vh-100">
          <Card className="p-4 shadow-lg w-100" style={{ maxWidth: '700px' }}>
            <Card.Body>
-             <Card.Title className="mb-4 text-center">ADD NEW DOCUMENT</Card.Title>
-
+           <Card.Title className="mb-4 text-center">{id ? `EDIT DOCUMENT: ${id}` : "ADD NEW DOCUMENT"}</Card.Title>
              {/* Step Indicator with Clickable Buttons */}
              <StepIndicator step={step}  totalSteps={4}  setStep={setStep}
                 validateStep={(currentStep) => {
@@ -763,13 +838,19 @@ const handleNextStep = () => {
             {step === 3 && renderStep3()}
             {step === 4 && renderStep4()}
 
-            <div className="mt-4 d-flex justify-content-between">
-              {step > 1 && <Button variant="secondary" onClick={handlePreviousStep}>Back</Button>}
-              {step < totalSteps ? (
-                <Button variant="primary" onClick={handleNextStep}>Next</Button>
-              ) : (
-                <Button variant="success" type="submit">Submit</Button>
-              )}
+            <div className="mt-4">
+              <Row>
+                <Col md={6}>
+                {step > 1 && <Button className='btn-back' variant="secondary" onClick={handlePreviousStep}>Back</Button>}
+               </Col>
+               <Col md={6}>
+                {step < totalSteps ? (
+                  <Button className='btn-save' variant="primary" onClick={handleNextStep}>Next</Button>
+                ) : (
+                  <Button className='btn-save' variant="success" onClick={handleSubmit} >Submit</Button>
+                )}
+                </Col>
+              </Row>
             </div>
           </Form>
         </Card.Body>
@@ -780,6 +861,4 @@ const handleNextStep = () => {
 }
 
 export default Documents;
-
-
 

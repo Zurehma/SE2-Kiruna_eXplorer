@@ -152,7 +152,6 @@ const validateRequest = (req, res, next) => {
  * @returns
  */
 const errorHandler = (err, req, res, next) => {
-  console.log(err);
   return res.status(err.errCode || 503).json({
     error: err.errMessage || "Internal Server Error",
     status: err.errCode || 503,
