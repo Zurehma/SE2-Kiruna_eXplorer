@@ -9,17 +9,6 @@ class DocumentController {
     this.documentDAO = new DocumentDAO();
   }
 
-  // getDocuments = () => {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       const documents = await this.documentDAO.getDocuments();
-  //       resolve(documents);
-  //     } catch (err) {
-  //       reject(err);
-  //     }
-  //   });
-  // };
-
   getDocumentById = (id) => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -31,7 +20,7 @@ class DocumentController {
     });
   };
 
-  getDocuments = (type, stakeholder, issuanceDateFrom, issuanceDateTo) => {  
+  getDocuments = (type, stakeholder, issuanceDateFrom, issuanceDateTo) => {
     return new Promise(async (resolve, reject) => {
       try {
         let queryParameter = { type, stakeholder, issuanceDateFrom, issuanceDateTo };
@@ -41,7 +30,7 @@ class DocumentController {
         reject(err);
       }
     });
-  }
+  };
 
   /**
    * Add a new document with the provided informations
@@ -97,41 +86,20 @@ class DocumentController {
   /**
    * Update an existing document with the provided informations
    * @param {Number} id
-   * @param {String || null} title
-   * @param {String || null} stakeholder
-   * @param {String || Number || null} scale
-   * @param {String || null} issuanceDate
-   * @param {String || null} type
-   * @param {String || null} language
-   * @param {String || null} description
+   * @param {String} title
+   * @param {String} stakeholder
+   * @param {String || Number} scale
+   * @param {String} issuanceDate
+   * @param {String} type
+   * @param {String} language
+   * @param {String} description
    * @param {Object || null} coordinates
-   * @param {Boolean} isCoordinatesPresent
    * @param {Number || null} pages
-   * @param {Boolean} isPagesPresent
    * @param {Number || null} pageFrom
-   * @param {Boolean} isPageFromPresent
    * @param {Number || null} pageTo
-   * @param {Boolean} isPageToPresent
    * @returns {Promise<null>} A promise that resolves to null
    */
-  updateDocument = (
-    id,
-    title,
-    stakeholder,
-    scale,
-    issuanceDate,
-    type,
-    language,
-    description,
-    coordinates,
-    isCoordinatesPresent,
-    pages,
-    isPagesPresent,
-    pageFrom,
-    isPageFromPresent,
-    pageTo,
-    isPageToPresent
-  ) => {
+  updateDocument = (id, title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
     return new Promise(async (resolve, reject) => {
       try {
         if (dayjs().isBefore(issuanceDate)) {
@@ -151,51 +119,19 @@ class DocumentController {
           throw error;
         }
 
-        let processedCoordinates = null;
-
-        if (isCoordinatesPresent && coordinates) {
-          processedCoordinates = JSON.stringify(coordinates);
-        } else if (oldDocument.coordinates) {
-          processedCoordinates = JSON.stringify(oldDocument.coordinates);
-        }
-
-        let processedPages = null;
-
-        if (isPagesPresent && pages) {
-          processedPages = pages;
-        } else {
-          processedPages = oldDocument.pages;
-        }
-
-        let processedPageFrom = null;
-
-        if (isPageFromPresent && pageFrom) {
-          processedPageFrom = pageFrom;
-        } else {
-          processedPageFrom = oldDocument.pageFrom;
-        }
-
-        let processedPageTo = null;
-
-        if (isPageToPresent && pageTo) {
-          processedPageTo = pageTo;
-        } else {
-          processedPageTo = oldDocument.pageTo;
-        }
-
         await this.documentDAO.updateDocument(
           id,
-          title || oldDocument.title,
-          stakeholder || oldDocument.stakeholder,
-          scale || oldDocument.scale,
-          issuanceDate || oldDocument.issuanceDate,
-          type || oldDocument.type,
-          language || oldDocument.language,
-          description || oldDocument.description,
-          processedCoordinates,
-          processedPages,
-          processedPageFrom,
-          processedPageTo
+          title,
+          stakeholder,
+          scale,
+          issuanceDate,
+          type,
+          language,
+          description,
+          coordinates ? JSON.stringify(coordinates) : null,
+          pages,
+          pageFrom,
+          pageTo
         );
 
         resolve(null);
@@ -231,6 +167,11 @@ class DocumentController {
   getLinks = (id1) => {
     return new Promise(async (resolve, reject) => {
       try {
+        const doc = await this.documentDAO.getDocumentByID(id1);
+        if (doc === undefined) {
+          const error = { errCode: 404, errMessage: "Document not found!" };
+          throw error;
+        }
         const links = await this.documentDAO.getLinks(id1);
         resolve(links);
       } catch (err) {

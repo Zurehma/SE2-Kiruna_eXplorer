@@ -33,9 +33,16 @@ Specific error scenarios will have their corresponding error code.
 
 #### GET `api/documents`
 
-Returns the list of all documents.
+Returns the list of all documents (if filters applied it returns the list of all documents filtered).
 
-- Request Parameters: _None_
+- Request Parameters (optional):
+  - `type`: a string that represent the type of the document.
+  - Request Parameters:
+  - `stakeholder`: a string that represent the stakeholder of the document.
+  - Request Parameters:
+  - `issuanceDateFrom`: a date that represent the starting date of the filtered document.
+  - Request Parameters:
+  - `issuanceDateTo`: a date that represent the last date in the range.
 - Request Body Content: _None_
 - Response Body Content: An array of **Document** objects.
 - Example:
@@ -136,10 +143,10 @@ Add a new document with the provided information.
 
 #### PUT `api/documents/:docID`
 
-Update an existing document with the provided information.
+Update an existing document by providing a new object.
 
 - Request Parameters: _None_
-- Request Body Content: An object with at least one of the following parameters:
+- Request Body Content: An object with the following parameters:
   - `title`: a string that must not be empty.
   - `stakeholder`: a string that must not be empty.
   - `scale`: an string value between: [`Blueprint/effects`, `Text`, `1:n`]. If the user choose `1:n`, it has to send only the value **n** in integer format. It represent the relationship between the dimensions drawn on a plan or architectural drawing and the actual dimensions of the building.
