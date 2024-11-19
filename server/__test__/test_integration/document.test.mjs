@@ -788,8 +788,10 @@ describe("DocumentRoutes", () => {
 
       const modifiedDocumentData = {
         title: "title2",
+        stakeholder: "stakeholder",
         scale: 200,
         issuanceDate: "2024-02-10",
+        type: "Informative",
         language: "Swedish",
         description: "Lorem ipsum...",
         coordinates: {"lat": 67.849982, "long": 20.217068},

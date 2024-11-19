@@ -292,13 +292,13 @@ describe("DocumentController", () => {
 
       const documentController = new DocumentController();
       documentController.documentDAO = documentDAO;
-      const result = await expect(documentController.updateDocument(1, "Document 1 Updated", "Stakeholder Updated",200, "2023-01-01", "Design", "Swedish", "Loreum ipsum...Updated", { lat: 67.849982, long: 20.217068 }, true, 16, false, null, false, null, false)
+      const result = await expect(documentController.updateDocument(1, "Document 1 Updated", "Stakeholder Updated",200, "2023-01-01", "Design", "Swedish", "Loreum ipsum...Updated", { lat: 67.849982, long: 20.217068 }, true, 16, false)
            ).resolves.toBeNull();
       
       expect(documentDAO.getDocumentByID).toHaveBeenCalled();
       expect(documentDAO.getDocumentByID).toHaveBeenCalledWith(1);
       expect(documentDAO.updateDocument).toHaveBeenCalled();
-      expect(documentDAO.updateDocument).toHaveBeenCalledWith(1, "Document 1 Updated", "Stakeholder Updated", 200, "2023-01-01", "Design", "Swedish", "Loreum ipsum...Updated", JSON.stringify({ lat: 67.849982, long: 20.217068 }), 16, undefined, undefined);
+      expect(documentDAO.updateDocument).toHaveBeenCalledWith(1, "Document 1 Updated", "Stakeholder Updated", 200, "2023-01-01", "Design", "Swedish", "Loreum ipsum...Updated", JSON.stringify({ lat: 67.849982, long: 20.217068 }), true, 16, false);
 
     });
 
