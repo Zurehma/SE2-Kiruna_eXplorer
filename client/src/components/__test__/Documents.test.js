@@ -10,6 +10,7 @@ jest.mock('../../../API', () => ({
   getTypeDocuments: jest.fn(),
   getTypeScale: jest.fn(),
   saveDocument: jest.fn(),
+  getStakeholders: jest.fn(),
 }));
 
 // Mock react-router-dom
@@ -23,7 +24,6 @@ describe('Documents Component', () => {
   const mockSetError = jest.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
     useNavigate.mockReturnValue(mockNavigate);
   });
 
@@ -58,5 +58,47 @@ describe('Documents Component', () => {
       expect(screen.queryByText(/Title is required/i)).not.toBeInTheDocument();
     });
   });
+  test('sets all fields and validates them correctly', async () => {
+    const stakeholder = [{ name: 'Some stakeholder' }];
+    API.getStakeholders.mockResolvedValue(stakeholder);
+    render(<Documents />);
+
+    // Test: Impostiamo il campo "Title"
+    const titleInput = screen.getByLabelText(/Title\*/i);
+    fireEvent.change(titleInput, { target: { value: 'Test Document Title' } });
+    expect(titleInput.value).toBe('Test Document Title'); // Verifica che il valore sia stato impostato
+
+    const issuanceDateInput = screen.getByPlaceholderText(/Select a date/i);
+
+    // Simula la modifica del campo
+    fireEvent.change(issuanceDateInput, { target: { value: '2024-11-19' } });
+
+    // Verifica che la data sia stata impostata correttamente
+    expect(issuanceDateInput.value).toBe('2024-11-18');
+    // Seleziona il campo Stakeholders tramite la sua etichetta
+    const stakeholderSelect = screen.getByLabelText(/Stakeholders\*/i);
+
+    // Simula la selezione di un'opzione
+    fireEvent.change(stakeholderSelect, { target: { value: 'Some stakeholder' } });
+
+    // Test: Impostiamo il campo "Description"
+    const descriptionInput = screen.getByLabelText(/Description\*/i);
+    fireEvent.change(descriptionInput, { target: { value: 'This is a test description for the document.' } });
+    expect(descriptionInput.value).toBe('This is a test description for the document.'); // Verifica che la descrizione sia stata impostata
+    const nextButton = screen.getByRole('button', { name: /Next/i });
+
+    // Test validation failure
+    fireEvent.click(nextButton);
+
+    // Verifica che non ci siano errori di validazione
+    await waitFor(() => {
+      expect(screen.queryByText(/Title is required/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Description is required/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Issuance Date is required/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Stakeholders is required/i)).not.toBeInTheDocument();
+    });
+  });
+  
+  
   
 });
