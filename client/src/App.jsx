@@ -88,8 +88,7 @@ function App() {
               <Route path="/" element={<Home setError={setError} />} />
               <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} loggedinError={loggedinError} setloggedinError={setloggedinError}/>}/>
               <Route path="/map" element={<Map2 setError={setError} loggedIn={loggedIn}/>}/>
-              <Route 
-                path="/documents" 
+              <Route path="/documents" 
                 element={
                 loggedIn ? (
                     <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
@@ -98,6 +97,7 @@ function App() {
                 )
                 } 
                 />
+
               <Route 
                 path="/documents/links" 
                 element={
@@ -108,6 +108,7 @@ function App() {
                 )
                 } 
                 />
+
               <Route 
                 path="/documents/all" 
                 element={
@@ -117,10 +118,21 @@ function App() {
                     <AccessDenied />
                 )
                 } 
-                /> 
-                <Route path='*' element={<NotFound/>}/>     
-              </Routes>
+                />
 
+              <Route 
+                path="/documents/:id" 
+                element={
+                loggedIn ? (
+                    <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
+                ) : (
+                    <AccessDenied />
+                )
+                } 
+                /> 
+                <Route path='*' element={<NotFound/>}/>   
+  
+            </Routes>
           </Container>
         </div>
     );

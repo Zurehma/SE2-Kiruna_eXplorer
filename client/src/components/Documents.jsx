@@ -155,32 +155,34 @@ function Documents(props) {
     try {
       const doc = await API.getDocumentById(documentId);
       const coordinates = doc.coordinates || { lat: '', long: '' };
-        let pages = doc.pages; 
+      let pages = doc.pages;
       if (!doc.pages && doc.pageFrom && doc.pageTo) {
         pages = `${doc.pageFrom}-${doc.pageTo}`;
-      } 
-      let scale = doc.scale;
-      let nValue = null; 
-      if (scale !== 'Text' && scale !== 'Blueprints/Effects' ) {
-        nValue = Number(scale); 
-        scale = `1:n`; 
-        setShowNField(true);
       }
   
+      let scale = doc.scale;
+      let nValue = '';
+      let showNField = false; // Variabile temporanea per gestire la visualizzazione del campo  
+      if (scale !== 'Text' && scale !== 'Blueprints/Effects') {
+        nValue = Number(scale); // Converti scale in numero
+        scale = `1:n`; // Imposta scale come `1:n`
+        showNField = true; // Mostra il campo nValue
+      }
+      // Aggiorna lo stato del documento e del campo di visualizzazione
       setDocument((prevDocument) => ({
         ...doc,
-        coordinates, 
-        pages,       
-        scale,     
-        nValue,      
-      }));
-  
-      console.log(doc);
+        coordinates,
+        pages,
+        scale,
+        nValue,
+      }));  
+      setShowNField(showNField); // Aggiorna la visibilità del campo nValue
     } catch (error) {
-      console.error("Error fetching document:", error);
+      console.error('Error fetching document:', error);
       props.setError(error);
     }
   };
+  
 
   const fetchAttachments = async (documentId) => {
     try {
@@ -207,14 +209,14 @@ function Documents(props) {
 
   const handleScaleChange = (e) => {
     const { value } = e.target;
-    handleChange(e);
-    if (value === '1:n') {
-      setShowNField(true);
-    } else {
-      setShowNField(false);
-    }
+    setDocument((prevDocument) => ({
+      ...prevDocument,
+      scale: value,
+      nValue: value === '1:n' ? prevDocument.nValue || '' : undefined, // Resetta nValue se non è `1:n`
+    }));
+    setShowNField(value === '1:n'); // Mostra o nascondi il campo nValue
   };
-
+  
   const polygonCoordinates = [
     [67.87328157366065, 20.20047943270466],
     [67.84024426842895, 20.35839687019359],
@@ -235,19 +237,23 @@ function Documents(props) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-     setDocument((prevDocument) => {
-         if (name === 'lat' || name === 'long') {
-             return {   ...prevDocument, coordinates: {
-                     ...prevDocument.coordinates, [name]: parseFloat(value) || ''  }
-                    };
-         } else {
-             return {
-                 ...prevDocument,
-                 [name]: name === 'nValue' ? parseInt(value, 10) || '' : value
-             };
-         }
-     });
-   };
+    setDocument((prevDocument) => {
+      if (name === 'lat' || name === 'long') {
+        return {
+          ...prevDocument,
+          coordinates: {
+            ...prevDocument.coordinates,
+            [name]: parseFloat(value) || ''
+          }
+        };
+      } else {
+        return {
+          ...prevDocument,
+          [name]: name === 'nValue' ? parseInt(value, 10) || '' : value
+        };
+      }
+    });
+  };
 
   const handleMapClick = (lat, lng) => {
     setPosition({ lat, lng });
@@ -380,7 +386,13 @@ function Documents(props) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if(document.scale === '1:n'){
+        document.scale = document.nValue;
+      }else{
+        document.nValue = '';
+      }
       if (id) {
+        console.log("Document to be updateeeeeed:", document);
         // Modalità Edit: aggiorna documento esistente
         await API.updateDocument(id, document);
         //Add new files and delete files
@@ -396,7 +408,9 @@ function Documents(props) {
         resetState();
         navigate(`/`);
       } else {
+        console.log("Document to be saveddddd:", document);
         const doc= await API.saveDocument(document);  
+        console.log("Dohhhhh:", doc);
         //Try to submit files
         handleFileUpload(doc);
         props.setNewDoc(doc);
@@ -574,13 +588,12 @@ function Documents(props) {
           <Col md={6}>
             <Form.Group controlId="scale">
               <Form.Label>Scale*</Form.Label>
-              <Form.Select 
-                as="select"
+              <Form.Select
                 name="scale"
                 value={document.scale || ""}
                 onChange={handleScaleChange}
-                className="input"    
-                isInvalid={!!errors.scale} 
+                className="input"
+                isInvalid={!!errors.scale}
               >
                 <option value="">Select a scale</option>
                 {scales.map((scale, index) => (
@@ -596,14 +609,13 @@ function Documents(props) {
             <Col md={6}>
               <Form.Group controlId="nValue">
                 <Form.Label>Value of n*</Form.Label>
-                <Form.Control 
-                  type="text" 
-                  name="nValue" 
-                  value={document.nValue || ""} 
-                  onChange={handleChange} 
+                <Form.Control
+                  type="text"
+                  name="nValue"
+                  value={document.nValue || ""}
+                  onChange={handleChange}
                   placeholder="Enter n"
                   className="input"
-                  //isInvalid={!!errors.scale}
                 />
               </Form.Group>
             </Col>
