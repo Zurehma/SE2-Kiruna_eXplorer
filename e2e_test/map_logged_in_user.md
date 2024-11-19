@@ -62,18 +62,12 @@ Steps:
 
 #### Test 5: Viewing Document Details within the Triangle
 Steps:
-1. Log in to the application with valid credentials.
-2. Navigate to the map by either:
-   - Selecting "Relocation of Kiruna" from the home page.
-   - Using the dropdown menu in the menu bar and selecting "Map."
-3. Locate the blue triangle on the map that contains several document markers.
-4. Click on a document marker within the triangle.
-5. Observe the document details displayed on the right-hand side panel.
+1. Verify that a "Modify" button is visible in the right-hand side panel for logged-in users.
+2. Click the "Modify" button and ensure it redirects to /documents/{id} where {id} corresponds to the selected document's ID.
 
-**Expected Results:**
-- Clicking on a document marker should open the detailed information of the selected document.
-- The details should include stakeholder information, scale, issue date, language, pages, and description.
-- The attachment section should be visible even if there are no attachments added.
+Expected Results:
+1. The "Modify" button should be visible for logged-in users in the details panel.
+2. Clicking the "Modify" button should redirect the user to the appropriate document's edit page.
 
 #### Test 6: Viewing General Documents Outside the Triangle
 Steps:
