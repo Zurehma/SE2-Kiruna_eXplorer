@@ -143,10 +143,10 @@ Add a new document with the provided information.
 
 #### PUT `api/documents/:docID`
 
-Update an existing document with the provided information.
+Update an existing document by providing a new object.
 
 - Request Parameters: _None_
-- Request Body Content: An object with at least one of the following parameters:
+- Request Body Content: An object with the following parameters:
   - `title`: a string that must not be empty.
   - `stakeholder`: a string that must not be empty.
   - `scale`: an string value between: [`Blueprint/effects`, `Text`, `1:n`]. If the user choose `1:n`, it has to send only the value **n** in integer format. It represent the relationship between the dimensions drawn on a plan or architectural drawing and the actual dimensions of the building.
