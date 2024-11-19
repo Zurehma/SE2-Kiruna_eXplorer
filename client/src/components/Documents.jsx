@@ -118,10 +118,12 @@ function Documents(props) {
       nValue: '',
       issuanceDate: '',
       type: '',
-      language: '',
-      coordinates: '',
       description: '',
-      pages: ''
+      language: '',
+      pages: '',
+      coordinates: { lat: '', long: '' },
+      pageFrom: '',
+      pageTo: ''
     }));
   };
   
@@ -152,31 +154,25 @@ function Documents(props) {
   const fetchDocument = async (documentId) => {
     try {
       const doc = await API.getDocumentById(documentId);
-      
-      // Assicurati che `coordinates` sia un oggetto con valori predefiniti se è nullo
       const coordinates = doc.coordinates || { lat: '', long: '' };
-  
-      // Calcola `pages` in base ai valori ricevuti
-      let pages = doc.pages; // Mantieni il valore esistente di `pages`
+        let pages = doc.pages; 
       if (!doc.pages && doc.pageFrom && doc.pageTo) {
-        pages = `${doc.pageFrom}-${doc.pageTo}`; // Genera "10-20" se entrambi sono presenti
+        pages = `${doc.pageFrom}-${doc.pageTo}`;
       } 
-  
-      // Gestisci il valore di `scale`
       let scale = doc.scale;
-      let nValue = null; // Campo da aggiungere a `document`
+      let nValue = null; 
       if (scale !== 'Text' && scale !== 'Blueprints/Effects' ) {
-        nValue = Number(scale); // Imposta nValue con il valore numerico di scale
-        scale = `1:n`;  // Imposta scale come "1:n"
+        nValue = Number(scale); 
+        scale = `1:n`; 
         setShowNField(true);
       }
   
       setDocument((prevDocument) => ({
         ...doc,
-        coordinates, // Imposta le coordinate predefinite
-        pages,       // Imposta il campo pages calcolato
-        scale,       // Imposta il campo scale aggiornato
-        nValue,      // Aggiungi il campo nValue
+        coordinates, 
+        pages,       
+        scale,     
+        nValue,      
       }));
   
       console.log(doc);
@@ -185,8 +181,6 @@ function Documents(props) {
       props.setError(error);
     }
   };
-  
-  
 
   const fetchAttachments = async (documentId) => {
     try {
@@ -235,7 +229,6 @@ function Documents(props) {
 
   const validateCoordinates = (lat, lng) => {
     const point = [lat, lng]; // ordine GeoJSON: [lng, lat]
-
     const isInside = turf.booleanPointInPolygon(point, polygonGeoJson);
     return isInside;
   };
@@ -256,73 +249,73 @@ function Documents(props) {
      });
    };
 
-   const handleMapClick = (lat, lng) => {
+  const handleMapClick = (lat, lng) => {
     setPosition({ lat, lng });
     setDocument((prevDocument) => ({
       ...prevDocument,
       coordinates: { lat, long: lng }
     }));
   };
-  
-const validateStep1 = () => {
-  const newErrors = {};
-  if (!document.title || document.title.length < 2) {
-    newErrors.title = "Title is required and cannot be empty.";
-  }
-  if (!document.stakeholder) {
-    newErrors.stakeholder = "You must select a stakeholder.";
-  }
-  if (!document.issuanceDate) {
-    newErrors.issuanceDate = "You must select a Date in a valid format (YYYY-MM-DD).";
-  }
-  if (!document.description || document.description.length < 2) {
-    newErrors.description = "Description is required and cannot be empty.";
-  }
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0; 
-};
+    
+  const validateStep1 = () => {
+    const newErrors = {};
+    if (!document.title || document.title.length < 2) {
+      newErrors.title = "Title is required and cannot be empty.";
+    }
+    if (!document.stakeholder) {
+      newErrors.stakeholder = "You must select a stakeholder.";
+    }
+    if (!document.issuanceDate) {
+      newErrors.issuanceDate = "You must select a Date in a valid format (YYYY-MM-DD).";
+    }
+    if (!document.description || document.description.length < 2) {
+      newErrors.description = "Description is required and cannot be empty.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; 
+  };
 
-const validateStep2 = () => {
-  const newErrors = {};
-  if (!document.scale) {
-    newErrors.scale = "You must select a scale.";
-  }
-  if (!document.type) {
-    newErrors.type = "You must select a type.";
-  }
-  if (!document.language) {
-    newErrors.language = "You must select a language.";
-  }
-  if (document.pages && !validatePages(document.pages)) {
-    newErrors.pages = "Please enter a valid number or range (e.g., 35 or 35-45).";
-  }
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+  const validateStep2 = () => {
+    const newErrors = {};
+    if (!document.scale) {
+      newErrors.scale = "You must select a scale.";
+    }
+    if (!document.type) {
+      newErrors.type = "You must select a type.";
+    }
+    if (!document.language) {
+      newErrors.language = "You must select a language.";
+    }
+    if (document.pages && !validatePages(document.pages)) {
+      newErrors.pages = "Please enter a valid number or range (e.g., 35 or 35-45).";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-const validateStep3 = () => {
-  const newErrors = {};
-  if ((document.coordinates.lat || document.coordinates.long) && !validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))) {
-    newErrors.coordinates = "Please enter a valid LATITUDE and LONGITUDE or select from the map.";
-  }
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+  const validateStep3 = () => {
+    const newErrors = {};
+    if ((document.coordinates.lat || document.coordinates.long) && !validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))) {
+      newErrors.coordinates = "Please enter a valid LATITUDE and LONGITUDE or select from the map.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-const handleNextStep = () => {
-  let isValid = false;
-  if (step === 1) {
-    isValid = validateStep1();
-  } else if (step === 2) {
-    isValid = validateStep2();
-  } else if (step === 3) {
-    isValid = validateStep3();
-  }
+  const handleNextStep = () => {
+    let isValid = false;
+    if (step === 1) {
+      isValid = validateStep1();
+    } else if (step === 2) {
+      isValid = validateStep2();
+    } else if (step === 3) {
+      isValid = validateStep3();
+    }
 
-  if (isValid) {
-    setStep(prev => prev + 1);
-  }
-};
+    if (isValid) {
+      setStep(prev => prev + 1);
+    }
+  };
 
   const handlePreviousStep = () => setStep(prev => prev - 1);
 
@@ -389,12 +382,9 @@ const handleNextStep = () => {
     try {
       if (id) {
         // Modalità Edit: aggiorna documento esistente
-        const updatedDoc = await API.updateDocument(id, document);
-        console.log(updatedDoc);
-        props.setUpdatedDoc(updatedDoc); // Se necessario
-        console.log("Document updated successfully:", updatedDoc);
+        await API.updateDocument(id, document);
         //Add new files and delete files
-        handleFileUpload(updatedDoc);
+        handleFileUpload(document);
         filesToBeDeleted.forEach(async (attachmentId) => {
           try{
             await API.deleteAttachment(id, attachmentId);
