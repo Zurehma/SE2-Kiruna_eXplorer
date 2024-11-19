@@ -4,7 +4,6 @@ import dayjs from "dayjs";
 import { app } from "../../index.mjs";
 import cleanup from "../../db/cleanup.mjs";
 import DocumentDAO from "../../dao/documentDAO.mjs";
-
 import { delete_table } from "../../db/db_utils.mjs";
 import db from "../../db/db.mjs";
 
@@ -43,6 +42,261 @@ describe("DocumentRoutes", () => {
 
   afterAll(async () => {
     await cleanup();
+  });
+
+  describe("1. - GET /api/documents", () => {
+    //add some documents
+    const exampleData = [
+      {
+        title: "tittttttttttttt",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      },
+      {
+        title: "titttttttttttttttttt1",
+        stakeholder: "stakeholder1",
+        scale: 100,
+        issuanceDate: "2014-02-12",
+        type: "Prescriptive",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      }
+    ] 
+    test("1 - It should return 200 a list of all documents", async() => {
+      //count all present documents in the database
+      let countResult = await request(app)
+      .get(basePath + "/documents")
+      .set("Cookie", userCookie)
+      .expect(200);
+      let count = countResult.body.length;
+
+      let result1 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleData[0])
+        .expect(201);
+      
+      let result2 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleData[1])
+        .expect(201);
+
+      //get documents
+      let res = await request(app)
+        .get(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .expect(200);
+
+      expect(res.body.length).toBe(count+2);
+    });
+  
+    test("2 - It should return 200 a list of all the filtered by type documents", async() => {
+      //count all present documents in the database
+      let countResult = await request(app)
+      .get(basePath + "/documents"+"?type=Prescriptive")
+      .set("Cookie", userCookie)
+      .expect(200);
+      let count = countResult.body.length;
+
+      let result1 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleData[0])
+        .expect(201);
+      
+      let result2 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleData[1])
+        .expect(201);
+
+      //get filtered documents
+      let res = await request(app)
+        .get(basePath + "/documents/"+"?type=Prescriptive")
+        .set("Cookie", userCookie)
+        .expect(200);
+
+      expect(res.body.length).toBe(count+1);
+      expect(res.body[0].type).toBe("Prescriptive");
+    });
+
+    test("3 - It should return 200 a list of all the filtered by stakeholder documents", async() => {
+      //count all present documents in the database
+      let countResult = await request(app)
+      .get(basePath + "/documents/"+"?stakeholder=stakeholder")
+      .set("Cookie", userCookie)
+      .expect(200);
+      let count = countResult.body.length;
+
+      let result1 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleData[0])
+        .expect(201);
+      
+      let result2 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleData[1])
+        .expect(201);
+
+      //get filtered documents
+      let res = await request(app)
+        .get(basePath + "/documents/"+"?stakeholder=stakeholder")
+        .set("Cookie", userCookie)
+        .expect(200);
+
+      expect(res.body.length).toBe(count+1);
+      expect(res.body[0].stakeholder).toBe("stakeholder");
+    });
+
+    test("4 - It should return 200 a list of all the documents in the range of the issuanceDate", async() => {
+      //count all present documents in the database
+      let countResult = await request(app)
+      .get(basePath + "/documents"+"?issuanceDateFrom=2015-01-10&issuanceDateTo=2025-10-20")
+      .set("Cookie", userCookie)
+      .expect(200);
+      let count = countResult.body.length;
+
+      let result1 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleData[0])
+        .expect(201);
+      
+      let result2 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleData[1])
+        .expect(201);
+
+      //get filtered documents
+      let res = await request(app)
+        .get(basePath + "/documents/"+"?issuanceDateFrom=2015-01-10&issuanceDateTo=2025-10-20")
+        .set("Cookie", userCookie)
+        .expect(200);
+
+      expect(res.body.length).toBe(count+1);
+    });
+
+    test("5 - It should return 200 a list of all the documents with the specified issuanceDate", async() => {
+      //count all present documents in the database
+      let countResult = await request(app)
+      .get(basePath + "/documents"+"?issuanceDateFrom=2014-02-12")
+      .set("Cookie", userCookie)
+      .expect(200);
+      let count = countResult.body.length;
+
+      let result1 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleData[0])
+        .expect(201);
+      
+      let result2 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleData[1])
+        .expect(201);
+
+      //get filtered documents
+      let res = await request(app)
+        .get(basePath + "/documents/"+"?issuanceDateFrom=2014-02-12")
+        .set("Cookie", userCookie)
+        .expect(200);
+
+      expect(res.body.length).toBe(count+1);
+      expect(res.body[0].issuanceDate).toBe("2014-02-12");
+    });
+  });
+  
+  describe("2. - GET /api/documents/:id", () => {
+    test("2.1 - It should return 200 the document with the specified id", async() => {
+
+      //add some documents
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const exampleDocumentData2 = {
+        title: "title2",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const exampleDocumentData3 = {
+        title: "title3",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+
+      let result1 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData)
+        .expect(201);
+      
+      let result2 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData2)
+        .expect(201);
+
+      let result3 = await request(app)
+        .post(basePath + "/documents")
+        .set("Cookie", userCookie)
+        .send(exampleDocumentData3)
+        .expect(201);
+      
+      const responseExample = {
+        id: result1.body.id,
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      }
+
+      //get document by id
+      let res = await request(app)
+        .get(basePath + "/documents/" + result1.body.id)
+        .set("Cookie", userCookie)
+        .expect(200);
+
+      expect(res.body).toMatchObject(responseExample);
+    });
+  
   });
 
   describe("1. - POST /api/documents", () => {
@@ -672,48 +926,3 @@ describe("AuthRoutes", () => {
 });
 
 
-let baseURL = "/api/documents";
-
-describe("DocumentRoutes", () => {
-
-  beforeAll(async () => {
-    // console.log("Node environment: ", process.env.NODE_ENV);
-    let info = await delete_table(db, "document");
-  });
-  
-  afterAll(async () => {
-    let info = await delete_table(db, "document");
-  });
-
-  let documentDAO = new DocumentDAO();
-
-  describe("GET api/documents", () => {
-    let mockDocumentController;
-    let testDocument;
-    beforeEach(async () => {
-      let res = await documentDAO.addDocument("Document 1", "Stakeholder", "test", "2023-01-01", "Informative", "english", "Description", null, null, null, null, null);
-      // console.log(res);
-    });
-
-    afterEach(() => {
-      delete_table(db, "document");
-    });
-
-    it("It should return 200 status code and a list of all documents", async () => {
-
-      const response = await request(app)
-        .get(baseURL);
-
-      expect(response.statusCode).toBe(200);
-      expect(response.body).toMatchObject([{
-        title: "Document 1",
-        stakeholder: "Stakeholder",
-        scale: "test",
-        issuanceDate: "2023-01-01",
-        type: "Informative",
-        pages: null
-      }]);
-    });
-  });
-
-}); 

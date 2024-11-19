@@ -72,10 +72,6 @@ describe("DocumentController", () => {
           expect(response[i]).toBe(mapRowsToDocument(exampleDocumentData[i]));
         }
       });
-  
-      // test("Wrong filter applied", async () => {
-      //   expect(result).rejects.toStrictEqual({ errCode: 400, errMessage: "Document filter error!" });
-      // });
     });
 
 
