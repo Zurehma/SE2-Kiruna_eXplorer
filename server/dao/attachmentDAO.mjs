@@ -90,3 +90,4 @@ class AttachmentDAO {
 }
 
 export default AttachmentDAO;
+export { mapRowsToAttachmentInfo };
