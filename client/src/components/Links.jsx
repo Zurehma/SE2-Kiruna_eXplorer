@@ -132,7 +132,7 @@ function Links(props) {
                 >
                   {!props.newDoc && <option value="">Select Document 1</option>}
                   {documents.map((doc) => (
-                    <option key={doc.id} value={doc.id}>
+                    <option name='optionsDoc1' key={doc.id} value={doc.id}>
                       {doc.title}
                     </option>
                   ))}
@@ -191,7 +191,7 @@ function Links(props) {
                 >
                   <option value="">Select a type of Link</option>
                   {typeLink.map((type, index) => (
-                    <option key={index} value={type.name}>
+                    <option name='optionLink' key={index} value={type.name}>
                       {type.name}
                     </option>
                   ))}

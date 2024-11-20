@@ -814,7 +814,7 @@ const handleNextStep = () => {
        <Container className="d-flex align-items-center justify-content-center min-vh-100">
          <Card className="p-4 shadow-lg w-100" style={{ maxWidth: '700px' }}>
            <Card.Body>
-           <Card.Title className="mb-4 text-center">{id ? `EDIT DOCUMENT: ${id}` : "ADD NEW DOCUMENT"}</Card.Title>
+           <Card.Title dataTest="form" className="mb-4 text-center">{id ? `EDIT DOCUMENT: ${id}` : "ADD NEW DOCUMENT"}</Card.Title>
              {/* Step Indicator with Clickable Buttons */}
              <StepIndicator step={step}  totalSteps={4}  setStep={setStep}
                 validateStep={(currentStep) => {
