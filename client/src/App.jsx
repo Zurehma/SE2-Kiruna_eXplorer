@@ -30,6 +30,7 @@ function App() {
     const [hideDocBar, sethideDocBar] = useState(false);
     const [editDoc, setEditDoc] = useState('');
     const navigate = useNavigate();
+    const [logging,setLogging] = useState(false);
     
     
     const handleLogin = async (credentials) => {
@@ -54,7 +55,25 @@ function App() {
             setloggedinError(error.message || "Login failed. Please check your credentials.");
         }
     };
-    
+    useEffect(() => {
+        setLogging(true);
+        const checkLogin = async () => {
+            try {
+                // Check if the user is already logged in
+                const user = await API.getUserInfo();
+                setUsername(user.username);
+                setCurrentUser(user);
+                setLoggedIn(true);
+                setRole(user.role)
+            } catch (error) {
+                // If the user is not logged in, an error will be thrown
+                // We can ignore this error, it's normal React behaviour
+            }finally{
+                setLogging(false);
+            }
+        };
+        checkLogin();
+    }, []);
 
     
     
@@ -76,7 +95,7 @@ function App() {
   }, [error]);
     
     return (
-        <div className="min-vh-100 d-flex flex-column">
+        !logging ? (<div className="min-vh-100 d-flex flex-column">
           <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} role={role} sethideDocBar= {sethideDocBar} hideDocBar ={sethideDocBar}/>
           <Container fluid className="flex-grow-1 d-flex flex-column px-0">
             {error && (
@@ -134,7 +153,7 @@ function App() {
   
             </Routes>
           </Container>
-        </div>
+        </div>) : (<div className="d-flex justify-content-center align-items-center" style={{height: '100vh'}}><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>)
     );
 }
 
