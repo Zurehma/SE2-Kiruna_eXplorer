@@ -927,4 +927,254 @@ describe("AuthRoutes", () => {
 
 });
 
+describe("AttachmentRoutes", () => {
+  beforeAll(async () => {
+    await cleanup();
+    await createUser(userData);
+    userCookie = await loginUser(userData);
+  });
+
+  afterAll(async () => {
+    await cleanup();
+  });
+
+  describe("1. GET /api/documents/:docID/attachments", () => {
+    test("1.1 - It should return 200 and array of attachments", async () => {
+      const exampleAttachment1 = {id:1, docID:1, name:"name", path: "path", format: "format"};
+      const exampleAttachment2 = {id:2, docID:1, name:"name", path: "path", format: "format"};
+      const docID = 1;
+
+      let result = await request(app)
+        .get(basePath + "/documents/" + docID + "/attachments")
+        .expect(200);
+
+    });
+
+    test("1.2 - It should return 404 when the document does not exist", async () => {
+      const exampleAttachment = {id:1, docID:1, name:"name", path: "path", format: "format"};
+
+      let result = await request(app)
+        .get(basePath + "/documents/" + 100000 + "/attachments")
+        .expect(404);
+
+    });
+  });
+
+  describe("2. POST /api/documents/:docID/attachments", () => {
+    
+    test("2.1 - It should return 201", async () => {
+      const docID = 1;
+      const exampleAttachment = {id:1, name:"name", path: "path", format: "format"};
+
+      let result = await request(app)
+        .post(basePath + "/documents/" + docID + "/attachments")
+        .set("Cookie", userCookie)
+        .attach("file", Buffer.from("Test content"), {
+          filename: "test.pdf",
+          contentType: "application/pdf",
+        })
+        .expect(201);
+
+        expect(result.body).toMatchObject({
+          id: expect.any(Number),
+          docID,
+          name: "test.pdf",
+          path: expect.stringContaining("uploads/documents"),
+          format: "application/pdf",
+        });
+
+        await request(app).delete(basePath + "/documents/" + docID + "/attachments/" + result.body.id).set("Cookie", userCookie);
+    });
+
+    test("2.2 - It should return 404 if the document does not exist", async () => {
+      const nonExistentDocID = 10000;
+  
+      await request(app)
+        .post(basePath + "/documents/" + nonExistentDocID + "/attachments")
+        .set("Cookie", userCookie)
+        .attach("file", Buffer.from("Test content"), {
+          filename: "test.pdf",
+          contentType: "application/pdf",
+        })
+        .expect(404);
+
+       
+    });
+  
+    test("2.3 - It should return 400 for unsupported file types", async () => {
+      const docID = 1;
+  
+      await request(app)
+        .post(`${basePath}/documents/${docID}/attachments`)
+        .set("Cookie", userCookie)
+        .attach("file", Buffer.from("Invalid content"), {
+          filename: "test.txt",
+          contentType: "text/plain",
+        })
+        .expect(400);
+    });
+  
+   /* test("2.4 - It should return 400 if the file size exceeds the limit", async () => {
+      const docID = 1;
+  
+      const largeFile = Buffer.alloc(10 * 1024 * 1024);
+  
+      await request(app)
+        .post(`${basePath}/documents/${docID}/attachments`)
+        .set("Cookie", userCookie)
+        .attach("file", largeFile, {
+          filename: "largefile.pdf",
+          contentType: "application/pdf",
+        })
+        .expect(201);
+
+    }); */
+  
+    test("2.5 - It should return 401 if the user is not logged in", async () => {
+      const docID = 1;
+  
+      await request(app)
+        .post(`${basePath}/documents/${docID}/attachments`)
+        .attach("file", Buffer.from("Test content"), {
+          filename: "test.pdf",
+          contentType: "application/pdf",
+        })
+        .expect(401);
+    });
+  });
+
+  describe("3. DELETE /api/documents/:docID/attachments/:attachmentID", () => {
+    test("3.1 - It should return 204 document deleted", async()=>{
+      const docID = 1;
+      const exampleAttachment = {id:1, name:"name", path: "path", format: "format"};
+
+      let resultPost = await request(app)
+        .post(basePath + "/documents/" + docID + "/attachments")
+        .set("Cookie", userCookie)
+        .attach("file", Buffer.from("Test content"), {
+          filename: "test.pdf",
+          contentType: "application/pdf",
+        })
+        .expect(201);
+
+      let resultDelete = await request(app)
+        .delete(basePath + "/documents/" + docID + "/attachments/" + resultPost.body.id)
+        .set("Cookie", userCookie)
+        .expect(204);
+    })
+
+    test("3.2 - It should return 404 attachment not found", async()=>{
+
+      const docID = 1;
+      let resultDelete = await request(app)
+        .delete(basePath + "/documents/" + docID + "/attachments/" + 100000)
+        .set("Cookie", userCookie)
+        .expect(404);
+    });
+
+    test("3.3 - It should retun 400 if document IDs do not match", async()=>{
+      const docID = 1;
+      const exampleAttachment = {id:1, name:"name", path: "path", format: "format"};
+
+      let resultPost = await request(app)
+        .post(basePath + "/documents/" + docID + "/attachments")
+        .set("Cookie", userCookie)
+        .attach("file", Buffer.from("Test content"), {
+          filename: "test.pdf",
+          contentType: "application/pdf",
+        })
+        .expect(201);
+
+      let resultDelete = await request(app)
+        .delete(basePath + "/documents/" + 2 + "/attachments/" + resultPost.body.id)
+        .set("Cookie", userCookie)
+        .expect(400);
+
+      //cleanup attachment
+      await request(app).delete(basePath + "/documents/" + docID + "/attachments/" + resultPost.body.id).set("Cookie", userCookie);
+
+    });
+
+    test("3.4 - Return 401 if user unauthorized", async()=>{
+      const docID = 1;
+      const exampleAttachment = {id:1, name:"name", path: "path", format: "format"};
+
+      let resultPost = await request(app)
+        .post(basePath + "/documents/" + docID + "/attachments")
+        .set("Cookie", userCookie)
+        .attach("file", Buffer.from("Test content"), {
+          filename: "test.pdf",
+          contentType: "application/pdf",
+        })
+        .expect(201);
+
+      let resultDelete = await request(app)
+        .delete(basePath + "/documents/" + docID + "/attachments/" + resultPost.body.id)
+        .set("Cookie", userCookie)
+        .expect(204);
+
+      //cleanup attachment
+      await request(app).delete(basePath + "/documents/" + docID + "/attachments/" + resultPost.body.id).set("Cookie", userCookie);
+
+    });
+  });
+
+  describe("4. GET /api/documents/:docID/attachments/:attachmentID/download", () => {
+    test("4.1 - It should return 200 and the attachment", async()=>{
+      const docID = 1;
+      const exampleAttachment = {id:1, name:"name", path: "path", format: "format"};
+
+      let resultPost = await request(app)
+        .post(basePath + "/documents/" + docID + "/attachments")
+        .set("Cookie", userCookie)
+        .attach("file", Buffer.from("Test content"), {
+          filename: "test.pdf",
+          contentType: "application/pdf",
+        })
+        .expect(201);
+
+      let resultGet = await request(app)
+        .get(`${basePath}/documents/${docID}/attachments/${resultPost.body.id}/download`)
+        .set("Cookie", userCookie)
+        .expect(200);
+
+        //cleanup
+        await request(app).delete(basePath + "/documents/" + docID + "/attachments/" + resultPost.body.id).set("Cookie", userCookie);
+
+    });
+
+    test("4.2 - It should return 404 attachment not found", async()=>{
+      const docID = 1;
+      let resultGet = await request(app)
+        .get(`${basePath}/documents/${docID}/attachments/100000/download`)
+        .set("Cookie", userCookie)
+        .expect(404);
+    });
+
+    test("4.3 - It should return 400 document IDs do not match", async()=>{
+      const docID = 1;
+      const exampleAttachment = {id:1, name:"name", path: "path", format: "format"};
+
+      let resultPost = await request(app)
+        .post(basePath + "/documents/" + docID + "/attachments")
+        .set("Cookie", userCookie)
+        .attach("file", Buffer.from("Test content"), {
+          filename: "test.pdf",
+          contentType: "application/pdf",
+        })
+        .expect(201);
+
+      let resultGet = await request(app)
+        .get(`${basePath}/documents/2/attachments/${resultPost.body.id}/download`)
+        .set("Cookie", userCookie)
+        .expect(400);
+
+        //cleanup
+        await request(app).delete(basePath + "/documents/" + docID + "/attachments/" + resultPost.body.id).set("Cookie", userCookie);
+    })
+
+  });
+
+});
+
 
