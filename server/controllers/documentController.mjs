@@ -13,6 +13,12 @@ class DocumentController {
     return new Promise(async (resolve, reject) => {
       try {
         const document = await this.documentDAO.getDocumentByID(id);
+
+        if (document === undefined) {
+          const error = { errCode: 404, errMessage: "Document not found." };
+          throw error;
+        }
+
         resolve(document);
       } catch (err) {
         reject(err);
