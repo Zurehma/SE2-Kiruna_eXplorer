@@ -1,6 +1,5 @@
 const SERVER_URL =  "http://localhost:3001" + "/api";
 
-
 /**
  * Utility function to check if an answer from the server is invalid.
  */
@@ -272,60 +271,58 @@ const deleteAttachment = async (docID, attachmentID) => {
     }
 }
 
-// Function to save a document
 const saveDocument = async (doc) => {
+  const filteredDoc = Object.fromEntries(
+      Object.entries({
+          title: doc.title,
+          stakeholder: doc.stakeholder,
+          scale: doc.scale,
+          issuanceDate: doc.issuanceDate,
+          type: doc.type,
+          description: doc.description,
+          language: doc.language,
+          pages: doc.pages,
+          pageFrom: doc.pageFrom,
+          pageTo: doc.pageTo,
+          coordinates:
+              doc.coordinates?.lat && doc.coordinates?.long
+                  ? { lat: doc.coordinates.lat, long: doc.coordinates.long }
+                  : undefined, // Non includere se lat/long non validi
+      }).filter(([_, value]) => value !== '' && value !== null && value !== undefined) // Filtra campi vuoti/nulli
+  );
 
-    const filteredDoc = Object.fromEntries(
-        Object.entries({
-            title: doc.title,
-            stakeholder: doc.stakeholder,
-            scale: doc.scale,
-            issuanceDate: doc.issuanceDate,
-            type: doc.type,
-            description: doc.description,
-            language: doc.language,
-            pages: doc.pages,
-            pageFrom: doc.pageFrom,
-            pageTo: doc.pageTo,
-            coordinates: { lat: doc.coordinates.lat, long: doc.coordinates.long },
-        }).filter(([_, value]) => value !== '' && value !== null)
-    );
-
-    console.log(filteredDoc);
-
-    try {
-        const response = await fetch(`${SERVER_URL}/documents/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(filteredDoc),
-        });
-        
-        return handleInvalidResponse(response).json();
-    } catch (error) {
-        throw error;
-    }
+  try {
+      const response = await fetch(`${SERVER_URL}/documents/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(filteredDoc),
+      });
+      return handleInvalidResponse(response).json();
+  } catch (error) {
+      throw error;
+  }
 };
 
 const updateDocument = async (documentId, doc) =>{
-
-    const filteredDoc = Object.fromEntries(
-        Object.entries({
-            title: doc.title,
-            stakeholder: doc.stakeholder,
-            scale: doc.scale,
-            issuanceDate: doc.issuanceDate,
-            type: doc.type,
-            description: doc.description,
-            language: doc.language,
-            pages: doc.pages,
-            pageFrom: doc.pageFrom,
-            pageTo: doc.pageTo,
-            coordinates: { lat: doc.coordinates.lat, long: doc.coordinates.long },
-        }).filter(([_, value]) => value !== '' && value !== null)
-    );
-
-    console.log(filteredDoc);
+  const filteredDoc = Object.fromEntries(
+    Object.entries({
+        title: doc.title,
+        stakeholder: doc.stakeholder,
+        scale: doc.scale,
+        issuanceDate: doc.issuanceDate,
+        type: doc.type,
+        description: doc.description,
+        language: doc.language,
+        pages: doc.pages,
+        pageFrom: doc.pageFrom,
+        pageTo: doc.pageTo,
+        coordinates:
+            doc.coordinates?.lat && doc.coordinates?.long
+                ? { lat: doc.coordinates.lat, long: doc.coordinates.long }
+                : undefined, // Non includere se lat/long non validi
+    }).filter(([_, value]) => value !== '' && value !== null && value !== undefined) // Filtra campi vuoti/nulli
+);
     try {
         const response = await fetch(`${SERVER_URL}/documents/${documentId}`, {
             method: "PUT",
@@ -335,8 +332,6 @@ const updateDocument = async (documentId, doc) =>{
             credentials: 'include',
             body: JSON.stringify(filteredDoc),
         });
-        return await response.json();
-
     } catch (error) {
         throw error;
     }

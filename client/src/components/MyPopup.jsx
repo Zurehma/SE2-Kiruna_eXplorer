@@ -156,23 +156,25 @@ function MyPopup(props) {
           <br />
           <strong className="text-dark">Issuance Date:</strong> {props.doc.issuanceDate} <br />
           <strong className="text-dark">Type:</strong> {props.doc.type} <br />
-
-          {/* Display connections */}
-          <strong className="text-dark">Connections:</strong> {props.doc.connections}{' '}
-          {/* Only display the caret if there are connections */}
-          {props.doc.connections>0 && !loading && (
-            <Dropdown.Toggle
-              variant="link"
-              aria-label="connections" 
-              id="dropdown-toggle-connection"
-              className="ms-2 p-0"
-              onClick={() => setShowLinks(!showLinks)}
-              style={{ color: 'black', fontSize: '1rem' }}
-              data-testid="connections-toggle-button"
-            >
-            </Dropdown.Toggle>
-          )}
         </p>
+        {/* Display connections */}
+        <p className="small text-muted m-0 d-flex align-items-center">
+            <strong className="text-dark">Connections:</strong> {props.doc.connections}
+            {props.doc.connections > 0 && !loading && (
+              <Dropdown className="d-inline ms-2">
+                <Dropdown.Toggle
+                  variant="link"
+                  aria-label="connections"
+                  id="dropdown-toggle-connection"
+                  className="p-0"
+                  onClick={() => setShowLinks(!showLinks)}
+                  style={{ color: 'black', fontSize: '1rem' }}
+                  data-testid="connections-toggle-button"
+                >
+                </Dropdown.Toggle>
+              </Dropdown>
+            )}
+          </p>
 
         {/* Display the dropdown list of connections if it's open */}
         {showLinks && (

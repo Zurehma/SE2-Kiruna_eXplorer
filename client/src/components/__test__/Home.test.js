@@ -36,7 +36,7 @@ describe('Home Component', () => {
 
     // Check for background image change (use querySelector for class-based selection)
     const homeBackground = document.querySelector('.home-background');
-    expect(homeBackground).toHaveStyle('background-image: url("../public/kirunadocs.png")');
+    expect(homeBackground).toHaveStyle('background-image: url("/kirunadocs.png")');
 
     // Check title text update
     expect(screen.getByText('Why we do the relocation of Kiruna?')).toBeInTheDocument();
@@ -66,7 +66,7 @@ describe('Home Component', () => {
 
     // Check for return to initial state (background and title)
     const homeBackground = document.querySelector('.home-background');
-    expect(homeBackground).toHaveStyle('background-image: url("../public/kiruna.jpg")');
+    expect(homeBackground).toHaveStyle('background-image: url("/kiruna.jpg")');
     expect(screen.getByText("Kiruna: A Town in Motion – Relocating for a Sustainable Future")).toBeInTheDocument();
   });
 

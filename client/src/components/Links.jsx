@@ -171,7 +171,18 @@ function Links(props) {
                   classNamePrefix="select"
                   isInvalid={!!errors.document2}
                   isDisabled={!linkData.document1}
+                  styles={{
+                    placeholder: (base, state) => ({
+                      ...base,
+                      color: state.isDisabled ? 'grey' : 'black', // Grigio quando disabilitato, nero altrimenti
+                    }),
+                    control: (base, state) => ({
+                      ...base,
+                      backgroundColor: state.isDisabled ? '#f5f5f5' : 'white', // Facoltativo, per cambiare lo sfondo
+                    }),
+                  }}
                 />
+
                 {/* Messaggio di errore */}
                 {errors.document2 && (
                   <div className="invalid-feedback d-block">

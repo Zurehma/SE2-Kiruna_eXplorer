@@ -17,10 +17,10 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 function StepIndicator({ step, totalSteps, setStep, validateStep }) {
   const steps = [
-    { label: 'STEP 1', icon: <i className="bi bi-lock"></i> },
+    { label: 'STEP 1', icon: <i class="bi bi-file-earmark-text"></i> },
     { label: 'STEP 2', icon: <i className="bi bi-person-circle"></i> },
-    { label: 'STEP 3', icon: <i className="bi bi-credit-card"></i> },
-    { label: 'STEP 4', icon: <i className="bi bi-check-circle"></i> }
+    { label: 'STEP 3', icon: <i class="bi bi-geo-alt"></i> },
+    { label: 'STEP 4', icon: <i class="bi bi-cloud-arrow-up"></i> }
   ];
 
   const handleStepChange = (newStep) => {
@@ -118,10 +118,12 @@ function Documents(props) {
       nValue: '',
       issuanceDate: '',
       type: '',
-      language: '',
-      coordinates: '',
       description: '',
-      pages: ''
+      language: '',
+      pages: '',
+      coordinates: { lat: '', long: '' },
+      pageFrom: '',
+      pageTo: ''
     }));
   };
   
@@ -152,40 +154,34 @@ function Documents(props) {
   const fetchDocument = async (documentId) => {
     try {
       const doc = await API.getDocumentById(documentId);
-      
-      // Assicurati che `coordinates` sia un oggetto con valori predefiniti se è nullo
       const coordinates = doc.coordinates || { lat: '', long: '' };
-  
-      // Calcola `pages` in base ai valori ricevuti
-      let pages = doc.pages; // Mantieni il valore esistente di `pages`
+      let pages = doc.pages;
       if (!doc.pages && doc.pageFrom && doc.pageTo) {
-        pages = `${doc.pageFrom}-${doc.pageTo}`; // Genera "10-20" se entrambi sono presenti
-      } 
-  
-      // Gestisci il valore di `scale`
-      let scale = doc.scale;
-      let nValue = null; // Campo da aggiungere a `document`
-      if (scale !== 'Text' && scale !== 'Blueprints/Effects' ) {
-        nValue = Number(scale); // Imposta nValue con il valore numerico di scale
-        scale = `1:n`;  // Imposta scale come "1:n"
-        setShowNField(true);
+        pages = `${doc.pageFrom}-${doc.pageTo}`;
       }
   
+      let scale = doc.scale;
+      let nValue = '';
+      let showNField = false; // Variabile temporanea per gestire la visualizzazione del campo  
+      if (scale !== 'Text' && scale !== 'Blueprints/Effects') {
+        nValue = Number(scale); // Converti scale in numero
+        scale = `1:n`; // Imposta scale come `1:n`
+        showNField = true; // Mostra il campo nValue
+      }
+      // Aggiorna lo stato del documento e del campo di visualizzazione
       setDocument((prevDocument) => ({
         ...doc,
-        coordinates, // Imposta le coordinate predefinite
-        pages,       // Imposta il campo pages calcolato
-        scale,       // Imposta il campo scale aggiornato
-        nValue,      // Aggiungi il campo nValue
-      }));
-  
-      console.log(doc);
+        coordinates,
+        pages,
+        scale,
+        nValue,
+      }));  
+      setShowNField(showNField); // Aggiorna la visibilità del campo nValue
     } catch (error) {
-      console.error("Error fetching document:", error);
+      console.error('Error fetching document:', error);
       props.setError(error);
     }
   };
-  
   
 
   const fetchAttachments = async (documentId) => {
@@ -213,14 +209,14 @@ function Documents(props) {
 
   const handleScaleChange = (e) => {
     const { value } = e.target;
-    handleChange(e);
-    if (value === '1:n') {
-      setShowNField(true);
-    } else {
-      setShowNField(false);
-    }
+    setDocument((prevDocument) => ({
+      ...prevDocument,
+      scale: value,
+      nValue: value === '1:n' ? prevDocument.nValue || '' : undefined, // Resetta nValue se non è `1:n`
+    }));
+    setShowNField(value === '1:n'); // Mostra o nascondi il campo nValue
   };
-
+  
   const polygonCoordinates = [
     [67.87328157366065, 20.20047943270466],
     [67.84024426842895, 20.35839687019359],
@@ -235,94 +231,107 @@ function Documents(props) {
 
   const validateCoordinates = (lat, lng) => {
     const point = [lat, lng]; // ordine GeoJSON: [lng, lat]
-
     const isInside = turf.booleanPointInPolygon(point, polygonGeoJson);
     return isInside;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-     setDocument((prevDocument) => {
-         if (name === 'lat' || name === 'long') {
-             return {   ...prevDocument, coordinates: {
-                     ...prevDocument.coordinates, [name]: parseFloat(value) || ''  }
-                    };
-         } else {
-             return {
-                 ...prevDocument,
-                 [name]: name === 'nValue' ? parseInt(value, 10) || '' : value
-             };
-         }
-     });
-   };
+    setDocument((prevDocument) => {
+      if (name === 'lat' || name === 'long') {
+        return {
+          ...prevDocument,
+          coordinates: {
+            ...prevDocument.coordinates,
+            [name]: value || ''
+          }
+        };
+      } else {
+        return {
+          ...prevDocument,
+          [name]: name === 'nValue' ? parseInt(value, 10) || '' : value
+        };
+      }
+    });
+  };
 
-   const handleMapClick = (lat, lng) => {
+  const handleMapClick = (lat, lng) => {
     setPosition({ lat, lng });
     setDocument((prevDocument) => ({
       ...prevDocument,
       coordinates: { lat, long: lng }
     }));
   };
-  
-const validateStep1 = () => {
-  const newErrors = {};
-  if (!document.title || document.title.length < 2) {
-    newErrors.title = "Title is required and cannot be empty.";
-  }
-  if (!document.stakeholder) {
-    newErrors.stakeholder = "You must select a stakeholder.";
-  }
-  if (!document.issuanceDate) {
-    newErrors.issuanceDate = "You must select a Date in a valid format (YYYY-MM-DD).";
-  }
-  if (!document.description || document.description.length < 2) {
-    newErrors.description = "Description is required and cannot be empty.";
-  }
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0; 
-};
+    
+  const validateStep1 = () => {
+    const newErrors = {};
+    if (!document.title || document.title.length < 2) {
+      newErrors.title = "Title is required and cannot be empty.";
+    }
+    if (!document.stakeholder) {
+      newErrors.stakeholder = "You must select a stakeholder.";
+    }
+    if (!document.issuanceDate) {
+      newErrors.issuanceDate = "You must select a Date in a valid format (YYYY-MM-DD).";
+    }
+    if (!document.description || document.description.length < 2) {
+      newErrors.description = "Description is required and cannot be empty.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; 
+  };
 
-const validateStep2 = () => {
-  const newErrors = {};
-  if (!document.scale) {
-    newErrors.scale = "You must select a scale.";
-  }
-  if (!document.type) {
-    newErrors.type = "You must select a type.";
-  }
-  if (!document.language) {
-    newErrors.language = "You must select a language.";
-  }
-  if (document.pages && !validatePages(document.pages)) {
-    newErrors.pages = "Please enter a valid number or range (e.g., 35 or 35-45).";
-  }
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+  const validateStep2 = () => {
+    const newErrors = {};
+    if (!document.scale) {
+      newErrors.scale = "You must select a scale.";
+    }
+    if (!document.type) {
+      newErrors.type = "You must select a type.";
+    }
+    if (!document.language) {
+      newErrors.language = "You must select a language.";
+    }
+    if (document.pages && !validatePages(document.pages)) {
+      newErrors.pages = "Please enter a valid number or range (e.g., 35 or 35-45).";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-const validateStep3 = () => {
-  const newErrors = {};
-  if ((document.coordinates.lat || document.coordinates.long) && !validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))) {
-    newErrors.coordinates = "Please enter a valid LATITUDE and LONGITUDE or select from the map.";
-  }
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+  const validateStep3 = () => {
+    setDocument((prevDocument) => {
+      return {
+        ...prevDocument,
+        coordinates: {
+          ...prevDocument.coordinates,
+          lat: parseFloat(prevDocument.coordinates.lat) || 0,
+          long: parseFloat(prevDocument.coordinates.long) || 0,
+        },
+      };
+    });
+    const newErrors = {};
+    if ((document.coordinates.lat || document.coordinates.long) && !validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))) {
+      newErrors.coordinates = "Please enter a valid LATITUDE and LONGITUDE or select from the map.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-const handleNextStep = () => {
-  let isValid = false;
-  if (step === 1) {
-    isValid = validateStep1();
-  } else if (step === 2) {
-    isValid = validateStep2();
-  } else if (step === 3) {
-    isValid = validateStep3();
-  }
+  const handleNextStep = () => {
+    let isValid = false;
+    if (step === 1) {
+      isValid = validateStep1();
+    } else if (step === 2) {
+      isValid = validateStep2();
+    } else if (step === 3) {
+      isValid = validateStep3();
+    }
 
-  if (isValid) {
-    setStep(prev => prev + 1);
-  }
-};
+    if (isValid) {
+      setStep(prev => prev + 1);
+    }
+  };
 
   const handlePreviousStep = () => setStep(prev => prev - 1);
 
@@ -387,14 +396,16 @@ const handleNextStep = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if(document.scale === '1:n'){
+        document.scale = document.nValue;
+      }else{
+        document.nValue = '';
+      }
       if (id) {
         // Modalità Edit: aggiorna documento esistente
-        const updatedDoc = await API.updateDocument(id, document);
-        console.log(updatedDoc);
-        props.setUpdatedDoc(updatedDoc); // Se necessario
-        console.log("Document updated successfully:", updatedDoc);
+        await API.updateDocument(id, document);
         //Add new files and delete files
-        handleFileUpload(updatedDoc);
+        handleFileUpload(document);
         filesToBeDeleted.forEach(async (attachmentId) => {
           try{
             await API.deleteAttachment(id, attachmentId);
@@ -487,7 +498,7 @@ const handleNextStep = () => {
                 name="stakeholder"
                 value={document.stakeholder || ""}
                 onChange={handleSelectChange}
-                className="input"
+                className="input-multi"
                 isInvalid={!!errors.stakeholder}
               >
                 <option value="">Select a stakeholder</option>
@@ -543,7 +554,7 @@ const handleNextStep = () => {
                   showYearDropdown
                   yearDropdownItemNumber={15}
                   scrollableYearDropdown
-                  className="input"
+                  className="input-multi"
                 />
               </div>
               {errors.issuanceDate && (
@@ -584,13 +595,12 @@ const handleNextStep = () => {
           <Col md={6}>
             <Form.Group controlId="scale">
               <Form.Label>Scale*</Form.Label>
-              <Form.Select 
-                as="select"
+              <Form.Select
                 name="scale"
                 value={document.scale || ""}
                 onChange={handleScaleChange}
-                className="input"    
-                isInvalid={!!errors.scale} 
+                className="input-multi"
+                isInvalid={!!errors.scale}
               >
                 <option value="">Select a scale</option>
                 {scales.map((scale, index) => (
@@ -606,14 +616,13 @@ const handleNextStep = () => {
             <Col md={6}>
               <Form.Group controlId="nValue">
                 <Form.Label>Value of n*</Form.Label>
-                <Form.Control 
-                  type="text" 
-                  name="nValue" 
-                  value={document.nValue || ""} 
-                  onChange={handleChange} 
+                <Form.Control
+                  type="text"
+                  name="nValue"
+                  value={document.nValue || ""}
+                  onChange={handleChange}
                   placeholder="Enter n"
                   className="input"
-                  //isInvalid={!!errors.scale}
                 />
               </Form.Group>
             </Col>
@@ -629,7 +638,7 @@ const handleNextStep = () => {
                 name="type"
                 value={document.type || ""}
                 onChange={handleSelectChange}
-                className="input"
+                className="input-multi"
                 isInvalid={!!errors.type}
               >
                 <option value="">Select a type</option>
@@ -672,7 +681,7 @@ const handleNextStep = () => {
                 name="language" 
                 value={document.language || ""} 
                 onChange={handleChange} 
-                className="input" 
+                className="input-multi" 
                 isInvalid={!!errors.language}
               >
                 <option value="" disabled>Select language...</option>
