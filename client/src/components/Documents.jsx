@@ -402,7 +402,6 @@ function Documents(props) {
         document.nValue = '';
       }
       if (id) {
-        console.log("Document to be updateeeeeed:", document);
         // Modalità Edit: aggiorna documento esistente
         await API.updateDocument(id, document);
         //Add new files and delete files
@@ -418,9 +417,7 @@ function Documents(props) {
         resetState();
         navigate(`/`);
       } else {
-        console.log("Document to be saveddddd:", document);
         const doc= await API.saveDocument(document);  
-        console.log("Dohhhhh:", doc);
         //Try to submit files
         handleFileUpload(doc);
         props.setNewDoc(doc);
