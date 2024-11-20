@@ -243,7 +243,7 @@ function Documents(props) {
           ...prevDocument,
           coordinates: {
             ...prevDocument.coordinates,
-            [name]: parseFloat(value) || ''
+            [name]: value || ''
           }
         };
       } else {
@@ -300,6 +300,16 @@ function Documents(props) {
   };
 
   const validateStep3 = () => {
+    setDocument((prevDocument) => {
+      return {
+        ...prevDocument,
+        coordinates: {
+          ...prevDocument.coordinates,
+          lat: parseFloat(prevDocument.coordinates.lat) || 0,
+          long: parseFloat(prevDocument.coordinates.long) || 0,
+        },
+      };
+    });
     const newErrors = {};
     if ((document.coordinates.lat || document.coordinates.long) && !validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))) {
       newErrors.coordinates = "Please enter a valid LATITUDE and LONGITUDE or select from the map.";
