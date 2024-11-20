@@ -278,9 +278,9 @@ Get all the attachment info objects of the document.
   ]
   ```
 
-- Access Constraints: Can only be called by a logged in user.
+- Access Constraints: _None_
 - Additional Constraints:
-  - It should return a 404 error when the attachment does not exist.
+  - It should return a 404 error when the document does not exist.
 
 #### POST `api/documents/:docID/attachments`
 
@@ -335,7 +335,7 @@ Start the download of a specific attachment.
   - `attachmentID`: a number that represent the ID of the attachment.
 - Request Body Content: _None_
 - Response Body Content: _None_
-- Access Constraints: Can only be called by a logged in user.
+- Access Constraints: _None_
 - Additional Constraints:
   - It should return a 400 error when the attachment is not linked with the document provided.
   - It should return a 404 error when the attachment does not exist.
