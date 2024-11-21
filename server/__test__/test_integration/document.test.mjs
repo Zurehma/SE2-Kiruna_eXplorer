@@ -940,9 +940,27 @@ describe("AttachmentRoutes", () => {
 
   describe("1. GET /api/documents/:docID/attachments", () => {
     test("1.1 - It should return 200 and array of attachments", async () => {
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const resultPostDoc = await request(app)
+                    .post(basePath + "/documents")
+                    .set("Cookie", userCookie)
+                    .send(exampleDocumentData)
+                    .expect(201);
+      
+      const docID = resultPostDoc.body.id;
       const exampleAttachment1 = {id:1, docID:1, name:"name", path: "path", format: "format"};
       const exampleAttachment2 = {id:2, docID:1, name:"name", path: "path", format: "format"};
-      const docID = 1;
+      
 
       let result = await request(app)
         .get(basePath + "/documents/" + docID + "/attachments")
@@ -963,7 +981,24 @@ describe("AttachmentRoutes", () => {
   describe("2. POST /api/documents/:docID/attachments", () => {
     
     test("2.1 - It should return 201", async () => {
-      const docID = 1;
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const resultPostDoc = await request(app)
+                    .post(basePath + "/documents")
+                    .set("Cookie", userCookie)
+                    .send(exampleDocumentData)
+                    .expect(201);
+      
+      const docID = resultPostDoc.body.id;
       const exampleAttachment = {id:1, name:"name", path: "path", format: "format"};
 
       let result = await request(app)
@@ -1002,7 +1037,24 @@ describe("AttachmentRoutes", () => {
     });
   
     test("2.3 - It should return 400 for unsupported file types", async () => {
-      const docID = 1;
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const resultPostDoc = await request(app)
+                    .post(basePath + "/documents")
+                    .set("Cookie", userCookie)
+                    .send(exampleDocumentData)
+                    .expect(201);
+      
+      const docID = resultPostDoc.body.id;
   
       await request(app)
         .post(`${basePath}/documents/${docID}/attachments`)
@@ -1031,7 +1083,24 @@ describe("AttachmentRoutes", () => {
     }); */
   
     test("2.5 - It should return 401 if the user is not logged in", async () => {
-      const docID = 1;
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const resultPostDoc = await request(app)
+                    .post(basePath + "/documents")
+                    .set("Cookie", userCookie)
+                    .send(exampleDocumentData)
+                    .expect(201);
+      
+      const docID = resultPostDoc.body.id;
   
       await request(app)
         .post(`${basePath}/documents/${docID}/attachments`)
@@ -1045,7 +1114,24 @@ describe("AttachmentRoutes", () => {
 
   describe("3. DELETE /api/documents/:docID/attachments/:attachmentID", () => {
     test("3.1 - It should return 204 document deleted", async()=>{
-      const docID = 1;
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const resultPostDoc = await request(app)
+                    .post(basePath + "/documents")
+                    .set("Cookie", userCookie)
+                    .send(exampleDocumentData)
+                    .expect(201);
+      
+      const docID = resultPostDoc.body.id;
       const exampleAttachment = {id:1, name:"name", path: "path", format: "format"};
 
       let resultPost = await request(app)
@@ -1065,7 +1151,24 @@ describe("AttachmentRoutes", () => {
 
     test("3.2 - It should return 404 attachment not found", async()=>{
 
-      const docID = 1;
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const resultPostDoc = await request(app)
+                    .post(basePath + "/documents")
+                    .set("Cookie", userCookie)
+                    .send(exampleDocumentData)
+                    .expect(201);
+      
+      const docID = resultPostDoc.body.id;
       let resultDelete = await request(app)
         .delete(basePath + "/documents/" + docID + "/attachments/" + 100000)
         .set("Cookie", userCookie)
@@ -1073,7 +1176,24 @@ describe("AttachmentRoutes", () => {
     });
 
     test("3.3 - It should retun 400 if document IDs do not match", async()=>{
-      const docID = 1;
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const resultPostDoc = await request(app)
+                    .post(basePath + "/documents")
+                    .set("Cookie", userCookie)
+                    .send(exampleDocumentData)
+                    .expect(201);
+      
+      const docID = resultPostDoc.body.id;
       const exampleAttachment = {id:1, name:"name", path: "path", format: "format"};
 
       let resultPost = await request(app)
@@ -1096,7 +1216,24 @@ describe("AttachmentRoutes", () => {
     });
 
     test("3.4 - Return 401 if user unauthorized", async()=>{
-      const docID = 1;
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const resultPostDoc = await request(app)
+                    .post(basePath + "/documents")
+                    .set("Cookie", userCookie)
+                    .send(exampleDocumentData)
+                    .expect(201);
+      
+      const docID = resultPostDoc.body.id;
       const exampleAttachment = {id:1, name:"name", path: "path", format: "format"};
 
       let resultPost = await request(app)
@@ -1121,7 +1258,24 @@ describe("AttachmentRoutes", () => {
 
   describe("4. GET /api/documents/:docID/attachments/:attachmentID/download", () => {
     test("4.1 - It should return 200 and the attachment", async()=>{
-      const docID = 1;
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const resultPostDoc = await request(app)
+                    .post(basePath + "/documents")
+                    .set("Cookie", userCookie)
+                    .send(exampleDocumentData)
+                    .expect(201);
+      
+      const docID = resultPostDoc.body.id;
       const exampleAttachment = {id:1, name:"name", path: "path", format: "format"};
 
       let resultPost = await request(app)
@@ -1144,7 +1298,24 @@ describe("AttachmentRoutes", () => {
     });
 
     test("4.2 - It should return 404 attachment not found", async()=>{
-      const docID = 1;
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const resultPostDoc = await request(app)
+                    .post(basePath + "/documents")
+                    .set("Cookie", userCookie)
+                    .send(exampleDocumentData)
+                    .expect(201);
+      
+      const docID = resultPostDoc.body.id;
       let resultGet = await request(app)
         .get(`${basePath}/documents/${docID}/attachments/100000/download`)
         .set("Cookie", userCookie)
@@ -1152,7 +1323,24 @@ describe("AttachmentRoutes", () => {
     });
 
     test("4.3 - It should return 400 document IDs do not match", async()=>{
-      const docID = 1;
+      const exampleDocumentData = {
+        title: "title",
+        stakeholder: "stakeholder",
+        scale: 100,
+        issuanceDate: "2024-02-12",
+        type: "Informative",
+        language: "English",
+        description: "Lore ipsum...",
+        coordinates: {"lat": 67.849982, "long": 20.217068},
+        pages: 16
+      };
+      const resultPostDoc = await request(app)
+                    .post(basePath + "/documents")
+                    .set("Cookie", userCookie)
+                    .send(exampleDocumentData)
+                    .expect(201);
+      
+      const docID = resultPostDoc.body.id;
       const exampleAttachment = {id:1, name:"name", path: "path", format: "format"};
 
       let resultPost = await request(app)
