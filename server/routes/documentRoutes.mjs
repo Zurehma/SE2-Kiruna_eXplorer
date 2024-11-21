@@ -12,15 +12,8 @@ class DocumentRoutes {
   getRouter = () => this.router;
 
   initRoutes = () => {
-    this.router.get("/", (req, res, next) => {
-      this.documentController
-        .getDocuments()
-        .then((documents) => res.status(200).json(documents))
-        .catch((err) => next(err));
-    });
-
     this.router.get(
-      "/filter/by",
+      "/",
       [
         query("type").optional().isString().withMessage("Type must be a string"),
         query("stakeholder").optional().isString().withMessage("Stakeholder must be a string"),
@@ -30,7 +23,7 @@ class DocumentRoutes {
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
-          .filterDocuments(req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo)
+          .getDocuments(req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo)
           .then((document) => {
             res.status(200).json(document);
           })
@@ -113,41 +106,33 @@ class DocumentRoutes {
       "/:docID",
       Utility.isLoggedIn,
       param("docID").isInt({ gt: 0 }),
-      body("title").optional().isString().notEmpty(),
-      body("stakeholder").optional().isString().notEmpty(),
-      oneOf([body("scale").optional().isString().notEmpty(), body("scale").optional().isInt({ gt: 0 })]),
-      oneOf([
-        body("issuanceDate").optional().isISO8601({ strict: true }),
-        body("issuanceDate").optional().isString().notEmpty().custom(Utility.isValidYearMonthOrYear),
-      ]),
-      body("type").optional().isString().notEmpty(),
-      body("language").optional().isString().notEmpty(),
-      body("description").optional().isString().notEmpty(),
+      body("title").isString().notEmpty(),
+      body("stakeholder").isString().notEmpty(),
+      oneOf([body("scale").isString().notEmpty(), body("scale").optional().isInt({ gt: 0 })]),
+      oneOf([body("issuanceDate").isISO8601({ strict: true }), body("issuanceDate").isString().notEmpty().custom(Utility.isValidYearMonthOrYear)]),
+      body("type").isString().notEmpty(),
+      body("language").isString().notEmpty(),
+      body("description").isString().notEmpty(),
       body("coordinates").optional().isObject().custom(Utility.isValidCoordinatesObject),
       body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
       body("pageFrom").optional().isInt({ gt: 0 }),
       body("pageTo").optional().isInt({ gt: 0 }),
-      body().custom(Utility.isBodyEmpty),
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
           .updateDocument(
             Number(req.params.docID),
-            req.body.title || null,
-            req.body.stakeholder || null,
-            req.body.scale || null,
-            req.body.issuanceDate || null,
-            req.body.type || null,
-            req.body.language || null,
-            req.body.description || null,
+            req.body.title,
+            req.body.stakeholder,
+            req.body.scale,
+            req.body.issuanceDate,
+            req.body.type,
+            req.body.language,
+            req.body.description,
             req.body.coordinates || null,
-            req.body.hasOwnProperty("coordinates"),
             req.body.pages || null,
-            req.body.hasOwnProperty("pages"),
             req.body.pageFrom || null,
-            req.body.hasOwnProperty("pageFrom"),
-            req.body.pageTo || null,
-            req.body.hasOwnProperty("pageTo")
+            req.body.pageTo || null
           )
           .then(() => res.status(204).end())
           .catch((err) => next(err));

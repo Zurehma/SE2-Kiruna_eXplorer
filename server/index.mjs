@@ -13,9 +13,9 @@ import AttachmentRoutes from "./routes/attachmentRoutes.mjs";
 import AuthRoutes from "./routes/authRoutes.mjs";
 
 const app = express();
-const port = 3001;
+const { PORT = 3001 } = process.env;
 const baseURL = "/api";
-const allowedOrigins = ["http://localhost:3000", "http://localhost:5173"];
+const allowedOrigins = ["http://localhost:3000", "http://localhost:5173", "http://frontend:3000", "http://backend:3001"];
 const corsOptions = {
   origin: allowedOrigins,
   optionsSuccessStatus: 200,
@@ -37,7 +37,7 @@ attachmentRoutes.initRoutes();
 const authRoutes = new AuthRoutes(app);
 authRoutes.initRoutes();
 
-app.use(baseURL + "/uploads", express.static("./uploads"));
+app.use(baseURL + "/uploads", Utility.isLoggedIn, express.static("./uploads"));
 app.use(baseURL + "/documents", documentRoutes.getRouter());
 app.use(baseURL + "/documents", attachmentRoutes.getRouter());
 app.use(baseURL + "/sessions", authRoutes.getRouter());
@@ -46,6 +46,6 @@ app.use(Utility.errorHandler);
 
 const httpServer = createServer(app);
 
-httpServer.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+httpServer.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
 
 export { app };

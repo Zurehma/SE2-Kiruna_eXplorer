@@ -1,0 +1,27 @@
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: lcpes/se2-kiruna_explorer:backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server/db:/app/src/server/db
+    networks:
+      - kx-network
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    image: lcpes/se2-kiruna_explorer:frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - kx-network
+    depends_on:
+      - backend
+
+networks:
+  kx-network:
+    driver: bridge

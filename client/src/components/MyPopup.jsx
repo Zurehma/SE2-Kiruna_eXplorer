@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Tooltip, OverlayTrigger, Button, Dropdown } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import API from '../../API';
 
@@ -85,11 +86,21 @@ function MyPopup(props) {
     );
   };
 
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (props.doc && props.doc.id && props.doc.id > 0) {
+      navigate(`/documents/${props.doc.id}`, { state: { docId: props.doc.id } });
+    } else {
+      props.setError('Invalid document data');
+    }
+  };
+  
   // Helper function to display "-" if value is null
   const displayValue = (value) => (value !== null ? value : '-');
 
   return (
-    <Row className="p-3 border rounded shadow-sm" style={{ backgroundColor: '#f9f9f9' }}>
+    <Row className="p-3 border rounded shadow-sm popupProp" style={{ backgroundColor: '#f9f9f9' }}>
       {/* Icon Column */}
       <Col
         xs={12}
@@ -145,27 +156,31 @@ function MyPopup(props) {
           <br />
           <strong className="text-dark">Issuance Date:</strong> {props.doc.issuanceDate} <br />
           <strong className="text-dark">Type:</strong> {props.doc.type} <br />
-
-          {/* Display connections */}
-          <strong className="text-dark">Connections:</strong> {props.doc.connections}{' '}
-          {/* Only display the caret if there are connections */}
-          {props.doc.connections>0 && !loading && (
-            <Dropdown.Toggle
-              variant="link"
-              id="dropdown-toggle-connection"
-              className="ms-2 p-0"
-              onClick={() => setShowLinks(!showLinks)}
-              style={{ color: 'black', fontSize: '1rem' }}
-            >
-            </Dropdown.Toggle>
-          )}
         </p>
+        {/* Display connections */}
+        <p className="small text-muted m-0 d-flex align-items-center">
+            <strong className="text-dark">Connections:</strong> {props.doc.connections}
+            {props.doc.connections > 0 && !loading && (
+              <Dropdown className="d-inline ms-2">
+                <Dropdown.Toggle
+                  variant="link"
+                  aria-label="connections"
+                  id="dropdown-toggle-connection"
+                  className="p-0"
+                  onClick={() => setShowLinks(!showLinks)}
+                  style={{ color: 'black', fontSize: '1rem' }}
+                  data-testid="connections-toggle-button"
+                >
+                </Dropdown.Toggle>
+              </Dropdown>
+            )}
+          </p>
 
         {/* Display the dropdown list of connections if it's open */}
         {showLinks && (
           <ul className="small text-muted ms-3">
             {links.map((link) => (
-              <li key={links.linkedDocID}>
+              <li key={link.linkedDocID}>
                 {link.title} - {link.type}
               </li>
             ))}
@@ -195,14 +210,17 @@ function MyPopup(props) {
       {props.loggedIn && (
       <Col xs={12} md={remainingWidth} className="d-flex align-items-start justify-content-center">
         <Button
+          name="edit-button"
           variant="outline-primary"
           className="shadow-sm edit-button" // Added custom class for targeted CSS
+          aria-label="edit" 
           style={{
             padding: '0.5rem',
             borderRadius: '50%',
             width: '2.5rem',
             height: '2.5rem',
           }}
+          onClick={handleClick}
         >
           <i className="bi bi-pencil-square edit-icon" style={{ fontSize: '1.25rem' }}></i>
         </Button>

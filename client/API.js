@@ -1,23 +1,35 @@
-const SERVER_URL = 'http://localhost:3001/api';
+const SERVER_URL =  "http://localhost:3001" + "/api";
 
 /**
  * Utility function to check if an answer from the server is invalid.
  */
 function handleInvalidResponse(response) {
-    if (!response.ok) { throw Error(response.statusText) }
-    let type = response.headers.get('Content-Type');
-    if (type !== null && type.indexOf('application/json') === -1){
-        throw new TypeError(`Expected JSON, got ${type}`)
-    }
-    return response;
+  if (!response.ok) {
+    throw Error(response.statusText);
+  }
+  let type = response.headers.get("Content-Type");
+  if (type !== null && type.indexOf("application/json") === -1) {
+    throw new TypeError(`Expected JSON, got ${type}`);
+  }
+  return response;
 }
 
 // Function to get all documents
 const getDocuments = async () => {
-    return await fetch(`${SERVER_URL}/documents`)
-        .then(handleInvalidResponse)
-        .then(response => response.json());
+  return await fetch(`${SERVER_URL}/documents`)
+    .then(handleInvalidResponse)
+    .then((response) => response.json());
 };
+
+const getDocumentById = async (id) => {
+    return await fetch(`${SERVER_URL}/documents/${id}`)
+      .then(handleInvalidResponse)
+      .then(response => response.json())
+      .catch(error => {
+        console.error(`Error fetching document with id ${id}:`, error);
+        throw error; // Rilancia l'errore per gestirlo a un livello superiore
+      });
+  };
 
 //Upload files
 const uploadFiles = async (docID, formData) => {
@@ -54,35 +66,35 @@ const uploadFiles = async (docID, formData) => {
 
 
 const getTypeDocuments = async () => {
-    return await fetch(`${SERVER_URL}/documents/document-types` , {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-    })
-        .then(handleInvalidResponse)
-        .then(response => response.json());
+  return await fetch(`${SERVER_URL}/documents/document-types`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  })
+    .then(handleInvalidResponse)
+    .then((response) => response.json());
 };
-  
+
 // Function to get types of scales
 const getTypeScale = async () => {
-    return await fetch(`${SERVER_URL}/documents/scale-types`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-    })
-        .then(handleInvalidResponse)
-        .then(response => response.json());
+  return await fetch(`${SERVER_URL}/documents/scale-types`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  })
+    .then(handleInvalidResponse)
+    .then((response) => response.json());
 };
 
 // Function to get types of links
 const getTypeLinks = async () => {
-    return await fetch(`${SERVER_URL}/documents/link-types`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-    })
-        .then(handleInvalidResponse)
-        .then(response => response.json());
+  return await fetch(`${SERVER_URL}/documents/link-types`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  })
+    .then(handleInvalidResponse)
+    .then((response) => response.json());
 };
 
 // Function to get linked documents
@@ -94,42 +106,6 @@ const getLinksDoc = async (documentId) => {
         .then(handleInvalidResponse)
         .then(response => response.json());
 };
-
-
-// Function to save a document
-const saveDocument = async (doc) => {
-
-    const filteredDoc = Object.fromEntries(
-        Object.entries({
-            title: doc.title,
-            stakeholder: doc.stakeholder,
-            scale: doc.scale,
-            issuanceDate: doc.issuanceDate,
-            type: doc.type,
-            description: doc.description,
-            language: doc.language,
-            pages: doc.pages,
-            pageFrom: doc.pageFrom,
-            pageTo: doc.pageTo,
-            lat: doc.latitude, 
-            long: doc.longitude 
-        }).filter(([_, value]) => value !== '' && value !== null)
-    );
-
-    try {
-        const response = await fetch(`${SERVER_URL}/documents/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(filteredDoc),
-        });
-        
-        return handleInvalidResponse(response).json();
-    } catch (error) {
-        throw error;
-    }
-};
-
 
 /** 
  * Function to get the attachments of a document given its ID. 
@@ -233,29 +209,33 @@ const getUserInfo = async () => {
 };
 
   // Function to filter documents
-const filterDocuments = async (filters) => {
+  const filterDocuments = async (filters) => {
     const queryParams = new URLSearchParams();
-
+  
     if (filters.type) queryParams.append('type', filters.type);
     if (filters.stakeholder) queryParams.append('stakeholder', filters.stakeholder);
     if (filters.issuanceDateFrom) queryParams.append('issuanceDateFrom', filters.issuanceDateFrom);
     if (filters.issuanceDateTo) queryParams.append('issuanceDateTo', filters.issuanceDateTo);
-
+  
     const queryString = queryParams.toString();
-
+  
+    // Form the URL properly by adding `?` if there are query parameters
+    const url = `${SERVER_URL}/documents${queryString ? `?${queryString}` : ''}`;
+  
     try {
-        const response = await fetch(`${SERVER_URL}/documents/filter/by?${queryString}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-        });
-
-        return handleInvalidResponse(response).json();
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+  
+      return handleInvalidResponse(response).json();
     } catch (error) {
-        console.error("Error filtering documents:", error);
-        throw error;
+      console.error("Error filtering documents:", error);
+      throw error;
     }
-};
+  };
+  
 
 // Function to get all stakeholders
 const getStakeholders = async () => {
@@ -279,9 +259,87 @@ const getDocumentTypes = async () => {
         .then((response) => response.json());
 };
 
+//Function to delete an attachment
+const deleteAttachment = async (docID, attachmentID) => {
+    try {
+        const response = await fetch(`${SERVER_URL}/documents/${docID}/attachments/${attachmentID}`, {
+            method: 'DELETE',
+            credentials: 'include',
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
+const saveDocument = async (doc) => {
+  const filteredDoc = Object.fromEntries(
+      Object.entries({
+          title: doc.title,
+          stakeholder: doc.stakeholder,
+          scale: doc.scale,
+          issuanceDate: doc.issuanceDate,
+          type: doc.type,
+          description: doc.description,
+          language: doc.language,
+          pages: doc.pages,
+          pageFrom: doc.pageFrom,
+          pageTo: doc.pageTo,
+          coordinates:
+              doc.coordinates?.lat && doc.coordinates?.long
+                  ? { lat: doc.coordinates.lat, long: doc.coordinates.long }
+                  : undefined, // Non includere se lat/long non validi
+      }).filter(([_, value]) => value !== '' && value !== null && value !== undefined) // Filtra campi vuoti/nulli
+  );
+
+  try {
+      const response = await fetch(`${SERVER_URL}/documents/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(filteredDoc),
+      });
+      return handleInvalidResponse(response).json();
+  } catch (error) {
+      throw error;
+  }
+};
+
+const updateDocument = async (documentId, doc) =>{
+  const filteredDoc = Object.fromEntries(
+    Object.entries({
+        title: doc.title,
+        stakeholder: doc.stakeholder,
+        scale: doc.scale,
+        issuanceDate: doc.issuanceDate,
+        type: doc.type,
+        description: doc.description,
+        language: doc.language,
+        pages: doc.pages,
+        pageFrom: doc.pageFrom,
+        pageTo: doc.pageTo,
+        coordinates:
+            doc.coordinates?.lat && doc.coordinates?.long
+                ? { lat: doc.coordinates.lat, long: doc.coordinates.long }
+                : undefined, // Non includere se lat/long non validi
+    }).filter(([_, value]) => value !== '' && value !== null && value !== undefined) // Filtra campi vuoti/nulli
+);
+    try {
+        const response = await fetch(`${SERVER_URL}/documents/${documentId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: 'include',
+            body: JSON.stringify(filteredDoc),
+        });
+    } catch (error) {
+        throw error;
+    }
+};
 
 //Export API methods
 const API = {
+    updateDocument,
     getStakeholders,
     getDocumentTypes,
     getDocuments,
@@ -297,9 +355,10 @@ const API = {
     getLinksDoc,
     getAttachments,
     downloadAttachment,
-    filterDocuments
+    filterDocuments,
+    deleteAttachment,
+    getDocumentById,
+    updateDocument
 };
-  
 
 export default API;
-  

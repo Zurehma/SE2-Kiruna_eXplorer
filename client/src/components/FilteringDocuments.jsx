@@ -34,37 +34,39 @@ const FilteringDocuments = (props) => {
         API.getStakeholders(),
         API.getDocumentTypes(),
       ]);
-      setStakeholdersList(stakeholders);
+      setStakeholdersList(stakeholders);      
       setDocumentTypesList(documentTypes);
     } catch (error) {
       console.error('Error fetching stakeholders or document types:', error);
     }
   };
 
-  // Fetch filtered documents from the backend
-  const fetchFilteredDocuments = async () => {
-    setLoading(true);
+// Fetch filtered documents from the backend
+const fetchFilteredDocuments = async () => {
+  setLoading(true);
 
-    const filters = {
-      type: documentType || undefined,
-      stakeholder: stakeholder || undefined,
-      issuanceDateFrom: isSingleDate ? formatDate(selectedDate) : formatDate(startDate),
-      issuanceDateTo: isSingleDate ? formatDate(selectedDate) : formatDate(endDate),
-    };
-
-    const filteredParams = Object.fromEntries(
-      Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
-    );
-
-    try {
-      const response = await API.filterDocuments(filteredParams);
-      setDocuments(response);
-    } catch (error) {
-      console.error('Error fetching filtered documents from backend:', error);
-    } finally {
-      setLoading(false);
-    }
+  const filters = {
+    type: documentType || undefined,
+    stakeholder: stakeholder || undefined,
+    issuanceDateFrom: isSingleDate ? formatDate(selectedDate) : formatDate(startDate),
+    issuanceDateTo: isSingleDate ? formatDate(selectedDate) : formatDate(endDate),
   };
+
+  // Remove undefined or empty filter values
+  const filteredParams = Object.fromEntries(
+    Object.entries(filters).filter(([_, value]) => value !== undefined && value !== '')
+  );
+
+  try {
+    const response = await API.filterDocuments(filteredParams);
+    setDocuments(response);
+  } catch (error) {
+    console.error('Error fetching filtered documents from backend:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Fetch stakeholders, document types, and filtered documents on component mount
   useEffect(() => {
@@ -134,7 +136,7 @@ const FilteringDocuments = (props) => {
                     >
                       <option value="">All Stakeholders</option>
                       {stakeholdersList.map((stakeholderItem, index) => (
-                        <option key={index} value={index}>
+                        <option key={index} value={stakeholderItem.name}>
                           {stakeholderItem.name}
                         </option>
                       ))}
@@ -152,7 +154,7 @@ const FilteringDocuments = (props) => {
                     >
                       <option value="">All Document Types</option>
                       {documentTypesList.map((typeItem, index) => (
-                        <option key={index} value={index}>
+                        <option key={index} value={typeItem.name}>
                           {typeItem.name}
                         </option>
                       ))}
@@ -255,7 +257,7 @@ const FilteringDocuments = (props) => {
                        
                   <option value="">All Stakeholders</option>
                   {stakeholdersList.map((stakeholderItem,index) => (
-                    <option key={index} value={index}>
+                    <option key={index} value={stakeholderItem.name}>
                       {stakeholderItem.name}
                     </option>
                   ))}
@@ -273,7 +275,7 @@ const FilteringDocuments = (props) => {
                 >
                   <option value="">All Document Types</option>
                   {documentTypesList.map((typeItem,index) => (
-                    <option key={index} value={index}>
+                    <option key={index} value={typeItem.name}>
                       {typeItem.name}
                     </option>
                   ))}

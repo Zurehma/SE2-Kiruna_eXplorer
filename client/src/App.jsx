@@ -11,9 +11,11 @@ import { Login } from './components/Login';
 import Home from './components/Home';
 import Documents from './components/Documents.jsx';
 import { NavigationBar } from './components/NavigationBar.jsx';
-import {Map2} from '../src/components/Map2.jsx';
+import Map2 from '../src/components/Map2.jsx';
 import API from '../API.js';
 import FilteringDocuments from './components/FilteringDocuments.jsx';
+import AccessDenied from './components/AccessDenied.jsx';
+import NotFound from './components/NotFound.jsx';
 
 
 function App() {
@@ -26,7 +28,9 @@ function App() {
     const [role, setRole] = useState('');
     const [newDoc, setNewDoc] = useState('');
     const [hideDocBar, sethideDocBar] = useState(false);
+    const [editDoc, setEditDoc] = useState('');
     const navigate = useNavigate();
+    const [logging,setLogging] = useState(false);
     
     
     const handleLogin = async (credentials) => {
@@ -51,7 +55,25 @@ function App() {
             setloggedinError(error.message || "Login failed. Please check your credentials.");
         }
     };
-    
+    useEffect(() => {
+        setLogging(true);
+        const checkLogin = async () => {
+            try {
+                // Check if the user is already logged in
+                const user = await API.getUserInfo();
+                setUsername(user.username);
+                setCurrentUser(user);
+                setLoggedIn(true);
+                setRole(user.role)
+            } catch (error) {
+                // If the user is not logged in, an error will be thrown
+                // We can ignore this error, it's normal React behaviour
+            }finally{
+                setLogging(false);
+            }
+        };
+        checkLogin();
+    }, []);
 
     
     
@@ -73,7 +95,7 @@ function App() {
   }, [error]);
     
     return (
-        <div className="min-vh-100 d-flex flex-column">
+        !logging ? (<div className="min-vh-100 d-flex flex-column">
           <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} role={role} sethideDocBar= {sethideDocBar} hideDocBar ={sethideDocBar}/>
           <Container fluid className="flex-grow-1 d-flex flex-column px-0">
             {error && (
@@ -85,12 +107,53 @@ function App() {
               <Route path="/" element={<Home setError={setError} />} />
               <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} loggedinError={loggedinError} setloggedinError={setloggedinError}/>}/>
               <Route path="/map" element={<Map2 setError={setError} loggedIn={loggedIn}/>}/>
-              <Route path="/documents" element={<Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError}/>}/>
-              <Route path="/documents/links" element={<Links newDoc={newDoc} setNewDoc={setNewDoc}  />}/>
-              <Route path="/documents/all" element={<FilteringDocuments loggedIn={loggedIn}/>}/>
-              </Routes>
+              <Route path="/documents" 
+                element={
+                loggedIn ? (
+                    <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
+                ) : (
+                    <AccessDenied />
+                )
+                } 
+                />
+
+              <Route 
+                path="/documents/links" 
+                element={
+                loggedIn ? (
+                    <Links newDoc={newDoc} setNewDoc={setNewDoc} />
+                ) : (
+                    <AccessDenied />
+                )
+                } 
+                />
+
+              <Route 
+                path="/documents/all" 
+                element={
+                loggedIn ? (
+                    <FilteringDocuments loggedIn={loggedIn} />
+                ) : (
+                    <AccessDenied />
+                )
+                } 
+                />
+
+              <Route 
+                path="/documents/:id" 
+                element={
+                loggedIn ? (
+                    <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
+                ) : (
+                    <AccessDenied />
+                )
+                } 
+                /> 
+                <Route path='*' element={<NotFound/>}/>   
+  
+            </Routes>
           </Container>
-        </div>
+        </div>) : (<div className="d-flex justify-content-center align-items-center" style={{height: '100vh'}}><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>)
     );
 }
 
