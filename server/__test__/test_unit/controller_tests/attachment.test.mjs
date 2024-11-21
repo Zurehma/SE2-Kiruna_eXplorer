@@ -29,6 +29,7 @@ describe("AttachmentController", () => {
 
             const attachmentController = new AttachmentController();
             attachmentController.attachmentDAO = attachmentDAO;
+            attachmentController.documentDAO = documentDAO; 
 
             const result = await attachmentController.getAttachments(1);
 
@@ -54,6 +55,7 @@ describe("AttachmentController", () => {
 
             const attachmentController = new AttachmentController();
             attachmentController.attachmentDAO = attachmentDAO;
+            attachmentController.documentDAO = documentDAO;
 
             const result = await attachmentController.getAttachments(1);
 
@@ -86,6 +88,7 @@ describe("AttachmentController", () => {
 
             const attachmentController = new AttachmentController();
             attachmentController.attachmentDAO = attachmentDAO;
+            attachmentController.documentDAO = documentDAO;
 
             const result = await attachmentController.addAttachment({}, 1);
 
