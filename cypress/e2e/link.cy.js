@@ -28,4 +28,24 @@ describe('Link test', () => {
 
     cy.contains('button', 'Save Link').click();
   })
+
+  it('Validation of errors', () => {
+    cy.visit('/login')
+    cy.get("#username").type("johndoe");
+    cy.get("#password").type("password");
+    cy.get('button[type="submit"]').click();
+
+    cy.get(".dropdown-toggle").click();
+    cy.get(".dropdown-item").contains("Add Link").click();
+  
+    cy.get('[name="document1"]')
+    .find('[name=optionsDoc1]')
+    .then((option) => {
+      const secondOptionValue = option[0].value; 
+      cy.get('[name="document1"]').select(secondOptionValue);
+    });
+
+    cy.contains('button', 'Save Link').click();
+    cy.contains('You must select at least one document.').should('be.visible');
+  })
 })

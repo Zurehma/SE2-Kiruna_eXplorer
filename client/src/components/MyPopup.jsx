@@ -210,6 +210,7 @@ function MyPopup(props) {
       {props.loggedIn && (
       <Col xs={12} md={remainingWidth} className="d-flex align-items-start justify-content-center">
         <Button
+          name="edit-button"
           variant="outline-primary"
           className="shadow-sm edit-button" // Added custom class for targeted CSS
           aria-label="edit" 
