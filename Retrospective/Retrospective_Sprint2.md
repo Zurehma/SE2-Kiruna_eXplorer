@@ -100,7 +100,8 @@ sections:
   - Tasks that required the use of a new technology took slightly longer than estimated. Other than that, the overall estimations were pretty balanced and appropriately assigned.
 
 - What lessons did you learn (both positive and negative) in this sprint?
-  - 
+  - The whole team now understands the workflow to be followed in such projects.
+  - Some tasks depend on the completion of others, we have learned to prioritize such tasks to avoid delays and hold-ups for the rest of the team
 
 - Which improvement goals set in the previous retrospective were you able to achieve?
   - We were able to achieve both goals set out in the previous retrospective
@@ -115,4 +116,4 @@ sections:
   > Propose one or two
 
 - One thing you are proud of as a Team!!
-  - All of us now understand the workflow
+  - We were able to deliver all the committed stories and have been able to deliver a well-functioning product so far.
