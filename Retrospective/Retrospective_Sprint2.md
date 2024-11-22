@@ -66,7 +66,7 @@ sections:
 - Total estimation error ratio: sum of total hours spent / sum of total hours effort - 1
   $$\frac{\sum_i spent_{task_i}}{\sum_i estimation_{task_i}} - 1$$
 
-  - (94h 35m)/(94h 20m) -1 = 0.0148
+  - (95h 40m)/(97h 05m) -1 = 0.0148
 - Absolute relative task estimation error: sum( abs( spent-task-i / estimation-task-i - 1))/n
   
   $$\frac{1}{n}\sum_i^n \left| \frac{spent_{task_i}}{estimation_task_i}-1 \right| $$
