@@ -50,10 +50,11 @@ export function NavigationBar(props) {
                   <Dropdown.Item onClick={() => { navigate('/documents/links'); handleClose(); }}>
                     <i className="bi bi-link-45deg me-2"></i> Add Link
                   </Dropdown.Item>
-                  <Dropdown.Item onClick={handleViewDocumentsClick}>
-                    <i className="bi bi-collection me-2"></i>
-                    {isViewingDocuments ? 'Home' : 'View All Documents'}
+
+                  <Dropdown.Item onClick={() => { navigate('/documents/all'); handleClose()}}>
+                    <i className="bi bi-collection me-2"></i>View all documents
                   </Dropdown.Item>
+
 
                   <Dropdown.Divider />
                   {location.pathname !== '/' && (
