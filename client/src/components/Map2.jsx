@@ -63,7 +63,7 @@ function Map2(props) {
     const [renderNumber,setRenderNumeber] = useState(0);
     const [typeDoc,setTypeDoc] = useState([]);
     const [selectedType, setSelectedType] = useState('All'); // New state for selected type
-    // Coordinate per il poligono (angoli specificati)
+    // Coordinate per il poligono (angoli specificati)-> to be loaded
     const polygonCoordinates = [
         [67.87328157366065, 20.20047943270466],
         [67.84024426842895, 20.35839687019359],
@@ -72,12 +72,6 @@ function Map2(props) {
 
     // Sposta il bottone "+" leggermente più su del vertice superiore del triangolo
     const plusButtonPosition = [67.8825492583, 20.2059690000253713];
-
-    // Linea per collegare il bottone "+" al vertice superiore del poligono
-    const lineCoordinates = [
-        plusButtonPosition, // Coordinate del bottone "+"
-        polygonCoordinates[0] // Coordinate del vertice superiore del triangolo
-    ];
 
     useEffect(()=>{
         setLoading(true);
@@ -146,110 +140,52 @@ function Map2(props) {
     const noCoordDocuments = data.filter(doc => doc.lat == null && doc.long == null);
     // Filter documents with coordinates
     const coordDocuments = data.filter(doc => doc.lat != null && doc.long != null);
-
+    /*
+    Things to do:
+    Improve design of the dropdown when it's open
+    Import Kiruna coordinates and draw them when a noCoordinates element is opened
+    Increase z-index of the MyPopup component to make it stay over the dropdowns
+    */
     return (
         <>
             {loading && (<p>Loading...</p>)}
             {!loading && 
-            <MapContainer 
-                center={positionActual}
-                zoom={zoomLevel} 
-                style={{ height: '91vh', width: '100%' }}
-            >
+            <MapContainer center={positionActual} zoom={zoomLevel} style={{ height: '91vh', width: '100%' }}>
                 <TileLayer
                     url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg"
                     attribution='&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
                 
-                {/* Polygon component for the area */}
-                <Polygon 
-                    positions={polygonCoordinates} 
-                    pathOptions={{ color: 'blue', fillColor: 'none'}} 
-                />
-                <Polyline positions={lineCoordinates} pathOptions={{ color: 'blue' }} />
-                
-                {/* Marker for the "+" button at the top vertex */}
-                <Marker position={plusButtonPosition} icon={plusIcon}>
-                    <Popup className='popupPropPlus'>
-                        <div>
-                            <p>Entire municipality of Kiruna: </p>
-                            {noCoordDocuments.length > 0 ? (
-                                noCoordDocuments.map((item) => {
-                                    const customIcon = createCustomIcon(item.type);
-                                    return (
-                                        <div 
-                                            key={item.id} 
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                margin: '5px',
-                                                cursor: 'pointer',
-                                                padding: '5px',
-                                                backgroundColor: '#f8f9fa',
-                                                borderRadius: '5px',
-                                                border: '1px solid #ddd',
-                                                boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-                                            }}
-                                            onClick={() => { setSelectedDoc(item); setRenderNumeber((renderNumber) => renderNumber + 1); }} // Set selected document on click
-                                        >
-                                            <div 
-                                                style={{
-                                                    marginRight: '10px',
-                                                    display: 'flex',
-                                                    alignItems: 'center'
-                                                }}
-                                            >
-                                                <i 
-                                                    className={`bi ${iconMap[item.type]}`} 
-                                                    style={{ fontSize: '20px', color: '#555' }}
-                                                /><p className=' ms-3 small'>{item.title}</p>
-                                            </div>
-                                        </div>
-                                    );
-                                })
-                            ) : (
-                                <p>No documents without coordinates available.</p>
-                            )}
-                        </div>
-                    </Popup>
-                </Marker>
-                {props.loggedIn && 
-                    <Dropdown
-                    style={{
-                        position: 'absolute',
-                        top: '15px',
-                        right: '15px',
-                        zIndex: 1000,
-                    }}
-                    onSelect={(eventKey) => setSelectedType(eventKey)} // Use setSelectedType to set the filter
-                >
-                    <Dropdown.Toggle
-                        variant="light"
-                        id="dropdown-filter-button"
-                        style={{
-                            boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
-                            borderRadius: '8px', // Changed to make it rectangular
-                            padding: '5px 15px', // Adjusted padding for rectangular look
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            border: 'none',
-                            color:'#006d77'
-                        }}
-                    >
-                        <i className="bi bi-filter" style={{ fontSize: '20px', marginRight: '8px' }}></i>
+                {/* Filter dropdown on the top-right corrner: to be fixed */}
+                {props.loggedIn && <Dropdown onSelect={(eventKey) => setSelectedType(eventKey)} className='myDropdownFilter'>
+                    <Dropdown.Toggle variant="light" id="dropdown-filter-button" className='myFilterMenu'>
+                        <i className="bi bi-filter me-1 myMapIcons"></i>
                         Filter
                     </Dropdown.Toggle>
-
                     <Dropdown.Menu style={{ backgroundColor: 'white' }}>
                         <Dropdown.Header>Filter by document type</Dropdown.Header>
                         <Dropdown.Item eventKey="All">All</Dropdown.Item>
                         {typeDoc.map((type, index) => (
-                            <Dropdown.Item key={index} eventKey={type.name}>{type.name}</Dropdown.Item>
+                            <Dropdown.Item key={index} eventKey={type.name}>{type.name}
+                            </Dropdown.Item>
                         ))}
                     </Dropdown.Menu>
                 </Dropdown>
                 }
+                {/*Show documents without coordinates with a button that groups them all*/}
+                <Dropdown onSelect={(eventKey) => {setSelectedDoc(noCoordDocuments.at((doc)=>doc.id===eventKey)); setRenderNumeber((renderNumber) => renderNumber + 1);}} className='myDropdownDocuments'>
+                    <Dropdown.Toggle variant="light" id="dropdown-DocumentWithoutCoordinates-button" className='myFilterMenu'>
+                        Kiruna municipality
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu style={{ backgroundColor: 'white' }}>
+                        {noCoordDocuments.map((doc) => (
+                            <Dropdown.Item key={doc.id} eventKey={doc.id}>
+                                <i className={`bi ${iconMap[doc.type]}`} style={{ fontSize: '20px', color: '#555' }}/>
+                                <p className=' ms-3 small'>{doc.title}</p>
+                            </Dropdown.Item>
+                        ))}
+                    </Dropdown.Menu>
+                </Dropdown>
                 {/* Render coordinate documents as markers on the map */}
                 {<ShowDocuments data={coordDocuments} createCustomIcon={createCustomIcon} setSelectedDoc={setSelectedDoc} setRenderNumeber={setRenderNumeber} renderNumber={renderNumber} />}
 
@@ -259,41 +195,17 @@ function Map2(props) {
                         const pos = selectedDoc.lat ? [selectedDoc.lat, selectedDoc.long] : plusButtonPosition;
                         const myKey = selectedDoc.id+renderNumber;
                         return (
-                            <Popup 
-                                position={pos} 
-                                maxWidth={800}
-                                key={myKey}
-                                onClose={() => setSelectedDoc(null)} // Clear selected document when popup is closed
-                            >
+                            <Popup position={pos} maxWidth={800} key={myKey} onClose={() => setSelectedDoc(null)}>
                                 <MyPopup doc={selectedDoc} setError={props.setError} loggedIn={props.loggedIn} className='popupProp' />
                             </Popup>
                         );
                     })()
                 )}
-
+                {/* To recenter the map */}
                 <RecenterMap position={positionActual} zoom={zoomLevel} />
 
-                <button 
-                    onClick={recenterMap} 
-                    style={{
-                        position: 'absolute', 
-                        top: '15%', 
-                        left: '0.8%', 
-                        background: 'white', 
-                        border: 'none', 
-                        width: '30px', 
-                        height: '30px', 
-                        borderRadius: '5px', 
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.5)',
-                        cursor: 'pointer',
-                        zIndex: 1000, 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        padding: '0' 
-                    }}
-                >
-                    <i className="bi bi-compass" style={{ fontSize: '20px' }}></i>
+                <button onClick={recenterMap} className='myRecenterButton'>
+                    <i className="bi bi-compass myMapIcons"></i>
                 </button>
             </MapContainer>}
         </>

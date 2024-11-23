@@ -198,4 +198,50 @@ margin: 0;
 .myPopup ul li a {
   font-size: 0.675rem; /* Riduce la dimensione del testo (14px) */
 }
+/* CSS added to clean the code of the navigation Map */
+.myRecenterButton{
+  position: absolute; 
+  top: 80px; 
+  left: 12px; 
+  background: white; 
+  border: none; 
+  width: 30px; 
+  height: 30px; 
+  border-radius: 5px; 
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  cursor: pointer;
+  z-index: 1000; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  padding: 0; 
+}
 
+.myFilterMenu {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  border-radius: 8px; 
+  padding: 5px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  color: #006d77;
+}
+
+.myDropdownFilter{
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 1000;
+}
+
+.myMapIcons{
+  font-size: 20px;
+}
+
+.myDropdownDocuments{
+  position: absolute;
+  top: 130px;
+  left: 10px;
+  z-index: 1000;
+}

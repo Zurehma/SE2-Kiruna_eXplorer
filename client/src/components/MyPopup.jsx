@@ -144,7 +144,7 @@ function MyPopup(props) {
       {/* Details Column */}
       <Col xs={12} md={4} className="myPopup">
         <h6 className="fw-bold text-secondary mb-2">{props.doc.title}</h6>
-        <p className="small text-muted m-0">
+        <div className="small text-muted m-0">
           <strong className="text-dark">Stakeholders:</strong> {props.doc.stakeholder} <br />
           <strong className="text-dark">Scale:</strong>{' '}
           {props.doc.scale &&
@@ -156,9 +156,9 @@ function MyPopup(props) {
           <br />
           <strong className="text-dark">Issuance Date:</strong> {props.doc.issuanceDate} <br />
           <strong className="text-dark">Type:</strong> {props.doc.type} <br />
-        </p>
+        </div>
         {/* Display connections */}
-        <p className="small text-muted m-0 d-flex align-items-center">
+        <div className="small text-muted m-0 d-flex align-items-center">
             <strong className="text-dark">Connections:</strong> {props.doc.connections}
             {props.doc.connections > 0 && !loading && (
               <Dropdown className="d-inline ms-2">
@@ -174,7 +174,7 @@ function MyPopup(props) {
                 </Dropdown.Toggle>
               </Dropdown>
             )}
-          </p>
+          </div>
 
         {/* Display the dropdown list of connections if it's open */}
         {showLinks && (
