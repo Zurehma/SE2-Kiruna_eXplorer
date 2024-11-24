@@ -230,7 +230,7 @@ margin: 0;
 
 .myDropdownFilter{
   position: absolute;
-  top: 15px;
+  top: 11px;
   right: 15px;
   z-index: 1000;
 }
@@ -241,7 +241,10 @@ margin: 0;
 
 .myDropdownDocuments{
   position: absolute;
-  top: 130px;
-  left: 10px;
+  top: 11px;
+  right: 120px;
   z-index: 1000;
+}
+.popUpNavigation{
+  z-index: 10000000000;
 }
