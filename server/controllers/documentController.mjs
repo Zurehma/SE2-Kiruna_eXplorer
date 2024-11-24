@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
-//import { getLinkTypes, isLinkType } from "../models/document.mjs";
 import Document from "../models/document.mjs";
 import Utility from "../utils/utility.mjs";
 
@@ -41,7 +40,7 @@ class DocumentController {
   /**
    * Add a new document with the provided informations
    * @param {String} title
-   * @param {String} stakeholder
+   * @param {Array<String>} stakeholders
    * @param {String | Number} scale
    * @param {String} issuanceDate
    * @param {String} type
@@ -53,7 +52,7 @@ class DocumentController {
    * @param {Number | null} pages
    * @returns {Promise<Document>} A promise that resolves to the newly created object
    */
-  addDocument = (title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
+  addDocument = (title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
     return new Promise(async (resolve, reject) => {
       try {
         if (dayjs().isBefore(issuanceDate)) {
@@ -68,7 +67,6 @@ class DocumentController {
 
         const result = await this.documentDAO.addDocument(
           title,
-          stakeholder,
           scale,
           issuanceDate,
           type,
@@ -79,6 +77,10 @@ class DocumentController {
           pageFrom,
           pageTo
         );
+
+        for (let stakeholder in stakeholders) {
+          await this.documentDAO.addStakeholder(result.lastID, stakeholder);
+        }
 
         const document = await this.documentDAO.getDocumentByID(result.lastID);
 
@@ -93,19 +95,19 @@ class DocumentController {
    * Update an existing document with the provided informations
    * @param {Number} id
    * @param {String} title
-   * @param {String} stakeholder
-   * @param {String || Number} scale
+   * @param {Array<String>} stakeholders
+   * @param {String | Number} scale
    * @param {String} issuanceDate
    * @param {String} type
    * @param {String} language
    * @param {String} description
-   * @param {Object || null} coordinates
-   * @param {Number || null} pages
-   * @param {Number || null} pageFrom
-   * @param {Number || null} pageTo
+   * @param {Object | null} coordinates
+   * @param {Number | null} pages
+   * @param {Number | null} pageFrom
+   * @param {Number | null} pageTo
    * @returns {Promise<null>} A promise that resolves to null
    */
-  updateDocument = (id, title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
+  updateDocument = (id, title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
     return new Promise(async (resolve, reject) => {
       try {
         if (dayjs().isBefore(issuanceDate)) {
@@ -128,7 +130,6 @@ class DocumentController {
         await this.documentDAO.updateDocument(
           id,
           title,
-          stakeholder,
           scale,
           issuanceDate,
           type,
@@ -139,6 +140,12 @@ class DocumentController {
           pageFrom,
           pageTo
         );
+
+        await this.documentDAO.deleteStakeholders(id);
+
+        for (let stakeholder in stakeholders) {
+          await this.documentDAO.addStakeholder(id, stakeholder);
+        }
 
         resolve(null);
       } catch (err) {

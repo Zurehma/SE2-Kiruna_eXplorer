@@ -37,7 +37,8 @@ class DocumentRoutes {
       "/",
       Utility.isLoggedIn,
       body("title").isString().notEmpty(),
-      body("stakeholder").isString().notEmpty(),
+      body("stakeholders").isArray().notEmpty(),
+      body("stakeholders.*").isString().notEmpty(),
       oneOf([body("scale").isString().notEmpty(), body("scale").isInt({ gt: 0 })]),
       oneOf([body("issuanceDate").isISO8601({ strict: true }), body("issuanceDate").isString().notEmpty().custom(Utility.isValidYearMonthOrYear)]),
       body("type").isString().notEmpty(),
@@ -52,7 +53,7 @@ class DocumentRoutes {
         this.documentController
           .addDocument(
             req.body.title,
-            req.body.stakeholder,
+            req.body.stakeholders,
             req.body.scale,
             req.body.issuanceDate,
             req.body.type,
@@ -107,7 +108,8 @@ class DocumentRoutes {
       Utility.isLoggedIn,
       param("docID").isInt({ gt: 0 }),
       body("title").isString().notEmpty(),
-      body("stakeholder").isString().notEmpty(),
+      body("stakeholders").isArray().notEmpty(),
+      body("stakeholders.*").isString().notEmpty(),
       oneOf([body("scale").isString().notEmpty(), body("scale").optional().isInt({ gt: 0 })]),
       oneOf([body("issuanceDate").isISO8601({ strict: true }), body("issuanceDate").isString().notEmpty().custom(Utility.isValidYearMonthOrYear)]),
       body("type").isString().notEmpty(),
@@ -123,7 +125,7 @@ class DocumentRoutes {
           .updateDocument(
             Number(req.params.docID),
             req.body.title,
-            req.body.stakeholder,
+            req.body.stakeholders,
             req.body.scale,
             req.body.issuanceDate,
             req.body.type,
