@@ -16,7 +16,7 @@ import API from '../API.js';
 import FilteringDocuments from './components/FilteringDocuments.jsx';
 import AccessDenied from './components/AccessDenied.jsx';
 import NotFound from './components/NotFound.jsx';
-
+import { SingleDocument } from './components/SingleDocument.jsx';
 
 function App() {
     const [currentUser, setCurrentUser] = useState('');
@@ -116,7 +116,7 @@ function App() {
                 )
                 } 
                 />
-
+              <Route path="/document/:id" element={<SingleDocument setError={setError} loggedIn={loggedIn} />} />
               <Route 
                 path="/documents/links" 
                 element={

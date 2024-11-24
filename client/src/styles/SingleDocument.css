@@ -1,0 +1,10 @@
+.documents-background {
+    background: linear-gradient(to right, #006d77, #83c5be); 
+    min-height: 100vh;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto; 
+    overflow-x:auto;
+}
