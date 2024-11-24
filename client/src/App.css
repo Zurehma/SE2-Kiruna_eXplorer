@@ -31,6 +31,8 @@
   white-space: normal;
 }
 
+
+
 .leaflet-container .leaflet-popup-content-wrapper {
   background-color: rgba(255, 255, 255, 0.8);
   color: #000;
@@ -226,6 +228,7 @@ margin: 0;
   justify-content: center;
   border: none;
   color: #006d77;
+  
 }
 
 .myDropdownFilter{
@@ -242,9 +245,27 @@ margin: 0;
 .myDropdownDocuments{
   position: absolute;
   top: 11px;
-  right: 120px;
+  right: 190px;
   z-index: 1000;
 }
-.popUpNavigation{
-  z-index: 10000000000;
+
+
+/* Centrato il menù e imposta la larghezza uguale al bottone */
+.custom-dropdown-menu {
+  width: auto;  /* Larghezza automatica basata sul contenuto */
+  min-width: 100%;  /* Imposta la larghezza minima uguale al bottone */
+  left: 50%;  /* Centra orizzontalmente il menu */
+  transform: translateX(-50%);  /* Usa translateX per centrare rispetto al bottone */
+  padding: 0;  /* Rimuovi padding aggiuntivo */
+}
+
+.myDropdownFilter .dropdown-toggle:focus,
+.myDropdownDocuments .dropdown-toggle:focus,
+.myDropdownFilter .dropdown-toggle:active,
+.myDropdownDocuments .dropdown-toggle:active {
+  color: #006d77; /* Colore quando il bottone è cliccato o in focus */
+}
+.myDropdownFilter .dropdown-toggle:hover,
+.myDropdownDocuments .dropdown-toggle:hover {
+  color: #006d77; /* Colore al passaggio del mouse */
 }

@@ -56,6 +56,7 @@ function Map2(props) {
     const [positionActual, setPositionActual] = useState(initialPosition);
     const [zoomLevel, setZoomLevel] = useState(11);
     const [selectedDoc, setSelectedDoc] = useState(null); // To manage the selected document for showing MyPopup
+    const [isSelected,setIsSelected] = useState(false);
     const [renderNumber,setRenderNumeber] = useState(0);
     const [typeDoc,setTypeDoc] = useState([]);
     const [selectedType, setSelectedType] = useState('All'); // New state for selected type
@@ -124,6 +125,7 @@ function Map2(props) {
 
         if (validPosition(initialPosition) && validZoom(11)) {
             setPositionActual(initialPosition);
+            setSelectedDoc(null);
             setZoomLevel(11);
         } else {
             console.error('Invalid position or zoom level');
@@ -152,41 +154,58 @@ function Map2(props) {
                     attribution='&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
                 
-                {/* Filter dropdown on the top-right corrner: to be fixed */}
-                {props.loggedIn && <Dropdown onSelect={(eventKey) => setSelectedType(eventKey)} className='myDropdownFilter'>
-                    <Dropdown.Toggle variant="light" id="dropdown-filter-button" className='myFilterMenu'>
-                        Filter
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu style={{ backgroundColor: 'white' }}>
-                        <Dropdown.Header>Filter by document type</Dropdown.Header>
-                        <Dropdown.Item eventKey="All">All</Dropdown.Item>
-                        {typeDoc.map((type, index) => (
-                            <Dropdown.Item key={index} eventKey={type.name}>{type.name}
-                            </Dropdown.Item>
-                        ))}
-                    </Dropdown.Menu>
-                </Dropdown>
-                }
-                {/*Show documents without coordinates with a button that groups them all*/}
-                <Dropdown onSelect={(eventKey) => {setSelectedDoc(noCoordDocuments.at((doc)=>doc.id===eventKey)); setRenderNumeber((renderNumber) => renderNumber + 1);}} className='myDropdownDocuments'>
-                    <Dropdown.Toggle variant="light" id="dropdown-DocumentWithoutCoordinates-button" className='myFilterMenu text-small'>
-                        Municipality
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu style={{ 
-            backgroundColor: 'white', 
-            maxHeight: '200px', 
-            overflowY: 'scroll', 
-            flexDirection: 'column',
-        }}>
-                        {noCoordDocuments.map((doc) => (
-                            <Dropdown.Item className='ms-1 me-1 mb-1' key={doc.id} eventKey={doc.id} style={{display: 'flex',justifyContent: 'center', alignItems: 'center', border: '1px solid black',padding: '5px', // Riduce lo spazio interno
-                                width: '150px',  // Imposta una larghezza fissa più stretta
-                                height: '30px',}}>
-                                <i className={`bi ${iconMap[doc.type]}`} style={{ fontSize: '16px', color: 'black' }} />
-                            </Dropdown.Item>
-                        ))}
-                    </Dropdown.Menu>
-                </Dropdown>
+                {/* Filter dropdown on the top-right corner */}
+{props.loggedIn && (
+  <Dropdown drop='down-centered' onSelect={(eventKey) => setSelectedType(eventKey)} className='myDropdownFilter'>
+    <Dropdown.Toggle drop='down-centered' variant="light" id="dropdown-filter-button" className='myFilterMenu'>
+      Filter Documents
+    </Dropdown.Toggle>
+    <Dropdown.Menu className="custom-dropdown-menu" style={{ backgroundColor: 'white' }}>
+      <Dropdown.Item eventKey="All">All</Dropdown.Item>
+      {typeDoc.map((type, index) => (
+        <Dropdown.Item key={index} eventKey={type.name} className='text-small'>{type.name}</Dropdown.Item>
+      ))}
+    </Dropdown.Menu>
+  </Dropdown>
+)}
+
+{/* Show documents without coordinates with a button that groups them all */}
+<Dropdown
+  onSelect={(eventKey) => { setSelectedDoc(noCoordDocuments.find((doc) => doc.id === eventKey)); setRenderNumeber((renderNumber) => renderNumber + 1); }}
+  className='myDropdownDocuments'>
+  <Dropdown.Toggle variant="light" id="dropdown-DocumentWithoutCoordinates-button" className='myFilterMenu text-small'>
+    Entire municipality
+  </Dropdown.Toggle>
+  <Dropdown.Menu
+    className="custom-dropdown-menu"
+    style={{
+      backgroundColor: 'white',
+      maxHeight: '200px',
+      overflowY: 'scroll',
+      flexDirection: 'column',
+    }}
+  >
+    {noCoordDocuments.map((doc) => (
+      <Dropdown.Item
+        className='ms-1 me-1 mb-1 mt-1'
+        key={doc.id}
+        eventKey={doc.id}
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          border: '2px solid #006d77',
+          padding: '5px',
+          width: 'auto',
+          height: 'auto',
+        }}
+      >
+        <i className={`bi ${iconMap[doc.type]}`} style={{ fontSize: '16px', color: '#006d77' }} />
+      </Dropdown.Item>
+    ))}
+  </Dropdown.Menu>
+</Dropdown>
+
                 {/* Render coordinate documents as markers on the map */}
                 {<ShowDocuments data={coordDocuments} createCustomIcon={createCustomIcon} setSelectedDoc={setSelectedDoc} setRenderNumeber={setRenderNumeber} renderNumber={renderNumber} />}
                 {/* Renderizza il poligono di Kiruna se un documento senza coordinate è selezionato */}
@@ -194,12 +213,12 @@ function Map2(props) {
                 
                 
                 {/* If a document is selected, show MyPopup in a popup */}
-                {selectedDoc && (
+                {selectedDoc!==null && (
                     (() => {
                         const pos = selectedDoc.lat ? [selectedDoc.lat, selectedDoc.long] : highestPoint;
                         const myKey = selectedDoc.id+renderNumber;
                         return (
-                            <Popup position={pos} maxWidth={800} key={myKey} onClose={() => setSelectedDoc(null)}>
+                            <Popup position={pos} maxWidth={800} key={myKey} onClose={() => setSelectedDoc(null)} >
                                 <MyPopup doc={selectedDoc} setError={props.setError} loggedIn={props.loggedIn} className='popupProp' />
                             </Popup>
                         );
