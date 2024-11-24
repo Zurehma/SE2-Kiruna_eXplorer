@@ -265,6 +265,7 @@ margin: 0;
 .myDropdownDocuments .dropdown-toggle:active {
   color: #006d77; /* Colore quando il bottone è cliccato o in focus */
 }
+
 .myDropdownFilter .dropdown-toggle:hover,
 .myDropdownDocuments .dropdown-toggle:hover {
   color: #006d77; /* Colore al passaggio del mouse */
