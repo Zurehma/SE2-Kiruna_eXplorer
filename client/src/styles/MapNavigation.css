@@ -290,3 +290,7 @@ button.myDropdownDocuments:focus {
 .modal-title {
     color: #006d77;
 }
+
+button.myDropdownDocuments {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}

@@ -3,7 +3,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'leaflet/dist/leaflet.css';
 
 import MarkerClusterGroup from "react-leaflet-cluster";
-import { MapContainer, TileLayer, Marker, Popup, Polygon, useMap, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polygon, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
 import '../../styles/MapNavigation.css';
@@ -12,7 +12,34 @@ import MyModal from './MyModal';
 import MyFilterDropdown from './MyFilterDropdown';
 import MyViewDropdown from './MyViewDropdown';
 import API from '../../../API';
+import { useMapEvents } from 'react-leaflet';
 
+const PopupCloseHandler = ({ onClose }) => {
+    const map = useMap();
+
+    useEffect(() => {
+        const handlePopupClose = () => {
+            onClose();
+        };
+
+        map.on('popupclose', handlePopupClose);
+        return () => {
+            map.off('popupclose', handlePopupClose);
+        };
+    }, [map, onClose]);
+
+    return null;
+};
+
+
+const MapClickHandler = ({ onMapClick }) => {
+    useMapEvents({
+        click: () => {
+            onMapClick();
+        },
+    });
+    return null;
+};
 
 
 // Icon mapping based on document type
@@ -189,7 +216,7 @@ function MapNavigation(props) {
                 <TileLayer url={mapStyles[mapView]}/>
 
                 <MyViewDropdown setMapView={setMapView} mapView={mapView} setSelectedDoc={setSelectedDoc}/>
-                
+                <MapClickHandler onMapClick={() => setSelectedDoc(null)} />
                 <MyFilterDropdown loggedIn={props.loggedIn} typeDoc={typeDoc} selectedType={selectedType} setSelectedType={setSelectedType} setSelectedDoc={setSelectedDoc} />
                 {/* Show documents without coordinates with a button that opens a modal */}
                 <MyModal noCoordDocuments={noCoordDocuments} setSelectedDoc={setSelectedDoc} setRenderNumeber={setRenderNumeber} classNameEntireMunicipality={classNameEntireMunicipality} iconMap={iconMap} renderNumber={renderNumber}/>
@@ -213,7 +240,8 @@ function MapNavigation(props) {
                         const pos = selectedDoc?.lat ? [selectedDoc.lat, selectedDoc.long] : highestPoint;
                         const myKey = selectedDoc.id+renderNumber;
                         return (
-                            <Popup position={pos} maxWidth={800} key={myKey} onClose={() => setSelectedDoc(null)} >
+                            <Popup position={pos} maxWidth={800} key={myKey}  closeButton={true} autoClose={false}>
+                                 <PopupCloseHandler onClose={() => setSelectedDoc(null)} />
                                 <MyPopup doc={selectedDoc} setError={props.setError} loggedIn={props.loggedIn} className='popupProp' />
                             </Popup>
                         );

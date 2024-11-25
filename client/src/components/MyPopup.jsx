@@ -14,7 +14,6 @@ function MyPopup(props) {
   const widthLastColumn = props.loggedIn ? 4 : 5;
   const remainingWidth = 12 -3 -4 - widthLastColumn;
 
-
   //fetch links and available attachments for the document 
   useEffect(() => { //As soon as the id of the doc changes, fetch its links and attachments
     setLoading(true);
@@ -87,7 +86,12 @@ function MyPopup(props) {
   };
 
   const navigate = useNavigate();
-
+  const computePages = (pageFrom, pageTo) => {
+    if (pageFrom && pageTo) {
+      return Number(pageTo) - Number(pageFrom) + 1;
+    }
+    return '-';
+  };
   const handleNavigation = (id) => {
     navigate(`/document/${id}`);
   };
@@ -198,11 +202,11 @@ function MyPopup(props) {
         )}
         <p className='text-muted small m-0'>
           <strong className="text-dark">Language:</strong> {props.doc.language} <br />
-          <strong className="text-dark">Number of pages:</strong> {displayValue(props.doc.pages)} <br />
+          <strong className="text-dark">Number of pages:</strong> {props.doc.pages ? displayValue(props.doc.pages) : computePages(props.doc.pageFrom,props.doc.pageTo)} <br />
           <strong className="text-dark">Pages:</strong>{' '}
           {props.doc.pageFrom && props.doc.pageTo
             ? `${props.doc.pageFrom}-${props.doc.pageTo}`
-            : displayValue(props.doc.pageFrom)}{' '}
+            : `-`}
           <br />
           <strong className="text-dark">Position:</strong>{' '}
           {props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'}
