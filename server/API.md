@@ -93,7 +93,7 @@ Returns the list of already existing stakeholders.
 - Example:
 
 ```json
-["KirunaKiruna kommun", "Kiruna kommun/White Arkitekter", "Kiruna kommun/Residents"]
+["KirunaKiruna kommun", "White Arkitekter", "Residents"]
 ```
 
 - Access Constraints: Can only be called by a logged in user.
@@ -106,7 +106,7 @@ Add a new document with the provided information.
 - Request Parameters: _None_
 - Request Body Content: An object with the following parameters:
   - `title`: a string that must not be empty.
-  - `stakeholder`: a string that must not be empty.
+  - `stakeholders`: a array of strings that must not be empty.
   - `scale`: an string value between: [`Blueprint/effects`, `Text`, `1:n`]. If the user choose `1:n`, it has to send only the value **n** in integer format. It represent the relationship between the dimensions drawn on a plan or architectural drawing and the actual dimensions of the building.
   - `issuanceDate`: a string that represent the date. It must be in the format _YYYY-MM-DD_.
   - `type`: a string that represent the type. Can be a value between: [`Informative`, `Prescriptive`, `Material`, `Design`, `Technical`].
@@ -123,7 +123,7 @@ Add a new document with the provided information.
   {
     "id": 1,
     "title": "example",
-    "stakeholder": "example",
+    "stakeholders": ["example1", "example2"],
     "scale": 100,
     "issuanceDate": "2024-10-28",
     "type": "Informative",
@@ -148,7 +148,7 @@ Update an existing document by providing a new object.
 - Request Parameters: _None_
 - Request Body Content: An object with the following parameters:
   - `title`: a string that must not be empty.
-  - `stakeholder`: a string that must not be empty.
+  - `stakeholders`: a array of strings that must not be empty.
   - `scale`: an string value between: [`Blueprint/effects`, `Text`, `1:n`]. If the user choose `1:n`, it has to send only the value **n** in integer format. It represent the relationship between the dimensions drawn on a plan or architectural drawing and the actual dimensions of the building.
   - `issuanceDate`: a string that represent the date. It must be in the format _YYYY-MM-DD_.
   - `type`: a string that represent the type. Can be a value between: [`Informative`, `Prescriptive`, `Material`, `Design`, `Technical`].
