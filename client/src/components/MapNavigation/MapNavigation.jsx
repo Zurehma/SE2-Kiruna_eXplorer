@@ -6,11 +6,12 @@ import MarkerClusterGroup from "react-leaflet-cluster";
 import { MapContainer, TileLayer, Marker, Popup, Polygon, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 
-import { Button, Modal, Form,Row,Col } from 'react-bootstrap';
-import '../App.css';
-import { MyPopup } from './MyPopup';
-import API from '../../API';
-import { Dropdown } from 'react-bootstrap';
+import '../../styles/MapNavigation.css';
+import { MyPopup } from '../MyPopup';
+import MyModal from './MyModal';
+import MyFilterDropdown from './MyFilterDropdown';
+import MyViewDropdown from './MyViewDropdown';
+import API from '../../../API';
 //import kirunaCoordinates from '../assets/KirunaMunicipality.geojson';
 
 
@@ -49,7 +50,7 @@ const RecenterMap = ({ position, zoom }) => {
     return null;
 }
 
-function Map2(props) {
+function MapNavigation(props) {
     const initialPosition = [67.850, 20.217];
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -68,15 +69,6 @@ function Map2(props) {
         terrain: "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
         outdoor: "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png",
     };
-
-    const [show, setShow] = useState(false); // State for the modal
-    const [searchQuery, setSearchQuery] = useState(""); // State for the search query
-
-    const handleSelect = (doc) => {
-        setShow(false); 
-        setSelectedDoc(doc);
-    };
-    
 
     useEffect(()=>{
         setLoading(true);
@@ -126,10 +118,7 @@ function Map2(props) {
     const noCoordDocuments = data.filter(doc => doc.lat == null && doc.long == null);
     // Filter documents with coordinates
     const coordDocuments = data.filter(doc => doc.lat != null && doc.long != null);
-    // Filter documents inside the modal
-    const filteredDocuments = noCoordDocuments.filter((doc) =>
-        doc.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    
 
     // Function to recenter the map on Kiruna with zoom reset to 13
     const recenterMap = () => {
@@ -155,116 +144,27 @@ function Map2(props) {
             {loading && (<p>Loading...</p>)}
             {!loading && 
             <MapContainer center={positionActual} zoom={zoomLevel} style={{ height: '92vh', width: '100%' }}>
-                <TileLayer
-                    url={mapStyles[mapView]}
-                />
-                {/*Dropdown to handle views-> place the check smaller!!*/}
-                <Dropdown drop="up" onSelect={(eventKey) => setMapView(eventKey)} className="myDropdownView">
-                <Dropdown.Toggle variant="light" id="dropdown-view-button" className="myFilterMenu">
-                    <i className="bi bi-globe me-1"></i> View
-                </Dropdown.Toggle>
-                <Dropdown.Menu className="custom-dropdown-menu" style={{ backgroundColor: "white" }}>
-                    <Dropdown.Item eventKey="satellite">
-                    {mapView === "satellite" && <i className="bi bi-check-circle-fill me-2"></i>} Satellite
-                    </Dropdown.Item>
-                    <Dropdown.Item eventKey="streets">
-                    {mapView === "streets" && <i className="bi bi-check-circle-fill me-2"></i>} Streets
-                    </Dropdown.Item>
-                    <Dropdown.Item eventKey="terrain">
-                    {mapView === "terrain" && <i className="bi bi-check-circle-fill me-2"></i>} Terrain
-                    </Dropdown.Item>
-                    <Dropdown.Item eventKey="outdoor">
-                    {mapView === "outdoor" && <i className="bi bi-check-circle-fill me-2"></i>} Outdoor
-                    </Dropdown.Item>
-                </Dropdown.Menu>
-                </Dropdown>
-                {/* Filter dropdown on the top-right corner */}
-                {props.loggedIn && (
-                <Dropdown drop='down-centered' onSelect={(eventKey) => setSelectedType(eventKey)} className='myDropdownFilter'>
-                    <Dropdown.Toggle drop='down-centered' variant="light" id="dropdown-filter-button" className='myFilterMenu'>
-                        <i className="bi bi-filter me-1" style={{ fontSize: '18px' }}></i>
-                        Filter
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu className="custom-dropdown-menu" style={{ backgroundColor: 'white' }}>
-                    <Dropdown.Item eventKey="All">All</Dropdown.Item>
-                    {typeDoc.map((type, index) => (
-                        <Dropdown.Item key={index} eventKey={type.name} className='text-small'>{type.name}</Dropdown.Item>
-                    ))}
-                    </Dropdown.Menu>
-                </Dropdown>
-                )}
 
+                <TileLayer url={mapStyles[mapView]}/>
+
+                <MyViewDropdown setMapView={setMapView} mapView={mapView} setSelectedDoc={setSelectedDoc}/>
+                
+                <MyFilterDropdown loggedIn={props.loggedIn} typeDoc={typeDoc} selectedType={selectedType} setSelectedType={setSelectedType} setSelectedDoc={setSelectedDoc} />
                 {/* Show documents without coordinates with a button that opens a modal */}
-                <Button variant="light" onClick={() => setShow(true)} className={classNameEntireMunicipality}>
-                    <i className="bi bi-folder2-open me-1"></i> Entire municipality
-                </Button>
-                <Modal show={show} onHide={() => setShow(false)} size="lg" centered className="modal-dialog-scrollable">
-                    <Modal.Header closeButton>
-                    <Modal.Title>
-                        <i className="bi bi-folder2-open me-2"></i> Documents
-                    </Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body style={{ maxHeight: "400px", overflowY: "auto" }}>
-                    {/* Barra di ricerca */}
-                    <Form.Control
-                        type="text"
-                        placeholder="Search documents (entire municiality)..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="mb-3"
-                    />
-                    {/* Lista dei documenti */}
-                    {filteredDocuments.length > 0 ? (
-                        <ul className="list-group">
-                        {filteredDocuments.map((doc) => (
-                            <li
-                            key={doc.id}
-                            className="list-group-item d-flex justify-content-between align-items-center"
-                            onClick={() => handleSelect(doc)}
-                            style={{ cursor: "pointer" }}
-                            >
-                            <span>
-                                <Row className="align-items-center">
-                                    <Col xs={2} >
-                                    <i className={`bi ${iconMap[doc.type]} me-2`} style={{ fontSize: '18px', color: "#006d77" }}></i>
-                                    </Col>
-                                    <Col xs={10}>
-                                        {doc.title}
-                                    </Col>
-                                </Row>   
-                            </span>
-                            <i className="bi bi-arrow-right-circle-fill"></i>
-                            </li>
-                        ))}
-                        </ul>
-                    ) : (
-                        <div className="text-muted text-center py-3">No documents available</div>
-                    )}
-                    </Modal.Body>
-                    <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShow(false)}>
-                        Close
-                    </Button>
-                    </Modal.Footer>
-                </Modal>
-
+                <MyModal noCoordDocuments={noCoordDocuments} setSelectedDoc={setSelectedDoc} setRenderNumeber={setRenderNumeber} classNameEntireMunicipality={classNameEntireMunicipality} iconMap={iconMap}/>
+                
                 {/* Draw clusters or icons depending on the zoom: also the exact same position is managed in this case */}
                 <MarkerClusterGroup>
                     {coordDocuments.map((doc) => (
                         <Marker key={doc.id} position={[doc.lat, doc.long]} icon={createCustomIcon(doc.type)}
-                            eventHandlers={{
-                                click: () => {
-                                    setSelectedDoc(doc);
-                                },
-                            }}
-                        />
+                            eventHandlers={{click: () => {setSelectedDoc(doc); setRenderNumeber(renderNumber+1);}
+                        }}/>
                     ))}
                 </MarkerClusterGroup>
                 
                 {/* If a document is selected, show MyPopup in a popup */}
                 {/*Done in this way to avoid visual problems dued to continue re-rendering because of clustering */}
-                {selectedDoc!==null && (
-                    (() => {
+                {selectedDoc!==null && ((() => {
                         const pos = selectedDoc.lat ? [selectedDoc.lat, selectedDoc.long] : highestPoint;
                         const myKey = selectedDoc.id+renderNumber;
                         return (
@@ -285,4 +185,4 @@ function Map2(props) {
     );
 }
 
-export default Map2
+export default MapNavigation
