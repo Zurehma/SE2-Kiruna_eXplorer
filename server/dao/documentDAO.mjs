@@ -53,7 +53,7 @@ class DocumentDAO {
     });
   };
 
-  getDocuments = (queryParameter) => {
+  getDocuments = (queryParameter, limit, offset) => {
     return new Promise((resolve, reject) => {
       try {
         let { type, stakeholder, issuanceDateFrom, issuanceDateTo } = queryParameter ? queryParameter : {};
@@ -83,6 +83,9 @@ class DocumentDAO {
         if (sqlConditions.length > 0) {
           sql += " WHERE " + sqlConditions.join(" AND ");
         }
+
+        sql += " LIMIT ? OFFSET ?";
+        sqlParams.push(limit, offset);
 
         db.all(sql, sqlParams, (err, rows) => {
           if (err) {
@@ -158,7 +161,7 @@ class DocumentDAO {
    * @param {String} type
    * @param {String} language
    * @param {String} description
-   * @param {String | null} coordinates
+   * @param {Array<String> | null} coordinates
    * @param {Number | null} pages
    * @param {Number | null} pageFrom
    * @param {Number | null} pageTo

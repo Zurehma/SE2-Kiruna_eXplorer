@@ -75,6 +75,32 @@ const isValidCoordinatesObject = (value) => {
   return true;
 };
 
+const isValidCoordinatesArray = (coordinatesArray) => {
+  if (!Array.isArray(coordinatesArray)) {
+    throw new Error("Input is not an array.");
+  }
+
+  coordinatesArray.forEach((value, index) => {
+    const lat = value.lat;
+    const long = value.long;
+    const numProperties = Object.keys(value).length;
+
+    if (lat === undefined || long === undefined || numProperties !== 2) {
+      throw new Error(`Invalid coordinates object at index ${index}.`);
+    }
+
+    if (typeof lat !== "number" || typeof long !== "number") {
+      throw new Error(`Invalid latitude or longitude types at index ${index}.`);
+    }
+
+    if (lat > 90 || lat < -90 || long > 180 || long < -180) {
+      throw new Error(`Invalid latitude or longitude values at index ${index}.`);
+    }
+  });
+
+  return true;
+};
+
 /**
  * Middleware to check if the body has the correct configuration for the page parameters
  * @param {*} value
@@ -167,6 +193,7 @@ const Utility = {
   isBodyEmpty,
   validateRequest,
   errorHandler,
+  isValidCoordinatesArray
 };
 
 export default Utility;

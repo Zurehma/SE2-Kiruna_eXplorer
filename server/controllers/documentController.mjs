@@ -25,11 +25,11 @@ class DocumentController {
     });
   };
 
-  getDocuments = (type, stakeholder, issuanceDateFrom, issuanceDateTo) => {
+  getDocuments = (type, stakeholder, issuanceDateFrom, issuanceDateTo, limit, offset) => {
     return new Promise(async (resolve, reject) => {
       try {
         let queryParameter = { type, stakeholder, issuanceDateFrom, issuanceDateTo };
-        const documents = await this.documentDAO.getDocuments(queryParameter);
+        const documents = await this.documentDAO.getDocuments(queryParameter, limit, offset);
         resolve(documents);
       } catch (err) {
         reject(err);
@@ -46,7 +46,7 @@ class DocumentController {
    * @param {String} type
    * @param {String} language
    * @param {String} description
-   * @param {Object | null} coordinates
+   * @param {Array<String> | null} coordinates
    * @param {Number | null} pages
    * @param {Number | null} pages
    * @param {Number | null} pages

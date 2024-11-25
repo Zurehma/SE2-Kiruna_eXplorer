@@ -25,14 +25,11 @@ DELETE http://localhost:3001/api/sessions/logout HTTP/1.1
 ### Get current logged in user
 GET http://localhost:3001/api/sessions/current HTTP/1.1
 
-### Get all documents
-# GET http://localhost:3001/api/documents HTTP/1.1
-
 ### Get document by id
 GET http://localhost:3001/api/documents/5 HTTP/1.1
 
 ### Filter documents
-GET http://localhost:3001/api/documents?type=Prescriptive&stakeholder=Kiruna%20kommun&issuanceDateFrom=2010-10-20&issuanceDateTo=2015-10-20 HTTP/1.1
+GET http://localhost:3001/api/documents?type=Prescriptive&stakeholder=Kiruna%20kommun&issuanceDateFrom=2010-10-20&issuanceDateTo=2015-10-20&offset=0&limit=1 HTTP/1.1
 
 ### Add a new document
 POST http://localhost:3001/api/documents HTTP/1.1
@@ -46,7 +43,7 @@ Content-Type: application/json
     "type": "Prescriptive",
     "language": "Swedish",
     "description": "This plan, approved in July 2016, is the first detailed plan to be implemented from the new masterplan (Adjusted development plan). The document defines the entire area near the town hall, comprising a total of 9 blocks known for their density. Among these are the 6 buildings that will face the main square. The functions are mixed, both public and private, with residential being prominent, as well as the possibility of incorporating accommodation facilities such as hotels. For all buildings in this plan, the only height limit is imposed by air traffic.",
-    "coordinates": {"lat": 67.848606, "long": 20.302761},
+    "coordinates": [{"lat": 67.848606, "long": 20.302761},{"lat": 67.850000, "long": 20.305000}],
     "pageFrom": 1,
     "pageTo": 43
 }
