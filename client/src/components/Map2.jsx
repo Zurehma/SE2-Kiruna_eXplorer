@@ -149,13 +149,7 @@ function Map2(props) {
     };
     const classNameEntireMunicipality = props.loggedIn ? 'myDropdownDocuments' : 'myDropdownFilter';
     
-    /*
-    Things to do:
-    Improve placement of the doc-without-coordinates button- remove style in-line
-    Import Kiruna coordinates and draw them when a noCoordinates element is opened
-    Increase z-index of the MyPopup component to make it stay over the dropdowns->doesn't work
-    <Polygon positions={kirunaCoordinates} color="blue" fillOpacity={0.3} />
-    */
+    
     return (
         <>
             {loading && (<p>Loading...</p>)}

@@ -88,6 +88,10 @@ function MyPopup(props) {
 
   const navigate = useNavigate();
 
+  const handleNavigation = (id) => {
+    navigate(`/document/${id}`);
+  };
+  
   const handleClick = () => {
     if (props.doc && props.doc.id && props.doc.id > 0) {
       navigate(`/documents/${props.doc.id}`, { state: { docId: props.doc.id } });
@@ -181,8 +185,14 @@ function MyPopup(props) {
           <ul className="small text-muted ms-3">
             {links.map((link) => (
               <li key={link.linkedDocID}>
-                {link.title} - {link.type}
-              </li>
+              <span
+                style={{ color: "#007bff", cursor: "pointer", textDecoration: "underline" }}
+                onClick={() => handleNavigation(link.linkedDocID)}
+              >
+                {link.title}
+              </span>{" "}
+              - {link.type}
+            </li>
             ))}
           </ul>
         )}
