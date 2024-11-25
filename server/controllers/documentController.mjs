@@ -78,7 +78,7 @@ class DocumentController {
           pageTo
         );
 
-        for (let stakeholder in stakeholders) {
+        for (let stakeholder of stakeholders) {
           await this.documentDAO.addStakeholder(result.lastID, stakeholder);
         }
 
@@ -143,7 +143,7 @@ class DocumentController {
 
         await this.documentDAO.deleteStakeholders(id);
 
-        for (let stakeholder in stakeholders) {
+        for (let stakeholder of stakeholders) {
           await this.documentDAO.addStakeholder(id, stakeholder);
         }
 

@@ -215,7 +215,7 @@ class DocumentDAO {
    * @returns {Promise<null>} A promise that resolves to null
    */
   addStakeholder = (docID, stakeholder) => {
-    return new promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const query = "INSERT INTO DOCUMENT_STAKEHOLDER (docID, stakeholder) VALUES (?, ?)";
 
       db.run(query, [docID, stakeholder], function (err) {
@@ -235,7 +235,7 @@ class DocumentDAO {
    */
   deleteStakeholders = (docID) => {
     return new Promise((resolve, reject) => {
-      const query = "DELETE FROM DOCUMENT-STAKEHOLDER WHERE docID = ?";
+      const query = "DELETE FROM DOCUMENT_STAKEHOLDER WHERE docID = ?";
 
       db.run(query, [docID], function (err) {
         if (err) {
