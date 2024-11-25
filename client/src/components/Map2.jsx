@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'leaflet/dist/leaflet.css';
 
-
+import MarkerClusterGroup from "react-leaflet-cluster";
 import { MapContainer, TileLayer, Marker, Popup, Polygon, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 
 import '../App.css';
 import { MyPopup } from './MyPopup';
 import API from '../../API';
-import { ShowDocuments } from './ShowDocuments';
 import { Dropdown } from 'react-bootstrap';
 //import kirunaCoordinates from '../assets/KirunaMunicipality.geojson';
 
@@ -56,12 +55,17 @@ function Map2(props) {
     const [positionActual, setPositionActual] = useState(initialPosition);
     const [zoomLevel, setZoomLevel] = useState(11);
     const [selectedDoc, setSelectedDoc] = useState(null); // To manage the selected document for showing MyPopup
-    const [isSelected,setIsSelected] = useState(false);
     const [renderNumber,setRenderNumeber] = useState(0);
     const [typeDoc,setTypeDoc] = useState([]);
     const [selectedType, setSelectedType] = useState('All'); // New state for selected type
     
-    
+    //Handle views in the map
+    const [mapView, setMapView] = useState("satellite");
+    const mapStyles = {
+        satellite: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", // Stile satellite
+        streets: "https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png", // Stile stradale
+        terrain: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", // Stile terreno
+    };
 
     // Trova il punto più alto nell'area di Kiruna (latitudine massima)
     //const highestPoint = kirunaCoordinates.reduce((max, coord) => (coord[0] > max[0] ? coord : max), [-Infinity, -Infinity]);
@@ -155,64 +159,71 @@ function Map2(props) {
                 />
                 
                 {/* Filter dropdown on the top-right corner */}
-{props.loggedIn && (
-  <Dropdown drop='down-centered' onSelect={(eventKey) => setSelectedType(eventKey)} className='myDropdownFilter'>
-    <Dropdown.Toggle drop='down-centered' variant="light" id="dropdown-filter-button" className='myFilterMenu'>
-      Filter Documents
-    </Dropdown.Toggle>
-    <Dropdown.Menu className="custom-dropdown-menu" style={{ backgroundColor: 'white' }}>
-      <Dropdown.Item eventKey="All">All</Dropdown.Item>
-      {typeDoc.map((type, index) => (
-        <Dropdown.Item key={index} eventKey={type.name} className='text-small'>{type.name}</Dropdown.Item>
-      ))}
-    </Dropdown.Menu>
-  </Dropdown>
-)}
+                {props.loggedIn && (
+                <Dropdown drop='down-centered' onSelect={(eventKey) => setSelectedType(eventKey)} className='myDropdownFilter'>
+                    <Dropdown.Toggle drop='down-centered' variant="light" id="dropdown-filter-button" className='myFilterMenu'>
+                    Filter Documents
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu className="custom-dropdown-menu" style={{ backgroundColor: 'white' }}>
+                    <Dropdown.Item eventKey="All">All</Dropdown.Item>
+                    {typeDoc.map((type, index) => (
+                        <Dropdown.Item key={index} eventKey={type.name} className='text-small'>{type.name}</Dropdown.Item>
+                    ))}
+                    </Dropdown.Menu>
+                </Dropdown>
+                )}
 
-{/* Show documents without coordinates with a button that groups them all */}
-<Dropdown
-  onSelect={(eventKey) => { setSelectedDoc(noCoordDocuments.find((doc) => doc.id === eventKey)); setRenderNumeber((renderNumber) => renderNumber + 1); }}
-  className='myDropdownDocuments'>
-  <Dropdown.Toggle variant="light" id="dropdown-DocumentWithoutCoordinates-button" className='myFilterMenu text-small'>
-    Entire municipality
-  </Dropdown.Toggle>
-  <Dropdown.Menu
-    className="custom-dropdown-menu"
-    style={{
-      backgroundColor: 'white',
-      maxHeight: '200px',
-      overflowY: 'scroll',
-      flexDirection: 'column',
-    }}
-  >
-    {noCoordDocuments.map((doc) => (
-      <Dropdown.Item
-        className='ms-1 me-1 mb-1 mt-1'
-        key={doc.id}
-        eventKey={doc.id}
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          border: '2px solid #006d77',
-          padding: '5px',
-          width: 'auto',
-          height: 'auto',
-        }}
-      >
-        <i className={`bi ${iconMap[doc.type]}`} style={{ fontSize: '16px', color: '#006d77' }} />
-      </Dropdown.Item>
-    ))}
-  </Dropdown.Menu>
-</Dropdown>
-
-                {/* Render coordinate documents as markers on the map */}
-                {<ShowDocuments data={coordDocuments} createCustomIcon={createCustomIcon} setSelectedDoc={setSelectedDoc} setRenderNumeber={setRenderNumeber} renderNumber={renderNumber} />}
-                {/* Renderizza il poligono di Kiruna se un documento senza coordinate è selezionato */}
-                
-                
+                {/* Show documents without coordinates with a button that groups them all-> Check if there are some */}
+                <Dropdown
+                onSelect={(eventKey) => { setSelectedDoc(noCoordDocuments.find((doc) => doc.id === eventKey)); setRenderNumeber((renderNumber) => renderNumber + 1); }}
+                className='myDropdownDocuments'>
+                <Dropdown.Toggle variant="light" id="dropdown-DocumentWithoutCoordinates-button" className='myFilterMenu text-small'>
+                    Entire municipality
+                </Dropdown.Toggle>
+                <Dropdown.Menu
+                    className="custom-dropdown-menu"
+                    style={{
+                    backgroundColor: 'white',
+                    maxHeight: '200px',
+                    overflowY: 'scroll',
+                    flexDirection: 'column',
+                    }}
+                >
+                    {noCoordDocuments.map((doc) => (
+                    <Dropdown.Item
+                        className='ms-1 me-1 mb-1 mt-1'
+                        key={doc.id}
+                        eventKey={doc.id}
+                        style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        border: '2px solid #006d77',
+                        padding: '5px',
+                        width: 'auto',
+                        height: 'auto',
+                        }}
+                    >
+                        <i className={`bi ${iconMap[doc.type]}`} style={{ fontSize: '16px', color: '#006d77' }} />
+                    </Dropdown.Item>
+                    ))}
+                </Dropdown.Menu>
+                </Dropdown>
+                {/* Draw clusters or icons depending on the zoom: also the exact same position is managed in this case */}
+                <MarkerClusterGroup>
+                    {coordDocuments.map((doc) => (
+                        <Marker key={doc.id} position={[doc.lat, doc.long]} icon={createCustomIcon(doc.type)}
+                            eventHandlers={{
+                                click: () => {
+                                    setSelectedDoc(doc);
+                                },
+                            }}
+                        />
+                    ))}
+                </MarkerClusterGroup>
                 
                 {/* If a document is selected, show MyPopup in a popup */}
+                {/*Done in this way to avoid visual problems dued to continue re-rendering because of clustering */}
                 {selectedDoc!==null && (
                     (() => {
                         const pos = selectedDoc.lat ? [selectedDoc.lat, selectedDoc.long] : highestPoint;
@@ -224,9 +235,9 @@ function Map2(props) {
                         );
                     })()
                 )}
-                {/* To recenter the map */}
-                <RecenterMap position={positionActual} zoom={zoomLevel} />
 
+                {/*Button to recenter the map*/}
+                <RecenterMap position={positionActual} zoom={zoomLevel} />
                 <button onClick={recenterMap} className='myRecenterButton'>
                     <i className="bi bi-compass myMapIcons"></i>
                 </button>
