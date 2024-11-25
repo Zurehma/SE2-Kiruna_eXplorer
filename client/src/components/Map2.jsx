@@ -62,9 +62,10 @@ function Map2(props) {
     //Handle views in the map
     const [mapView, setMapView] = useState("satellite");
     const mapStyles = {
-        satellite: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", // Stile satellite
-        streets: "https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png", // Stile stradale
-        terrain: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", // Stile terreno
+        satellite: "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg",
+        streets: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
+        terrain: "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
+        outdoor: "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png",
     };
 
     // Trova il punto più alto nell'area di Kiruna (latitudine massima)
@@ -135,7 +136,7 @@ function Map2(props) {
             console.error('Invalid position or zoom level');
         }
     };
-
+    const classNameEntireMunicipality = props.loggedIn ? 'myDropdownDocuments' : 'myDropdownFilter';
     // Filter documents without coordinates
     const noCoordDocuments = data.filter(doc => doc.lat == null && doc.long == null);
     // Filter documents with coordinates
@@ -145,24 +146,42 @@ function Map2(props) {
     Improve placement of the doc-without-coordinates button- remove style in-line
     Import Kiruna coordinates and draw them when a noCoordinates element is opened
     Increase z-index of the MyPopup component to make it stay over the dropdowns->doesn't work
-    Give the possibility of multiple views in the map (e.g. satellite, terrain, etc.)
     <Polygon positions={kirunaCoordinates} color="blue" fillOpacity={0.3} />
     */
     return (
         <>
             {loading && (<p>Loading...</p>)}
             {!loading && 
-            <MapContainer center={positionActual} zoom={zoomLevel} style={{ height: '91vh', width: '100%' }}>
+            <MapContainer center={positionActual} zoom={zoomLevel} style={{ height: '92vh', width: '100%' }}>
                 <TileLayer
-                    url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg"
-                    attribution='&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url={mapStyles[mapView]}
                 />
-                
+                {/*Dropdown to handle views-> place the check smaller!!*/}
+                <Dropdown drop="up" onSelect={(eventKey) => setMapView(eventKey)} className="myDropdownView">
+                <Dropdown.Toggle variant="light" id="dropdown-view-button" className="myFilterMenu">
+                    <i className="bi bi-globe me-1"></i> View
+                </Dropdown.Toggle>
+                <Dropdown.Menu className="custom-dropdown-menu" style={{ backgroundColor: "white" }}>
+                    <Dropdown.Item eventKey="satellite">
+                    {mapView === "satellite" && <i className="bi bi-check-circle-fill me-2"></i>} Satellite
+                    </Dropdown.Item>
+                    <Dropdown.Item eventKey="streets">
+                    {mapView === "streets" && <i className="bi bi-check-circle-fill me-2"></i>} Streets
+                    </Dropdown.Item>
+                    <Dropdown.Item eventKey="terrain">
+                    {mapView === "terrain" && <i className="bi bi-check-circle-fill me-2"></i>} Terrain
+                    </Dropdown.Item>
+                    <Dropdown.Item eventKey="outdoor">
+                    {mapView === "outdoor" && <i className="bi bi-check-circle-fill me-2"></i>} Outdoor
+                    </Dropdown.Item>
+                </Dropdown.Menu>
+                </Dropdown>
                 {/* Filter dropdown on the top-right corner */}
                 {props.loggedIn && (
                 <Dropdown drop='down-centered' onSelect={(eventKey) => setSelectedType(eventKey)} className='myDropdownFilter'>
                     <Dropdown.Toggle drop='down-centered' variant="light" id="dropdown-filter-button" className='myFilterMenu'>
-                    Filter Documents
+                        <i className="bi bi-filter me-1"></i>
+                        Filter
                     </Dropdown.Toggle>
                     <Dropdown.Menu className="custom-dropdown-menu" style={{ backgroundColor: 'white' }}>
                     <Dropdown.Item eventKey="All">All</Dropdown.Item>
@@ -176,34 +195,14 @@ function Map2(props) {
                 {/* Show documents without coordinates with a button that groups them all-> Check if there are some */}
                 <Dropdown
                 onSelect={(eventKey) => { setSelectedDoc(noCoordDocuments.find((doc) => doc.id === eventKey)); setRenderNumeber((renderNumber) => renderNumber + 1); }}
-                className='myDropdownDocuments'>
+                className={classNameEntireMunicipality}>
                 <Dropdown.Toggle variant="light" id="dropdown-DocumentWithoutCoordinates-button" className='myFilterMenu text-small'>
+                    <i class="bi bi-folder2-open me-1"></i>
                     Entire municipality
                 </Dropdown.Toggle>
-                <Dropdown.Menu
-                    className="custom-dropdown-menu"
-                    style={{
-                    backgroundColor: 'white',
-                    maxHeight: '200px',
-                    overflowY: 'scroll',
-                    flexDirection: 'column',
-                    }}
-                >
+                <Dropdown.Menu className="custom-dropdown-menu myMenForScrolling">
                     {noCoordDocuments.map((doc) => (
-                    <Dropdown.Item
-                        className='ms-1 me-1 mb-1 mt-1'
-                        key={doc.id}
-                        eventKey={doc.id}
-                        style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        border: '2px solid #006d77',
-                        padding: '5px',
-                        width: 'auto',
-                        height: 'auto',
-                        }}
-                    >
+                    <Dropdown.Item className='ms-1 me-1 mb-1 mt-1 myDropdownItem' key={doc.id} eventKey={doc.id}>
                         <i className={`bi ${iconMap[doc.type]}`} style={{ fontSize: '16px', color: '#006d77' }} />
                     </Dropdown.Item>
                     ))}

@@ -8,3 +8,24 @@
     overflow-y: auto; 
     overflow-x:auto;
 }
+
+.myPopupStyle {
+    max-width: 70%; /* Ridotto per rendere il popup più stretto */
+    max-height: 60%; /* Aumentato per rendere il popup più alto */
+    overflow-y: auto; /* Per scorrere il contenuto verticalmente */
+    overflow-x: auto; /* Per scorrere il contenuto orizzontalmente */
+    background-color: white; /* Colore di sfondo per distinguere */
+    padding: 1rem; /* Spazio interno */
+    border-radius: 8px; /* Bordo arrotondato */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Effetto ombra */
+}
+
+/* Regola per la responsività su schermi più piccoli */
+@media (max-width: 768px) {
+    .myPopupStyle {
+        max-width: 90%; /* Adatta alla larghezza dello schermo */
+        max-height: 80%; /* Più alto su schermi ridotti */
+        overflow: auto; /* Consenti scrolling su schermi piccoli */
+    }
+}
+

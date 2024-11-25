@@ -245,7 +245,7 @@ margin: 0;
 .myDropdownDocuments{
   position: absolute;
   top: 11px;
-  right: 190px;
+  right: 125px;
   z-index: 1000;
 }
 
@@ -260,13 +260,39 @@ margin: 0;
 }
 
 .myDropdownFilter .dropdown-toggle:focus,
+.myDropdownView .dropdown-toggle:focus,
 .myDropdownDocuments .dropdown-toggle:focus,
 .myDropdownFilter .dropdown-toggle:active,
+.myDropdownView .dropdown-toggle:active,
 .myDropdownDocuments .dropdown-toggle:active {
   color: #006d77; /* Colore quando il bottone è cliccato o in focus */
 }
 
 .myDropdownFilter .dropdown-toggle:hover,
+.myDropdownView .dropdown-toggle:hover,
 .myDropdownDocuments .dropdown-toggle:hover {
   color: #006d77; /* Colore al passaggio del mouse */
+}
+
+.myDropdownView{
+  position: absolute;
+  bottom: 20px;
+  left: 13px;
+  z-index: 1000;
+}
+
+.myDropdownItem{
+  display: "flex";
+  justify-content: "center";
+  align-items: "center";
+  border: "2px solid #006d77";
+  padding: "5px";
+  width: "auto";
+  height: "auto";
+}
+.myMenForScrolling{
+  background-color: white;
+  max-height: 200px;
+  overflow-y: scroll;
+  flex-direction: column;
 }
