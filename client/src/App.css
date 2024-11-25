@@ -290,9 +290,3 @@ margin: 0;
   width: "auto";
   height: "auto";
 }
-.myMenForScrolling{
-  background-color: white;
-  max-height: 200px;
-  overflow-y: scroll;
-  flex-direction: column;
-}

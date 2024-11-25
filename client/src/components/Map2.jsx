@@ -6,6 +6,7 @@ import MarkerClusterGroup from "react-leaflet-cluster";
 import { MapContainer, TileLayer, Marker, Popup, Polygon, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 
+import { Button, Modal, Form,Row,Col } from 'react-bootstrap';
 import '../App.css';
 import { MyPopup } from './MyPopup';
 import API from '../../API';
@@ -68,9 +69,13 @@ function Map2(props) {
         outdoor: "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png",
     };
 
-    // Trova il punto più alto nell'area di Kiruna (latitudine massima)
-    //const highestPoint = kirunaCoordinates.reduce((max, coord) => (coord[0] > max[0] ? coord : max), [-Infinity, -Infinity]);
+    const [show, setShow] = useState(false); // State for the modal
+    const [searchQuery, setSearchQuery] = useState(""); // State for the search query
 
+    const handleSelect = (doc) => {
+        setShow(false); 
+        setSelectedDoc(doc);
+    };
     
 
     useEffect(()=>{
@@ -117,8 +122,14 @@ function Map2(props) {
         };
         fetchData();
     }, [selectedType]); // Fetch documents when selectedType changes
-    
-    
+    // Filter documents without coordinates
+    const noCoordDocuments = data.filter(doc => doc.lat == null && doc.long == null);
+    // Filter documents with coordinates
+    const coordDocuments = data.filter(doc => doc.lat != null && doc.long != null);
+    // Filter documents inside the modal
+    const filteredDocuments = noCoordDocuments.filter((doc) =>
+        doc.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     // Function to recenter the map on Kiruna with zoom reset to 13
     const recenterMap = () => {
@@ -137,10 +148,7 @@ function Map2(props) {
         }
     };
     const classNameEntireMunicipality = props.loggedIn ? 'myDropdownDocuments' : 'myDropdownFilter';
-    // Filter documents without coordinates
-    const noCoordDocuments = data.filter(doc => doc.lat == null && doc.long == null);
-    // Filter documents with coordinates
-    const coordDocuments = data.filter(doc => doc.lat != null && doc.long != null);
+    
     /*
     Things to do:
     Improve placement of the doc-without-coordinates button- remove style in-line
@@ -180,7 +188,7 @@ function Map2(props) {
                 {props.loggedIn && (
                 <Dropdown drop='down-centered' onSelect={(eventKey) => setSelectedType(eventKey)} className='myDropdownFilter'>
                     <Dropdown.Toggle drop='down-centered' variant="light" id="dropdown-filter-button" className='myFilterMenu'>
-                        <i className="bi bi-filter me-1"></i>
+                        <i className="bi bi-filter me-1" style={{ fontSize: '18px' }}></i>
                         Filter
                     </Dropdown.Toggle>
                     <Dropdown.Menu className="custom-dropdown-menu" style={{ backgroundColor: 'white' }}>
@@ -192,22 +200,60 @@ function Map2(props) {
                 </Dropdown>
                 )}
 
-                {/* Show documents without coordinates with a button that groups them all-> Check if there are some */}
-                <Dropdown
-                onSelect={(eventKey) => { setSelectedDoc(noCoordDocuments.find((doc) => doc.id === eventKey)); setRenderNumeber((renderNumber) => renderNumber + 1); }}
-                className={classNameEntireMunicipality}>
-                <Dropdown.Toggle variant="light" id="dropdown-DocumentWithoutCoordinates-button" className='myFilterMenu text-small'>
-                    <i class="bi bi-folder2-open me-1"></i>
-                    Entire municipality
-                </Dropdown.Toggle>
-                <Dropdown.Menu className="custom-dropdown-menu myMenForScrolling">
-                    {noCoordDocuments.map((doc) => (
-                    <Dropdown.Item className='ms-1 me-1 mb-1 mt-1 myDropdownItem' key={doc.id} eventKey={doc.id}>
-                        <i className={`bi ${iconMap[doc.type]}`} style={{ fontSize: '16px', color: '#006d77' }} />
-                    </Dropdown.Item>
-                    ))}
-                </Dropdown.Menu>
-                </Dropdown>
+                {/* Show documents without coordinates with a button that opens a modal */}
+                <Button variant="light" onClick={() => setShow(true)} className={classNameEntireMunicipality}>
+                    <i className="bi bi-folder2-open me-1"></i> Entire municipality
+                </Button>
+                <Modal show={show} onHide={() => setShow(false)} size="lg" centered className="modal-dialog-scrollable">
+                    <Modal.Header closeButton>
+                    <Modal.Title>
+                        <i className="bi bi-folder2-open me-2"></i> Documents
+                    </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body style={{ maxHeight: "400px", overflowY: "auto" }}>
+                    {/* Barra di ricerca */}
+                    <Form.Control
+                        type="text"
+                        placeholder="Search documents (entire municiality)..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="mb-3"
+                    />
+                    {/* Lista dei documenti */}
+                    {filteredDocuments.length > 0 ? (
+                        <ul className="list-group">
+                        {filteredDocuments.map((doc) => (
+                            <li
+                            key={doc.id}
+                            className="list-group-item d-flex justify-content-between align-items-center"
+                            onClick={() => handleSelect(doc)}
+                            style={{ cursor: "pointer" }}
+                            >
+                            <span>
+                                <Row className="align-items-center">
+                                    <Col xs={2} >
+                                    <i className={`bi ${iconMap[doc.type]} me-2`} style={{ fontSize: '18px', color: "#006d77" }}></i>
+                                    </Col>
+                                    <Col xs={10}>
+                                        {doc.title}
+                                    </Col>
+                                </Row>   
+                            </span>
+                            <i className="bi bi-arrow-right-circle-fill"></i>
+                            </li>
+                        ))}
+                        </ul>
+                    ) : (
+                        <div className="text-muted text-center py-3">No documents available</div>
+                    )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShow(false)}>
+                        Close
+                    </Button>
+                    </Modal.Footer>
+                </Modal>
+
                 {/* Draw clusters or icons depending on the zoom: also the exact same position is managed in this case */}
                 <MarkerClusterGroup>
                     {coordDocuments.map((doc) => (
