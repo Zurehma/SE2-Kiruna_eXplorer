@@ -1,7 +1,7 @@
 
 # End 2 End testing
 
-## Tests for Stories
+## Tests for Stories KX4 and KX11
 
 ### [ ] Map-Based Document Management Features
 
@@ -140,4 +140,114 @@ Steps:
 - The map should remain visible but with no document markers.
 - The user should be able to modify or reset the filter to return to the previous view.
 
+# E2E Testing related to the version delivered for sprint 3 (functionalities related to the previous sprint are still tested, refer to the previous documentation)
+
+#### Test 1: Change of the view of the map when logged in
+Steps:
+1. Login using credentials.
+2. Navigate to the map by either:
+   - Selecting "Relocation of Kiruna" from the home page.
+   - Using the dropdown menu in the menu bar and selecting "Map."
+3. Resize the browser window to different dimensions (e.g., mobile, tablet, desktop).
+4. Try to open the drop-up menù on the bottom-left corner
+5. 4 options should be visible, 'satellite' should be the default one
+6. Try to click all the other 3 options in the menu
+
+**Expected Results:**
+- The view of the map changes
+- The dropdown closes, you can click on it again and repeat step 5 and 6
+#### Test 2: Change of the view of the map when not logged in
+Steps:
+1. Navigate to the map by selecting "Relocation of Kiruna" from the home page.
+2. Resize the browser window to different dimensions (e.g., mobile, tablet, desktop).
+3. Try to open the drop-up menù on the bottom-left corner
+4. 4 options should be visible, 'satellite' should be the default one
+5. Try to click all the other 3 and verify that the view of the map changes
+   
+**Expected Results:**
+- The view of the map changes
+- The dropdown closes, you can click on it again and repeat step 5 and 6
+
+#### Test 3: Open the modal containing documents without coordinates when logged in 
+Steps:
+1. Login using credentials.
+2. Navigate to the map by either:
+   - Selecting "Relocation of Kiruna" from the home page.
+   - Using the dropdown menu in the menu bar and selecting "Map."
+3. Resize the browser window to different dimensions (e.g., mobile, tablet, desktop).
+4. Try to click on the button on the top-right corner, 'Kiruna municipality'
+
+
+**Expected Results:**
+- A modal opens in the center of the page, it contains documents without coordinates (just one by now)
+- The modal has a search bar in which you should be allowed to type and a button to close it 
+
+#### Test 4: Repeat the previous steps when not logged in, the expected result should be the same
+
+#### Test 5: Try to open a document without coordinates
+Steps:
+1. Login using credentials.
+2. Navigate to the map by either:
+   - Selecting "Relocation of Kiruna" from the home page.
+   - Using the dropdown menu in the menu bar and selecting "Map."
+3. Resize the browser window to different dimensions (e.g., mobile, tablet, desktop).
+4. Try to click on the button on the top-right corner, 'Kiruna municipality'
+5. When the modal opens, click on the document without coordinates
+
+
+**Expected Results:**
+- The modal closes, the popup related to the document opens and the area of the municipality appears
+- By clicking on the close button or on any other place of the map, the popup closes and the area disappears
+
+ #### Test 6: Try to open a document without coordinates when not logged in, the steps and the expected result is the same as before
+
+#### Test 7: Verify that the new clustering capability works when logged in 
+Steps:
+1. Login using credentials.
+2. Navigate to the map by either:
+   - Selecting "Relocation of Kiruna" from the home page.
+   - Using the dropdown menu in the menu bar and selecting "Map."
+3. Resize the browser window to different dimensions (e.g., mobile, tablet, desktop).
+4. Try to click on a cluster and then go back re-centering the map
+
+**Expected Results:**
+- When the cluster contains icons that are close but not in the same position, the zoom is increased and the map centered over the icons contained in the cluster or over the subclusters, depending on which one you clicked, verify that numbers reported in the cluster are coherent 
+- When the cluster contains documents that are exactly in the same position, they are spiderfied, making clear that they belong to the same point
+  
+#### Test 8: Repeat the previous procedure when not logged in, the expected outcame is the same
+
+#### Test 9: Try to open a popup related to a document with coordinates when logged-in
+Steps:
+1. Login using credentials.
+2. Navigate to the map by either:
+   - Selecting "Relocation of Kiruna" from the home page.
+   - Using the dropdown menu in the menu bar and selecting "Map."
+3. Resize the browser window to different dimensions (e.g., mobile, tablet, desktop).
+4. Try to click on a cluster until you don't see an icon
+5. Click on the icon
+
+**Expected Results:**
+- A popup opens, verify that all the informations are available in the card 
+- If in the card the area is mentioned, you should be able to see it on the map, otherwise no
+
+#### Test 10: Repeat the previous procedure as a normal user, the expected outcame is the same, except that the modify button on the top-right corner of the map should not be visible
+
+#### Test 11: Try to open a document linked to the one currently open
+Steps:
+1. Login using credentials.
+2. Navigate to the map by either:
+   - Selecting "Relocation of Kiruna" from the home page.
+   - Using the dropdown menu in the menu bar and selecting "Map."
+3. Resize the browser window to different dimensions (e.g., mobile, tablet, desktop).
+4. Try to click on a cluster until you don't see an icon
+5. Click on the icon
+6. If there are connections to that document, an arrow to open a dropdown should be visible
+7. Click on the arrow, the list of connections should appear in the form title-typeOfLink
+8. Click on the title of one of the connections
+
+**Expected Results:**
+- A page with the card of the connected document opens
+- You should be able to see a card with all the informations and a button on the top-left corner that allows you to go back to the map
+
+#### Test 12: Try to open a document linked to the one currently open when not logged in
 
