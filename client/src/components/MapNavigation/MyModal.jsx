@@ -9,7 +9,7 @@ function MyModal(props){
     const handleSelect = (doc) => {
         setShow(false); 
         props.setSelectedDoc(doc); 
-        props.setRenderNumeber(renderNumber+1);
+        props.setRenderNumeber(props.renderNumber+1);
     };
     // Filter documents inside the modal
     const filteredDocuments = props.noCoordDocuments.filter((doc) =>
