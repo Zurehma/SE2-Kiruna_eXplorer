@@ -31,6 +31,42 @@ Specific error scenarios will have their corresponding error code.
 
 ### Document APIs
 
+#### GET `api/documents/:id`
+
+Returns the document with the requested id.
+
+- Request Parameters: 
+  - `id`: a number that represent the id of the document.
+- Request Body Content: _None_
+- Response Body Content: An array of strings.
+- Example:
+
+```json
+["Informative", "Prescriptive", "Material", "Design", "Technical"]
+```
+
+- Additional Constraints: _None_
+- Response Body Content: A **Document** object.
+- Example:
+
+  ```json
+    {
+        "id": 1,
+        "title": "example",
+        "stakeholder": "example",
+        "scale": 100,
+        "issuanceDate": "2024-10-28",
+        "connections": 3,
+        "language": "English",
+        "coordinates": {
+          "lat": 67.853058,
+          "long": 20.294995
+         },
+        "pages": 2,
+        "description": "Lore ipsum..."
+    },
+    ...
+
 #### GET `api/documents`
 
 Returns the list of all documents (if filters applied it returns the list of all documents filtered).
@@ -57,8 +93,12 @@ Returns the list of all documents (if filters applied it returns the list of all
         "issuanceDate": "2024-10-28",
         "connections": 3,
         "language": "English",
-        "page": 2,
-        "description": "Lore ipsum..."
+        "pages": 2,
+        "description": "Lore ipsum...",
+        "coordinates": {
+         "lat": 67.853058,
+         "long": 20.294995
+        },
     },
     ...
   ]
