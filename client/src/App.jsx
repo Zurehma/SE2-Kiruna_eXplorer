@@ -1,7 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-
 import React, { useState,useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, Link } from 'react-router-dom';
 import {Container,Alert } from 'react-bootstrap';
@@ -11,12 +10,12 @@ import { Login } from './components/Login';
 import Home from './components/Home';
 import Documents from './components/Documents.jsx';
 import { NavigationBar } from './components/NavigationBar.jsx';
-import Map2 from '../src/components/Map2.jsx';
+import MapNavigation from './components/MapNavigation/MapNavigation.jsx';
 import API from '../API.js';
 import FilteringDocuments from './components/FilteringDocuments.jsx';
 import AccessDenied from './components/AccessDenied.jsx';
 import NotFound from './components/NotFound.jsx';
-
+import { SingleDocument } from './components/SingleDocument.jsx';
 
 function App() {
     const [currentUser, setCurrentUser] = useState('');
@@ -106,7 +105,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home setError={setError} />} />
               <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} loggedinError={loggedinError} setloggedinError={setloggedinError}/>}/>
-              <Route path="/map" element={<Map2 setError={setError} loggedIn={loggedIn}/>}/>
+              <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn}/>}/>
               <Route path="/documents" 
                 element={
                 loggedIn ? (
@@ -116,7 +115,7 @@ function App() {
                 )
                 } 
                 />
-
+              <Route path="/document/:id" element={<SingleDocument setError={setError} loggedIn={loggedIn} />} />
               <Route 
                 path="/documents/links" 
                 element={

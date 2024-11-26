@@ -14,7 +14,6 @@ function MyPopup(props) {
   const widthLastColumn = props.loggedIn ? 4 : 5;
   const remainingWidth = 12 -3 -4 - widthLastColumn;
 
-
   //fetch links and available attachments for the document 
   useEffect(() => { //As soon as the id of the doc changes, fetch its links and attachments
     setLoading(true);
@@ -87,7 +86,16 @@ function MyPopup(props) {
   };
 
   const navigate = useNavigate();
-
+  const computePages = (pageFrom, pageTo) => {
+    if (pageFrom && pageTo) {
+      return Number(pageTo) - Number(pageFrom) + 1;
+    }
+    return '-';
+  };
+  const handleNavigation = (id) => {
+    navigate(`/document/${id}`);
+  };
+  
   const handleClick = () => {
     if (props.doc && props.doc.id && props.doc.id > 0) {
       navigate(`/documents/${props.doc.id}`, { state: { docId: props.doc.id } });
@@ -144,7 +152,7 @@ function MyPopup(props) {
       {/* Details Column */}
       <Col xs={12} md={4} className="myPopup">
         <h6 className="fw-bold text-secondary mb-2">{props.doc.title}</h6>
-        <p className="small text-muted m-0">
+        <div className="small text-muted m-0">
           <strong className="text-dark">Stakeholders:</strong> {props.doc.stakeholder} <br />
           <strong className="text-dark">Scale:</strong>{' '}
           {props.doc.scale &&
@@ -156,9 +164,9 @@ function MyPopup(props) {
           <br />
           <strong className="text-dark">Issuance Date:</strong> {props.doc.issuanceDate} <br />
           <strong className="text-dark">Type:</strong> {props.doc.type} <br />
-        </p>
+        </div>
         {/* Display connections */}
-        <p className="small text-muted m-0 d-flex align-items-center">
+        <div className="small text-muted m-0 d-flex align-items-center">
             <strong className="text-dark">Connections:</strong> {props.doc.connections}
             {props.doc.connections > 0 && !loading && (
               <Dropdown className="d-inline ms-2">
@@ -174,25 +182,31 @@ function MyPopup(props) {
                 </Dropdown.Toggle>
               </Dropdown>
             )}
-          </p>
+          </div>
 
         {/* Display the dropdown list of connections if it's open */}
         {showLinks && (
           <ul className="small text-muted ms-3">
             {links.map((link) => (
               <li key={link.linkedDocID}>
-                {link.title} - {link.type}
-              </li>
+              <span
+                style={{ color: "#007bff", cursor: "pointer", textDecoration: "underline" }}
+                onClick={() => handleNavigation(link.linkedDocID)}
+              >
+                {link.title}
+              </span>{" "}
+              - {link.type}
+            </li>
             ))}
           </ul>
         )}
         <p className='text-muted small m-0'>
           <strong className="text-dark">Language:</strong> {props.doc.language} <br />
-          <strong className="text-dark">Number of pages:</strong> {displayValue(props.doc.pages)} <br />
+          <strong className="text-dark">Number of pages:</strong> {props.doc.pages ? displayValue(props.doc.pages) : computePages(props.doc.pageFrom,props.doc.pageTo)} <br />
           <strong className="text-dark">Pages:</strong>{' '}
           {props.doc.pageFrom && props.doc.pageTo
             ? `${props.doc.pageFrom}-${props.doc.pageTo}`
-            : displayValue(props.doc.pageFrom)}{' '}
+            : `-`}
           <br />
           <strong className="text-dark">Position:</strong>{' '}
           {props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'}

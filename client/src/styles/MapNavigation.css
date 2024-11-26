@@ -1,0 +1,296 @@
+.myPopup {
+    padding: 1.25rem;
+    border-right: 0.125rem solid black;
+    overflow: hidden;
+}
+
+.popupPropPlus {
+    max-height: 30vh;
+    overflow-y: auto;
+}
+
+.popupProp {
+    min-width: 90vh;
+}
+
+.leaflet-popup-content-wrapper {
+    width: 100%;
+    max-width: 90vw;
+    max-height: 50vh;
+    overflow-y: auto;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #000;
+    border-radius: 0.5rem;
+    padding: 0.625rem;
+}
+
+.leaflet-popup-content {
+    white-space: normal;
+}
+
+.leaflet-container .leaflet-popup-content-wrapper {
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #000;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+@media (max-width: 768px) {
+    .myPopup {
+        padding: 0.625rem;
+        border-right: none;
+        border-bottom: 0.125rem solid black;
+    }
+
+    .my-icons {
+        text-align: left;
+        font-size: 2rem;
+    }
+
+    .leaflet-popup-content-wrapper {
+        min-width: auto;
+        max-width: 90vw;
+        padding: 0.9375rem;
+        max-height: 60vh;
+    }
+}
+
+.my-icons {
+    font-size: 3rem;
+}
+
+.custom-navbar {
+    background-color: white;
+}
+
+.my-arrow-dropdown::after {
+    color: white !important;
+}
+
+.map-content {
+    position: relative;
+    top: 56px;
+    width: 100vw;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    padding-bottom: 1rem;
+}
+
+.text-danger:focus, .text-danger:active {
+    color: red !important;
+    background-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.btn-black {
+    background-color: black !important;
+    color: white !important;
+    border: none;
+}
+
+.btn-black:hover {
+    background-color: #333 !important;
+}
+
+.service-container {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.service-button {
+    border: 2px solid black;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    width: 150px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: #4a4a4a;
+    text-transform: uppercase;
+    margin-top: 40px;
+    letter-spacing: 2px;
+    margin-bottom: 50px;
+    border-bottom: 2px solid black;
+    display: inline-block;
+    padding-bottom: 10px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.service-button:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.service-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.service-button p {
+    font-size: 16px;
+    margin: 0;
+}
+
+.alert-custom {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.alert-custom.fade {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.alert-custom.show {
+    opacity: 1;
+}
+
+.edit-button:hover .edit-icon {
+    color: #d9e0eb !important;
+}
+
+.edit-icon {
+    color: #0d6efd;
+}
+
+.file-input {
+    height: auto;
+}
+
+.myPopup ul {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.myPopup ul li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.myPopup ul li a {
+    font-size: 0.675rem;
+}
+
+.myRecenterButton {
+    position: absolute;
+    top: 80px;
+    left: 12px;
+    background: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.myFilterMenu {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 5px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    color: #006d77;
+}
+
+.myDropdownFilter {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 1000;
+}
+
+.myMapIcons {
+    font-size: 20px;
+}
+
+.myDropdownDocuments {
+    position: absolute;
+    top: 15px;
+    right: 125px;
+    z-index: 1000;
+}
+
+.custom-dropdown-menu {
+    width: auto;
+    min-width: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0;
+}
+
+.myDropdownFilter .dropdown-toggle:focus,
+.myDropdownView .dropdown-toggle:focus,
+.myDropdownFilter .dropdown-toggle:active,
+.myDropdownView .dropdown-toggle:active {
+    color: #006d77;
+}
+
+.custom-dropdown-menu .dropdown-item {
+    color: #006d77;
+}
+
+.myDropdownFilter .dropdown-toggle:hover,
+.myDropdownView .dropdown-toggle:hover {
+    color: #006d77;
+}
+
+button.myDropdownDocuments,
+button.myDropdownFilter {
+    color: #006d77;
+}
+
+button.myDropdownFilter:hover,
+button.myDropdownFilter:focus,
+button.myDropdownDocuments:hover,
+button.myDropdownDocuments:focus {
+    color: #006d77;
+    text-decoration: none;
+}
+
+.myDropdownView {
+    position: absolute;
+    bottom: 20px;
+    left: 13px;
+    z-index: 1000;
+}
+
+.myDropdownItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #006d77;
+    padding: 5px;
+    width: auto;
+    height: auto;
+}
+
+.modal-title {
+    color: #006d77;
+}
+
+button.myDropdownDocuments {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
