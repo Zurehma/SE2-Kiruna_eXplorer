@@ -1,0 +1,54 @@
+.documents-background {
+    background: linear-gradient(to right, #006d77, #83c5be); 
+    min-height: 100vh;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto; 
+    overflow-x:auto;
+}
+
+.myPopupStyle {
+    max-width: 70%;
+    max-height: 60%;
+    overflow-y: auto;
+    overflow-x: auto;
+    background-color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .myPopupStyle {
+        max-width: 90%;
+        max-height: 80%;
+        overflow: auto;
+    }
+}
+
+.back-button{
+    display: flex;
+    align-items: center;
+    border: none;
+    background: none;
+    color: #006d77;
+    cursor: pointer;
+    padding: 0;
+    font-size: 16px;
+    background: none;
+    border: none;
+    outline: none;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover,
+.back-button:focus {
+    background: rgba(0, 109, 119, 0.1); 
+    color: #006d77; 
+}
+
+.back-button:active {
+    background: rgba(0, 109, 119, 0.2); /* Colore più scuro durante il click */
+  }
