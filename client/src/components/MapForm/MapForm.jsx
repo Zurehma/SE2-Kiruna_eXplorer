@@ -71,6 +71,7 @@ const MapForm = (props) => {
   const mapContainerClass = "map-container";
   const mapFullscreenClass = "map-fullscreen";
   const [mapSizeClass, setMapSizeClass] = useState(mapContainerClass);
+  const [overlay, setOverlay] = useState('without-overlay');
 
   const predefinedPoint = "Predefined point";
   const predefinedArea = "Predefined area";
@@ -103,15 +104,17 @@ const MapForm = (props) => {
   useEffect(() => {
     if (isFullscreen) {
       setMapSizeClass(mapFullscreenClass);
+      setOverlay('overlay');
       setInitalZoom(12);
     } else {
       setMapSizeClass(mapContainerClass);
+      setOverlay('without-overlay');
       setInitalZoom(11);
     }
   }, [isFullscreen]);
 
   return (
-    <div style={{ height: "50vh", width: "50vw" }}>
+    <div  className={overlay}>
       <div className={mapSizeClass}>
         <MapContainer key={isFullscreen} center={initialPosition} zoom={initialZoom} style={{ height: "100%", width: "100%" }}>
           <ResizeButton isFullscreen={isFullscreen} toggleResize={() => setIsFullscreen(!isFullscreen)} />

@@ -11,15 +11,34 @@
 
 /* Fullscreen state (fixed positioning) */
 .map-fullscreen {
-  position: fixed;
+  position: fixed; /* Cambia da absolute a fixed per centrarla rispetto alla viewport */
   height: 94vh;
-  width: 100vw;
-  top: 6vh;
-  left: 0;
+  width: 94vw;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centra la mappa */
   margin: 0;
   padding: 0;
-  z-index: 900;
+  z-index: 1600;
+  background-color: white; /* Assicurati che abbia uno sfondo visibile */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Aggiungi un'ombra per effetto di focus */
 }
+
+.overlay {
+  position: fixed; /* Copre l'intero viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7); /* Sfondo scuro traslucido */
+  z-index: 1500; /* Deve essere più basso rispetto alla mappa ma sopra il resto del contenuto */
+}
+
+.without-overlay {
+  height: 50vh;
+  width: 50vw;
+}
+
 
 /* Pulsante di controllo */
 .resize-button {

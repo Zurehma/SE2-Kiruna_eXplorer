@@ -17,6 +17,8 @@ import AccessDenied from './components/AccessDenied.jsx';
 import NotFound from './components/NotFound.jsx';
 import { SingleDocument } from './components/SingleDocument.jsx';
 
+import MapForm from './components/MapForm/MapForm.jsx';
+
 function App() {
     const [currentUser, setCurrentUser] = useState('');
     const [username, setUsername] = useState('');
@@ -106,6 +108,7 @@ function App() {
               <Route path="/" element={<Home setError={setError} />} />
               <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} loggedinError={loggedinError} setloggedinError={setloggedinError}/>}/>
               <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn}/>}/>
+              <Route path="/mapform" element={<MapForm/>}/>
               <Route path="/documents" 
                 element={
                 loggedIn ? (
