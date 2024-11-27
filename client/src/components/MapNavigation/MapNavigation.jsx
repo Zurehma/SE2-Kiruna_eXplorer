@@ -3,7 +3,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'leaflet/dist/leaflet.css';
 
 import MarkerClusterGroup from "react-leaflet-cluster";
-import { MapContainer, TileLayer, Marker, Popup, Polygon, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
 import '../../styles/MapNavigation.css';
@@ -11,6 +11,8 @@ import { MyPopup } from '../MyPopup';
 import MyModal from './MyModal';
 import MyFilterDropdown from './MyFilterDropdown';
 import MyViewDropdown from './MyViewDropdown';
+import KirunaMunicipality from '../MapUtils/KirunaMunicipality';
+import RecenterButton from '../MapUtils/RecenterButton';
 import API from '../../../API';
 import { useMapEvents } from 'react-leaflet';
 
@@ -67,15 +69,7 @@ const createCustomIcon = (type) => {
 };
 
 
-// Custom hook to recenter the map
-const RecenterMap = ({ position, zoom }) => {
-    const map = useMap();
-    useEffect(() => {
-        map.setView(position, zoom); // Set the map view to the new position and zoom
-    }, [map, position, zoom]);
 
-    return null;
-}
 
 function MapNavigation(props) {
     const initialPosition = [67.850, 20.217];
@@ -90,28 +84,17 @@ function MapNavigation(props) {
     const [geoJsonData, setGeoJsonData] = useState(null);
     const [highestPoint, setHighestPoint] = useState(null);
 
-    useEffect(() => {
-        const loadGeoJson = async () => {
-            try {
-                const response = await fetch('/assets/KirunaMunicipality.geojson'); 
-                const data = await response.json();
-                setGeoJsonData(data);
-            } catch (error) {
-                console.error('Errore durante il caricamento del GeoJSON:', error);
-            }
-        };
-
-        loadGeoJson();
-    }, []);
-
-    const getCoordinates = () => {
-        if (!geoJsonData) return [];
-        const multiPolygonCoordinates = geoJsonData.features[0].geometry.coordinates;
-        return multiPolygonCoordinates.flatMap(polygon =>
-            polygon.map(ring => ring.map(coord => [coord[1], coord[0]]))
-        );
+    
+    //Handle views in the map
+    const [mapView, setMapView] = useState("satellite");
+    const mapStyles = {
+        satellite: "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg",
+        streets: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
+        terrain: "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
+        outdoor: "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png",
     };
 
+    //Get the highest point, used to understand where to place the popup. 
     useEffect(() => {
         if(!geoJsonData) return;
         const getHighestPoint = () => {
@@ -127,16 +110,6 @@ function MapNavigation(props) {
         };
         setHighestPoint(getHighestPoint());
     }, [geoJsonData]);
-    
-
-    //Handle views in the map
-    const [mapView, setMapView] = useState("satellite");
-    const mapStyles = {
-        satellite: "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg",
-        streets: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
-        terrain: "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
-        outdoor: "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png",
-    };
 
     useEffect(()=>{
         setLoading(true);
@@ -166,6 +139,7 @@ function MapNavigation(props) {
                 const filters = selectedType === 'All' ? {} : { type: selectedType };
                 const documents = await API.filterDocuments(filters);
                 const updatedDocuments = documents.map(doc => {
+                    //Manage here the concept of areas
                     if (!doc.coordinates) {
                         return { ...doc, lat: null, long: null };
                     } else {
@@ -188,22 +162,7 @@ function MapNavigation(props) {
     const coordDocuments = data.filter(doc => doc.lat != null && doc.long != null);
     
 
-    // Function to recenter the map on Kiruna with zoom reset to 13
-    const recenterMap = () => {
-        const validZoom = (zoom) => zoom >= 0;
-        const validPosition = (position) => 
-            Array.isArray(position) && 
-            position.length === 2 && 
-            position.every(coord => typeof coord === 'number' && coord >= -90 && coord <= 90);
-
-        if (validPosition(initialPosition) && validZoom(11)) {
-            setPositionActual(initialPosition);
-            setSelectedDoc(null);
-            setZoomLevel(11);
-        } else {
-            console.error('Invalid position or zoom level');
-        }
-    };
+    
     const classNameEntireMunicipality = props.loggedIn ? 'myDropdownDocuments' : 'myDropdownFilter';
     
     
@@ -212,18 +171,24 @@ function MapNavigation(props) {
             {loading && (<p>Loading...</p>)}
             {!loading && 
             <MapContainer center={positionActual} zoom={zoomLevel} style={{ height: '92vh', width: '100%' }}>
-
+                
+                {/* Add the tile layer based on the selected view */}
                 <TileLayer url={mapStyles[mapView]}/>
-
+                
+                {/* Dropdown to change the map view */}
                 <MyViewDropdown setMapView={setMapView} mapView={mapView} setSelectedDoc={setSelectedDoc}/>
+                
+                {/* Close the popup when the map is clicked */}
                 <MapClickHandler onMapClick={() => setSelectedDoc(null)} />
+                
+                {/* Dropdown to filter documents by type */}
                 <MyFilterDropdown loggedIn={props.loggedIn} typeDoc={typeDoc} selectedType={selectedType} setSelectedType={setSelectedType} setSelectedDoc={setSelectedDoc} />
+                
                 {/* Show documents without coordinates with a button that opens a modal */}
                 <MyModal noCoordDocuments={noCoordDocuments} setSelectedDoc={setSelectedDoc} setRenderNumeber={setRenderNumeber} classNameEntireMunicipality={classNameEntireMunicipality} iconMap={iconMap} renderNumber={renderNumber}/>
                 
-                {geoJsonData && selectedDoc && selectedDoc.lat === null &&(
-                    <Polygon pathOptions={{ color: 'blue' }} positions={getCoordinates()} />
-                )}
+                {/* Draw the entire municipality, as stated in the FAQ, it should be always be visible */}
+                <KirunaMunicipality setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} setHighestPoint={setHighestPoint} />
 
                 {/* Draw clusters or icons depending on the zoom: also the exact same position is managed in this case */}
                 <MarkerClusterGroup>
@@ -248,11 +213,8 @@ function MapNavigation(props) {
                     })()
                 )}
 
-                {/*Button to recenter the map*/}
-                <RecenterMap position={positionActual} zoom={zoomLevel} />
-                <button onClick={recenterMap} className='myRecenterButton'>
-                    <i className="bi bi-compass myMapIcons"></i>
-                </button>
+                {/* Button to re-center the map */}
+                <RecenterButton positionActual={positionActual} setPositionActual={setPositionActual} setZoomLevel={setZoomLevel} zoomLevel={zoomLevel} initialPosition={initialPosition}/>
             </MapContainer>}
         </>
     );
