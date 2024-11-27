@@ -117,7 +117,7 @@ class DocumentRoutes {
       body("type").isString().notEmpty(),
       body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
-      body("coordinates").optional().isObject().custom(Utility.isValidCoordinatesObject),
+      body("coordinates").optional().isArray().custom(Utility.isValidCoordinatesArray),
       body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
       body("pageFrom").optional().isInt({ gt: 0 }),
       body("pageTo").optional().isInt({ gt: 0 }),

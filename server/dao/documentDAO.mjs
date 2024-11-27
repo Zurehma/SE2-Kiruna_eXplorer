@@ -53,51 +53,76 @@ class DocumentDAO {
     });
   };
 
-  getDocuments = (queryParameter, limit, offset) => {
-    return new Promise((resolve, reject) => {
-      try {
-        let { type, stakeholder, issuanceDateFrom, issuanceDateTo } = queryParameter ? queryParameter : {};
+  getDocuments = async (queryParameter, limit, offset) => {
+    try {
+        const { type, stakeholder, issuanceDateFrom, issuanceDateTo } = queryParameter || {};
         let sql = "SELECT * FROM DOCUMENT";
-        let sqlConditions = [];
-        let sqlParams = [];
+        const sqlConditions = [];
+        const sqlParams = [];
+        const sqlLimit = [];
 
-        if (type || stakeholder || issuanceDateFrom || issuanceDateTo) {
-          if (type) {
-            sqlConditions.push("type = ?");
+        if (type) {
+            sqlConditions.push("DOCUMENT.type = ?");
             sqlParams.push(type);
-          }
-          if (stakeholder) {
-            sqlConditions.push("stakeholder = ?");
+        }
+        if (stakeholder) {
+            sqlConditions.push("DOCUMENT_STAKEHOLDER.stakeholder = ?");
             sqlParams.push(stakeholder);
-          }
-          if (issuanceDateFrom && issuanceDateTo) {
-            sqlConditions.push("issuanceDate between ? AND ?");
-            sqlParams.push(issuanceDateFrom, issuanceDateTo);
-          }
-          if (issuanceDateFrom && !issuanceDateTo) {
-            sqlConditions.push("issuanceDate = ?");
+        }
+        if (issuanceDateFrom) {
+            sqlConditions.push("DOCUMENT.issuanceDate >= ?");
             sqlParams.push(issuanceDateFrom);
-          }
+        }
+        if (issuanceDateTo) {
+            sqlConditions.push("DOCUMENT.issuanceDate <= ?");
+            sqlParams.push(issuanceDateTo);
+        }
+        if (limit) {
+            sqlLimit.push(" LIMIT ?");
+            sqlParams.push(limit);
+        }
+        if (offset) {
+            sqlLimit.push(" OFFSET ?");
+            sqlParams.push(offset);
         }
 
         if (sqlConditions.length > 0) {
-          sql += " WHERE " + sqlConditions.join(" AND ");
+            sql += " JOIN DOCUMENT_STAKEHOLDER ON DOCUMENT.id = DOCUMENT_STAKEHOLDER.docID";
+            sql += " WHERE " + sqlConditions.join(" AND ");
+        }
+        if (sqlLimit.length > 0) {
+            sql += sqlLimit.join("");
         }
 
-        sql += " LIMIT ? OFFSET ?";
-        sqlParams.push(limit, offset);
-
-        db.all(sql, sqlParams, (err, rows) => {
-          if (err) {
-            reject(err);
-          }
-          resolve(mapRowsToDocument(rows));
+        const rows = await new Promise((resolve, reject) => {
+            db.all(sql, sqlParams, (err, rows) => {
+                if (err) return reject(err);
+                resolve(rows);
+            });
         });
-      } catch (err) {
-        reject(err);
-      }
-    });
-  };
+
+        return await this.getStakeholdersOfDocument(rows);
+
+    } catch (err) {
+        throw err;
+    }};
+
+  getStakeholdersOfDocument = async (rows) => {
+    try {
+        const idArray = rows.map((row) => row.id); 
+        const query2 = `SELECT * FROM DOCUMENT_STAKEHOLDER WHERE docID IN (${idArray.map(() => '?').join(',')})`;
+
+        const stakeholderRows = await new Promise((resolve, reject) => {
+            db.all(query2, idArray, (err, rows) => {
+                if (err) return reject(err);
+                resolve(rows);
+            });
+        });
+        return mapRowsToDocument(rows, stakeholderRows);
+    } catch (err) {
+        throw err;
+    }
+};
 
   /**
    * Get already present document types
@@ -190,7 +215,7 @@ class DocumentDAO {
    * @param {String} type
    * @param {String} language
    * @param {String} description
-   * @param {String | null} coordinates
+   * @param {Array<String> | null} coordinates
    * @param {Number | null} pages
    * @param {Number | null} pageFrom
    * @param {Number | null} pageTo

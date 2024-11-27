@@ -29,7 +29,7 @@ GET http://localhost:3001/api/sessions/current HTTP/1.1
 GET http://localhost:3001/api/documents/5 HTTP/1.1
 
 ### Filter documents
-GET http://localhost:3001/api/documents?type=Prescriptive&stakeholder=Kiruna%20kommun&issuanceDateFrom=2010-10-20&issuanceDateTo=2015-10-20&offset=0&limit=1 HTTP/1.1
+GET http://localhost:3001/api/documents?type=Prescriptive&stakeholder=Kiruna%20kommun&issuanceDateFrom=2010-10-20&issuanceDateTo=2025-10-20&offset=0&limit=3 HTTP/1.1
 
 ### Add a new document
 POST http://localhost:3001/api/documents HTTP/1.1
@@ -37,29 +37,30 @@ Content-Type: application/json
 
 {
     "title": "Detail plan for square and commercial street (50)",
-    "stakeholder": "Kiruna kommun",
+    "stakeholders": ["Kiruna kommun", "LKAB"],
     "scale": "1000",
     "issuanceDate": "2016-06-22",
     "type": "Prescriptive",
     "language": "Swedish",
     "description": "This plan, approved in July 2016, is the first detailed plan to be implemented from the new masterplan (Adjusted development plan). The document defines the entire area near the town hall, comprising a total of 9 blocks known for their density. Among these are the 6 buildings that will face the main square. The functions are mixed, both public and private, with residential being prominent, as well as the possibility of incorporating accommodation facilities such as hotels. For all buildings in this plan, the only height limit is imposed by air traffic.",
-    "coordinates": [{"lat": 67.848606, "long": 20.302761},{"lat": 67.850000, "long": 20.305000}],
+    "coordinates": [{"lat": 67.87328157366065, "long": 20.20047943270466}],
     "pageFrom": 1,
     "pageTo": 43
 }
 
-### Add a new document
-POST http://localhost:3001/api/documents HTTP/1.1
+### Modify a document
+PUT http://localhost:3001/api/documents/15 HTTP/1.1
 Content-Type: application/json
 
 {
-    "title": "Construction of Scandic Hotel begins (63)",
-    "stakeholder":"LKAB",
-    "scale":"Blueprint/effects",
-    "issuanceDate":"2010-04-01",
-    "type":"Material effect",
-    "description":"After two extensions of the land acquisition agreement, necessary because this document in Sweden is valid for only two years, construction of the hotel finally began in 2019.",
-    "coordinates": {"lat": 667.848528, "long": 20.294995}
+    "title": "Detail plan for square and commercial street (50)",
+    "stakeholders": ["Kiruna kommun", "LKAB"],
+    "scale": "1000",
+    "issuanceDate": "2016-06-22",
+    "type": "Prescriptive",
+    "language": "Swedish",
+    "description":"After extensions of the land acquisition agreement, necessary because this document in Sweden is valid for only two years, construction of the hotel finally began in 2019.",
+    "coordinates": [{"lat": 67.87318157366065, "long": 20.20047943270466}]
 }
 
 ### Add a link

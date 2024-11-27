@@ -60,7 +60,7 @@ class DocumentController {
           throw error;
         }
 
-        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
+        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates)) {
           const error = { errCode: 400, errMessage: "Coordinates error." };
           throw error;
         }
@@ -101,7 +101,7 @@ class DocumentController {
    * @param {String} type
    * @param {String} language
    * @param {String} description
-   * @param {Object | null} coordinates
+   * @param {Array<String> | null} coordinates
    * @param {Number | null} pages
    * @param {Number | null} pageFrom
    * @param {Number | null} pageTo
@@ -115,7 +115,7 @@ class DocumentController {
           throw error;
         }
 
-        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
+        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates)) {
           const error = { errCode: 400, errMessage: "Coordinates error." };
           throw error;
         }

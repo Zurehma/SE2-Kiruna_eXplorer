@@ -11,7 +11,7 @@ import { polygon, point, booleanPointInPolygon } from "@turf/turf";
  * @param {Number} long
  * @returns {Boolean} **true** if the coordinates provided are inside of Kiruna
  */
-const isValidKirunaCoordinates = (lat, long) => {
+const isValidKirunaCoordinates = (coordinatesArray) => {
   const kirunaCoordinates = [
     [67.87328157366065, 20.20047943270466],
     [67.84024426842895, 20.35839687019359],
@@ -20,9 +20,14 @@ const isValidKirunaCoordinates = (lat, long) => {
   ];
 
   const a = polygon([kirunaCoordinates]);
-  const p = point([lat, long]);
 
-  return booleanPointInPolygon(p, a);
+  let bool = [];
+  coordinatesArray.map((coordinate) => {
+    const p = point([coordinate.lat, coordinate.long]);
+      bool.push(booleanPointInPolygon(p, a));
+  });
+
+  return bool.every((value) => value === true);
 };
 
 /**
