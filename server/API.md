@@ -99,7 +99,8 @@ Returns the list of all documents (if filters applied it returns the list of all
   ```
 
 - Access Constraints: _None_
-- Additional Constraints: _None_
+- Additional Constraints: 
+  - It should return a 422 error when `offset` is added without specifying `limit` in the parameter query.
 
 #### GET `api/documents/document-types`
 

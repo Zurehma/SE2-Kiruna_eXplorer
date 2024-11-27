@@ -20,7 +20,12 @@ class DocumentRoutes {
         query("issuanceDateFrom").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
         query("issuanceDateTo").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
         query("limit").optional().isInt({ gt: 0 }).withMessage("Limit must be a positive integer"),
-        query("offset").optional().isInt({ min: 0 }).withMessage("Offset must be a non-negative integer"),
+        query("offset").optional().isInt({ min: 0 }).withMessage("Offset must be a non-negative integer").custom((value, { req }) => {
+          if (!req.query.limit) {
+            throw new Error("Offset is required when limit is specified");
+          }
+          return true;
+        }),
       ],
       Utility.validateRequest,
       (req, res, next) => {
