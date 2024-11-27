@@ -21,30 +21,12 @@ const MapClickHandler = (props) => {
   return null;
 };
 
-/**
- * Button component to remove the current marker
- * @param {*} clearPosition function to clear the position marker
- * @returns
- */
-const ClearPositionButton = (props) => {
-  const { clearPosition } = props;
-
-  return (
-    <>
-      <Button variant="danger" size="sm" className="clear-position-button" onClick={(e) => clearPosition()}>
-        Remove marker
-      </Button>
-    </>
-  );
-};
-
 const MapLayoutCustomPoint = (props) => {
-  const { newPosition, clearPosition } = props;
+  const { newPosition } = props;
 
   return (
     <>
       <MapClickHandler newPosition={newPosition} />
-      <ClearPositionButton clearPosition={clearPosition} />
     </>
   );
 };

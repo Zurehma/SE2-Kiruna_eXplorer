@@ -7,6 +7,7 @@ import "../../styles/MapForm.css";
 import { Button, Dropdown } from "react-bootstrap";
 import MapLayoutCustomPoint from "./MapLayoutCustomPoint";
 import MapLayoutPredefinedPoint from "./MapFormLayoutPredefinedPoint";
+import MapLayoutPredefinedArea from "./MapFormLayoutPredefinedArea";
 
 /**
  * Button component to resize the map
@@ -29,6 +30,23 @@ const ResizeButton = (props) => {
         }}
       >
         {isFullscreen ? <i className="bi bi-arrows-angle-contract" /> : <i className="bi bi-arrows-angle-expand" />}
+      </Button>
+    </>
+  );
+};
+
+/**
+ * Button component to remove the current marker
+ * @param {*} clearPosition function to clear the position marker
+ * @returns
+ */
+const ClearPositionButton = (props) => {
+  const { clearPosition } = props;
+
+  return (
+    <>
+      <Button variant="secondary" size="sm" className="clear-position-button" onClick={() => clearPosition()}>
+        Clear
       </Button>
     </>
   );
@@ -127,26 +145,27 @@ const MapForm = (props) => {
               }}
             />
           )}
-          {isFullscreen && currentOption === predefinedPoint && <MapLayoutPredefinedPoint newPosition={newPosition} clearPosition={clearPosition} />}
-          {isFullscreen && currentOption === predefinedArea && <></>}
-          {isFullscreen && currentOption === customPoint && (
-            <MapLayoutCustomPoint position={position} newPosition={newPosition} clearPosition={clearPosition} />
-          )}
+          {isFullscreen && currentOption === predefinedPoint && <MapLayoutPredefinedPoint position newPosition={newPosition} />}
+          {isFullscreen && currentOption === predefinedArea && <MapLayoutPredefinedArea />}
+          {isFullscreen && currentOption === customPoint && <MapLayoutCustomPoint position={position} newPosition={newPosition} />}
           {isFullscreen && currentOption === customArea && <></>}
           {position.lat && position.long && (
-            <Marker position={[position.lat, position.long]} data-testid="map-marker">
-              <Popup>
-                {position.name && (
-                  <>
-                    {`Name: ${position.name}`}
-                    <br />
-                  </>
-                )}
-                Latitude: {position.lat}
-                <br />
-                Longitude: {position.long}
-              </Popup>
-            </Marker>
+            <>
+              <Marker position={[position.lat, position.long]} data-testid="map-marker" zIndexOffset={10}>
+                <Popup>
+                  {position.name && (
+                    <>
+                      {`Name: ${position.name}`}
+                      <br />
+                    </>
+                  )}
+                  Latitude: {position.lat}
+                  <br />
+                  Longitude: {position.long}
+                </Popup>
+              </Marker>
+              <ClearPositionButton clearPosition={clearPosition} />
+            </>
           )}
           <TileLayer url={mapStyles[mapView]} />
           <ResizeMap />
