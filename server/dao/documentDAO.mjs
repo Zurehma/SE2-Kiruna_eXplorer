@@ -308,6 +308,33 @@ class DocumentDAO {
     });
   };
 
+  getAllLinks = () => {
+    return new Promise((resolve, reject) => {
+      const query = `
+        SELECT 
+          d1.id AS documentID,
+          d1.title AS documentTitle,
+          l.docID1,
+          l.docID2,
+          d2.id AS linkedDocID,
+          d2.title AS linkedTitle,
+          l.type
+        FROM LINK l
+        JOIN DOCUMENT d1 ON l.docID1 = d1.id
+        JOIN DOCUMENT d2 ON l.docID2 = d2.id
+        ORDER BY documentID, linkedDocID ASC`;
+  
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  };
+  
+
   /**
    * Insert a new link between two documents
    * @param {Number} id1
