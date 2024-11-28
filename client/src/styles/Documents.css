@@ -1,36 +1,130 @@
 /* Documents.css */
+
+/* Stile per STEPINDICATOR 1*/
+
+.step-indicator-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.step-icon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0; /* Rimuove padding extra */
+  margin: 0; /* Rimuove margini extra */
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.step-icon-btn.active {
+  color: #006d77;
+  transform: scale(1.1);
+}
+
+.step-icon-btn:not(.active) {
+  color: #aaa;
+}
+
+.step-icon-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.step-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.step-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Stile per STEPINDICATOR 2*/
+
+.step-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly; /* Uniforma la spaziatura tra bottoni e barre */
+  position: relative;
+  width: 90%; /* Assicura che l'intera larghezza sia usata */
+  gap: 15px; /* Distanza uniforme tra gli elementi */
+}
+
+.step-bar {
+  flex-grow: 1; /* Permette alle barre di occupare lo spazio disponibile */
+  height: 6px;
+  background-color: #bfbcc0 !important; /* Colore barra vuota */
+  position: relative;
+  overflow: hidden; /* Nasconde contenuto extra */
+  border-radius: 3px; /* Smussa i bordi */
+  transition: background-color 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+.step-bar.completed {
+  background-color: #006d77 !important; /* Colore barra piena */
+}
+
+.step-bar.half-filled {
+  background-color: #f0f0f0;
+}
+
+.step-bar.half-filled::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50%; /* Larghezza barra a metà */
+  background-color: #006d77; /* Colore riempimento */
+  transition: width 0.3s ease-in-out;
+}
+
+.step-bar.disabled {
+  background-color: #f0f0f0;
+}
+
+/* Stile per la pagina di dettaglio del documento */
 .container {
-    max-width: 700px;
-  }
-  
-  .card-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  button {
-    padding: 0.6rem 2rem;
-  }
+  max-width: 700px;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+button {
+  padding: 0.6rem 2rem;
+}
 
 * {
   box-sizing: border-box;
 }
 
 .documents-background {
-  background: linear-gradient(to right, #006d77, #83c5be); 
+  background: linear-gradient(to right, #006d77, #83c5be);
   min-height: 100vh;
   padding: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow-y: auto; 
+  overflow-y: auto;
 }
 
-body, html {
-  overflow-y: auto; 
+body,
+html {
+  overflow-y: auto;
   height: 100%;
   margin: 0;
-  padding: 0; 
+  padding: 0;
 }
 
 .card {
@@ -44,7 +138,9 @@ body, html {
   color: #006d77;
 }
 
-.input, .input-textarea, .input-multi {
+.input,
+.input-textarea,
+.input-multi {
   border-radius: 5px;
   border: 1px solid #006d77;
   padding: 0.75rem;
@@ -52,11 +148,12 @@ body, html {
   font-size: 1rem; /* Assicura una buona leggibilità */
 }
 
-.input:focus, .input-textarea:focus, select:focus {
+.input:focus,
+.input-textarea:focus,
+select:focus {
   border-color: #006d77;
   box-shadow: 0 0 5px rgba(0, 109, 119, 0.5);
 }
-
 
 .btn-save {
   background-color: #006d77;
@@ -65,8 +162,6 @@ body, html {
   transition: background-color 0.3s ease;
   float: right; /* Allinea a destra */
 }
-
-
 
 .btn-back {
   background-color: #626667;
@@ -104,32 +199,26 @@ body, html {
     align-items: center;
   }
 
-  .btn-back, .btn-save {
+  .btn-back,
+  .btn-save {
     width: 100%; /* Bottoni larghi quanto il contenitore */
     padding: 0.6rem; /* Uniforme su dispositivi mobili */
     margin-bottom: 0.5rem; /* Spazio tra i bottoni */
   }
 
-  .input, .input-textarea, select {
+  .input,
+  .input-textarea,
+  select {
     padding: 0.5rem; /* Riduce padding su schermi piccoli */
   }
 }
 
-
-
-
-.step-btn {
-  flex: 1;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
+.input-textarea {
+  font-size: 1.1rem; /* Dimensione del testo più grande */
+  padding: 10px; /* Maggiore spazio interno */
+  height: 150px; /* Altezza iniziale */
+  resize: vertical; /* Permette all'utente di ridimensionarla */
 }
-
-.step-btn .icon {
-  font-size: 1.5rem;
-  margin-bottom: 5px;
-}
-
 
 /* Menu dropdown con sfondo bianco e bordi leggeri */
 .dropdown-menu-white {
@@ -168,7 +257,6 @@ body, html {
 
 /* Assicurati che il pulsante mantenga lo stile desiderato */
 .dropdown-toggle {
-
   color: #333;
   border-radius: 4px;
   padding: 8px 12px;
@@ -200,3 +288,10 @@ body, html {
   width: 100%; /* Sincronizza la larghezza del campo interno */
 }
 
+/* Campo disabilitato */
+.disabled-field {
+  background-color: #e9ecef; /* Grigio chiaro per il campo */
+  border-color: #dad0ce; /* Bordo grigio */
+  color: #a6a6a6; /* Testo grigio */
+  cursor: not-allowed;
+}
