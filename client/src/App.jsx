@@ -8,7 +8,7 @@ import { Container, Alert } from "react-bootstrap";
 import Links from "./components/Links.jsx";
 import { Login } from "./components/Login";
 import Home from "./components/Home";
-import Documents from "./components/Documents.jsx";
+import Documents from "./components/Doc/Documents.jsx";
 import { NavigationBar } from "./components/NavigationBar.jsx";
 import MapNavigation from "./components/MapNavigation/MapNavigation.jsx";
 import API from "../API.js";

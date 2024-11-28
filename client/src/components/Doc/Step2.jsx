@@ -149,8 +149,8 @@ const Step2 = ({
       <Row className="mb-3">
         <Form.Group controlId="issuanceDate">
           <Form.Label>Issuance Date*</Form.Label>
-          {/* Dropdown per l'anno */}
           <Row>
+            {/* Dropdown per l'anno */}
             <Col className="mb-3" md={4}>
               <Form.Select
                 as="select"
@@ -161,9 +161,13 @@ const Step2 = ({
                   handleChange({
                     target: {
                       name: "issuanceDate",
-                      value: `${e.target.value || ""}-${
-                        document.issuanceDate?.split("-")[1] || ""
-                      }-${document.issuanceDate?.split("-")[2] || ""}`,
+                      value: [
+                        e.target.value || "",
+                        document.issuanceDate?.split("-")[1] || "",
+                        document.issuanceDate?.split("-")[2] || "",
+                      ]
+                        .filter(Boolean) // Rimuove elementi vuoti
+                        .join("-"),
                     },
                   })
                 }
@@ -189,9 +193,13 @@ const Step2 = ({
                   handleChange({
                     target: {
                       name: "issuanceDate",
-                      value: `${document.issuanceDate?.split("-")[0] || ""}-${
-                        e.target.value || ""
-                      }-${document.issuanceDate?.split("-")[2] || ""}`,
+                      value: [
+                        document.issuanceDate?.split("-")[0] || "",
+                        e.target.value || "",
+                        document.issuanceDate?.split("-")[2] || "",
+                      ]
+                        .filter(Boolean) // Rimuove elementi vuoti
+                        .join("-"),
                     },
                   })
                 }
@@ -215,9 +223,13 @@ const Step2 = ({
                   handleChange({
                     target: {
                       name: "issuanceDate",
-                      value: `${document.issuanceDate?.split("-")[0] || ""}-${
-                        document.issuanceDate?.split("-")[1] || ""
-                      }-${e.target.value || ""}`,
+                      value: [
+                        document.issuanceDate?.split("-")[0] || "",
+                        document.issuanceDate?.split("-")[1] || "",
+                        e.target.value || "",
+                      ]
+                        .filter(Boolean) // Rimuove elementi vuoti
+                        .join("-"),
                     },
                   })
                 }
