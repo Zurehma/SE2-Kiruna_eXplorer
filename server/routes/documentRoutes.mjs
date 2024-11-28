@@ -12,6 +12,18 @@ class DocumentRoutes {
   getRouter = () => this.router;
 
   initRoutes = () => {
+
+    this.router.get("/allExistingLinks", (req, res, next) => {
+      this.documentController
+        .getAllExistingLinks()
+        .then((links) => {
+          res.status(200).json(links);
+        })
+        .catch((err) => {
+          next(err);
+        });
+    });
+    
     this.router.get(
       "/",
       [
@@ -143,6 +155,8 @@ class DocumentRoutes {
       }
     );
 
+  
+
     this.router.get("/links/:id", param("id").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
       this.documentController
         .getLinks(req.params.id)
@@ -164,6 +178,7 @@ class DocumentRoutes {
       Utility.isLoggedIn,
       async (req, res, next) => {
         try {
+          console.log(req.body);
           const { id1, ids, type } = req.body;
 
           // Check if any of the provided IDs already have a link
