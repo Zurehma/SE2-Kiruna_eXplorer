@@ -4,14 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import API from '../../API';
 
-// Define the color scheme for stakeholders
-const stakeholderColors = {
-  'Kiruna kommun/Residents': '#1f77b4',
-  'Kiruna kommun': '#ff7f0e',
-  'Kiruna kommun/White Arkitekter': '#2ca02c',
-  'LKAB': '#d62728',
-};
-
+// Define the color scheme for stakeholders (larger palette)
 const iconMap = {
   Design: 'bi-file-earmark-text',
   Informative: 'bi-info-circle',
@@ -28,62 +21,74 @@ const colorList = [
   '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
 ];
 
-const getRandomColor = () => colorList[Math.floor(Math.random() * colorList.length)];
+// Function to cycle through the color list
+const getColorFromList = (index) => colorList[index % colorList.length];
+
+// Function to generate unique color based on name (HSL)
+const generateColorFromName = (name) => {
+  const hashCode = (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash << 5) - hash + str.charCodeAt(i);
+    }
+    return hash;
+  };
+  const hash = hashCode(name);
+  const color = `hsl(${(hash % 360 + 360) % 360}, 70%, 60%)`; // HSL color based on hash
+  return color;
+};
 
 const DocumentChartStatic = () => {
   const svgRef = useRef();
 
   const [stakeholders, setStakeholders] = useState([]);
   const [documentTypes, setDocumentTypes] = useState([]);
-  const [documentsList, setDocumentsList] = useState([]);
-  const [linksMap, setLinksMap] = useState({});
+  const [documents, setDocuments] = useState([]);
+  const [links, setLinks] = useState([]);
   const [stakeholderColorMap, setStakeholderColorMap] = useState({});
+  const [documentTypeColorMap, setDocumentTypeColorMap] = useState({});
 
-  const fetchDoc = async () => {
+  // Fetch all data
+  const fetchData = async () => {
     try {
-      const [stakeholder, documentType, docs] = await Promise.all([
+      const [stakeholder, documentType, documentData, linkData] = await Promise.all([
         API.getStakeholders(),
         API.getDocumentTypes(),
         API.getDocuments(),
+        API.allExistingLinks()
       ]);
       setStakeholders(stakeholder);
       setDocumentTypes(documentType);
-      setDocumentsList(docs);
-
-      // Fetch links for each document and group them by document ID
-      const linksResponse = await Promise.all(
-        docs.map(async (doc) => {
-          const links = await API.getLinksDoc(doc.id); // Fetch links for each document
-          return { docId: doc.id, links: links || [] }; // Return the document ID and its associated links
-        })
-      );
-
-      // Create a links map to store links by document ID
-      const linksMap = {};
-      linksResponse.forEach(({ docId, links }) => {
-        linksMap[docId] = links;
-      });
-
-      setLinksMap(linksMap);
+      setDocuments(documentData);
+      setLinks(linkData);
     } catch (error) {
-      console.error('Error fetching stakeholders or documents:', error);
+      console.error('Error fetching data:', error);
     }
   };
 
   useEffect(() => {
-    fetchDoc();
+    fetchData();
   }, []); // Fetch on mount
 
-  // Assign stable colors for stakeholders
+  // Assign stable colors for stakeholders (using generateColorFromName)
   useEffect(() => {
-    const colorMap = {};
-    stakeholders.forEach(stakeholder => {
-      if (!colorMap[stakeholder.name]) {
-        colorMap[stakeholder.name] = getRandomColor(); // Assign a color if not already assigned
-      }
+    const stakeholderColorMap = {};
+    stakeholders.forEach((stakeholder) => {
+      const color = generateColorFromName(stakeholder.name); // Generate color based on name
+      stakeholderColorMap[stakeholder.name] = color;
     });
-    setStakeholderColorMap(colorMap);
+    setStakeholderColorMap(stakeholderColorMap);
   }, [stakeholders]);
+
+  // Assign stable colors for document types
+  useEffect(() => {
+    const documentTypeColorMap = {};
+    documentTypes.forEach((doc, index) => {
+      const color = getColorFromList(index); // Cycling colors for document types
+      documentTypeColorMap[doc.name] = color;
+    });
+    setDocumentTypeColorMap(documentTypeColorMap);
+  }, [documentTypes]);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
@@ -102,29 +107,27 @@ const DocumentChartStatic = () => {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // X Scale (using issuanceDate)
+    // X Scale (dates)
     const xScale = d3.scaleTime()
-      .domain(d3.extent(documentsList, (d) => new Date(d.issuanceDate)))
+      .domain([
+        // Start one year earlier than the first document
+        d3.timeYear.offset(d3.min(documents, d => new Date(d.issuanceDate)), -1), 
+        d3.max(documents, d => new Date(d.issuanceDate))  // End at the latest date
+      ])
       .range([0, innerWidth]);
 
-    // Y Scale (for numeric scale values, adjusted for text, scale, and blueprint)
-    const yScale = d3.scaleLinear()
-      .domain([0, d3.max(documentsList, (d) => d.scale)]) // Use max scale value
-      .range([innerHeight, 0]);
+    // Y Scale (categorical: Text, Scale, Blueprint)
+    const yScale = d3.scaleBand()
+      .domain(['Text', 'Scale', 'Blueprint'])
+      .range([0, innerHeight])
+      .padding(0.2);
 
-    // Add some padding to Y scale to spread out nodes
-    const paddingFactor = 2.5; // You can adjust this value for better spacing
-    const yScaleAdjusted = d3.scaleLinear()
-      .domain([0, d3.max(documentsList, (d) => d.scale) * paddingFactor])
-      .range([innerHeight, 0]);
-
-    // X Axis (issuanceDate)
+    // X Axis (date)
     const xAxis = d3.axisBottom(xScale)
-      .tickFormat(d3.timeFormat('%Y'))
-      .tickSize(-innerHeight);
+      .tickFormat(d3.timeFormat('%Y'));
 
-    // Y Axis (numeric scale)
-    const yAxis = d3.axisLeft(yScaleAdjusted)
+    // Y Axis (categorical)
+    const yAxis = d3.axisLeft(yScale)
       .tickSize(0);
 
     // Append X Axis
@@ -139,102 +142,79 @@ const DocumentChartStatic = () => {
       .call(yAxis)
       .call((g) => g.select('.domain').remove());
 
-    // Filter valid documents
-    const validDocuments = documentsList.filter(d => {
-      const validDate = new Date(d.issuanceDate).getTime() > 0;
-      const validScale = !isNaN(d.scale) && d.scale > 0;
-      return validDate && validScale;
-    });
-
-    // Create an index for quick lookup of documents by ID
-    const idToNode = {};
-    validDocuments.forEach((doc) => {
-      if (doc && doc.issuanceDate) {
-        idToNode[doc.id] = doc;
-      }
-    });
-
-    // Draw Links based on document relationships
-    Object.entries(linksMap).forEach(([docId, links]) => {
-      links.forEach((link) => {
-        const doc1 = idToNode[docId];
-        const doc2 = idToNode[link.linkedDocID];
-
-        // Ensure both documents exist
-        if (doc1 && doc2) {
-          const linkType = link.type;
-
-          g.append('line')
-            .attr('x1', xScale(new Date(doc1.issuanceDate)))
-            .attr('y1', yScaleAdjusted(doc1.scale))
-            .attr('x2', xScale(new Date(doc2.issuanceDate)))
-            .attr('y2', yScaleAdjusted(doc2.scale))
-            .style('stroke', '#888')
-            .style('stroke-width', 1.5)
-            .style('stroke-dasharray', getDashArrayForLink(linkType));
-        }
-      });
-    });
-
-    // Plot Data Points (Documents)
-    g.selectAll('.node')
-      .data(validDocuments)
+    // Plot Documents
+    const documentGroup = g.selectAll('.document')
+      .data(documents)
       .enter()
       .append('g')
-      .attr('transform', (d) => {
-        if (d && d.issuanceDate && d.scale) {
-          const xPos = xScale(new Date(d.issuanceDate));
-          const yPos = yScaleAdjusted(d.scale);
-          if (xPos != null && yPos != null) {
-            return `translate(${xPos},${yPos})`;
-          }
-        }
-        return '';
-      })
+      .attr('class', 'document')
+      .attr('transform', d => `translate(${xScale(new Date(d.issuanceDate))}, 0)`)
       .each(function (d) {
-        if (d && d.issuanceDate && d.scale) {
-          const stakeholderColor = stakeholderColorMap[d.stakeholders[0]] || '#333'; // Use color from stakeholderColorMap
+        // Get the color for the first stakeholder
+        const stakeholderColor = stakeholderColorMap[d.stakeholders[0]] || '#333'; // Default color if not found
+        const yPos = yScale(d.type); // Y position based on the type
+        const docTypeColor = documentTypeColorMap[d.type] || '#333'; // Color for document type
+
+        // Add icon based on document type
+        const iconClass = iconMap[d.type] || 'bi-file-earmark';
+        d3.select(this)
+          .append('foreignObject') // Use foreignObject to add HTML elements (icons)
+          .attr('x', -8) // Adjust to center the icon
+          .attr('y', yPos - 10) // Position the icon
+          .attr('width', 16)
+          .attr('height', 16)
+          .append('xhtml:div')
+          .attr('class', `bi ${iconClass}`)
+          .style('font-size', '16px')
+          .style('color', stakeholderColor);  // Ensure the icon uses the stakeholder color
+
+        // Add a label for the document title
+        d3.select(this)
+          .append('text')
+          .attr('x', 0)
+          .attr('y', yPos + 20)
+          .attr('text-anchor', 'middle')
+          .style('fill', '#000')
+          .style('font-size', '10px')
+          .text(d.title);
+
+        // Add the scale label under "Scale" category
+        if (d.scale && yPos === yScale('Scale')) {
           d3.select(this)
-            .append('foreignObject')
-            .attr('width', 20)
-            .attr('height', 20)
-            .append('xhtml:div')
-            .attr('class', 'icon-node')
-            .style('color', stakeholderColor)
-            .html(`<i class="bi ${iconMap[d.type]}" style="font-size: 18px;"></i>`);
+            .append('text')
+            .attr('x', 0)
+            .attr('y', yPos + 35) // Adjust position below the document title
+            .attr('text-anchor', 'middle')
+            .style('fill', '#000')
+            .style('font-size', '8px')
+            .text(d.scale); // Display the scale number
         }
       });
 
-    // Add Y Axis Custom Labels
-    const yAxisLabels = [
-      { label: 'Text', position: innerHeight / 4 },
-      { label: 'Scale', position: innerHeight / 2 },
-      { label: 'Blueprint', position: innerHeight },
-    ];
+    // Plot links between documents (if any)
+    links.forEach(link => {
+      const sourceDoc = documents.find(d => d.id === link.source);
+      const targetDoc = documents.find(d => d.id === link.target);
 
-    g.selectAll('.y-label')
-      .data(yAxisLabels)
-      .enter()
-      .append('text')
-      .attr('x', -15) // Position labels on the left
-      .attr('y', (d) => d.position)
-      .attr('text-anchor', 'end')
-      .style('font-size', '12px')
-      .text((d) => d.label);
-  }, [documentsList, linksMap, stakeholderColorMap]);
+      if (sourceDoc && targetDoc) {
+        const sourceX = xScale(new Date(sourceDoc.issuanceDate));
+        const targetX = xScale(new Date(targetDoc.issuanceDate));
+        const sourceY = yScale(sourceDoc.type) + 10; // Adjust to position the link near the document
+        const targetY = yScale(targetDoc.type) + 10;
 
-  const getDashArrayForLink = (linkType) => {
-    switch (linkType) {
-      case 'Collateral':
-        return '4,2';
-      case 'Projection':
-        return '2,2';
-      case 'Update':
-        return '8,4,2,4';
-      default:
-        return '0';
-    }
-  };
+        // Get the color for the first stakeholder involved in the link
+        const linkColor = stakeholderColorMap[sourceDoc.stakeholders[0]] || '#999';
+
+        g.append('line')
+          .attr('x1', sourceX)
+          .attr('y1', sourceY)
+          .attr('x2', targetX)
+          .attr('y2', targetY)
+          .attr('stroke', linkColor) // Color the link based on stakeholder
+          .attr('stroke-width', 1);
+      }
+    });
+  }, [documents, stakeholderColorMap, documentTypeColorMap, links]);
 
   return (
     <div className="container-fluid col-12" style={{ height: 'auto', position: 'relative', zIndex: 1000 }}>
@@ -251,31 +231,40 @@ const DocumentChartStatic = () => {
               );
             })}
           </div>
-          <div style={{ fontSize: '8px', display: 'flex', gap: '20px', paddingLeft: '0.5cm' }}>
-            <div style={{ flex: 1 }}>
-              <h6 style={{ fontSize: '9px', marginBottom: '8px' }}>Stakeholders:</h6>
-              {stakeholders.map((stakeholder, index) => {
-                const randomColor = stakeholderColorMap[stakeholder.name] || getRandomColor();
-                return (
-                  <p key={index} style={{ color: randomColor, marginBottom: '2px' }}>
-                    ■ {stakeholder.name}
-                  </p>
-                );
-              })}
-            </div>
-            <div style={{ flex: 1 }}>
-              <h6 style={{ fontSize: '9px' }}>Connections:</h6>
-              <p style={{ marginBottom: '5px' }}>
-                <span style={{ borderBottom: '1px solid black' }}>________</span> Direct consequence
+          <div style={{ fontSize: '6px', display: 'flex', gap: '10px', paddingLeft: '0.2cm' }}>
+          {/* Stakeholders Section */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <h6 style={{ fontSize: '8px', marginBottom: '4px' }}>Stakeholders:</h6>
+            {stakeholders.map((stakeholder, index) => {
+              const color = stakeholderColorMap[stakeholder.name] || getColorFromList(index);
+              return (
+                <p key={index} style={{ color, marginBottom: '0', fontSize: '6px' }}>
+                  <span style={{ fontSize: '10px' }}>■</span> {stakeholder.name}
+                </p>
+              );
+            })}
+          </div>
+
+          {/* Connections Section */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <h6 style={{ fontSize: '8px', marginBottom: '4px' }}>Connections:</h6>
+            <div style={{ fontSize: '6px' }}>
+              <p style={{ marginBottom: '0' }}>
+                <span style={{ fontSize: '8px' }}>➔</span> Direct consequence <strong>----</strong>
               </p>
-              <p style={{ marginBottom: '5px' }}>
-                <span style={{ borderBottom: '1px dashed black' }}>--------</span> Collateral consequence
+              <p style={{ marginBottom: '0' }}>
+                <span style={{ fontSize: '8px' }}>➔</span> Collateral consequence <strong>----</strong>
               </p>
-              <p>
-                <span style={{ borderBottom: '1px dotted black' }}>........</span> Projection
+              <p style={{ marginBottom: '0' }}>
+                <span style={{ fontSize: '8px' }}>➔</span> Prevision <strong>.....</strong>
+              </p>
+              <p style={{ marginBottom: '0' }}>
+                <span style={{ fontSize: '8px' }}>➔</span> Update <strong>-.-.-.-.</strong>
               </p>
             </div>
           </div>
+        </div>
+
         </div>
 
         <div className="col-10" style={{ height: '100%', background: '#ffffff', position: 'relative', paddingLeft: '1cm' }}>

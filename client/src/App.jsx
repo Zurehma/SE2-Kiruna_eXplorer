@@ -16,8 +16,8 @@ import FilteringDocuments from "./components/FilteringDocuments.jsx";
 import AccessDenied from "./components/AccessDenied.jsx";
 import NotFound from "./components/NotFound.jsx";
 import { SingleDocument } from "./components/SingleDocument.jsx";
-
 import MapForm from "./components/MapForm/MapForm.jsx";
+import DocumentChartStatic from "./components/Graphvis.jsx";
 
 function App() {
   const [currentUser, setCurrentUser] = useState("");
@@ -114,7 +114,16 @@ function App() {
           </Alert>
         )}
         <Routes>
-          <Route path="/" element={<Home setError={setError} />} />
+
+
+        <Route path="/" element={
+          <>
+            <Home setError={setError} />
+            < DocumentChartStatic/>
+          </>
+        } />
+
+
           <Route
             path="/login"
             element={
