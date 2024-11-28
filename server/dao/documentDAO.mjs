@@ -366,8 +366,8 @@ class DocumentDAO {
   addLink = (id1, id2, type) => {
     return new Promise((resolve, reject) => {
       //Check if the link already exists in either direction
-      const query1 = "SELECT * FROM LINK WHERE docID1=? AND docID2=? OR docID1=? AND docID2=?";
-      db.all(query1, [id1, id2, id2, id1], (err, rows) => {
+      const query1 = "SELECT * FROM LINK WHERE (docID1=? AND docID2=? AND type=?) OR (docID1=? AND docID2=? AND type=?)";
+      db.all(query1, [id1, id2, type, id2, id1, type], (err, rows) => {
         if (err) {
           reject(err);
         } else if (rows.length > 0) {
@@ -385,6 +385,8 @@ class DocumentDAO {
       });
     });
   };
+
+
 }
 
 export default DocumentDAO;
