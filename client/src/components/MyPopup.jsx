@@ -209,7 +209,7 @@ function MyPopup(props) {
             : `-`}
           <br />
           <strong className="text-dark">Position:</strong>{' '}
-          {props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'}
+          {props.doc.area? 'Area' : props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'  }
         </p>
       </Col>
 

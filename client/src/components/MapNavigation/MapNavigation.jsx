@@ -138,6 +138,7 @@ function MapNavigation(props) {
             try {
                 const filters = selectedType === 'All' ? {} : { type: selectedType };
                 const documents = await API.filterDocuments(filters);
+                console.log(documents);
                 const updatedDocuments = documents.map(doc => {
                     if (!doc.coordinates || doc.coordinates.length === 0) {
                         return { ...doc, lat: null, long: null };
@@ -162,7 +163,7 @@ function MapNavigation(props) {
                         }
                     }
                 });
-                
+                console.log(updatedDocuments);
                 setData(updatedDocuments);
             } catch (error) {
                 props.setError(error);
