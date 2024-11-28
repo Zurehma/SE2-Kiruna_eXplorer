@@ -6,7 +6,7 @@ class Document {
    * Document class constructor
    * @param {Number} id
    * @param {String} title
-   * @param {String} stakeholder
+   * @param {Array<String>} stakeholders
    * @param {String | Number} scale
    * @param {String} issuanceDate
    * @param {String} type
@@ -21,7 +21,7 @@ class Document {
   constructor(
     id,
     title,
-    stakeholder,
+    stakeholders,
     scale,
     issuanceDate,
     type,
@@ -35,7 +35,7 @@ class Document {
   ) {
     this.id = id;
     this.title = title;
-    this.stakeholder = stakeholder;
+    this.stakeholders = stakeholders;
     this.scale = Number(scale) || scale;
     this.issuanceDate = issuanceDate;
     this.type = type;
@@ -48,7 +48,5 @@ class Document {
     pageTo ? (this.pageTo = pageTo) : "";
   }
 }
-
-
 
 export default Document;

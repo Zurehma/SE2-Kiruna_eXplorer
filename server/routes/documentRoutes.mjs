@@ -12,6 +12,18 @@ class DocumentRoutes {
   getRouter = () => this.router;
 
   initRoutes = () => {
+
+    this.router.get("/allExistingLinks", (req, res, next) => {
+      this.documentController
+        .getAllExistingLinks()
+        .then((links) => {
+          res.status(200).json(links);
+        })
+        .catch((err) => {
+          next(err);
+        });
+    });
+    
     this.router.get(
       "/",
       [
@@ -19,11 +31,18 @@ class DocumentRoutes {
         query("stakeholder").optional().isString().withMessage("Stakeholder must be a string"),
         query("issuanceDateFrom").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
         query("issuanceDateTo").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
+        query("limit").optional().isInt({ gt: 0 }).withMessage("Limit must be a positive integer"),
+        query("offset").optional().isInt({ min: 0 }).withMessage("Offset must be a non-negative integer").custom((value, { req }) => {
+          if (!req.query.limit) {
+            throw new Error("Offset is required when limit is specified");
+          }
+          return true;
+        }),
       ],
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
-          .getDocuments(req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo)
+          .getDocuments(req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo, req.query.limit, req.query.offset)
           .then((document) => {
             res.status(200).json(document);
           })
@@ -37,13 +56,14 @@ class DocumentRoutes {
       "/",
       Utility.isLoggedIn,
       body("title").isString().notEmpty(),
-      body("stakeholder").isString().notEmpty(),
+      body("stakeholders").isArray().notEmpty(),
+      body("stakeholders.*").isString().notEmpty(),
       oneOf([body("scale").isString().notEmpty(), body("scale").isInt({ gt: 0 })]),
       oneOf([body("issuanceDate").isISO8601({ strict: true }), body("issuanceDate").isString().notEmpty().custom(Utility.isValidYearMonthOrYear)]),
       body("type").isString().notEmpty(),
       body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
-      body("coordinates").optional().isObject().custom(Utility.isValidCoordinatesObject),
+      body("coordinates").optional().isArray().custom(Utility.isValidCoordinatesArray),
       body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
       body("pageFrom").optional().isInt({ gt: 0 }),
       body("pageTo").optional().isInt({ gt: 0 }),
@@ -52,7 +72,7 @@ class DocumentRoutes {
         this.documentController
           .addDocument(
             req.body.title,
-            req.body.stakeholder,
+            req.body.stakeholders,
             req.body.scale,
             req.body.issuanceDate,
             req.body.type,
@@ -107,13 +127,14 @@ class DocumentRoutes {
       Utility.isLoggedIn,
       param("docID").isInt({ gt: 0 }),
       body("title").isString().notEmpty(),
-      body("stakeholder").isString().notEmpty(),
+      body("stakeholders").isArray().notEmpty(),
+      body("stakeholders.*").isString().notEmpty(),
       oneOf([body("scale").isString().notEmpty(), body("scale").optional().isInt({ gt: 0 })]),
       oneOf([body("issuanceDate").isISO8601({ strict: true }), body("issuanceDate").isString().notEmpty().custom(Utility.isValidYearMonthOrYear)]),
       body("type").isString().notEmpty(),
       body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
-      body("coordinates").optional().isObject().custom(Utility.isValidCoordinatesObject),
+      body("coordinates").optional().isArray().custom(Utility.isValidCoordinatesArray),
       body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
       body("pageFrom").optional().isInt({ gt: 0 }),
       body("pageTo").optional().isInt({ gt: 0 }),
@@ -123,7 +144,7 @@ class DocumentRoutes {
           .updateDocument(
             Number(req.params.docID),
             req.body.title,
-            req.body.stakeholder,
+            req.body.stakeholders,
             req.body.scale,
             req.body.issuanceDate,
             req.body.type,
@@ -138,6 +159,8 @@ class DocumentRoutes {
           .catch((err) => next(err));
       }
     );
+
+  
 
     this.router.get("/links/:id", param("id").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
       this.documentController
@@ -160,6 +183,7 @@ class DocumentRoutes {
       Utility.isLoggedIn,
       async (req, res, next) => {
         try {
+          console.log(req.body);
           const { id1, ids, type } = req.body;
 
           // Check if any of the provided IDs already have a link

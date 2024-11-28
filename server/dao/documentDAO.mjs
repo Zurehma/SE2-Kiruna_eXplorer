@@ -1,13 +1,13 @@
 import db from "../db/db.mjs";
 import Document from "../models/document.mjs";
 
-const mapRowsToDocument = (rows) => {
-  return rows.map(
+const mapRowsToDocument = (documentRows, stakeholderRows) => {
+  return documentRows.map(
     (row) =>
       new Document(
         row.id,
         row.title,
-        row.stakeholder,
+        stakeholderRows.filter((stakeholderRow) => stakeholderRow.docID === row.id).map((stakeholderRow) => stakeholderRow.stakeholder),
         row.scale,
         row.issuanceDate,
         row.type,
@@ -24,19 +24,6 @@ const mapRowsToDocument = (rows) => {
 
 class DocumentDAO {
   constructor() {}
-
-  // getDocuments = () => {
-  //   return new Promise((resolve, reject) => {
-  //     const query = "SELECT * FROM document";
-  //     db.all(query, [], (err, rows) => {
-  //       if (err) {
-  //         reject(err);
-  //       }
-  //       resolve(mapRowsToDocument(rows));
-  //     });
-  //   });
-  // };
-
   /**
    * Get a document by its ID
    * @param {Number} ID
@@ -44,62 +31,98 @@ class DocumentDAO {
    */
   getDocumentByID = (ID) => {
     return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM DOCUMENT WHERE id = ?";
+      const query1 = "SELECT * FROM DOCUMENT WHERE id = ?";
 
-      db.get(query, [ID], (err, row) => {
+      db.get(query1, [ID], (err, documentRow) => {
         if (err) {
           reject(err);
-        } else if (row === undefined) {
+        } else if (documentRow === undefined) {
           resolve(undefined);
         } else {
-          resolve(mapRowsToDocument([row])[0]);
+          const query2 = "SELECT * FROM DOCUMENT_STAKEHOLDER WHERE docID = ?";
+
+          db.all(query2, [ID], (err, stakeholderRows) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(mapRowsToDocument([documentRow], stakeholderRows)[0]);
+            }
+          });
         }
       });
     });
   };
 
-  getDocuments = (queryParameter) => {
-    return new Promise((resolve, reject) => {
-      try{
-        let {type, stakeholder, issuanceDateFrom, issuanceDateTo} = queryParameter ? queryParameter : {};
+  getDocuments = async (queryParameter, limit, offset) => {
+    try {
+        const { type, stakeholder, issuanceDateFrom, issuanceDateTo } = queryParameter || {};
         let sql = "SELECT * FROM DOCUMENT";
-        let sqlConditions = [];
-        let sqlParams = [];
+        const sqlConditions = [];
+        const sqlParams = [];
+        const sqlLimit = [];
 
-        if (type || stakeholder || issuanceDateFrom || issuanceDateTo) {
-          if (type) {
-            sqlConditions.push("type = ?");
+        if (type) {
+            sqlConditions.push("DOCUMENT.type = ?");
             sqlParams.push(type);
-          }
-          if (stakeholder) {
-            sqlConditions.push("stakeholder = ?");
+        }
+        if (stakeholder) {
+            sqlConditions.push("DOCUMENT_STAKEHOLDER.stakeholder = ?");
             sqlParams.push(stakeholder);
-          }
-          if (issuanceDateFrom && issuanceDateTo) {
-            sqlConditions.push("issuanceDate between ? AND ?");
-            sqlParams.push(issuanceDateFrom, issuanceDateTo);
-          }
-          if (issuanceDateFrom && !issuanceDateTo) {
-            sqlConditions.push("issuanceDate = ?");
+        }
+        if (issuanceDateFrom) {
+            sqlConditions.push("DOCUMENT.issuanceDate >= ?");
             sqlParams.push(issuanceDateFrom);
-          }
+        }
+        if (issuanceDateTo) {
+            sqlConditions.push("DOCUMENT.issuanceDate <= ?");
+            sqlParams.push(issuanceDateTo);
+        }
+        if (limit) {
+            sqlLimit.push(" LIMIT ?");
+            sqlParams.push(limit);
+        }
+        if (offset) {
+            sqlLimit.push(" OFFSET ?");
+            sqlParams.push(offset);
         }
 
         if (sqlConditions.length > 0) {
-          sql += " WHERE " + sqlConditions.join(" AND ");
+            sql += " JOIN DOCUMENT_STAKEHOLDER ON DOCUMENT.id = DOCUMENT_STAKEHOLDER.docID";
+            sql += " WHERE " + sqlConditions.join(" AND ");
+        }
+        if (sqlLimit.length > 0) {
+            sql += sqlLimit.join("");
         }
 
-        db.all(sql, sqlParams, (err, rows) => {
-          if (err) {
-            reject(err);
-          }
-          resolve(mapRowsToDocument(rows));
+        const rows = await new Promise((resolve, reject) => {
+            db.all(sql, sqlParams, (err, rows) => {
+                if (err) return reject(err);
+                resolve(rows);
+            });
         });
-      } catch (err) {
-        reject(err);
-      }
-    });
-  };
+
+        return await this.getStakeholdersOfDocument(rows);
+
+    } catch (err) {
+        throw err;
+    }};
+
+  getStakeholdersOfDocument = async (rows) => {
+    try {
+        const idArray = rows.map((row) => row.id); 
+        const query2 = `SELECT * FROM DOCUMENT_STAKEHOLDER WHERE docID IN (${idArray.map(() => '?').join(',')})`;
+
+        const stakeholderRows = await new Promise((resolve, reject) => {
+            db.all(query2, idArray, (err, rows) => {
+                if (err) return reject(err);
+                resolve(rows);
+            });
+        });
+        return mapRowsToDocument(rows, stakeholderRows);
+    } catch (err) {
+        throw err;
+    }
+};
 
   /**
    * Get already present document types
@@ -158,36 +181,23 @@ class DocumentDAO {
   /**
    * Insert a new document in the database
    * @param {String} title
-   * @param {String} stakeholder
    * @param {String | Number} scale
    * @param {String} issuanceDate
    * @param {String} type
    * @param {String} language
    * @param {String} description
-   * @param {String | null} coordinates
+   * @param {Array<String> | null} coordinates
    * @param {Number | null} pages
    * @param {Number | null} pageFrom
    * @param {Number | null} pageTo
    * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the last document inserted and the number of lines changed
    */
-  addDocument = (
-    title,
-    stakeholder,
-    scale,
-    issuanceDate,
-    type,
-    language,
-    description,
-    coordinates = null,
-    pages = null,
-    pageFrom = null,
-    pageTo = null
-  ) => {
+  addDocument = (title, scale, issuanceDate, type, language, description, coordinates = null, pages = null, pageFrom = null, pageTo = null) => {
     return new Promise((resolve, reject) => {
-      const query =
-        "INSERT INTO DOCUMENT (title, stakeholder, scale, issuanceDate, type, connections, language, description, coordinates, pages, pageFrom, pageTo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      const query1 =
+        "INSERT INTO DOCUMENT (title, scale, issuanceDate, type, connections, language, description, coordinates, pages, pageFrom, pageTo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-      db.run(query, [title, stakeholder, scale, issuanceDate, type, 0, language, description, coordinates, pages, pageFrom, pageTo], function (err) {
+      db.run(query1, [title, scale, issuanceDate, type, 0, language, description, coordinates, pages, pageFrom, pageTo], function (err) {
         if (err) {
           reject(err);
         } else {
@@ -197,29 +207,69 @@ class DocumentDAO {
     });
   };
 
-  updateDocument = (
-    id,
-    title,
-    stakeholder,
-    scale,
-    issuanceDate,
-    type,
-    language,
-    description,
-    coordinates = null,
-    pages = null,
-    pageFrom = null,
-    pageTo = null
-  ) => {
+  /**
+   * Update an existing document in the database
+   * @param {String} title
+   * @param {String | Number} scale
+   * @param {String} issuanceDate
+   * @param {String} type
+   * @param {String} language
+   * @param {String} description
+   * @param {Array<String> | null} coordinates
+   * @param {Number | null} pages
+   * @param {Number | null} pageFrom
+   * @param {Number | null} pageTo
+   * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the document updated and the number of lines changed
+   */
+  updateDocument = (id, title, scale, issuanceDate, type, language, description, coordinates = null, pages = null, pageFrom = null, pageTo = null) => {
     return new Promise((resolve, reject) => {
       const query =
-        "UPDATE DOCUMENT SET title = ?, stakeholder = ?, scale = ?, issuanceDate = ?, type = ?, language = ?, description = ?, coordinates = ?, pages = ?, pageFrom = ?, pageTo = ? WHERE id = ?";
+        "UPDATE DOCUMENT SET title = ?, scale = ?, issuanceDate = ?, type = ?, language = ?, description = ?, coordinates = ?, pages = ?, pageFrom = ?, pageTo = ? WHERE id = ?";
 
-      db.run(query, [title, stakeholder, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo, id], function (err) {
+      db.run(query, [title, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo, id], function (err) {
         if (err) {
           reject(err);
         } else {
           resolve({ changes: this.changes, lastID: this.lastID });
+        }
+      });
+    });
+  };
+
+  /**
+   * Add a new stakeholder for an existing document
+   * @param {Number} docID
+   * @param {String} stakeholder
+   * @returns {Promise<null>} A promise that resolves to null
+   */
+  addStakeholder = (docID, stakeholder) => {
+    return new Promise((resolve, reject) => {
+      const query = "INSERT INTO DOCUMENT_STAKEHOLDER (docID, stakeholder) VALUES (?, ?)";
+
+      db.run(query, [docID, stakeholder], function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  };
+
+  /**
+   * Delete all the assigned stakeholders for an existing document
+   * @param {Number} docID
+   * @returns {Promise<null>} A promise that resolves to null
+   */
+  deleteStakeholders = (docID) => {
+    return new Promise((resolve, reject) => {
+      const query = "DELETE FROM DOCUMENT_STAKEHOLDER WHERE docID = ?";
+
+      db.run(query, [docID], function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this.changes);
         }
       });
     });
@@ -258,6 +308,33 @@ class DocumentDAO {
     });
   };
 
+  getAllLinks = () => {
+    return new Promise((resolve, reject) => {
+      const query = `
+        SELECT 
+          d1.id AS documentID,
+          d1.title AS documentTitle,
+          l.docID1,
+          l.docID2,
+          d2.id AS linkedDocID,
+          d2.title AS linkedTitle,
+          l.type
+        FROM LINK l
+        JOIN DOCUMENT d1 ON l.docID1 = d1.id
+        JOIN DOCUMENT d2 ON l.docID2 = d2.id
+        ORDER BY documentID, linkedDocID ASC`;
+  
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  };
+  
+
   /**
    * Insert a new link between two documents
    * @param {Number} id1
@@ -290,4 +367,3 @@ class DocumentDAO {
 }
 
 export default DocumentDAO;
-export { mapRowsToDocument };
