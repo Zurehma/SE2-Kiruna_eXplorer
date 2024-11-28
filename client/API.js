@@ -336,6 +336,16 @@ const updateDocument = async (documentId, doc) =>{
         throw error;
     }
 };
+const allExistingLinks = async () => {
+  return await fetch(`${SERVER_URL}/documents/allExistingLinks`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+  })
+      .then(handleInvalidResponse)
+      .then((response) => response.json());
+};
+
 
 //Export API methods
 const API = {
@@ -358,7 +368,8 @@ const API = {
     filterDocuments,
     deleteAttachment,
     getDocumentById,
-    updateDocument
+    updateDocument,
+    allExistingLinks
 };
 
 export default API;
