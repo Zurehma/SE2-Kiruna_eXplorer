@@ -1,0 +1,65 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [20.2253, 67.8558]
+      },
+      "properties": {
+        "name": "Kiruna Church"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [20.226, 67.8663]
+      },
+      "properties": {
+        "name": "Kiruna Town Hall"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [20.2083, 67.8475]
+      },
+      "properties": {
+        "name": "Icehotel"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [20.2258, 67.8466]
+      },
+      "properties": {
+        "name": "LKAB Mine"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [20.2263, 67.8392]
+      },
+      "properties": {
+        "name": "Esrange Space Center"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [20.2295, 67.8592]
+      },
+      "properties": {
+        "name": "Knut Liestams Fjällstation"
+      }
+    }
+  ]
+}

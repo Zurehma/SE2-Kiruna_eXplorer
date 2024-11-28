@@ -1,0 +1,83 @@
+/* Initial container state (relative positioning) */
+.map-container {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  top: 0;
+  left: 0;
+  z-index: 900;
+}
+
+/* Fullscreen state (fixed positioning) */
+.map-fullscreen {
+  position: fixed; /* Cambia da absolute a fixed per centrarla rispetto alla viewport */
+  height: 94vh;
+  width: 94vw;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centra la mappa */
+  margin: 0;
+  padding: 0;
+  z-index: 1600;
+  background-color: white; /* Assicurati che abbia uno sfondo visibile */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Aggiungi un'ombra per effetto di focus */
+}
+
+.overlay {
+  position: fixed; /* Copre l'intero viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7); /* Sfondo scuro traslucido */
+  z-index: 1500; /* Deve essere più basso rispetto alla mappa ma sopra il resto del contenuto */
+}
+
+.without-overlay {
+  height: 50vh;
+  width: 50vw;
+}
+
+
+/* Pulsante di controllo */
+.resize-button {
+  position: absolute;
+  top: 10px; /* Distance from the top of the container */
+  right: 10px; /* Distance from the right of the container */
+  z-index: 1000; /* Ensure it's above other content */
+  padding: 10px 20px;
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.clear-position-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 1000; /* Ensure it's above other content */
+  padding: 10px 20px;
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.map-options-dropdown {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 1000;
+}
+
+.dropdown-menu {
+  background-color: #f8f9fa;
+}
+
+.dropdown-item {
+  color: #495057;
+  background-color: #f8f9fa;
+}
+
+.dropdown-item:hover {
+  background-color: #e9ecef;
+  color: #495057;
+}

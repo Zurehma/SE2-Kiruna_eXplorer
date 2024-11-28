@@ -80,7 +80,8 @@ function Map({ handleMapClick,setPosition,latitude,longitude,polygonCoordinates,
         )}
         <RecenterMap position={positionActual} zoom={zoomLevel} />
         <button 
-          onClick={recenterMap} 
+          onClick={(event)=>{recenterMap(); event.preventDefault();}} 
+          type="button"
           style={{
           position: 'absolute', 
           top: '25%', 
