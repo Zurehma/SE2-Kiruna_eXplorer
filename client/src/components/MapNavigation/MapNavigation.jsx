@@ -139,14 +139,30 @@ function MapNavigation(props) {
                 const filters = selectedType === 'All' ? {} : { type: selectedType };
                 const documents = await API.filterDocuments(filters);
                 const updatedDocuments = documents.map(doc => {
-                    //Manage here the concept of areas
-                    if (!doc.coordinates) {
+                    if (!doc.coordinates || doc.coordinates.length === 0) {
                         return { ...doc, lat: null, long: null };
                     } else {
-                        const { lat, long } = doc.coordinates;
-                        return { ...doc, lat, long };
+                        if (doc.coordinates.length > 1) {
+                            // Function to find the highest point in a polygon, where the popup and the marker will be shown
+                            const highestPoint = doc.coordinates.reduce((max, point) => {
+                                return point.lat > max.lat ? point : max;
+                            }, doc.coordinates[0]);
+                
+                            // Added the area to be shown 
+                            const area = doc.coordinates.map(coord => [coord.lat, coord.long]);
+                
+                            return { 
+                                ...doc, lat: highestPoint.lat, long: highestPoint.long, area };
+                        } else {
+                            // Single coordinate
+                            const { lat, long } = doc.coordinates;
+                            return { 
+                                ...doc, lat, long
+                            };
+                        }
                     }
                 });
+                
                 setData(updatedDocuments);
             } catch (error) {
                 props.setError(error);
@@ -189,6 +205,8 @@ function MapNavigation(props) {
                 
                 {/* Draw the entire municipality, as stated in the FAQ, it should be always be visible */}
                 <KirunaMunicipality setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} setHighestPoint={setHighestPoint} />
+                {/*Draw the area associated with a document, if defined*/}
+                {selectedDoc && selectedDoc.area && <Polygon positions={selectedDoc.area} color="red" />}
 
                 {/* Draw clusters or icons depending on the zoom: also the exact same position is managed in this case */}
                 <MarkerClusterGroup>
