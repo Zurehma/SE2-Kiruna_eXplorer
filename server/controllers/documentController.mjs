@@ -277,6 +277,25 @@ class DocumentController {
       }
     });
   };
+
+  getAllLinks = () =>{
+    return new Promise(async (resolve, reject)=>{
+      try{
+        const links = await this.documentDAO.getAllLinks2();
+        if (links === undefined){
+          const error = {errCode: 404, errMessage: "Links not found!"};
+          throw error;
+        }
+        resolve(links);
+      }
+      catch(err){
+        reject(err);
+      }
+    })
+  }
+
+
+
 }
 
 export default DocumentController;
