@@ -261,6 +261,55 @@ Returns the list of all specific link types.
 - Access Constraints: _None_
 - Additional Constraints: _None_
 
+#### GET `api/documents/allExistingLinks`
+
+- Request Parameters: _None_
+- Request Body Content: _None_
+- Response Body Content: The response is a JSON object where each key is a documentID. Each documentID corresponds to a document with its title and links. The links is an array of linkedDocIds and titles
+- Example:
+
+```json
+  {
+  "1": {
+    "documentTitle": "title",
+    "links": [
+      {
+        "linkedDocID": 2,
+        "linkedTitle": "Detail plan for Bolagsomradet Gruvstad-spark (18)",
+        "type": "Direct"
+      },
+      {
+        "linkedDocID": 5,
+        "linkedTitle": "Adjusted development plan (47)",
+        "type": "Direct"
+      },
+      {
+        "linkedDocID": 6,
+        "linkedTitle": "Detail plan for square and commercial street (50)",
+        "type": "Direct"
+      }
+    ]
+  },
+  "3": {
+    "documentTitle": "Development Plan (41)",
+    "links": [
+      {
+        "linkedDocID": 1,
+        "linkedTitle": "title",
+        "type": "Direct"
+      },
+      {
+        "linkedDocID": 2,
+        "linkedTitle": "Detail plan for Bolagsomradet Gruvstad-spark (18)",
+        "type": "Direct"
+      }
+    ]
+  }
+}
+```
+- Access Constraints: _None_
+- Additional Constraints: _None_
+
 #### POST `api/documents/link`
 
 - Request Body: An object with the following fields:
