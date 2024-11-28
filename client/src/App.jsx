@@ -90,62 +90,93 @@ function App() {
       return () => clearTimeout(timer); // Cleanup timer on component unmount
     }
   }, [error]);
-    
-    return (
-        !logging ? (<div className="min-vh-100 d-flex flex-column">
-          <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} role={role} sethideDocBar= {sethideDocBar} hideDocBar ={sethideDocBar}/>
-          <Container fluid className="flex-grow-1 d-flex flex-column px-0">
-            {error && (
-                <Alert variant="danger" className="fixed-top mt-3" style={{zIndex:1500}} dismissible onClose={() => setError(null)}>
-                <p>{error.message}</p>
-                </Alert>
-            )}
-            <Routes>
-              <Route path="/" element={<Home setError={setError} />} />
-              <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} loggedinError={loggedinError} setloggedinError={setloggedinError}/>}/>
-              <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn}/>}/>
-              <Route path="/documents" 
-                element={
-                loggedIn ? (
-                    <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
-                ) : (
-                    <AccessDenied />
-                )
-                } 
-                />
-              <Route path="/document/:id" element={<SingleDocument setError={setError} loggedIn={loggedIn} />} />
-              <Route 
-                path="/documents/links" 
-                element={
-                loggedIn ? (
-                    <Links newDoc={newDoc} setNewDoc={setNewDoc} />
-                ) : (
-                    <AccessDenied />
-                )
-                } 
-                />
+
+  return !logging ? (
+    <div className="min-vh-100 d-flex flex-column">
+      <NavigationBar
+        loggedIn={loggedIn}
+        username={username}
+        handleLogout={handleLogout}
+        role={role}
+        sethideDocBar={sethideDocBar}
+        hideDocBar={sethideDocBar}
+      />
+      <Container fluid className="flex-grow-1 d-flex flex-column px-0">
+        {error && (
+          <Alert
+            variant="danger"
+            className="fixed-top mt-3"
+            style={{ zIndex: 1500 }}
+            dismissible
+            onClose={() => setError(null)}
+          >
+            <p>{error.message}</p>
+          </Alert>
+        )}
+        <Routes>
+          <Route path="/" element={<Home setError={setError} />} />
+          <Route
+            path="/login"
+            element={
+              <Login
+                handleLogin={handleLogin}
+                username={username}
+                setUsername={setUsername}
+                password={password}
+                setPassword={setPassword}
+                setRole={setRole}
+                loggedinError={loggedinError}
+                setloggedinError={setloggedinError}
+              />
+            }
+          />
+          <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn} />} />
+          <Route path="/mapform" element={<MapForm />} />
+          <Route
+            path="/documents"
+            element={
+              loggedIn ? (
+                <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
+              ) : (
+                <AccessDenied />
+              )
+            }
+          />
+          <Route
+            path="/document/:id"
+            element={<SingleDocument setError={setError} loggedIn={loggedIn} />}
+          />
+          <Route
+            path="/documents/links"
+            element={loggedIn ? <Links newDoc={newDoc} setNewDoc={setNewDoc} /> : <AccessDenied />}
+          />
 
           <Route
             path="/documents/all"
             element={loggedIn ? <FilteringDocuments loggedIn={loggedIn} /> : <AccessDenied />}
           />
 
-              <Route 
-                path="/documents/:id" 
-                element={
-                loggedIn ? (
-                    <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
-                ) : (
-                    <AccessDenied />
-                )
-                } 
-                /> 
-                <Route path='*' element={<NotFound/>}/>   
-  
-            </Routes>
-          </Container>
-        </div>) : (<div className="d-flex justify-content-center align-items-center" style={{height: '100vh'}}><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>)
-    );
+          <Route
+            path="/documents/:id"
+            element={
+              loggedIn ? (
+                <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
+              ) : (
+                <AccessDenied />
+              )
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Container>
+    </div>
+  ) : (
+    <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  );
 }
 
 export default App;
