@@ -15,7 +15,7 @@ class DocumentRoutes {
 
     this.router.get("/allExistingLinks", (req, res, next) => {
       this.documentController
-        .getAllExistingLinks()
+        .getAllLinks()
         .then((links) => {
           res.status(200).json(links);
         })

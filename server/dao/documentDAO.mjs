@@ -308,7 +308,7 @@ class DocumentDAO {
     });
   };
 
-  getAllLinks = () => {
+  /*getAllLinks = () => {
     return new Promise((resolve, reject) => {
       const query = `
         SELECT 
@@ -332,7 +332,28 @@ class DocumentDAO {
         }
       });
     });
-  };
+  };*/
+
+  getAllLinks = () => {
+    return new Promise((resolve, reject) => {
+      const query = `
+      SELECT 
+      CASE WHEN DocID1 < DocID2 THEN DocID1 ELSE DocID2 END AS DocID1,
+      CASE WHEN DocID1 < DocID2 THEN DocID2 ELSE DocID1 END AS DocID2,
+      type
+      FROM LINK
+      ORDER BY DocID1 ASC, DocID2 ASC;
+    `;
+  
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  }
   
 
   /**
