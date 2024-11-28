@@ -33,7 +33,7 @@ function RecenterButton(props) { //it takes setPositionActual,setZoomLevel,posit
         <>
             {/*Button to recenter the map*/}
             <RecenterMap position={props.positionActual} zoom={props.zoomLevel} />
-            <button onClick={recenterMap} className='myRecenterButton'>
+            <button onClick={(event)=>{recenterMap(); event.preventDefault();}} className='myRecenterButton' type="button">
                 <i className="bi bi-compass myMapIcons"></i>
             </button>
         </>
