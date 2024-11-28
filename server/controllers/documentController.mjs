@@ -281,7 +281,7 @@ class DocumentController {
   getAllLinks = () =>{
     return new Promise(async (resolve, reject)=>{
       try{
-        const links = await this.documentDAO.getAllLinks2();
+        const links = await this.documentDAO.getAllLinks();
         if (links === undefined){
           const error = {errCode: 404, errMessage: "Links not found!"};
           throw error;
