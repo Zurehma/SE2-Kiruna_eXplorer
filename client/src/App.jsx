@@ -8,7 +8,7 @@ import { Container, Alert } from "react-bootstrap";
 import Links from "./components/Links.jsx";
 import { Login } from "./components/Login";
 import Home from "./components/Home";
-import Documents from "./components/Doc/Documents.jsx";
+import Documents from "./components/Documents.jsx";
 import { NavigationBar } from "./components/NavigationBar.jsx";
 import MapNavigation from "./components/MapNavigation/MapNavigation.jsx";
 import API from "../API.js";
@@ -17,7 +17,7 @@ import AccessDenied from "./components/AccessDenied.jsx";
 import NotFound from "./components/NotFound.jsx";
 import { SingleDocument } from "./components/SingleDocument.jsx";
 
-import MapForm from './components/MapForm/MapForm.jsx';
+import MapForm from "./components/MapForm/MapForm.jsx";
 
 function App() {
   const [currentUser, setCurrentUser] = useState("");
@@ -90,41 +90,6 @@ function App() {
       return () => clearTimeout(timer); // Cleanup timer on component unmount
     }
   }, [error]);
-    
-    return (
-        !logging ? (<div className="min-vh-100 d-flex flex-column">
-          <NavigationBar loggedIn={loggedIn} username={username} handleLogout={handleLogout} role={role} sethideDocBar= {sethideDocBar} hideDocBar ={sethideDocBar}/>
-          <Container fluid className="flex-grow-1 d-flex flex-column px-0">
-            {error && (
-                <Alert variant="danger" className="fixed-top mt-3" style={{zIndex:1500}} dismissible onClose={() => setError(null)}>
-                <p>{error.message}</p>
-                </Alert>
-            )}
-            <Routes>
-              <Route path="/" element={<Home setError={setError} />} />
-              <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} loggedinError={loggedinError} setloggedinError={setloggedinError}/>}/>
-              <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn}/>}/>
-              <Route path="/mapform" element={<MapForm/>}/>
-              <Route path="/documents" 
-                element={
-                loggedIn ? (
-                    <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
-                ) : (
-                    <AccessDenied />
-                )
-                } 
-                />
-              <Route path="/document/:id" element={<SingleDocument setError={setError} loggedIn={loggedIn} />} />
-              <Route 
-                path="/documents/links" 
-                element={
-                loggedIn ? (
-                    <Links newDoc={newDoc} setNewDoc={setNewDoc} />
-                ) : (
-                    <AccessDenied />
-                )
-                } 
-                />
 
   return !logging ? (
     <div className="min-vh-100 d-flex flex-column">
@@ -166,6 +131,7 @@ function App() {
             }
           />
           <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn} />} />
+          <Route path="/mapform" element={<MapForm />} />
           <Route
             path="/documents"
             element={
