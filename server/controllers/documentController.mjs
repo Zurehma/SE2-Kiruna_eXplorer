@@ -25,11 +25,11 @@ class DocumentController {
     });
   };
 
-  getDocuments = (type, stakeholder, issuanceDateFrom, issuanceDateTo) => {
+  getDocuments = (type, stakeholder, issuanceDateFrom, issuanceDateTo, limit, offset) => {
     return new Promise(async (resolve, reject) => {
       try {
         let queryParameter = { type, stakeholder, issuanceDateFrom, issuanceDateTo };
-        const documents = await this.documentDAO.getDocuments(queryParameter);
+        const documents = await this.documentDAO.getDocuments(queryParameter, limit, offset);
         resolve(documents);
       } catch (err) {
         reject(err);
@@ -46,7 +46,7 @@ class DocumentController {
    * @param {String} type
    * @param {String} language
    * @param {String} description
-   * @param {Object | null} coordinates
+   * @param {Array<String> | null} coordinates
    * @param {Number | null} pages
    * @param {Number | null} pages
    * @param {Number | null} pages
@@ -60,7 +60,7 @@ class DocumentController {
           throw error;
         }
 
-        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
+        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates)) {
           const error = { errCode: 400, errMessage: "Coordinates error." };
           throw error;
         }
@@ -101,7 +101,7 @@ class DocumentController {
    * @param {String} type
    * @param {String} language
    * @param {String} description
-   * @param {Object | null} coordinates
+   * @param {Array<String> | null} coordinates
    * @param {Number | null} pages
    * @param {Number | null} pageFrom
    * @param {Number | null} pageTo
@@ -115,7 +115,7 @@ class DocumentController {
           throw error;
         }
 
-        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
+        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates)) {
           const error = { errCode: 400, errMessage: "Coordinates error." };
           throw error;
         }
@@ -221,6 +221,57 @@ class DocumentController {
           throw error;
         }
         resolve(id1, id2, type);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
+  getAllExistingLinks = () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const links = await this.documentDAO.getAllLinks();
+        console.log(links);
+    
+        // Group the links by document ID
+        const groupedLinks = links.reduce((acc, row) => {
+          // Initialize the document's object if it doesn't exist
+          if (!acc[row.documentID]) {
+            acc[row.documentID] = {
+              documentTitle: row.documentTitle,
+              links: [],
+            };
+          }
+    
+          // Add each linked document information
+          acc[row.documentID].links.push({
+            linkedDocID: row.linkedDocID,
+            linkedTitle: row.linkedTitle,
+            type: row.type,
+          });
+    
+          return acc;
+        }, {});
+    
+        // Step 1: Sort the links for each document in ascending order of linkedDocID
+        Object.keys(groupedLinks).forEach(docID => {
+          groupedLinks[docID].links.sort((a, b) => a.linkedDocID - b.linkedDocID);
+        });
+  
+        // Step 2: Format the result as desired
+        const formattedResponse = {};
+        Object.keys(groupedLinks).forEach(docID => {
+          formattedResponse[docID] = {
+            documentTitle: groupedLinks[docID].documentTitle,
+            links: groupedLinks[docID].links.map(link => ({
+              linkedDocID: link.linkedDocID,
+              linkedTitle: link.linkedTitle,
+              type: link.type,
+            }))
+          };
+        });
+  
+        resolve(formattedResponse);
       } catch (err) {
         reject(err);
       }

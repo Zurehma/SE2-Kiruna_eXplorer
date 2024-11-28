@@ -11,7 +11,7 @@ import { polygon, point, booleanPointInPolygon } from "@turf/turf";
  * @param {Number} long
  * @returns {Boolean} **true** if the coordinates provided are inside of Kiruna
  */
-const isValidKirunaCoordinates = (lat, long) => {
+const isValidKirunaCoordinates = (coordinatesArray) => {
   const kirunaCoordinates = [
     [67.87328157366065, 20.20047943270466],
     [67.84024426842895, 20.35839687019359],
@@ -20,9 +20,14 @@ const isValidKirunaCoordinates = (lat, long) => {
   ];
 
   const a = polygon([kirunaCoordinates]);
-  const p = point([lat, long]);
 
-  return booleanPointInPolygon(p, a);
+  let bool = [];
+  coordinatesArray.map((coordinate) => {
+    const p = point([coordinate.lat, coordinate.long]);
+      bool.push(booleanPointInPolygon(p, a));
+  });
+
+  return bool.every((value) => value === true);
 };
 
 /**
@@ -71,6 +76,32 @@ const isValidCoordinatesObject = (value) => {
   if (lat > 90 || lat < -90 || long > 180 || long < -180) {
     throw new Error("Invalid latitude and longitude values.");
   }
+
+  return true;
+};
+
+const isValidCoordinatesArray = (coordinatesArray) => {
+  if (!Array.isArray(coordinatesArray)) {
+    throw new Error("Input is not an array.");
+  }
+
+  coordinatesArray.forEach((value, index) => {
+    const lat = value.lat;
+    const long = value.long;
+    const numProperties = Object.keys(value).length;
+
+    if (lat === undefined || long === undefined || numProperties !== 2) {
+      throw new Error(`Invalid coordinates object at index ${index}.`);
+    }
+
+    if (typeof lat !== "number" || typeof long !== "number") {
+      throw new Error(`Invalid latitude or longitude types at index ${index}.`);
+    }
+
+    if (lat > 90 || lat < -90 || long > 180 || long < -180) {
+      throw new Error(`Invalid latitude or longitude values at index ${index}.`);
+    }
+  });
 
   return true;
 };
@@ -167,6 +198,7 @@ const Utility = {
   isBodyEmpty,
   validateRequest,
   errorHandler,
+  isValidCoordinatesArray
 };
 
 export default Utility;

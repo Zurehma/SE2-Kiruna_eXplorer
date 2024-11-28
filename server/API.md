@@ -31,6 +31,34 @@ Specific error scenarios will have their corresponding error code.
 
 ### Document APIs
 
+#### GET `api/documents/:id`
+
+Returns the document with the requested id.
+
+- Request Parameters: 
+  - `id`: a number that represent the id of the document.
+- Additional Constraints: _None_
+- Response Body Content: A **Document** object.
+- Example:
+
+  ```json
+    {
+        "id": 1,
+        "title": "example",
+        "stakeholder": ["example"],
+        "scale": 100,
+        "issuanceDate": "2024-10-28",
+        "connections": 3,
+        "language": "English",
+        "coordinates": {
+          "lat": 67.853058,
+          "long": 20.294995
+         },
+        "pages": 2,
+        "description": "Lore ipsum..."
+    },
+    ...
+
 #### GET `api/documents`
 
 Returns the list of all documents (if filters applied it returns the list of all documents filtered).
@@ -43,6 +71,8 @@ Returns the list of all documents (if filters applied it returns the list of all
   - `issuanceDateFrom`: a date that represent the starting date of the filtered document.
   - Request Parameters:
   - `issuanceDateTo`: a date that represent the last date in the range.
+  - `limit`: a number that represents the maximum number of documents returned.
+  - `offset`: a number that specifies the number of rows to skip.  
 - Request Body Content: _None_
 - Response Body Content: An array of **Document** objects.
 - Example:
@@ -52,20 +82,25 @@ Returns the list of all documents (if filters applied it returns the list of all
     {
         "id": 1,
         "title": "example",
-        "stakeholder": "example",
+        "stakeholder": ["example"],
         "scale": 100,
         "issuanceDate": "2024-10-28",
         "connections": 3,
         "language": "English",
-        "page": 2,
-        "description": "Lore ipsum..."
+        "pages": 2,
+        "description": "Lore ipsum...",
+        "coordinates": {
+         "lat": 67.853058,
+         "long": 20.294995
+        },
     },
     ...
   ]
   ```
 
 - Access Constraints: _None_
-- Additional Constraints: _None_
+- Additional Constraints: 
+  - It should return a 422 error when `offset` is added without specifying `limit` in the parameter query.
 
 #### GET `api/documents/document-types`
 
@@ -112,7 +147,7 @@ Add a new document with the provided information.
   - `type`: a string that represent the type. Can be a value between: [`Informative`, `Prescriptive`, `Material`, `Design`, `Technical`].
   - `language`: a string that must not be empty.
   - `description`: a string that must not be empty. It represent a brief description of the document.
-  - `coordinates`: an object that must have only two properties: `lat` and `long` that must be valid latitude and longitude values.
+  - `coordinates`: an array that contain coordinates that must have only two properties: `lat` and `long` that must be valid latitude and longitude values.
   - `pages`: an integer that must be greater than 0. If `pageFrom` or `pageTo` are present, this parameter should not be present.
   - `pageFrom`: an integer that must be greater than 0. It need `pageTo` to be present.
   - `pageTo`: an integer that must be greater than 0. It need `pageFrom` to be present.
@@ -129,6 +164,12 @@ Add a new document with the provided information.
     "type": "Informative",
     "connections": 0,
     "language": "English",
+    "coordinates": [
+      {
+        "lat": 67.87318157366065, 
+        "long": 20.20047943270466
+       }
+      ],
     "pages": 20,
     "pageFrom": 12,
     "pageTo": 32,
@@ -139,7 +180,7 @@ Add a new document with the provided information.
 - Access Constraints: Can only be called by a logged in user.
 - Additional Constraints:
   - It should return a 400 error when `issuanceDate` is after the current date.
-  - It should return a 400 error when `coordinates` is located in a different place than Kiruna.
+  - It should return a 400 error when `coordinates` are located in a different place than Kiruna.
 
 #### PUT `api/documents/:docID`
 
@@ -154,7 +195,7 @@ Update an existing document by providing a new object.
   - `type`: a string that represent the type. Can be a value between: [`Informative`, `Prescriptive`, `Material`, `Design`, `Technical`].
   - `language`: a string that must not be empty.
   - `description`: a string that must not be empty. It represent a brief description of the document.
-  - `coordinates`: an object that must have only two properties: `lat` and `long` that must be valid latitude and longitude values.
+  - `coordinates`: an array that contain coordinates that must have only two properties: `lat` and `long` that must be valid latitude and longitude values.
   - `pages`: an integer that must be greater than 0. If `pageFrom` or `pageTo` are present, this parameter should not be present.
   - `pageFrom`: an integer that must be greater than 0. It need `pageTo` to be present.
   - `pageTo`: an integer that must be greater than 0. It need `pageFrom` to be present.
@@ -163,7 +204,7 @@ Update an existing document by providing a new object.
 - Access Constraints: Can only be called by a logged in user.
 - Additional Constraints:
   - It should return a 400 error when `issuanceDate` is after the current date.
-  - It should return a 400 error when `coordinates` is located in a different place than Kiruna.
+  - It should return a 400 error when `coordinates` are located in a different place than Kiruna.
 
 #### GET `api/documents/link-types`
 
