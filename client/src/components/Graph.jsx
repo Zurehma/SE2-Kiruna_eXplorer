@@ -3,17 +3,22 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import '../styles/FlowDiagram.css';
 import 'bootstrap-icons/font/bootstrap-icons.css'; // Import Bootstrap Icons
+import Legend from './Legend'; // Import the Legend component
 
 const iconMap = {
-  Design: 'bi-file-earmark-text',
   Informative: 'bi-info-circle',
   Prescriptive: 'bi-arrow-right-square',
+  Design: 'bi-file-earmark-text',
   Technical: 'bi-file-earmark-code',
-  Agreement: 'bi-people-fill',
-  Conflict: 'bi-x-circle',
-  Consultation: 'bi-chat-dots',
-  Action: 'bi-exclamation-triangle',
   Material: 'bi-file-earmark-binary',
+};
+
+// Assign a color to each stakeholder for differentiation
+const stakeholderColors = {
+  'Kiruna kommun/Residents': '#1f77b4', // Blue
+  'Kiruna kommun': '#ff7f0e', // Orange
+  'Kiruna kommun/White Arkitekter': '#2ca02c', // Green
+  'LKAB': '#d62728', // Red
 };
 
 const DocumentChart = () => {
@@ -21,76 +26,116 @@ const DocumentChart = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({});
 
-  // Mocked data
+  // Expanded mocked data for a more populated chart
   const documents = [
     {
       id: 1,
-      title: "Citizen Feedback",
-      date: new Date(2007, 0, 1),
-      stakeholder: 'Citizens',
-      category: 'Text',
-      type: 'Informative doc',
-      scale: 15000,
-      connections: 2,
-      linksTo: [
-        { linkedDocID: 2, linkType: 'Collateral consequence' },
-        { linkedDocID: 3, linkType: 'Update' },
-      ],
+      title: "Compilation of responses",
+      stakeholder: 'Kiruna kommun/Residents',
+      scale: 'Text',
+      issuanceDate: '2007-01-01',
+      type: 'Informative',
+      connections: 1,
     },
     {
       id: 2,
-      title: 'Development Plan (41)',
-      date: new Date(2008, 0, 1),
-      stakeholder: 'Municipality',
-      category: 'Plan',
-      type: 'Design doc',
-      scale: 15000,
+      title: "Detail plan for Bolaget",
+      stakeholder: 'Kiruna kommun',
+      scale: 8000,
+      issuanceDate: '2010-10-20',
+      type: 'Prescriptive',
       connections: 1,
-      linksTo: [{ linkedDocID: 1, linkType: 'Revision' }],
     },
     {
       id: 3,
-      title: 'City Infrastructure Plan',
-      date: new Date(2009, 0, 1),
-      stakeholder: 'Architecture firms',
-      category: 'Plan',
-      type: 'Technical doc',
-      scale: 10000,
-      connections: 3,
-      linksTo: [{ linkedDocID: 1, linkType: 'Direct consequence' }],
+      title: "Development Plan (41)",
+      stakeholder: 'Kiruna kommun/White Arkitekter',
+      scale: 7500,
+      issuanceDate: '2014-03-17',
+      type: 'Design',
+      connections: 2,
     },
     {
       id: 4,
-      title: 'Environmental Impact Study',
-      date: new Date(2010, 0, 1),
-      stakeholder: 'Environmental Agency',
-      category: 'Concept',
-      type: 'Consultation',
-      scale: 11000,
-      connections: 2,
-      linksTo: [{ linkedDocID: 2, linkType: 'Collateral consequence' }, { linkedDocID: 3, linkType: 'Direct consequence' }],
+      title: "Deformation forecast",
+      stakeholder: 'LKAB',
+      scale: 12000,
+      issuanceDate: '2014-12-01',
+      type: 'Technical',
+      connections: 0,
     },
     {
       id: 5,
-      title: 'Blueprint Action Plan',
-      date: new Date(2011, 0, 1),
-      stakeholder: 'Municipality',
-      category: 'Blueprints/actions',
-      type: 'Action',
-      scale: 15000,
-      connections: 1,
-      linksTo: [{ linkedDocID: 4, linkType: 'Update' }],
+      title: "Adjusted development plan",
+      stakeholder: 'Kiruna kommun/White Arkitekter',
+      scale: 7500,
+      issuanceDate: '2015-01-01',
+      type: 'Design',
+      connections: 0,
     },
     {
       id: 6,
-      title: 'Revised Development Plan',
-      date: new Date(2012, 0, 1),
-      stakeholder: 'Municipality',
-      category: 'Plan',
-      type: 'Design doc',
-      scale: 10000,
-      connections: 3,
-      linksTo: [{ linkedDocID: 5, linkType: 'Revision' }, { linkedDocID: 1, linkType: 'Update' }],
+      title: "Detail plan for square",
+      stakeholder: 'Kiruna kommun',
+      scale: 1000,
+      issuanceDate: '2016-06-22',
+      type: 'Prescriptive',
+      connections: 0,
+    },
+    {
+      id: 7,
+      title: "Environmental Impact Report",
+      stakeholder: 'LKAB',
+      scale: 5000,
+      issuanceDate: '2017-03-11',
+      type: 'Informative',
+      connections: 1,
+    },
+    {
+      id: 8,
+      title: "Community Workshop Report",
+      stakeholder: 'Kiruna kommun/Residents',
+      scale: 'Text',
+      issuanceDate: '2018-05-30',
+      type: 'Informative',
+      connections: 1,
+    },
+    {
+      id: 9,
+      title: "Feasibility Study for New Area",
+      stakeholder: 'Kiruna kommun',
+      scale: 15000,
+      issuanceDate: '2019-07-20',
+      type: 'Design',
+      connections: 2,
+    },
+  ];
+
+  const links = [
+    {
+      docID1: 3,
+      docID2: 1,
+      type: 'Direct',
+    },
+    {
+      docID1: 3,
+      docID2: 2,
+      type: 'Direct',
+    },
+    {
+      docID1: 7,
+      docID2: 4,
+      type: 'Collateral',
+    },
+    {
+      docID1: 9,
+      docID2: 5,
+      type: 'Update',
+    },
+    {
+      docID1: 9,
+      docID2: 8,
+      type: 'Projection',
     },
   ];
 
@@ -109,9 +154,9 @@ const DocumentChart = () => {
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove(); // Clear previous content
 
-    const width = window.innerWidth;
-    const height = window.innerHeight / 2;
-    const margin = { top: 40, right: 50, bottom: 70, left: 250 };
+    const width = svg.node().getBoundingClientRect().width;
+    const height = svg.node().getBoundingClientRect().height;
+    const margin = { top: 20, right: 30, bottom: 50, left: 60 };
 
     // Append group element
     const g = svg
@@ -130,82 +175,41 @@ const DocumentChart = () => {
     // Create axes
     createAxes(g, xScale, yScale, innerWidth, innerHeight);
 
-    // Draw links first
-    drawLinks(g, data, xScale, yScale);
+    // Draw links first with offset
+    drawLinks(g, data, xScale, yScale, links);
 
-    // Plot data points
+    // Plot data points with jittering to avoid overlaps
     plotData(g, data, xScale, yScale);
-
-    // Add a legend
-    createLegend(svg);
   };
 
   const processData = (documents) => {
-    // Define yCategories in desired order
-    const yCategories = [
-      'Text',
-      'Concept',
-      'Plan (1:1,000)',
-      'Plan (1:5,000)',
-      'Plan (1:10,000)',
-      'Plan (1:15,000)',
-      'Blueprints/actions'
-    ];
+    const uniqueScales = Array.from(new Set(documents.map((d) => (typeof d.scale === 'number' ? d.scale : 0)))).sort((a, b) => a - b);
+    const yCategories = ['Text', ...uniqueScales.map((scale) => `Plan (1:${scale.toLocaleString()})`)];
 
     return documents.map((doc) => {
-      let yCategory = '';
-      if (doc.category === 'Text') {
-        yCategory = 'Text';
-      } else if (doc.category === 'Concept') {
-        yCategory = 'Concept';
-      } else if (doc.category === 'Plan') {
-        if (doc.scale === 1000) {
-          yCategory = 'Plan (1:1,000)';
-        } else if (doc.scale === 5000) {
-          yCategory = 'Plan (1:5,000)';
-        } else if (doc.scale === 10000) {
-          yCategory = 'Plan (1:10,000)';
-        } else if (doc.scale === 15000) {
-          yCategory = 'Plan (1:15,000)';
-        }
-      } else if (doc.category === 'Blueprints/actions') {
-        yCategory = 'Blueprints/actions';
-      }
+      let yCategory = doc.scale === 'Text' ? 'Text' : `Plan (1:${doc.scale.toLocaleString()})`;
       return {
         ...doc,
         yCategory,
-        yCategories, // Include yCategories for use in createYScale
+        yCategories,
       };
     });
   };
 
   const createXScale = (data, width) => {
-    const xExtent = d3.extent(data, (d) => d.date);
-    const xScale = d3.scaleTime().domain(xExtent).range([0, width]).nice();
-    return xScale;
+    const xExtent = d3.extent(data, (d) => new Date(d.issuanceDate));
+    return d3.scaleTime().domain(xExtent).range([0, width]).nice();
   };
 
   const createYScale = (data, height) => {
     const yCategories = data[0].yCategories;
-
-    const yScale = d3
-      .scalePoint()
-      .domain(yCategories)
-      .range([0, height]) // 'Text' at the top
-      .padding(1.5);
-    return yScale;
+    return d3.scalePoint().domain(yCategories).range([0, height]).padding(1.5);
   };
 
   const createAxes = (g, xScale, yScale, width, height) => {
-    const xAxis = d3
-      .axisBottom(xScale)
-      .tickFormat(d3.timeFormat('%Y'))
-      .tickSize(-height)
-      .tickPadding(15);
+    const xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat('%Y')).tickSize(-height).tickPadding(5);
+    const yAxis = d3.axisLeft(yScale).tickSize(-width).tickPadding(5);
 
-    const yAxis = d3.axisLeft(yScale).tickSize(-width).tickPadding(15);
-
-    // X-axis
     g.append('g')
       .attr('transform', `translate(0, ${height})`)
       .attr('class', 'x axis')
@@ -213,7 +217,6 @@ const DocumentChart = () => {
       .call((g) => g.select('.domain').remove())
       .call((g) => g.selectAll('.tick line').attr('stroke', '#ccc'));
 
-    // Y-axis
     g.append('g')
       .attr('class', 'y axis')
       .call(yAxis)
@@ -221,22 +224,10 @@ const DocumentChart = () => {
       .call((g) => g.selectAll('.tick line').attr('stroke', '#ccc'));
   };
 
-  const drawLinks = (g, data, xScale, yScale) => {
+  const drawLinks = (g, data, xScale, yScale, links) => {
     const idToNode = {};
     data.forEach((d) => {
       idToNode[d.id] = d;
-    });
-
-    const links = [];
-    data.forEach((d) => {
-      if (d.linksTo && d.linksTo.length > 0) {
-        d.linksTo.forEach((link) => {
-          const target = idToNode[link.linkedDocID];
-          if (target) {
-            links.push({ source: d, target, linkType: link.linkType });
-          }
-        });
-      }
     });
 
     g.selectAll('.link')
@@ -244,35 +235,22 @@ const DocumentChart = () => {
       .enter()
       .append('line')
       .attr('class', 'link')
-      .attr('x1', (d) => xScale(d.source.date))
-      .attr('y1', (d) => yScale(d.source.yCategory))
-      .attr('x2', (d) => xScale(d.target.date))
-      .attr('y2', (d) => yScale(d.target.yCategory))
-      .style('stroke', (d) => {
-        switch (d.linkType) {
-          case 'Direct consequence':
-            return '#ff6347'; // Tomato color for visibility
-          case 'Collateral consequence':
-            return '#4682b4'; // Steel blue
-          case 'Revision':
-            return '#32cd32'; // Lime green
-          case 'Update':
-            return '#ffa500'; // Orange
-          default:
-            return 'gray';
-        }
-      })
+      .attr('x1', (d) => xScale(new Date(idToNode[d.docID1].issuanceDate)))
+      .attr('y1', (d) => yScale(idToNode[d.docID1].yCategory) + (Math.random() * 10 - 5))
+      .attr('x2', (d) => xScale(new Date(idToNode[d.docID2].issuanceDate)))
+      .attr('y2', (d) => yScale(idToNode[d.docID2].yCategory) + (Math.random() * 10 - 5))
+      .style('stroke', '#888')
       .style('stroke-width', 2.5)
       .style('stroke-dasharray', (d) => {
-        switch (d.linkType) {
-          case 'Direct consequence':
-            return '0'; // Solid line
-          case 'Collateral consequence':
-            return '6,4'; // Dashed line
-          case 'Revision':
-            return '3,3'; // Dotted line
+        switch (d.type) {
+          case 'Direct':
+            return '0';
+          case 'Collateral':
+            return '6,4';
+          case 'Projection':
+            return '3,3';
           case 'Update':
-            return '8,4,2,4'; // Dash-dot
+            return '8,4,2,4';
           default:
             return '0';
         }
@@ -284,64 +262,36 @@ const DocumentChart = () => {
       .data(data)
       .enter()
       .append('foreignObject')
-      .attr('x', (d) => xScale(d.date) - 15) // Position and center the icon
-      .attr('y', (d) => yScale(d.yCategory) - 15)
-      .attr('width', 30)
-      .attr('height', 30)
+      .attr('x', (d) => xScale(new Date(d.issuanceDate)) - 10)
+      .attr('y', (d) => yScale(d.yCategory) - 10 + (Math.random() * 5 - 2.5))
+      .attr('width', 20)
+      .attr('height', 20)
       .append('xhtml:div')
       .attr('class', 'icon-node')
-      .html((d) => `<i class="bi ${iconMap[d.type.split(' ')[0]] || 'bi-info-circle'}"></i>`)
+      .style('color', (d) => stakeholderColors[d.stakeholder] || '#333')
+      .html((d) => `<i class="bi ${iconMap[d.type] || 'bi-info-circle'}"></i>`)
       .on('click', (event, d) => {
         setModalContent({
           title: d.title,
           stakeholder: d.stakeholder,
-          category: d.category,
           type: d.type,
           scale: d.scale ? '1:' + d.scale.toLocaleString() : '',
-          date: d3.timeFormat('%Y')(d.date),
+          date: d.issuanceDate,
           connections: d.connections,
-          icon: iconMap[d.type.split(' ')[0]] || 'bi-info-circle',
+          icon: iconMap[d.type] || 'bi-info-circle',
         });
         setIsModalOpen(true);
       });
   };
 
-  const createLegend = (svg) => {
-    const legendData = [
-      { label: 'Direct consequence', color: '#ff6347' },
-      { label: 'Collateral consequence', color: '#4682b4' },
-      { label: 'Revision', color: '#32cd32' },
-      { label: 'Update', color: '#ffa500' },
-    ];
-
-    const legend = svg.append('g')
-      .attr('class', 'legend')
-      .attr('transform', 'translate(20, 60)');
-
-    legend.selectAll('rect')
-      .data(legendData)
-      .enter()
-      .append('rect')
-      .attr('x', 0)
-      .attr('y', (d, i) => i * 25)
-      .attr('width', 15)
-      .attr('height', 15)
-      .style('fill', d => d.color);
-
-    legend.selectAll('text')
-      .data(legendData)
-      .enter()
-      .append('text')
-      .attr('x', 25)
-      .attr('y', (d, i) => i * 25 + 12)
-      .text(d => d.label)
-      .style('font-size', '14px')
-      .attr('alignment-baseline', 'middle');
-  };
-
   return (
-    <div className="chart-container">
-      <svg ref={svgRef}></svg>
+    <div className="document-chart-container">
+      <div className="legend-container">
+        <Legend stakeholderColors={stakeholderColors} />
+      </div>
+      <div className="chart-container">
+        <svg ref={svgRef}></svg>
+      </div>
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -350,7 +300,6 @@ const DocumentChart = () => {
               {modalContent.title}
             </h2>
             <div><strong>Stakeholder:</strong> {modalContent.stakeholder}</div>
-            <div><strong>Category:</strong> {modalContent.category}</div>
             <div><strong>Type:</strong> {modalContent.type}</div>
             <div><strong>Scale:</strong> {modalContent.scale}</div>
             <div><strong>Date:</strong> {modalContent.date}</div>
@@ -364,4 +313,3 @@ const DocumentChart = () => {
 };
 
 export default DocumentChart;
-

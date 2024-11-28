@@ -16,6 +16,8 @@ import FilteringDocuments from './components/FilteringDocuments.jsx';
 import AccessDenied from './components/AccessDenied.jsx';
 import NotFound from './components/NotFound.jsx';
 import { SingleDocument } from './components/SingleDocument.jsx';
+import DocumentChart from './components/Graph.jsx';
+import DocumentChartVisJS from './components/Graphvis.jsx'
 
 function App() {
     const [currentUser, setCurrentUser] = useState('');
@@ -103,7 +105,19 @@ function App() {
                 </Alert>
             )}
             <Routes>
-              <Route path="/" element={<Home setError={setError} />} />
+              {/* <Route path="/" element={<Home setError={setError} />} />
+              <Route path="/" element={<DocumentChart />} /> */}
+               <Route
+                    path="/"
+                    element={
+                    <>
+                        <Home setError={setError} />
+                        <div>
+                        <DocumentChartVisJS />
+                        </div>
+                    </>
+                    }
+                />
               <Route path="/login" element={<Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} setRole={setRole} loggedinError={loggedinError} setloggedinError={setloggedinError}/>}/>
               <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn}/>}/>
               <Route path="/documents" 
@@ -149,7 +163,7 @@ function App() {
                 } 
                 /> 
                 <Route path='*' element={<NotFound/>}/>   
-  
+                {/* <Route path='/graph' element={<DocumentChartVisJS/>}/> */}
             </Routes>
           </Container>
         </div>) : (<div className="d-flex justify-content-center align-items-center" style={{height: '100vh'}}><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div>)
