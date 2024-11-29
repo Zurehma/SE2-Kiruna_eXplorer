@@ -15,7 +15,7 @@ class DocumentRoutes {
 
     this.router.get("/allExistingLinks", (req, res, next) => {
       this.documentController
-        .getAllExistingLinks()
+        .getAllLinks()
         .then((links) => {
           res.status(200).json(links);
         })
@@ -183,17 +183,19 @@ class DocumentRoutes {
       Utility.isLoggedIn,
       async (req, res, next) => {
         try {
-          console.log(req.body);
           const { id1, ids, type } = req.body;
+          
+          // Find links that exist with the same document pairs and the same type
+          const existingLinks = await this.documentController.getLinks(id1); 
+          const duplicates = ids.filter((id) =>
+            existingLinks.some(
+              (link) => link.linkedDocID === id && link.type === type
+            )
+          );
 
-          // Check if any of the provided IDs already have a link
-          const existingLinks = await this.documentController.getLinks(id1);
-          const existingIDs = existingLinks.map((link) => link.linkedDocID);
-
-          const duplicates = ids.filter((id) => existingIDs.includes(id));
           if (duplicates.length > 0) {
             return res.status(409).json({
-              message: `Link already exists for ID(s): ${duplicates.join(", ")}`,
+              message: `Link already exists for ID(s): ${duplicates.join(", ")} with type '${type}'`,
             });
           }
 
