@@ -101,7 +101,7 @@ const MapForm = (props) => {
 
   const [position, setPosition] = useState(props.position || undefined);
 
-  const newPosition = (lat, long, name = null) => setPosition({ type: "Point", lat: lat, long: long, name: name });
+  const newPoint = (lat, long, name = null) => setPosition({ type: "Point", lat: lat, long: long, name: name });
   const newArea = (coordinates, name) => setPosition({ type: "Area", coordinates: coordinates, name: name });
   const clearPosition = () => setPosition(undefined);
 
@@ -155,9 +155,9 @@ const MapForm = (props) => {
               }}
             />
           )}
-          {isFullscreen && currentMode === predefinedPoint && <MapLayoutPredefinedPoint newPosition={newPosition} />}
+          {isFullscreen && currentMode === predefinedPoint && <MapLayoutPredefinedPoint newPoint={newPoint} />}
           {isFullscreen && currentMode === predefinedArea && <MapLayoutPredefinedArea newArea={newArea} />}
-          {isFullscreen && currentMode === customPoint && <MapLayoutCustomPoint position={position} newPosition={newPosition} />}
+          {isFullscreen && currentMode === customPoint && <MapLayoutCustomPoint position={position} newPoint={newPoint} />}
           {isFullscreen && currentMode === customArea && <></>}
           {position && position.type === "Point" && (
             <>

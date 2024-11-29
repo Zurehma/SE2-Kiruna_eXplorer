@@ -22,7 +22,7 @@ const blueMarkerIcon = new L.Icon({
 });
 
 const MapLayoutPredefinedPoint = (props) => {
-  const { newPosition } = props;
+  const { newPoint } = props;
   const [predefinedPoints, setPredefinedPoints] = useState(undefined);
   const [choosenPosition, setChoosenPosition] = useState(undefined);
 
@@ -53,7 +53,7 @@ const MapLayoutPredefinedPoint = (props) => {
             eventHandlers={{
               click: () => {
                 setChoosenPosition(predefinedPoint.name);
-                newPosition(predefinedPoint.lat, predefinedPoint.long, predefinedPoint.name);
+                newPoint(predefinedPoint.lat, predefinedPoint.long, predefinedPoint.name);
               },
             }}
           >
