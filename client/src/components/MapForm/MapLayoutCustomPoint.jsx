@@ -27,12 +27,6 @@ const MapLayoutCustomPoint = (props) => {
   return (
     <>
       <MapClickHandler newPoint={newPoint} />
-      <Form>
-        <Form.Group className="m-3">
-          <Form.Text id="lat-input" />
-          <Form.Text id="long-input" />
-        </Form.Group>
-      </Form>
     </>
   );
 };

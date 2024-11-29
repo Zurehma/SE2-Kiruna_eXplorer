@@ -280,31 +280,13 @@ function Documents(props) {
     }
   };
 
-  const [position, setPosition] = useState(undefined);
+  const [position, setPosition] = useState({ type: null, coordinates: null, name: null });
 
   useEffect(() => {
-    if (position && position.type === "Area") {
+    if (position && position.coordinates) {
       document.coordinates = position.coordinates;
-    } else if (position && position.type === "Point") {
-      document.coordinates = { lat: position.lat, long: position.long };
     }
   }, [...Object.values(position)]);
-
-  useEffect(() => {
-    if (
-      document.coordinates.lat &&
-      document.coordinates.long &&
-      validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))
-    ) {
-      setPosition({ lat: document.coordinates.lat, lng: document.coordinates.long });
-    } else if (
-      document.coordinates.lat &&
-      document.coordinates.long &&
-      !validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))
-    ) {
-      setPosition({ lat: null, lng: null });
-    }
-  }, [document.coordinates.lat, document.coordinates.long]);
 
   const handleFileUpload = async (doc) => {
     if (files.length > 0) {
@@ -454,17 +436,7 @@ function Documents(props) {
                   showNField={showNField}
                 />
               )}
-              {step === 3 && (
-                <Step3
-                  document={document}
-                  errors={errors}
-                  handleChange={handleChange}
-                  position={position}
-                  setPosition={setPosition}
-                  polygonCoordinates={polygonCoordinates}
-                  validateCoordinates={validateCoordinates}
-                />
-              )}
+              {step === 3 && <Step3 document={document} errors={errors} handleChange={handleChange} position={position} setPosition={setPosition} />}
               {step === 4 && (
                 <Step4
                   handleFileChange={handleFileChange}

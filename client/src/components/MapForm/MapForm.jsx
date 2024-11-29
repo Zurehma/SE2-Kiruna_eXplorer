@@ -99,11 +99,11 @@ const MapForm = (props) => {
   const modeList = [predefinedPoint, predefinedArea, customPoint, customArea];
   const [currentMode, setCurrentMode] = useState(undefined);
 
-  const [position, setPosition] = useState(props.position || undefined);
+  const [position, setPosition] = useState(props.position || { type: null, coordinates: null, name: null });
 
-  const newPoint = (lat, long, name = null) => setPosition({ type: "Point", lat: lat, long: long, name: name });
+  const newPoint = (lat, long, name = null) => setPosition({ type: "Point", coordinates: { lat: lat, long: long }, name: name });
   const newArea = (coordinates, name) => setPosition({ type: "Area", coordinates: coordinates, name: name });
-  const clearPosition = () => setPosition(undefined);
+  const clearPosition = () => setPosition({ type: null, coordinates: null, name: null });
 
   const resetOnChange = () => {
     clearPosition();
@@ -124,15 +124,16 @@ const MapForm = (props) => {
 
   useEffect(() => {
     props.setPosition(position);
-  }, [position]);
+    console.log(props.position);
+  }, [...Object.values(position)]);
 
   useEffect(() => {
     if (isFullscreen) {
       setMapSizeClass(mapFullscreenClass);
       setOverlay("overlay");
-      if(currentMode === predefinedArea) {
-        setInitalZoom(7);}
-      else {
+      if (currentMode === predefinedArea) {
+        setInitalZoom(7);
+      } else {
         setInitalZoom(12);
       }
     } else {
@@ -164,28 +165,26 @@ const MapForm = (props) => {
           {isFullscreen && currentMode === customPoint && <MapLayoutCustomPoint position={position} newPoint={newPoint} />}
           {isFullscreen && currentMode === customArea && <></>}
           {position && position.type === "Point" && (
-            <>
-              <Marker position={[position.lat, position.long]} data-testid="map-marker" zIndexOffset={10}>
-                <Popup>
-                  {position.name && (
-                    <>
-                      {`Name: ${position.name}`}
-                      <br />
-                    </>
-                  )}
-                  Latitude: {position.lat}
-                  <br />
-                  Longitude: {position.long}
-                </Popup>
-              </Marker>
-            </>
+            <Marker position={[position.coordinates.lat, position.coordinates.long]} data-testid="map-marker" zIndexOffset={10}>
+              <Popup>
+                {position.name && (
+                  <>
+                    {`Name: ${position.name}`}
+                    <br />
+                  </>
+                )}
+                Latitude: {position.coordinates.lat}
+                <br />
+                Longitude: {position.coordinates.long}
+              </Popup>
+            </Marker>
           )}
           {position && position.type === "Area " && (
             <Polygon positions={position.coordinates} color="black" weight={3} fillColor="lightblue" zIndexOffset={10}>
               {position.name && <Popup>Name: {position.name}</Popup>}
             </Polygon>
           )}
-          {position && <ClearPositionButton clearPosition={clearPosition} />}
+          {position && position.coordinates && <ClearPositionButton clearPosition={clearPosition} />}
           <TileLayer url={mapStyles[mapView]} />
           <ResizeMap />
         </MapContainer>

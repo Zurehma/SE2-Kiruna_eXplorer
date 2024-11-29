@@ -29,8 +29,8 @@ const MapLayoutPredefinedArea = (props) => {
     };
 
     fetchPredefinedAreas();
-  },[]);
-  
+  }, []);
+
   return (
     <>
       {predefinedAreas &&

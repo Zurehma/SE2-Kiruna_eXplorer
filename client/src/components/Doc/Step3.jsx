@@ -3,7 +3,7 @@ import { Form, Row, Col, Card } from "react-bootstrap";
 import { Map } from "./../Map.jsx";
 import MapForm from "../MapForm/MapForm.jsx";
 
-const Step3 = ({ document, errors, handleChange, handleMapClick, setPosition, position, polygonCoordinates, validateCoordinates }) => (
+const Step3 = ({ errors, setPosition, position }) => (
   <Card className="mb-4">
     <Card.Body>
       <Col>
