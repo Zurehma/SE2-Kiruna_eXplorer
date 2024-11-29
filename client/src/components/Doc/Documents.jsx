@@ -20,23 +20,15 @@ import StepIndicator from "./StepIndicator";
 
 function Documents(props) {
   const [scales, setScales] = useState(["Text", "Blueprints/Effects", "1:n"]);
-  const [showNField, setShowNField] = useState(false);
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [existingAttachments, setExistingAttachments] = useState([]);
   const [filesToBeDeleted, setFilesToBeDeleted] = useState([]);
   const { id } = useParams();
-
   const [step, setStep] = useState(1);
   const [types, setTypes] = useState([]);
-  const [currentTypes, setCurrentTypes] = useState([]);
-  const [isAddingNewType, setIsAddingNewType] = useState(false);
-  const [newType, setNewType] = useState("");
-
   const [stakeholders, setStakeholders] = useState([]);
-  const [currentStakeholders, setCurrentStakeholders] = useState([]);
-  const [isAddingNew, setIsAddingNew] = useState(false);
-  const [newStakeholder, setNewStakeholder] = useState("");
+  const [selectedStakeholders, setSelectedStakeholders] = useState([]);
 
   const [document, setDocument] = useState({
     title: "",
@@ -45,6 +37,7 @@ function Documents(props) {
     nValue: "",
     issuanceDate: "",
     type: "",
+    newType: "",
     description: "",
     language: "",
     pages: "",
@@ -64,6 +57,8 @@ function Documents(props) {
     coordinates: "",
     description: "",
     pages: "",
+    nValue: "",
+    newType: "",
   });
 
   const resetState = () => {
@@ -72,8 +67,10 @@ function Documents(props) {
       stakeholder: "",
       scale: "",
       nValue: "",
+      newType: "",
       issuanceDate: "",
       type: "",
+      newType: "",
       description: "",
       language: "",
       pages: "",
@@ -87,11 +84,15 @@ function Documents(props) {
     const fetchTypes = async () => {
       try {
         const response = await API.getStakeholders();
-        setStakeholders(response);
-        setCurrentStakeholders(response);
+        const formattedStakeholders = response.map((stakeholder) => ({
+          value: stakeholder.name,
+          label: stakeholder.name,
+          isNew: false, // Indica che è predefinito
+        }));
+        setStakeholders(formattedStakeholders);
         const response2 = await API.getTypeDocuments();
         setTypes(response2);
-        setCurrentTypes(response2);
+        console.log("types", response);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -115,16 +116,20 @@ function Documents(props) {
       if (!doc.pages && doc.pageFrom && doc.pageTo) {
         pages = `${doc.pageFrom}-${doc.pageTo}`;
       }
-
       let scale = doc.scale;
       let nValue = "";
-      let showNField = false; // Variabile temporanea per gestire la visualizzazione del campo
       if (scale !== "Text" && scale !== "Blueprints/Effects") {
-        nValue = Number(scale); // Converti scale in numero
-        scale = `1:n`; // Imposta scale come `1:n`
-        showNField = true; // Mostra il campo nValue
+        nValue = Number(scale);
+        scale = `1:n`;
       }
-      // Aggiorna lo stato del documento e del campo di visualizzazione
+      // Aggiorna gli stakeholders selezionati
+      const selected = (doc.stakeholder || []).map((stakeholder) => ({
+        value: stakeholder,
+        label: stakeholder,
+        isNew: false,
+      }));
+      setSelectedStakeholders(selected); // Imposta lo stato
+      // Aggiorna il documento
       setDocument((prevDocument) => ({
         ...doc,
         coordinates,
@@ -132,7 +137,6 @@ function Documents(props) {
         scale,
         nValue,
       }));
-      setShowNField(showNField); // Aggiorna la visibilità del campo nValue
     } catch (error) {
       console.error("Error fetching document:", error);
       props.setError(error);
@@ -160,14 +164,25 @@ function Documents(props) {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
-  const handleScaleChange = (e) => {
-    const { value } = e.target;
-    setDocument((prevDocument) => ({
-      ...prevDocument,
-      scale: value,
-      nValue: value === "1:n" ? prevDocument.nValue || "" : undefined, // Resetta nValue se non è `1:n`
-    }));
-    setShowNField(value === "1:n"); // Mostra o nascondi il campo nValue
+  const handleAddNew = (e) => {
+    const { name, value } = e.target;
+    setDocument((prevDocument) => {
+      if (name === "scale") {
+        return {
+          ...prevDocument,
+          scale: value,
+          nValue: value === "1:n" ? prevDocument.nValue || "" : undefined, // Resetta nValue se non è `1:n`
+        };
+      }
+      if (name === "type") {
+        return {
+          ...prevDocument,
+          type: value,
+          newType: value === "add_new_type" ? prevDocument.newType || "" : undefined, // Resetta newType se non è `add_new_type`
+        };
+      }
+      return prevDocument;
+    });
   };
 
   const handleChange = (e) => {
@@ -195,8 +210,8 @@ function Documents(props) {
     if (!document.title || document.title.length < 2) {
       newErrors.title = "Title is required and cannot be empty.";
     }
-    if (!document.stakeholder) {
-      newErrors.stakeholder = "You must select a stakeholder.";
+    if (!document.stakeholder || document.stakeholder.length === 0) {
+      newErrors.stakeholder = "You must select at least one stakeholder.";
     }
     if (!document.description || document.description.length < 2) {
       newErrors.description = "Description is required and cannot be empty.";
@@ -210,8 +225,14 @@ function Documents(props) {
     if (!document.scale) {
       newErrors.scale = "You must select a scale.";
     }
+    if (document.scale == "1:n" && !document.nValue) {
+      newErrors.nValue = "You must insert a number or select another scale.";
+    }
     if (!document.type) {
       newErrors.type = "You must select a type.";
+    }
+    if (document.type == "add_new_type" && document.newType.length < 2) {
+      newErrors.newType = "You must insert a new type or select one from the menu.";
     }
     if (!document.issuanceDate) {
       newErrors.issuanceDate = "You must select a Date in a valid format (YYYY or YYYY-MM or YYYY-MM-DD).";
@@ -232,13 +253,11 @@ function Documents(props) {
     console.log("step", step);
     let isValid = false;
     if (step === 1) {
-      console.log("step1");
       isValid = validateStep1();
     } else if (step === 2) {
-      console.log("step2");
+      console.log("types", types);
       isValid = validateStep2();
     } else if (step === 3) {
-      console.log("step3");
       isValid = validateStep3();
     }
     if (isValid) {
@@ -315,6 +334,11 @@ function Documents(props) {
       } else {
         document.nValue = "";
       }
+      if (document.type === "add_new_type") {
+        document.type = document.newType;
+      } else {
+        document.newType = "";
+      }
       if (id) {
         // Modalità Edit: aggiorna documento esistente
         await API.updateDocument(id, document);
@@ -331,6 +355,7 @@ function Documents(props) {
         resetState();
         navigate(`/documents/all`);
       } else if (step === 4) {
+        console.log("document", document);
         const doc = await API.saveDocument(document);
         //Try to submit files
         handleFileUpload(doc);
@@ -344,41 +369,46 @@ function Documents(props) {
     }
   };
 
-  //add_new Stakeholder and Type management
-  const handleSelectChange = (e) => {
-    const value = e.target.value;
-    if (value === "add_new") {
-      setIsAddingNew(true);
-    } else if (value === "add_new_type") {
-      setIsAddingNewType(true);
-    } else {
-      handleChange(e);
+  ///////STAKEHOLDERS///////
+
+  //Gestisce la selezione degli stakeholders
+  const handleStake = (selectedOptions) => {
+    // Trova le opzioni rimosse
+    const removedOptions = selectedStakeholders.filter(
+      (opt) => !(selectedOptions || []).some((sel) => sel.value === opt.value)
+    );
+    // Rimuove solo quelli creati manualmente
+    const removedNewOptions = removedOptions.filter((opt) => opt.isNew);
+    if (removedNewOptions.length > 0) {
+      setStakeholders((prev) =>
+        prev.filter(
+          (stakeholder) => !removedNewOptions.some((removed) => removed.value === stakeholder.value)
+        )
+      );
     }
+    // Aggiorna le opzioni selezionate
+    setSelectedStakeholders(selectedOptions || []);
+
+    // Aggiorna document.stakeholder
+    handleChange({
+      target: {
+        name: "stakeholder",
+        value: selectedOptions?.map((opt) => opt.value) || [],
+      },
+    });
   };
 
-  const handleNewStakeholderChange = (e) => {
-    setNewStakeholder(e.target.value);
-  };
+  // Aggiunge un nuovo stakeholder
+  const handleCreate = (inputValue) => {
+    const newStakeholder = { value: inputValue, label: inputValue, isNew: true };
+    setStakeholders((prev) => [...prev, newStakeholder]);
+    setSelectedStakeholders((prev) => [...prev, newStakeholder]);
 
-  const handleNewTypeChange = (e) => {
-    setNewType(e.target.value);
-  };
-
-  const handleNewBlur = () => {
-    if (newStakeholder.trim() !== "") {
-      const newEntry = { name: newStakeholder };
-      setCurrentStakeholders([...currentStakeholders, newEntry]);
-      setIsAddingNew(false);
-      handleChange({ target: { name: "stakeholder", value: newStakeholder } });
-      setNewStakeholder("");
-    }
-    // if (newType.trim() !== "") {
-    //   const newEntry = { name: newType };
-    //   setCurrentTypes([...currentTypes, newEntry]); // Aggiungi il nuovo tipo
-    //   setIsAddingNewType(false); // Nascondi il campo di input
-    //   handleChange({ target: { name: "type", value: newType } }); // Aggiorna il valore selezionato
-    //   setNewType(""); // Resetta il campo di input
-    // }
+    // Salva nel documento
+    setDocument((prevDoc) => ({
+      ...prevDoc,
+      stakeholder: [...selectedStakeholders, newStakeholder].map((opt) => opt.value),
+    }));
   };
 
   return (
@@ -412,13 +442,10 @@ function Documents(props) {
                   document={document}
                   errors={errors}
                   handleChange={handleChange}
-                  currentStakeholders={currentStakeholders}
-                  isAddingNew={isAddingNew}
-                  newStakeholder={newStakeholder}
-                  handleNewStakeholderChange={handleNewStakeholderChange}
-                  handleNewBlur={handleNewBlur}
-                  handleSelectChange={handleSelectChange}
+                  handleStake={handleStake}
+                  handleCreate={handleCreate}
                   stakeholders={stakeholders}
+                  selectedStakeholders={selectedStakeholders}
                 />
               )}
               {step === 2 && (
@@ -426,14 +453,9 @@ function Documents(props) {
                   document={document}
                   errors={errors}
                   handleChange={handleChange}
-                  handleScaleChange={handleScaleChange}
-                  handleSelectChange={handleSelectChange}
-                  handleNewTypeChange={handleNewTypeChange}
+                  handleAddNew={handleAddNew}
                   scales={scales}
-                  currentTypes={currentTypes}
-                  isAddingNewType={isAddingNewType}
-                  newType={newType}
-                  showNField={showNField}
+                  types={types}
                 />
               )}
               {step === 3 && <Step3 document={document} errors={errors} handleChange={handleChange} position={position} setPosition={setPosition} />}
