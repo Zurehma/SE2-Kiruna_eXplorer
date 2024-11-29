@@ -130,13 +130,17 @@ const MapForm = (props) => {
     if (isFullscreen) {
       setMapSizeClass(mapFullscreenClass);
       setOverlay("overlay");
-      setInitalZoom(12);
+      if(currentMode === predefinedArea) {
+        setInitalZoom(7);}
+      else {
+        setInitalZoom(12);
+      }
     } else {
       setMapSizeClass(mapContainerClass);
       setOverlay("without-overlay");
       setInitalZoom(11);
     }
-  }, [isFullscreen]);
+  }, [isFullscreen, currentMode]);
 
   return (
     <div className={overlay}>
