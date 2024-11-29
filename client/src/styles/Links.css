@@ -1,76 +1,123 @@
+.links-background {
+  background: linear-gradient(to right, #006d77, #83c5be);
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
 
+body,
+html {
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+}
 
-  
-   .links-background {
-    background: linear-gradient(to right, #006d77, #83c5be);
-    min-height: 100vh;
-    padding: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow-y: auto;
+.container {
+  max-width: 700px;
+}
+
+.card-link {
+  border-radius: 10px;
+  height: 500px;
+  width: 600px;
+  border: none;
+  display: flex;
+  align-items: top;
+  margin-top: 10px;
+  justify-content: center;
+}
+
+.links-card-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-align: center;
+  color: #006d77;
+}
+
+.links-input,
+.links-select {
+  border-radius: 5px;
+  border: 1px solid #006d77;
+  padding: 0.75rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.links-input:focus,
+.links-select:focus {
+  border-color: #006d77;
+  box-shadow: 0 0 5px rgba(0, 109, 119, 0.5);
+}
+
+.btn-save {
+  background-color: #006d77;
+  border: none;
+  padding: 0.6rem 2.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-save:hover {
+  background-color: #005f6b;
+}
+
+.links-form-label {
+  font-weight: 500;
+  color: #006d77;
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
   }
-  
-  body, html {
-    overflow-y: auto;
-    margin: 0;
-    padding: 0;
-  } 
-
-  .card-link {
-    border-radius: 10px;
-    height: 450px;
-    width: 500px;
-    border: none;
-    display: flex;
-    align-items: top; 
-    margin-top: 10px ;
-    justify-content: center;
-  }
-    
 
   .links-card-title {
-    font-size: 1.8rem;
-    font-weight: bold;
-    text-align: center;
-    color: #006d77;
+    font-size: 1.5rem;
   }
-  
-  .links-input, .links-select {
-    border-radius: 5px;
-    border: 1px solid #006d77;
-    padding: 0.75rem;
-    transition: all 0.2s ease-in-out;
-  }
-  
-  .links-input:focus, .links-select:focus {
-    border-color: #006d77;
-    box-shadow: 0 0 5px rgba(0, 109, 119, 0.5);
-  }
-  
-  .btn-save{
-    background-color: #006d77;
-    border: none;
-    padding: 0.6rem 2.5rem;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btn-save:hover {
-    background-color: #005f6b;
-  }
-  
-  .links-form-label {
-    font-weight: 500;
-    color: #006d77;
-  }
-  
-  @media (max-width: 768px) {
-    .card {
-      padding: 1rem;
-    }
-  
-    .links-card-title {
-      font-size: 1.5rem;
-    }
-  }
-   
+}
+
+.dropdown-toggle {
+  width: 100%;
+  text-align: left;
+  background-color: white;
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.1); /* Per un'ombra leggera */
+
+  border-radius: 5px;
+  border: 1px solid #006d77;
+  padding: 0.75rem;
+  transition: all 0.2s ease-in-out;
+  font-size: 1rem; /* Assicura una buona leggibilità */
+}
+
+.dropdown-menu-white {
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Per un'ombra leggera */
+  padding: 8px;
+  max-height: 200px;
+  overflow-y: auto; /* Aggiungi uno scroll se il contenuto è lungo */
+  z-index: 1050; /* Assicura che il menu sia sopra gli altri elementi */
+}
+
+/* Rimuove la freccia di dropdown */
+.dropdown-toggle::after {
+  display: none !important; /* Aggiungi !important per forzare la sovrascrittura */
+}
+
+.dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.invalid-feedback {
+  display: block;
+  font-size: 0.875em;
+  color: #dc3545;
+}
+
+.search-bar {
+  width: 60%;
+
+  border-radius: 10px !important; /* Elimina gli angoli arrotondati */
+  margin: 0 10px;
+  /* mx-3 my-2 w-auto */
+}

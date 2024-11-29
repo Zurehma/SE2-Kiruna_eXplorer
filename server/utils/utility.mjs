@@ -4,6 +4,7 @@
 
 import { validationResult } from "express-validator";
 import { polygon, point, booleanPointInPolygon } from "@turf/turf";
+import kiruna from "./KirunaMunicipality.mjs";
 
 /**
  * Check if the provided coordinates are inside the area of Kiruna
@@ -12,22 +13,22 @@ import { polygon, point, booleanPointInPolygon } from "@turf/turf";
  * @returns {Boolean} **true** if the coordinates provided are inside of Kiruna
  */
 const isValidKirunaCoordinates = (coordinatesArray) => {
-  const kirunaCoordinates = [
-    [67.87328157366065, 20.20047943270466],
-    [67.84024426842895, 20.35839687019359],
-    [67.82082254726043, 20.181254701184297],
-    [67.87328157366065, 20.20047943270466],
-  ];
+  const coordinates = kiruna?.features[0]?.geometry?.coordinates;
 
-  const a = polygon([kirunaCoordinates]);
-
-  let bool = [];
-  coordinatesArray.map((coordinate) => {
-    const p = point([coordinate.lat, coordinate.long]);
-      bool.push(booleanPointInPolygon(p, a));
-  });
-
-  return bool.every((value) => value === true);
+  for (let coordinate of coordinates) {
+    console.log(coordinate);
+    const a = polygon([coordinate[0]]);
+    for (let i = 0; i < coordinatesArray.length; i++) {
+      let bool = [];
+      coordinatesArray.map((c) => {
+        const p = point([c.lat, c.long]);
+        bool.push(booleanPointInPolygon(p, a));
+      });
+      if (bool.every((value) => value === true)) {
+        return true;
+      }
+    }
+  }
 };
 
 /**
@@ -198,7 +199,7 @@ const Utility = {
   isBodyEmpty,
   validateRequest,
   errorHandler,
-  isValidCoordinatesArray
+  isValidCoordinatesArray,
 };
 
 export default Utility;

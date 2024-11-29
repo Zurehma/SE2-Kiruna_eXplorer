@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Polygon } from 'react-leaflet';
 
-function KirunaMunicipality(props) { //it takes geoJsonData, setGeoJsonData and setHighestPoint as props
+function KirunaMunicipality(props) { //it takes geoJsonData and setGeoJsonData as props
     //fetch the geojson file and set the data
     useEffect(() => {
         const loadGeoJson = async () => {
@@ -30,7 +30,7 @@ function KirunaMunicipality(props) { //it takes geoJsonData, setGeoJsonData and 
         <>
         {/* Draw the entire municipality, as stated in the FAQ, it should be always be visible */}
         {props.geoJsonData && (
-            <Polygon pathOptions={{ color: 'blue' }} positions={getCoordinates()} />
+            <Polygon interactive={false} pathOptions={{ color: 'blue' }} positions={getCoordinates()} />
         )}
         </>
     );

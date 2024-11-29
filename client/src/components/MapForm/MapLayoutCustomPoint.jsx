@@ -1,32 +1,44 @@
-import React, { useState, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, useMap, useMapEvents, Marker, Popup } from "react-leaflet";
-import { Button } from "react-bootstrap";
+import React from "react";
+import { Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 import "../../styles/MapForm.css";
 
-const MapClickHandler = (props) => {
-  const { newPosition } = props;
-
+const MapClickHandler = ({ onPointSelected }) => {
+  // Gestisce gli eventi di clic sulla mappa
   useMapEvents({
     click: (e) => {
-      const clickOnMap = e.originalEvent.target.className.startsWith("leaflet-container");
-
-      if (clickOnMap) {
-        newPosition(e.latlng.lat, e.latlng.lng);
+      const target = e.originalEvent.target;
+      if (target.closest(".resize-button")) {
+        return; // Ignora il clic se è avvenuto sul bottone o su un suo elemento figlio
       }
+      const { lat, lng } = e.latlng;
+      onPointSelected({ lat, lng }); // Passa il punto cliccato al componente padre
     },
   });
 
   return null;
 };
 
-const MapLayoutCustomPoint = (props) => {
-  const { newPosition } = props;
+const MapLayoutCustomPoint = ({ position, newPoint, validateCoordinates }) => {
+  const handlePointSelected = (point) => {
+    // Validazione delle coordinate
+    const isValid = validateCoordinates({ type: "Point", coordinates: [point.lng, point.lat] });
+    if (isValid) {
+      // Passa direttamente il punto validato al metodo newPoint
+      newPoint(point.lat,point.lng,"CustomPoint");
+    }
+  };
 
   return (
     <>
-      <MapClickHandler newPosition={newPosition} />
+      {/* Gestore del clic sulla mappa */}
+      <MapClickHandler onPointSelected={handlePointSelected} />
+
+      {/* Marker del punto confermato */}
+      {position && position.type === "Point" && (
+        <Marker position={[position.coordinates.lat, position.coordinates.long]}/>
+      )}
     </>
   );
 };

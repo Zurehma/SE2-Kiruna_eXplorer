@@ -90,21 +90,21 @@ class DocumentRoutes {
       }
     );
 
-    this.router.get("/document-types", Utility.isLoggedIn, (req, res, next) => {
+    this.router.get("/document-types", (req, res, next) => {
       this.documentController
         .getDocumentTypes()
         .then((documentTypes) => res.status(200).json(documentTypes))
         .catch((err) => next(err));
     });
 
-    this.router.get("/stakeholders", Utility.isLoggedIn, (req, res, next) => {
+    this.router.get("/stakeholders", (req, res, next) => {
       this.documentController
         .getStakeholders()
         .then((stakeholders) => res.status(200).json(stakeholders))
         .catch((err) => next(err));
     });
 
-    this.router.get("/link-types", Utility.isLoggedIn, (req, res, next) => {
+    this.router.get("/link-types", (req, res, next) => {
       this.documentController
         .getLinkTypes()
         .then((linkTypes) => res.status(200).json(linkTypes))

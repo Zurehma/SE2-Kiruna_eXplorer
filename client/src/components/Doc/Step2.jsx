@@ -1,23 +1,7 @@
 import React from "react";
 import { Card, Form, Row, Col } from "react-bootstrap";
 
-const handleNewTypeChange = (e) => {
-  setNewType(e.target.value);
-};
-
-const Step2 = ({
-  document,
-  errors,
-  handleChange,
-  handleScaleChange,
-  handleSelectChange,
-  setNewType,
-  scales,
-  currentTypes,
-  isAddingNewType,
-  newType,
-  showNField,
-}) => (
+const Step2 = ({ document, errors, handleChange, handleAddNew, scales, types }) => (
   <Card className="mb-4">
     <Card.Body>
       {/* SCALE */}
@@ -28,7 +12,7 @@ const Step2 = ({
             <Form.Select
               name="scale"
               value={document.scale || ""}
-              onChange={handleScaleChange}
+              onChange={handleAddNew}
               className="input-multi"
               isInvalid={!!errors.scale}
             >
@@ -51,14 +35,15 @@ const Step2 = ({
               name="nValue"
               value={document.nValue || ""}
               onChange={handleChange}
+              isInvalid={!!errors.nValue}
               placeholder="Enter n"
               className={`input ${document.scale === "1:n" ? "" : "disabled-field"}`}
               disabled={document.scale !== "1:n"}
             />
+            <Form.Control.Feedback type="invalid">{errors.nValue}</Form.Control.Feedback>
           </Form.Group>
         </Col>
       </Row>
-
       {/* TYPE */}
       <Row className="mb-3">
         <Col md={6}>
@@ -67,12 +52,12 @@ const Step2 = ({
             <Form.Select
               name="type"
               value={document.type || ""}
-              onChange={handleSelectChange}
+              onChange={handleAddNew}
               className="input-multi"
               isInvalid={!!errors.type}
             >
               <option value="">Select a type</option>
-              {currentTypes.map((type, index) => (
+              {types.map((type, index) => (
                 <option key={index} value={type.name}>
                   {type.name}
                 </option>
@@ -85,20 +70,21 @@ const Step2 = ({
 
         <Col md={6}>
           <Form.Group controlId="newType">
-            <Form.Label>New Type</Form.Label>
+            <Form.Label>New Type*</Form.Label>
             <Form.Control
               type="text"
               name="newType"
               value={document.newType || ""}
-              onChange={handleNewTypeChange}
+              onChange={handleChange}
+              isInvalid={!!errors.newType}
               placeholder="Enter new type"
               className={`input ${document.type === "add_new_type" ? "" : "disabled-field"}`}
               disabled={document.type !== "add_new_type"}
             />
+            <Form.Control.Feedback type="invalid">{errors.newType}</Form.Control.Feedback>
           </Form.Group>
         </Col>
       </Row>
-
       {/* LANGUAGE & PAGES */}
       <Row className="mb-3">
         {/* LANGUAGE */}
@@ -157,20 +143,25 @@ const Step2 = ({
                 className="input-multi"
                 isInvalid={!!errors.issuanceDate}
                 value={document.issuanceDate?.split("-")[0] || ""}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const year = e.target.value || "";
                   handleChange({
                     target: {
                       name: "issuanceDate",
-                      value: [
-                        e.target.value || "",
-                        document.issuanceDate?.split("-")[1] || "",
-                        document.issuanceDate?.split("-")[2] || "",
-                      ]
-                        .filter(Boolean) // Rimuove elementi vuoti
-                        .join("-"),
+                      value: year
+                        ? `${year}-${document.issuanceDate?.split("-")[1] || ""}-${
+                            document.issuanceDate?.split("-")[2] || ""
+                          }`
+                        : "",
                     },
-                  })
-                }
+                  });
+
+                  if (!year) {
+                    handleChange({
+                      target: { name: "issuanceDate", value: "" }, // Resetta l'intero campo se l'anno è vuoto
+                    });
+                  }
+                }}
               >
                 <option value="">Year</option>
                 {[...Array(50)].map((_, index) => {
@@ -189,20 +180,26 @@ const Step2 = ({
                 as="select"
                 className="input-multi"
                 value={document.issuanceDate?.split("-")[1] || ""}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const month = e.target.value || "";
                   handleChange({
                     target: {
                       name: "issuanceDate",
-                      value: [
-                        document.issuanceDate?.split("-")[0] || "",
-                        e.target.value || "",
-                        document.issuanceDate?.split("-")[2] || "",
-                      ]
-                        .filter(Boolean) // Rimuove elementi vuoti
-                        .join("-"),
+                      value: `${document.issuanceDate?.split("-")[0] || ""}-${month}-${
+                        document.issuanceDate?.split("-")[2] || ""
+                      }`,
                     },
-                  })
-                }
+                  });
+
+                  if (!month) {
+                    handleChange({
+                      target: {
+                        name: "issuanceDate",
+                        value: `${document.issuanceDate?.split("-")[0] || ""}-`,
+                      }, // Resetta il giorno se il mese è vuoto
+                    });
+                  }
+                }}
                 disabled={!document.issuanceDate?.split("-")[0]} // Disabilitato finché non viene scelto l'anno
               >
                 <option value="">Month</option>
@@ -223,13 +220,9 @@ const Step2 = ({
                   handleChange({
                     target: {
                       name: "issuanceDate",
-                      value: [
-                        document.issuanceDate?.split("-")[0] || "",
-                        document.issuanceDate?.split("-")[1] || "",
-                        e.target.value || "",
-                      ]
-                        .filter(Boolean) // Rimuove elementi vuoti
-                        .join("-"),
+                      value: `${document.issuanceDate?.split("-")[0] || ""}-${
+                        document.issuanceDate?.split("-")[1] || ""
+                      }-${e.target.value || ""}`,
                     },
                   })
                 }
