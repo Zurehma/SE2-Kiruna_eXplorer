@@ -308,7 +308,7 @@ class DocumentDAO {
     });
   };
 
-  getAllLinks = () => {
+  /*getAllLinks = () => {
     return new Promise((resolve, reject) => {
       const query = `
         SELECT 
@@ -332,7 +332,28 @@ class DocumentDAO {
         }
       });
     });
-  };
+  };*/
+
+  getAllLinks = () => {
+    return new Promise((resolve, reject) => {
+      const query = `
+      SELECT 
+      CASE WHEN DocID1 < DocID2 THEN DocID1 ELSE DocID2 END AS DocID1,
+      CASE WHEN DocID1 < DocID2 THEN DocID2 ELSE DocID1 END AS DocID2,
+      type
+      FROM LINK
+      ORDER BY DocID1 ASC, DocID2 ASC;
+    `;
+  
+      db.all(query, [], (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  }
   
 
   /**
@@ -345,8 +366,8 @@ class DocumentDAO {
   addLink = (id1, id2, type) => {
     return new Promise((resolve, reject) => {
       //Check if the link already exists in either direction
-      const query1 = "SELECT * FROM LINK WHERE docID1=? AND docID2=? OR docID1=? AND docID2=?";
-      db.all(query1, [id1, id2, id2, id1], (err, rows) => {
+      const query1 = "SELECT * FROM LINK WHERE (docID1=? AND docID2=? AND type=?) OR (docID1=? AND docID2=? AND type=?)";
+      db.all(query1, [id1, id2, type, id2, id1, type], (err, rows) => {
         if (err) {
           reject(err);
         } else if (rows.length > 0) {
@@ -364,6 +385,8 @@ class DocumentDAO {
       });
     });
   };
+
+
 }
 
 export default DocumentDAO;
