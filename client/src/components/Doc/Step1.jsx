@@ -1,6 +1,5 @@
 import React from "react";
 import { Card, Form, Row, Col } from "react-bootstrap";
-import StakeholdersField from "./esempio";
 import CreatableSelect from "react-select/creatable";
 
 const Step1 = ({
