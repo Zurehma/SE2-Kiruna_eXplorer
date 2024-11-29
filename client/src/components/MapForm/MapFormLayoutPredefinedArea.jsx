@@ -17,8 +17,15 @@ const MapLayoutPredefinedArea = (props) => {
 
       setPredefinedAreas(
         data.features.map((feature) => {
-          feature.geometry.coordinates[0].map((c) => c.reverse());
-          return { coordinates: feature.geometry.coordinates, name: feature.properties.id };
+          let coordinates;
+
+          if (feature.geometry.type === "Polygon") {
+            coordinates = feature.geometry.coordinates[0].map((c) => c.reverse());
+          } else if (feature.geometry.type === "MultiPolygon") {
+            coordinates = feature.geometry.coordinates.map((p) => p[0].map((c) => c.reverse()));
+          }
+
+          return { featureType: feature.geometry.type, coordinates: coordinates, name: feature.properties.id };
         })
       );
     };
@@ -39,6 +46,7 @@ const MapLayoutPredefinedArea = (props) => {
             eventHandlers={{
               click: () => {
                 setChoosenArea(predefinedArea.name);
+                newArea(predefinedArea.coordinates, predefinedArea.name);
               },
             }}
           >

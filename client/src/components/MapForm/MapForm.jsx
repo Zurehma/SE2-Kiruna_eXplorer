@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, useMap, useMapEvents, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, useMap, useMapEvents, Marker, Popup, Polygon } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 import "../../styles/MapForm.css";
@@ -21,6 +21,7 @@ const ResizeButton = (props) => {
   return (
     <>
       <Button
+        type="button"
         variant="light"
         size="sm"
         className="resize-button"
@@ -45,26 +46,26 @@ const ClearPositionButton = (props) => {
 
   return (
     <>
-      <Button variant="secondary" size="sm" className="clear-position-button" onClick={() => clearPosition()}>
+      <Button type="button" variant="secondary" size="sm" className="clear-position-button" onClick={() => clearPosition()}>
         Clear
       </Button>
     </>
   );
 };
 
-const DropdownMapOptions = (props) => {
-  const { options, currentOption, setCurrentOption } = props;
+const DropdownMapMode = (props) => {
+  const { modeList, currentMode, setCurrentMode } = props;
 
   return (
     <>
-      <Dropdown drop="up" size="sm" onSelect={(eventKey) => setCurrentOption(eventKey)} className="map-options-dropdown">
-        <Dropdown.Toggle variant="light" id="dropdown-map-option-button">
-          {currentOption || "Change selection"}
+      <Dropdown drop="up" size="sm" onSelect={(eventKey) => setCurrentMode(eventKey)} className="map-mode-dropdown">
+        <Dropdown.Toggle variant="light" id="dropdown-map-mode-button">
+          {currentMode || "Change mode"}
         </Dropdown.Toggle>
         <Dropdown.Menu className="dropdown-menu">
-          {options.map((option) => (
-            <Dropdown.Item key={option} eventKey={option} className="dropdown-item">
-              {option}
+          {modeList.map((mode) => (
+            <Dropdown.Item key={mode} eventKey={mode} className="dropdown-item">
+              {mode}
             </Dropdown.Item>
           ))}
         </Dropdown.Menu>
@@ -89,22 +90,24 @@ const MapForm = (props) => {
   const mapContainerClass = "map-container";
   const mapFullscreenClass = "map-fullscreen";
   const [mapSizeClass, setMapSizeClass] = useState(mapContainerClass);
-  const [overlay, setOverlay] = useState('without-overlay');
+  const [overlay, setOverlay] = useState("without-overlay");
 
   const predefinedPoint = "Predefined point";
   const predefinedArea = "Predefined area";
   const customPoint = "Custom point";
   const customArea = "Custom area";
-  const options = [predefinedPoint, predefinedArea, customPoint, customArea];
-  const [currentOption, setCurrentOption] = useState(undefined);
+  const modeList = [predefinedPoint, predefinedArea, customPoint, customArea];
+  const [currentMode, setCurrentMode] = useState(undefined);
 
-  const [position, setPosition] = useState({ lat: null, long: null, name: null });
-  const [area, setArea] = useState([]);
+  const [position, setPosition] = useState(props.position || undefined);
 
-  const newPosition = (lat, long, name = null) => setPosition({ lat: lat, long: long, name: name });
-  const clearPosition = () => setPosition({ lat: null, long: null, name: null });
+  const newPosition = (lat, long, name = null) => setPosition({ type: "Point", lat: lat, long: long, name: name });
+  const newArea = (coordinates, name) => setPosition({ type: "Area", coordinates: coordinates, name: name });
+  const clearPosition = () => setPosition(undefined);
 
-  const resetOptionOnChange = () => clearPosition();
+  const resetOnChange = () => {
+    clearPosition();
+  };
 
   const ResizeMap = () => {
     const map = useMap();
@@ -120,39 +123,43 @@ const MapForm = (props) => {
   };
 
   useEffect(() => {
+    props.setPosition(position);
+  }, [position]);
+
+  useEffect(() => {
     if (isFullscreen) {
       setMapSizeClass(mapFullscreenClass);
-      setOverlay('overlay');
+      setOverlay("overlay");
       setInitalZoom(12);
     } else {
       setMapSizeClass(mapContainerClass);
-      setOverlay('without-overlay');
+      setOverlay("without-overlay");
       setInitalZoom(11);
     }
   }, [isFullscreen]);
 
   return (
-    <div  className={overlay}>
+    <div className={overlay}>
       <div className={mapSizeClass}>
         <MapContainer key={isFullscreen} center={initialPosition} zoom={initialZoom} style={{ height: "100%", width: "100%" }}>
           <ResizeButton isFullscreen={isFullscreen} toggleResize={() => setIsFullscreen(!isFullscreen)} />
           {isFullscreen && (
-            <DropdownMapOptions
-              options={options}
-              currentOption={currentOption}
-              setCurrentOption={(option) => {
-                if (currentOption !== option) {
-                  resetOptionOnChange();
-                  setCurrentOption(option);
+            <DropdownMapMode
+              modeList={modeList}
+              currentMode={currentMode}
+              setCurrentMode={(mode) => {
+                if (currentMode !== mode) {
+                  resetOnChange();
+                  setCurrentMode(mode);
                 }
               }}
             />
           )}
-          {isFullscreen && currentOption === predefinedPoint && <MapLayoutPredefinedPoint position newPosition={newPosition} />}
-          {isFullscreen && currentOption === predefinedArea && <MapLayoutPredefinedArea />}
-          {isFullscreen && currentOption === customPoint && <MapLayoutCustomPoint position={position} newPosition={newPosition} />}
-          {isFullscreen && currentOption === customArea && <></>}
-          {position.lat && position.long && (
+          {isFullscreen && currentMode === predefinedPoint && <MapLayoutPredefinedPoint newPosition={newPosition} />}
+          {isFullscreen && currentMode === predefinedArea && <MapLayoutPredefinedArea newArea={newArea} />}
+          {isFullscreen && currentMode === customPoint && <MapLayoutCustomPoint position={position} newPosition={newPosition} />}
+          {isFullscreen && currentMode === customArea && <></>}
+          {position && position.type === "Point" && (
             <>
               <Marker position={[position.lat, position.long]} data-testid="map-marker" zIndexOffset={10}>
                 <Popup>
@@ -167,9 +174,14 @@ const MapForm = (props) => {
                   Longitude: {position.long}
                 </Popup>
               </Marker>
-              <ClearPositionButton clearPosition={clearPosition} />
             </>
           )}
+          {position && position.type === "Area " && (
+            <Polygon positions={position.coordinates} color="black" weight={3} fillColor="lightblue" zIndexOffset={10}>
+              {position.name && <Popup>Name: {position.name}</Popup>}
+            </Polygon>
+          )}
+          {position && <ClearPositionButton clearPosition={clearPosition} />}
           <TileLayer url={mapStyles[mapView]} />
           <ResizeMap />
         </MapContainer>

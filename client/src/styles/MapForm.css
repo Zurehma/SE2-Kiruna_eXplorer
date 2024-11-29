@@ -36,9 +36,8 @@
 
 .without-overlay {
   height: 50vh;
-  width: 50vw;
+  width: 100vw;
 }
-
 
 /* Pulsante di controllo */
 .resize-button {
@@ -61,7 +60,7 @@
   cursor: pointer; /* Pointer cursor on hover */
 }
 
-.map-options-dropdown {
+.map-mode-dropdown {
   position: absolute;
   bottom: 10px;
   left: 10px;
