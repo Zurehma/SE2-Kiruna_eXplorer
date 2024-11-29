@@ -10,7 +10,7 @@ function Links(props) {
   const [typeLink, setTypeLink] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
-  const [linkedDocuments, setLinkedDocuments] = useState([]); // Contiene gli ID dei documenti collegati
+  const [linkedDocuments, setLinkedDocuments] = useState([]); // Documenti già collegati
   const navigate = useNavigate();
   const [linkData, setLinkData] = useState({
     document1: "",
@@ -49,11 +49,10 @@ function Links(props) {
   }, [props.newDoc]);
 
   useEffect(() => {
-    if (linkData.document1) {
+    if (linkData.document1 && linkData.linkType) {
       const fetchLinkedDocuments = async () => {
         try {
-          const linkedResponse = await API.getLinksDoc(linkData.document1);
-          // Estrarre gli ID dei documenti collegati
+          const linkedResponse = await API.getLinksDoc(linkData.document1, linkData.linkType);
           const linkedIds = linkedResponse.map((doc) => doc.linkedDocID);
           setLinkedDocuments(linkedIds);
         } catch (error) {
@@ -62,16 +61,16 @@ function Links(props) {
       };
       fetchLinkedDocuments();
     } else {
-      setLinkedDocuments([]); // Resetta se document1 non è selezionato
+      setLinkedDocuments([]); // Resetta se manca document1 o il tipo di link
     }
-  }, [linkData.document1]);
+  }, [linkData.document1, linkData.linkType]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setLinkData((prevLinkData) => ({
       ...prevLinkData,
       [name]: value,
-      ...(name === "document1" ? { document2: [] } : {}), // Resetta document2 quando document1 cambia
+      ...(name === "document1" || name === "linkType" ? { document2: [] } : {}), // Resetta document2 se document1 o linkType cambia
     }));
   };
 
@@ -132,14 +131,32 @@ function Links(props) {
                 >
                   {!props.newDoc && <option value="">Select Document 1</option>}
                   {documents.map((doc) => (
-                    <option name='optionsDoc1' key={doc.id} value={doc.id}>
+                    <option key={doc.id} value={doc.id}>
                       {doc.title}
                     </option>
                   ))}
                 </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.document1}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.document1}</Form.Control.Feedback>
+              </Form.Group>
+
+              {/* Link Type */}
+              <Form.Group controlId="linkType" className="links-form-group">
+                <Form.Label className="links-form-label">Link Type</Form.Label>
+                <Form.Select
+                  name="linkType"
+                  value={linkData.linkType}
+                  onChange={handleChange}
+                  isInvalid={!!errors.linkType}
+                  disabled={!linkData.document1}
+                >
+                  <option value="">Select a type of Link</option>
+                  {typeLink.map((type, index) => (
+                    <option key={index} value={type.name}>
+                      {type.name}
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">{errors.linkType}</Form.Control.Feedback>
               </Form.Group>
 
               {/* Document 2 */}
@@ -159,8 +176,7 @@ function Links(props) {
                   options={documents
                     .filter(
                       (doc) =>
-                        doc.id !== Number(linkData.document1) &&
-                        !linkedDocuments.includes(doc.id)
+                        doc.id !== Number(linkData.document1) && !linkedDocuments.includes(doc.id)
                     )
                     .map((doc) => ({
                       value: doc.id,
@@ -170,55 +186,16 @@ function Links(props) {
                   className="basic-multi-select"
                   classNamePrefix="select"
                   isInvalid={!!errors.document2}
-                  isDisabled={!linkData.document1}
-                  styles={{
-                    placeholder: (base, state) => ({
-                      ...base,
-                      color: state.isDisabled ? 'grey' : 'black', // Grigio quando disabilitato, nero altrimenti
-                    }),
-                    control: (base, state) => ({
-                      ...base,
-                      backgroundColor: state.isDisabled ? '#f5f5f5' : 'white', // Facoltativo, per cambiare lo sfondo
-                    }),
-                  }}
+                  isDisabled={!linkData.document1 || !linkData.linkType}
                 />
-
-                {/* Messaggio di errore */}
                 {errors.document2 && (
-                  <div className="invalid-feedback d-block">
-                    {errors.document2}
-                  </div>
+                  <div className="invalid-feedback d-block">{errors.document2}</div>
                 )}
-              </Form.Group>
-
-              {/* Link Type */}
-              <Form.Group controlId="linkType" className="links-form-group">
-                <Form.Label className="links-form-label">Link Type</Form.Label>
-                <Form.Select
-                  name="linkType"
-                  value={linkData.linkType}
-                  onChange={handleChange}
-                  isInvalid={!!errors.linkType}
-                >
-                  <option value="">Select a type of Link</option>
-                  {typeLink.map((type, index) => (
-                    <option name='optionLink' key={index} value={type.name}>
-                      {type.name}
-                    </option>
-                  ))}
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.linkType}
-                </Form.Control.Feedback>
               </Form.Group>
 
               {/* Save Button */}
               <div className="text-center mt-5">
-                <Button
-                  variant="primary"
-                  onClick={handleSaveLinks}
-                  className="btn-save"
-                >
+                <Button variant="primary" onClick={handleSaveLinks} className="btn-save">
                   Save Link
                 </Button>
               </div>
@@ -240,19 +217,11 @@ function Links(props) {
           </Modal.Body>
           <Modal.Footer>
             {saveStatus === "Completed" ? (
-              <Button
-                variant="primary"
-                onClick={handleNewLink}
-                className="btn-saveLink"
-              >
+              <Button variant="primary" onClick={handleNewLink} className="btn-saveLink">
                 Save New Link
               </Button>
             ) : (
-              <Button
-                variant="primary"
-                onClick={handleNewLink}
-                className="btn-saveLink"
-              >
+              <Button variant="primary" onClick={handleNewLink} className="btn-saveLink">
                 Try again!
               </Button>
             )}
