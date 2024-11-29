@@ -152,9 +152,7 @@ function Documents(props) {
     const selectedFiles = Array.from(e.target.files);
     const validFormats = [".mp4", ".jpeg", ".pdf", ".png", "jpg"];
     // Filter files by extension and add them only if they respect the correct format
-    const newFiles = selectedFiles.filter((file) =>
-      validFormats.some((format) => file.name.endsWith(format))
-    );
+    const newFiles = selectedFiles.filter((file) => validFormats.some((format) => file.name.endsWith(format)));
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
   };
 
@@ -170,24 +168,6 @@ function Documents(props) {
       nValue: value === "1:n" ? prevDocument.nValue || "" : undefined, // Resetta nValue se non è `1:n`
     }));
     setShowNField(value === "1:n"); // Mostra o nascondi il campo nValue
-  };
-
-  const polygonCoordinates = [
-    [67.87328157366065, 20.20047943270466],
-    [67.84024426842895, 20.35839687019359],
-    [67.82082254726043, 20.181254701184297],
-    [67.87328157366065, 20.20047943270466],
-  ];
-
-  const polygonGeoJson = {
-    type: "Polygon",
-    coordinates: [polygonCoordinates], // GeoJSON richiede un array annidato
-  };
-
-  const validateCoordinates = (lat, lng) => {
-    const point = [lat, lng]; // ordine GeoJSON: [lng, lat]
-    const isInside = turf.booleanPointInPolygon(point, polygonGeoJson);
-    return isInside;
   };
 
   const handleChange = (e) => {
@@ -208,14 +188,6 @@ function Documents(props) {
         };
       }
     });
-  };
-
-  const handleMapClick = (lat, lng) => {
-    setPosition({ lat, lng });
-    setDocument((prevDocument) => ({
-      ...prevDocument,
-      coordinates: { lat, long: lng },
-    }));
   };
 
   const validateStep1 = () => {
@@ -242,8 +214,7 @@ function Documents(props) {
       newErrors.type = "You must select a type.";
     }
     if (!document.issuanceDate) {
-      newErrors.issuanceDate =
-        "You must select a Date in a valid format (YYYY or YYYY-MM or YYYY-MM-DD).";
+      newErrors.issuanceDate = "You must select a Date in a valid format (YYYY or YYYY-MM or YYYY-MM-DD).";
     }
     if (!document.language) {
       newErrors.language = "You must select a language.";
@@ -255,27 +226,7 @@ function Documents(props) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const validateStep3 = () => {
-    setDocument((prevDocument) => {
-      return {
-        ...prevDocument,
-        coordinates: {
-          ...prevDocument.coordinates,
-          lat: parseFloat(prevDocument.coordinates.lat) || 0,
-          long: parseFloat(prevDocument.coordinates.long) || 0,
-        },
-      };
-    });
-    const newErrors = {};
-    if (
-      (document.coordinates.lat || document.coordinates.long) &&
-      !validateCoordinates(Number(document.coordinates.lat), Number(document.coordinates.long))
-    ) {
-      newErrors.coordinates = "Please enter a valid LATITUDE and LONGITUDE or select from the map.";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const validateStep3 = () => true;
 
   const handleNextStep = () => {
     console.log("step", step);
@@ -329,13 +280,15 @@ function Documents(props) {
     }
   };
 
-  const [position, setPosition] = useState({ lat: null, lng: null });
+  const [position, setPosition] = useState(undefined);
+
   useEffect(() => {
-    if (position.lat && position.lng) {
-      document.coordinates.lat = position.lat;
-      document.coordinates.long = position.lng;
+    if (position && position.type === "Area") {
+      document.coordinates = position.coordinates;
+    } else if (position && position.type === "Point") {
+      document.coordinates = { lat: position.lat, long: position.long };
     }
-  }, [position.lat, position.lng]);
+  }, [...Object.values(position)]);
 
   useEffect(() => {
     if (
@@ -506,7 +459,6 @@ function Documents(props) {
                   document={document}
                   errors={errors}
                   handleChange={handleChange}
-                  handleMapClick={handleMapClick}
                   position={position}
                   setPosition={setPosition}
                   polygonCoordinates={polygonCoordinates}

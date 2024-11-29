@@ -4,7 +4,7 @@
 
 import { validationResult } from "express-validator";
 import { polygon, point, booleanPointInPolygon } from "@turf/turf";
-import kiruna from "./KirunaMunicipality.js"
+import kiruna from "./KirunaMunicipality.mjs";
 
 /**
  * Check if the provided coordinates are inside the area of Kiruna
@@ -15,22 +15,21 @@ import kiruna from "./KirunaMunicipality.js"
 const isValidKirunaCoordinates = (coordinatesArray) => {
   const coordinates = kiruna?.features[0]?.geometry?.coordinates;
 
-  for(let coordinate of coordinates) {
+  for (let coordinate of coordinates) {
     console.log(coordinate);
-      const a = polygon([coordinate[0]]);
-      for (let i = 0; i < coordinatesArray.length; i++) {
-        let bool = [];
-        coordinatesArray.map((c) => {
-          const p = point([c.lat, c.long]);
-          bool.push(booleanPointInPolygon(p, a));
-        });
-        if(bool.every((value) => value === true)) {
-          return true;
-        }
+    const a = polygon([coordinate[0]]);
+    for (let i = 0; i < coordinatesArray.length; i++) {
+      let bool = [];
+      coordinatesArray.map((c) => {
+        const p = point([c.lat, c.long]);
+        bool.push(booleanPointInPolygon(p, a));
+      });
+      if (bool.every((value) => value === true)) {
+        return true;
       }
+    }
   }
 };
-
 
 /**
  * Middleware to check if a user has logged in
@@ -200,7 +199,7 @@ const Utility = {
   isBodyEmpty,
   validateRequest,
   errorHandler,
-  isValidCoordinatesArray
+  isValidCoordinatesArray,
 };
 
 export default Utility;
