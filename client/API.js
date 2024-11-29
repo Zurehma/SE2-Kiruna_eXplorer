@@ -285,7 +285,6 @@ const saveDocument = async (doc) => {
           : undefined, // Non includere se lat/long non validi
     }).filter(([_, value]) => value !== "" && value !== null && value !== undefined) // Filtra campi vuoti/nulli
   );
-  console.log("gang", filteredDoc);
   try {
     const response = await fetch(`${SERVER_URL}/documents/`, {
       method: "POST",

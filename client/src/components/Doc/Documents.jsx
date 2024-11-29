@@ -92,7 +92,6 @@ function Documents(props) {
         setStakeholders(formattedStakeholders);
         const response2 = await API.getTypeDocuments();
         setTypes(response2);
-        console.log("types", response);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -257,12 +256,10 @@ function Documents(props) {
   const validateStep3 = () => true;
 
   const handleNextStep = () => {
-    console.log("step", step);
     let isValid = false;
     if (step === 1) {
       isValid = validateStep1();
     } else if (step === 2) {
-      console.log("types", types);
       isValid = validateStep2();
     } else if (step === 3) {
       isValid = validateStep3();
@@ -270,7 +267,6 @@ function Documents(props) {
     if (isValid) {
       setStep((prev) => prev + 1);
     }
-    console.log("isValid", step);
   };
 
   const handlePreviousStep = () => setStep((prev) => prev - 1);
@@ -362,7 +358,6 @@ function Documents(props) {
         resetState();
         navigate(`/documents/all`);
       } else if (step === 4) {
-        console.log("document", document);
         const doc = await API.saveDocument(document);
         //Try to submit files
         handleFileUpload(doc);
