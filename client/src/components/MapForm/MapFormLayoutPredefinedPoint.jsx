@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, useMap, useMapEvents, Marker, Popup } from "react-leaflet";
-import { Button } from "react-bootstrap";
+import { Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 import "../../styles/MapForm.css";
@@ -22,9 +21,17 @@ const blueMarkerIcon = new L.Icon({
 });
 
 const MapLayoutPredefinedPoint = (props) => {
-  const { newPoint } = props;
+  const { position,newPoint } = props;
   const [predefinedPoints, setPredefinedPoints] = useState(undefined);
-  const [choosenPosition, setChoosenPosition] = useState(undefined);
+  const [choosenPosition, setChoosenPosition] = useState(position?.type==='Point' ? position.name : undefined);
+
+  useEffect(() => {
+    if (position?.type === "Point") {
+      setChoosenPosition(position.name);
+    }else{
+      setChoosenPosition(undefined)
+    }
+  }, [position]);
 
   useEffect(() => {
     const fetchPredefinedPoints = async () => {
@@ -40,13 +47,13 @@ const MapLayoutPredefinedPoint = (props) => {
 
     fetchPredefinedPoints();
   }, []);
-
+  
   return (
     <>
       {predefinedPoints &&
         predefinedPoints.map((predefinedPoint) => (
           <Marker
-            key={predefinedPoint.name}
+            key={`${predefinedPoint.name}-${choosenPosition}`}
             position={[predefinedPoint.lat, predefinedPoint.long]}
             icon={choosenPosition === predefinedPoint.name ? blueMarkerIcon : redMarkerIcon}
             data-test-id={`map-marker-${predefinedPoint.name}`}

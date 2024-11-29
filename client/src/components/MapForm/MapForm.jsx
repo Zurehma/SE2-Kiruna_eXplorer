@@ -76,7 +76,7 @@ const DropdownMapMode = (props) => {
 
 const MapForm = (props) => {
   const [initialPosition, setInitalPosition] = useState([67.85, 20.217]);
-  const [initialZoom, setInitalZoom] = useState(11);
+  const [initialZoom, setInitalZoom] = useState(7);
   const [mapView, setMapView] = useState("satellite");
   const mapStyles = {
     satellite: "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg",
@@ -101,8 +101,12 @@ const MapForm = (props) => {
 
   const [position, setPosition] = useState(props.position || { type: null, coordinates: null, name: null });
 
-  const newPoint = (lat, long, name = null) => setPosition({ type: "Point", coordinates: { lat: lat, long: long }, name: name });
-  const newArea = (coordinates, name) => setPosition({ type: "Area", coordinates: coordinates, name: name });
+  const handleSetPoint = (lat, long, name) => {
+    setPosition({ type: "Point", coordinates: { lat: lat, long: long }, name: name });
+  };
+  const handleSetArea = (coordinates, name) => {
+    setPosition({ type: "Area", coordinates: coordinates, name: name });
+  };
   const clearPosition = () => setPosition({ type: null, coordinates: null, name: null });
 
   const resetOnChange = () => {
@@ -124,7 +128,6 @@ const MapForm = (props) => {
 
   useEffect(() => {
     props.setPosition(position);
-    console.log(props.position);
   }, [...Object.values(position)]);
 
   useEffect(() => {
@@ -134,12 +137,12 @@ const MapForm = (props) => {
       if (currentMode === predefinedArea) {
         setInitalZoom(7);
       } else {
-        setInitalZoom(12);
+        setInitalZoom(11);
       }
     } else {
       setMapSizeClass(mapContainerClass);
       setOverlay("without-overlay");
-      setInitalZoom(11);
+      setInitalZoom(8);
     }
   }, [isFullscreen, currentMode]);
 
@@ -160,9 +163,9 @@ const MapForm = (props) => {
               }}
             />
           )}
-          {isFullscreen && currentMode === predefinedPoint && <MapLayoutPredefinedPoint newPoint={newPoint} />}
-          {isFullscreen && currentMode === predefinedArea && <MapLayoutPredefinedArea newArea={newArea} />}
-          {isFullscreen && currentMode === customPoint && <MapLayoutCustomPoint position={position} newPoint={newPoint} />}
+          {isFullscreen && currentMode === predefinedPoint && <MapLayoutPredefinedPoint position={position} newPoint={handleSetPoint} />}
+          {isFullscreen && currentMode === predefinedArea && <MapLayoutPredefinedArea position={position} newArea={handleSetArea} />}
+          {isFullscreen && currentMode === customPoint && <MapLayoutCustomPoint position={position} newPoint={handleSetPoint} />}
           {isFullscreen && currentMode === customArea && <></>}
           {position && position.type === "Point" && (
             <Marker position={[position.coordinates.lat, position.coordinates.long]} data-testid="map-marker" zIndexOffset={10}>
@@ -179,8 +182,8 @@ const MapForm = (props) => {
               </Popup>
             </Marker>
           )}
-          {position && position.type === "Area " && (
-            <Polygon positions={position.coordinates} color="black" weight={3} fillColor="lightblue" zIndexOffset={10}>
+          {position && position.type === "Area" && (
+            <Polygon positions={position.coordinates} color="black" weight={3} fillColor="blue">
               {position.name && <Popup>Name: {position.name}</Popup>}
             </Polygon>
           )}

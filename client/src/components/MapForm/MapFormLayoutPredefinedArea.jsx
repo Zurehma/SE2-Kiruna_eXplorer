@@ -5,9 +5,18 @@ import "leaflet/dist/leaflet.css";
 import "../../styles/MapForm.css";
 
 const MapLayoutPredefinedArea = (props) => {
-  const { newArea } = props;
+  const { position, newArea } = props;
   const [predefinedAreas, setPredefinedAreas] = useState(undefined);
-  const [choosenArea, setChoosenArea] = useState(undefined);
+  const [choosenArea, setChoosenArea] = useState(position.type==='Polygon' ? position : undefined);
+  //useEffect on position
+  useEffect(() => {
+    if (position?.type === "Area") {
+      setChoosenArea(position.name);
+    }else{
+      setChoosenArea(undefined)
+    }
+  }, [position]);
+
 
   useEffect(() => {
     const fetchPredefinedAreas = async () => {
