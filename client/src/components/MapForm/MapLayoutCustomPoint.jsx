@@ -8,6 +8,10 @@ const MapClickHandler = ({ onPointSelected }) => {
   // Gestisce gli eventi di clic sulla mappa
   useMapEvents({
     click: (e) => {
+      const target = e.originalEvent.target;
+      if (target.closest(".resize-button")) {
+        return; // Ignora il clic se è avvenuto sul bottone o su un suo elemento figlio
+      }
       const { lat, lng } = e.latlng;
       onPointSelected({ lat, lng }); // Passa il punto cliccato al componente padre
     },
