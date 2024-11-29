@@ -32,6 +32,7 @@ function App() {
   const [editDoc, setEditDoc] = useState("");
   const navigate = useNavigate();
   const [logging, setLogging] = useState(false);
+  const [position,setPosition] = useState(undefined);
 
   const handleLogin = async (credentials) => {
     try {
@@ -131,7 +132,7 @@ function App() {
             }
           />
           <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn} />} />
-          <Route path="/mapform" element={<MapForm />} />
+          <Route path="/mapform" element={<MapForm position={position} setPosition={setPosition} />} />
           <Route
             path="/documents"
             element={
