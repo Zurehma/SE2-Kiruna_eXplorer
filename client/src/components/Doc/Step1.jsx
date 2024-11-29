@@ -6,7 +6,7 @@ const Step1 = ({
   document,
   errors,
   handleChange,
-  stakeholders,
+  stakeholdersList,
   handleStake,
   selectedStakeholders,
   handleCreate,
@@ -38,7 +38,7 @@ const Step1 = ({
             <div className={!!errors.stakeholder ? "is-invalid" : ""}>
               <CreatableSelect
                 isMulti
-                options={stakeholders}
+                options={stakeholdersList}
                 value={selectedStakeholders}
                 onChange={handleStake}
                 onCreateOption={handleCreate}

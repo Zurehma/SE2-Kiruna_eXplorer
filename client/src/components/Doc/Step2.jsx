@@ -148,11 +148,13 @@ const Step2 = ({ document, errors, handleChange, handleAddNew, scales, types }) 
                   handleChange({
                     target: {
                       name: "issuanceDate",
-                      value: year
-                        ? `${year}-${document.issuanceDate?.split("-")[1] || ""}-${
-                            document.issuanceDate?.split("-")[2] || ""
-                          }`
-                        : "",
+                      value: [
+                        year,
+                        document.issuanceDate?.split("-")[1] || "",
+                        document.issuanceDate?.split("-")[2] || "",
+                      ]
+                        .filter(Boolean) // Rimuove valori vuoti
+                        .join("-"), // Unisce con il separatore "-"
                     },
                   });
 
@@ -185,9 +187,13 @@ const Step2 = ({ document, errors, handleChange, handleAddNew, scales, types }) 
                   handleChange({
                     target: {
                       name: "issuanceDate",
-                      value: `${document.issuanceDate?.split("-")[0] || ""}-${month}-${
-                        document.issuanceDate?.split("-")[2] || ""
-                      }`,
+                      value: [
+                        document.issuanceDate?.split("-")[0] || "",
+                        month,
+                        document.issuanceDate?.split("-")[2] || "",
+                      ]
+                        .filter(Boolean) // Rimuove valori vuoti
+                        .join("-"),
                     },
                   });
 
@@ -195,8 +201,10 @@ const Step2 = ({ document, errors, handleChange, handleAddNew, scales, types }) 
                     handleChange({
                       target: {
                         name: "issuanceDate",
-                        value: `${document.issuanceDate?.split("-")[0] || ""}-`,
-                      }, // Resetta il giorno se il mese è vuoto
+                        value: [document.issuanceDate?.split("-")[0] || ""]
+                          .filter(Boolean)
+                          .join("-"), // Solo anno
+                      },
                     });
                   }
                 }}
@@ -216,16 +224,21 @@ const Step2 = ({ document, errors, handleChange, handleAddNew, scales, types }) 
                 as="select"
                 className="input-multi"
                 value={document.issuanceDate?.split("-")[2] || ""}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const day = e.target.value || "";
                   handleChange({
                     target: {
                       name: "issuanceDate",
-                      value: `${document.issuanceDate?.split("-")[0] || ""}-${
-                        document.issuanceDate?.split("-")[1] || ""
-                      }-${e.target.value || ""}`,
+                      value: [
+                        document.issuanceDate?.split("-")[0] || "",
+                        document.issuanceDate?.split("-")[1] || "",
+                        day,
+                      ]
+                        .filter(Boolean) // Rimuove valori vuoti
+                        .join("-"),
                     },
-                  })
-                }
+                  });
+                }}
                 disabled={!document.issuanceDate?.split("-")[1]} // Disabilitato finché non viene scelto il mese
               >
                 <option value="">Day</option>
