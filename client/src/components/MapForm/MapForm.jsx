@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, useMap, useMapEvents, Marker, Popup, Polygon } from "react-leaflet";
+import React, { useState, useEffect } from "react";
+import { MapContainer, TileLayer, useMap, Marker, Popup, Polygon } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { booleanPointInPolygon } from "@turf/turf";
+
 
 import "../../styles/MapForm.css";
 
@@ -8,7 +10,7 @@ import { Button, Dropdown } from "react-bootstrap";
 import MapLayoutCustomPoint from "./MapLayoutCustomPoint";
 import MapLayoutPredefinedPoint from "./MapFormLayoutPredefinedPoint";
 import MapLayoutPredefinedArea from "./MapFormLayoutPredefinedArea";
-
+import KirunaMunicipality from "../MapUtils/KirunaMunicipality";
 /**
  * Button component to resize the map
  * @param {*} isFullScreen boolean to tell is the map occupies the whole screen or the container size
@@ -78,6 +80,30 @@ const MapForm = (props) => {
   const [initialPosition, setInitalPosition] = useState([67.85, 20.217]);
   const [initialZoom, setInitalZoom] = useState(7);
   const [mapView, setMapView] = useState("satellite");
+  const [geoJsonData, setGeoJsonData] = useState(null);
+
+  //validate coordinates: verify they're in the Kiruna Municipality
+  const validateCoordinates = (coord) => {
+    if (!geoJsonData) return false;
+    const multiPolygon = geoJsonData.features[0]; 
+    if (coord.type === "Point") {
+      // Converte le coordinate in un oggetto punto GeoJSON
+      const point = {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: coord.coordinates, // [lng, lat]
+        },
+      };
+      // Verifica se il punto è dentro il MultiPolygon
+      return booleanPointInPolygon(point, multiPolygon);
+    } else {
+      // TODO: Verifica per un'area (multi-coordinates)
+      return false;
+    }
+  };
+  
+
   const mapStyles = {
     satellite: "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg",
     streets: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
@@ -165,8 +191,10 @@ const MapForm = (props) => {
           )}
           {isFullscreen && currentMode === predefinedPoint && <MapLayoutPredefinedPoint position={position} newPoint={handleSetPoint} />}
           {isFullscreen && currentMode === predefinedArea && <MapLayoutPredefinedArea position={position} newArea={handleSetArea} />}
-          {isFullscreen && currentMode === customPoint && <MapLayoutCustomPoint position={position} newPoint={handleSetPoint} />}
+          {isFullscreen && currentMode === customPoint && <MapLayoutCustomPoint position={position} newPoint={handleSetPoint} validateCoordinates={validateCoordinates} />}
           {isFullscreen && currentMode === customArea && <></>}
+          {/* Show the borders only when a custom point or area is concerned */}
+          {isFullscreen && (currentMode === predefinedArea || currentMode ===customPoint) && <KirunaMunicipality setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} />}
           {position && position.type === "Point" && (
             <Marker position={[position.coordinates.lat, position.coordinates.long]} data-testid="map-marker" zIndexOffset={10}>
               <Popup>
