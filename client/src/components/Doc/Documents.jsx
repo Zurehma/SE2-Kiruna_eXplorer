@@ -140,11 +140,9 @@ function Documents(props) {
       }));
 
       if (coordinates && typeof coordinates === "object") {
-        setPosition({ coordinates: { lat: coordinates.lat, long: coordinates.long }, type: "Point" });
-      } else if (coordinates && coordinates.length == 1) {
-        setPosition({ coordinates: { lat: coordinates[0].long, long: coordinates[0].lat }, type: "Point" });
-      } else if (coordinates && coordinates.length > 1) {
-        setPosition({ coordinates: coordinates.map((c) => [c.lat, c.long]), type: "Area" });
+        setPosition({ coordinates: coordinates, type: "Point" });
+      } else if (coordinates && coordinates.length > 3) {
+        setPosition({ coordinates: coordinates, type: "Area" });
       }
     } catch (error) {
       console.error("Error fetching document:", error);
@@ -310,10 +308,10 @@ function Documents(props) {
   };
 
   useEffect(() => {
-    if (position && position.coordinates) {
+    if (position) {
       document.coordinates = position.coordinates;
     }
-  }, [...Object.values(position)]);
+  }, [position.coordinates, position.type]);
 
   const handleFileUpload = async (doc) => {
     if (files.length > 0) {

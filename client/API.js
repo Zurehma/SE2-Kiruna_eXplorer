@@ -119,12 +119,9 @@ const getAttachments = async (docID) => {
 const downloadAttachment = async (docID, attachmentID) => {
   try {
     // EFetch request to the server
-    const response = await fetch(
-      `${SERVER_URL}/documents/${docID}/attachments/${attachmentID}/download`,
-      {
-        method: "GET",
-      }
-    );
+    const response = await fetch(`${SERVER_URL}/documents/${docID}/attachments/${attachmentID}/download`, {
+      method: "GET",
+    });
 
     // 200 if the response is correct
     if (!response.ok) {
@@ -279,10 +276,7 @@ const saveDocument = async (doc) => {
       pages: doc.pages,
       pageFrom: doc.pageFrom,
       pageTo: doc.pageTo,
-      coordinates:
-        doc.coordinates?.lat && doc.coordinates?.long
-          ? [{ lat: doc.coordinates.lat, long: doc.coordinates.long }]
-          : undefined, // Non includere se lat/long non validi
+      coordinates: doc.coordinates,
     }).filter(([_, value]) => value !== "" && value !== null && value !== undefined) // Filtra campi vuoti/nulli
   );
   try {
@@ -311,12 +305,11 @@ const updateDocument = async (documentId, doc) => {
       pages: doc.pages,
       pageFrom: doc.pageFrom,
       pageTo: doc.pageTo,
-      coordinates:
-        doc.coordinates?.lat && doc.coordinates?.long
-          ? [{ lat: doc.coordinates.lat, long: doc.coordinates.long }]
-          : undefined, // Non includere se lat/long non validi
+      coordinates: doc.coordinates,
     }).filter(([_, value]) => value !== "" && value !== null && value !== undefined) // Filtra campi vuoti/nulli
   );
+
+  console.log(filteredDoc);
   try {
     const response = await fetch(`${SERVER_URL}/documents/${documentId}`, {
       method: "PUT",
