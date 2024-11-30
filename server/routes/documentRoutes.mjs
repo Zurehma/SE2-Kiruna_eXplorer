@@ -12,7 +12,6 @@ class DocumentRoutes {
   getRouter = () => this.router;
 
   initRoutes = () => {
-
     this.router.get("/allExistingLinks", (req, res, next) => {
       this.documentController
         .getAllLinks()
@@ -23,7 +22,7 @@ class DocumentRoutes {
           next(err);
         });
     });
-    
+
     this.router.get(
       "/",
       [
@@ -32,12 +31,16 @@ class DocumentRoutes {
         query("issuanceDateFrom").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
         query("issuanceDateTo").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
         query("limit").optional().isInt({ gt: 0 }).withMessage("Limit must be a positive integer"),
-        query("offset").optional().isInt({ min: 0 }).withMessage("Offset must be a non-negative integer").custom((value, { req }) => {
-          if (!req.query.limit) {
-            throw new Error("Offset is required when limit is specified");
-          }
-          return true;
-        }),
+        query("offset")
+          .optional()
+          .isInt({ min: 0 })
+          .withMessage("Offset must be a non-negative integer")
+          .custom((value, { req }) => {
+            if (!req.query.limit) {
+              throw new Error("Offset is required when limit is specified");
+            }
+            return true;
+          }),
       ],
       Utility.validateRequest,
       (req, res, next) => {
@@ -63,7 +66,10 @@ class DocumentRoutes {
       body("type").isString().notEmpty(),
       body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
-      body("coordinates").optional().isArray().custom(Utility.isValidCoordinatesArray),
+      oneOf([
+        body("coordinates").optional().custom(Utility.isValidCoordinatesObject),
+        body("coordinates").optional().custom(Utility.isValidCoordinatesArray),
+      ]),
       body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
       body("pageFrom").optional().isInt({ gt: 0 }),
       body("pageTo").optional().isInt({ gt: 0 }),
@@ -134,7 +140,10 @@ class DocumentRoutes {
       body("type").isString().notEmpty(),
       body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
-      body("coordinates").optional().isArray().custom(Utility.isValidCoordinatesArray),
+      oneOf([
+        body("coordinates").optional().custom(Utility.isValidCoordinatesObject),
+        body("coordinates").optional().custom(Utility.isValidCoordinatesArray),
+      ]),
       body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
       body("pageFrom").optional().isInt({ gt: 0 }),
       body("pageTo").optional().isInt({ gt: 0 }),
@@ -160,8 +169,6 @@ class DocumentRoutes {
       }
     );
 
-  
-
     this.router.get("/links/:id", param("id").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
       this.documentController
         .getLinks(req.params.id)
@@ -184,14 +191,10 @@ class DocumentRoutes {
       async (req, res, next) => {
         try {
           const { id1, ids, type } = req.body;
-          
+
           // Find links that exist with the same document pairs and the same type
           const existingLinks = await this.documentController.getLinks(id1);
-          const duplicates = ids.filter((id) =>
-            existingLinks.some(
-              (link) => link.linkedDocID === id && link.type === type
-            )
-          );
+          const duplicates = ids.filter((id) => existingLinks.some((link) => link.linkedDocID === id && link.type === type));
 
           if (duplicates.length > 0) {
             return res.status(409).json({

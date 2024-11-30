@@ -60,7 +60,14 @@ class DocumentController {
           throw error;
         }
 
-        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates)) {
+        if (coordinates && Array.isArray(coordinates)) {
+          coordinates.forEach((c) => {
+            if (!Utility.isValidKirunaCoordinates(c[0], c[1])) {
+              const error = { errCode: 400, errMessage: "Coordinates error." };
+              throw error;
+            }
+          });
+        } else if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
           const error = { errCode: 400, errMessage: "Coordinates error." };
           throw error;
         }
@@ -115,7 +122,14 @@ class DocumentController {
           throw error;
         }
 
-        if (coordinates && !Utility.isValidKirunaCoordinates(coordinates)) {
+        if (coordinates && Array.isArray(coordinates)) {
+          coordinates.forEach((c) => {
+            if (!Utility.isValidKirunaCoordinates(c[0], c[1])) {
+              const error = { errCode: 400, errMessage: "Coordinates error." };
+              throw error;
+            }
+          });
+        } else if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
           const error = { errCode: 400, errMessage: "Coordinates error." };
           throw error;
         }
@@ -181,7 +195,7 @@ class DocumentController {
     return new Promise(async (resolve, reject) => {
       try {
         const doc = await this.documentDAO.getDocumentByID(id1);
-        
+
         if (doc === undefined) {
           const error = { errCode: 404, errMessage: "Document not found!" };
           throw error;
@@ -235,7 +249,7 @@ class DocumentController {
       try {
         const links = await this.documentDAO.getAllLinks();
         console.log(links);
-    
+
         // Group the links by document ID
         const groupedLinks = links.reduce((acc, row) => {
           // Initialize the document's object if it doesn't exist
@@ -245,35 +259,35 @@ class DocumentController {
               links: [],
             };
           }
-    
+
           // Add each linked document information
           acc[row.documentID].links.push({
             linkedDocID: row.linkedDocID,
             linkedTitle: row.linkedTitle,
             type: row.type,
           });
-    
+
           return acc;
         }, {});
-    
+
         // Step 1: Sort the links for each document in ascending order of linkedDocID
-        Object.keys(groupedLinks).forEach(docID => {
+        Object.keys(groupedLinks).forEach((docID) => {
           groupedLinks[docID].links.sort((a, b) => a.linkedDocID - b.linkedDocID);
         });
-  
+
         // Step 2: Format the result as desired
         const formattedResponse = {};
-        Object.keys(groupedLinks).forEach(docID => {
+        Object.keys(groupedLinks).forEach((docID) => {
           formattedResponse[docID] = {
             documentTitle: groupedLinks[docID].documentTitle,
-            links: groupedLinks[docID].links.map(link => ({
+            links: groupedLinks[docID].links.map((link) => ({
               linkedDocID: link.linkedDocID,
               linkedTitle: link.linkedTitle,
               type: link.type,
-            }))
+            })),
           };
         });
-  
+
         resolve(formattedResponse);
       } catch (err) {
         reject(err);
@@ -281,24 +295,20 @@ class DocumentController {
     });
   };
 
-  getAllLinks = () =>{
-    return new Promise(async (resolve, reject)=>{
-      try{
+  getAllLinks = () => {
+    return new Promise(async (resolve, reject) => {
+      try {
         const links = await this.documentDAO.getAllLinks();
-        if (links === undefined){
-          const error = {errCode: 404, errMessage: "Links not found!"};
+        if (links === undefined) {
+          const error = { errCode: 404, errMessage: "Links not found!" };
           throw error;
         }
         resolve(links);
-      }
-      catch(err){
+      } catch (err) {
         reject(err);
       }
-    })
-  }
-
-
-
+    });
+  };
 }
 
 export default DocumentController;
