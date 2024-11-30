@@ -105,12 +105,11 @@ function MyPopup(props) {
   };
   const stakeholderList=(stakeholderArray)=>{
     let stakeholderList='';
+    console.log(stakeholderArray);
     stakeholderArray.forEach((stakeholder,index)=>{
-      if(index!==0){
-        stakeholderList += `/${stakeholder}`;
-      }
+    stakeholderList += `${stakeholder}`;
       if(index<stakeholderArray.length-1){
-        stakeholderList+=', ';
+        stakeholderList+='/';
       }
     });
     return stakeholderList;
