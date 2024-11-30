@@ -29,6 +29,7 @@ function Documents(props) {
   const [types, setTypes] = useState([]);
   const [stakeholdersList, setStakeholders] = useState([]);
   const [selectedStakeholders, setSelectedStakeholders] = useState([]);
+  const [position, setPosition] = useState({ type: null, coordinates: null, name: null });
 
   const [document, setDocument] = useState({
     title: "",
@@ -110,7 +111,7 @@ function Documents(props) {
   const fetchDocument = async (documentId) => {
     try {
       const doc = await API.getDocumentById(documentId);
-      const coordinates = doc.coordinates || [{ lat: "", long: "" }];
+      const coordinates = doc.coordinates;
       let pages = doc.pages;
       if (!doc.pages && doc.pageFrom && doc.pageTo) {
         pages = `${doc.pageFrom}-${doc.pageTo}`;
@@ -128,6 +129,7 @@ function Documents(props) {
         isNew: false,
       }));
       setSelectedStakeholders(selected); // Imposta lo stato
+
       // Aggiorna il documento
       setDocument((prevDocument) => ({
         ...doc,
@@ -136,6 +138,14 @@ function Documents(props) {
         scale,
         nValue,
       }));
+
+      if (coordinates && typeof coordinates === "object") {
+        setPosition({ coordinates: { lat: coordinates.lat, long: coordinates.long }, type: "Point" });
+      } else if (coordinates && coordinates.length == 1) {
+        setPosition({ coordinates: { lat: coordinates[0].long, long: coordinates[0].lat }, type: "Point" });
+      } else if (coordinates && coordinates.length > 1) {
+        setPosition({ coordinates: coordinates.map((c) => [c.lat, c.long]), type: "Area" });
+      }
     } catch (error) {
       console.error("Error fetching document:", error);
       props.setError(error);
@@ -155,9 +165,7 @@ function Documents(props) {
     const selectedFiles = Array.from(e.target.files);
     const validFormats = [".mp4", ".jpeg", ".pdf", ".png", "jpg"];
     // Filter files by extension and add them only if they respect the correct format
-    const newFiles = selectedFiles.filter((file) =>
-      validFormats.some((format) => file.name.endsWith(format))
-    );
+    const newFiles = selectedFiles.filter((file) => validFormats.some((format) => file.name.endsWith(format)));
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
   };
 
@@ -240,8 +248,7 @@ function Documents(props) {
       newErrors.newType = "You must insert a new type or select one from the menu.";
     }
     if (!document.issuanceDate) {
-      newErrors.issuanceDate =
-        "You must select a Date in a valid format (YYYY or YYYY-MM or YYYY-MM-DD).";
+      newErrors.issuanceDate = "You must select a Date in a valid format (YYYY or YYYY-MM or YYYY-MM-DD).";
     }
     if (!document.language) {
       newErrors.language = "You must select a language.";
@@ -301,8 +308,6 @@ function Documents(props) {
       return false; // Input non valido
     }
   };
-
-  const [position, setPosition] = useState({ type: null, coordinates: null, name: null });
 
   useEffect(() => {
     if (position && position.coordinates) {
@@ -376,18 +381,11 @@ function Documents(props) {
   //Gestisce la selezione degli stakeholders
   const handleStake = (selectedOptions) => {
     // Trova le opzioni rimosse
-    const removedOptions = selectedStakeholders.filter(
-      (opt) => !(selectedOptions || []).some((sel) => sel.value === opt.value)
-    );
+    const removedOptions = selectedStakeholders.filter((opt) => !(selectedOptions || []).some((sel) => sel.value === opt.value));
     // Rimuove solo quelli creati manualmente
     const removedNewOptions = removedOptions.filter((opt) => opt.isNew);
     if (removedNewOptions.length > 0) {
-      setStakeholders((prev) =>
-        prev.filter(
-          (stakeholders) =>
-            !removedNewOptions.some((removed) => removed.value === stakeholders.value)
-        )
-      );
+      setStakeholders((prev) => prev.filter((stakeholders) => !removedNewOptions.some((removed) => removed.value === stakeholders.value)));
     }
     // Aggiorna le opzioni selezionate
     setSelectedStakeholders(selectedOptions || []);
@@ -452,24 +450,9 @@ function Documents(props) {
                 />
               )}
               {step === 2 && (
-                <Step2
-                  document={document}
-                  errors={errors}
-                  handleChange={handleChange}
-                  handleAddNew={handleAddNew}
-                  scales={scales}
-                  types={types}
-                />
+                <Step2 document={document} errors={errors} handleChange={handleChange} handleAddNew={handleAddNew} scales={scales} types={types} />
               )}
-              {step === 3 && (
-                <Step3
-                  document={document}
-                  errors={errors}
-                  handleChange={handleChange}
-                  position={position}
-                  setPosition={setPosition}
-                />
-              )}
+              {step === 3 && <Step3 document={document} errors={errors} handleChange={handleChange} position={position} setPosition={setPosition} />}
               {step === 4 && (
                 <Step4
                   handleFileChange={handleFileChange}
