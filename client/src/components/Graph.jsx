@@ -75,38 +75,44 @@ const DocumentChartStatic = () => {
   useEffect(() => {
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove(); // Clear previous content
-
+  
     const width = svg.node().getBoundingClientRect().width;
     const height = svg.node().getBoundingClientRect().height;
-    const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+    const margin = { top: 20, right: 20, bottom: 40, left: 80 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
-
+  
     const g = svg
       .attr('width', width)
       .attr('height', height)
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
-
-    const years = Array.from(new Set(chartData.map(d => new Date(d.issuanceDate).getFullYear())));
+  
+    // Ensure years are sorted in ascending order
+    const years = Array.from(new Set(chartData.map(d => new Date(d.issuanceDate).getFullYear())))
+      .sort((a, b) => a - b);  // Sort the years
+  
     const scales = Array.from(new Set([
       'Text',
       ...chartData.map(d => d.scale).filter((v, i, a) => a.indexOf(v) === i)
     ]));
-
-    // Ensure 'Blueprint' is included in the yScales
+  
+    // Ensure 'Blueprint' is included once in yScales
     const yScales = scales.includes('Blueprint') ? scales : [...scales, 'Blueprint'];
-
+  
+    // Remove the last element from the yScales
+    yScales.pop();  // This removes the last item from the array
+  
     const xScale = d3.scaleBand()
-      .domain(years)
+      .domain(years)  // Use the sorted years
       .range([0, innerWidth])
       .padding(0.1);
-
+  
     const yScale = d3.scaleBand()
       .domain(yScales)
       .range([0, innerHeight])
       .padding(0.2);
-
+  
     // Customizing the Y-axis ticks to display the '1:' label, but not for "Blueprint" or "Text"
     const xAxis = d3.axisBottom(xScale).tickFormat(d3.format('d'));
     const yAxis = d3.axisLeft(yScale)
@@ -118,14 +124,14 @@ const DocumentChartStatic = () => {
         return d; // For "Blueprint" and "Text", don't add the prefix
       })
       .tickSize(0);  // Remove tick lines
-
+  
     g.append('g')
       .attr('transform', `translate(0, ${innerHeight})`)
       .call(xAxis);
-
+  
     g.append('g')
       .call(yAxis);
-
+  
     const documentPositions = chartData.reduce((acc, doc) => {
       const year = new Date(doc.issuanceDate).getFullYear();
       const xPos = xScale(year);
@@ -133,21 +139,21 @@ const DocumentChartStatic = () => {
       acc[doc.id] = { x: xPos + xScale.bandwidth() / 2, y: yPos + yScale.bandwidth() / 2 };
       return acc;
     }, {});
-
+  
     const stakeholderColorMap = stakeholders.reduce((acc, stakeholder) => {
       acc[stakeholder.name] = stakeholder.color;
       return acc;
     }, {});
-
+  
     chartData.forEach((doc) => {
       const year = new Date(doc.issuanceDate).getFullYear();
       const xPos = xScale(year);
       const yPos = yScale(doc.scale);
-
+  
       const iconClass = iconMap[doc.type] || 'bi-file-earmark';
       const stakeholderColor = doc.stakeholders ? doc.stakeholders.map(stakeholder => stakeholderColorMap[stakeholder] || 'gray') : ['gray'];
       const iconColor = stakeholderColor.length > 0 ? stakeholderColor.join(', ') : 'gray';
-
+  
       g.append('foreignObject')
         .attr('x', xPos + xScale.bandwidth() / 2 - 12)
         .attr('y', yPos + yScale.bandwidth() / 2 - 12)
@@ -157,11 +163,11 @@ const DocumentChartStatic = () => {
         .html(`<i class="bi ${iconClass}" style="font-size: 20px; color: ${iconColor};"></i>`)
         .on('click', () => handleDocumentClick(doc)); // Add click handler to document icon
     });
-
+  
     links.forEach(link => {
       const doc1Pos = documentPositions[link.DocID1];
       const doc2Pos = documentPositions[link.DocID2];
-
+  
       if (doc1Pos && doc2Pos) {
         g.append('line')
           .attr('x1', doc1Pos.x)
@@ -174,7 +180,7 @@ const DocumentChartStatic = () => {
       }
     });
   }, [chartData, links, stakeholders]);
-
+  
   const handleDocumentClick = (doc) => {
     // Navigate to the document detail page using the document's ID
     navigate(`/document/${doc.id}`);
@@ -197,7 +203,7 @@ const DocumentChartStatic = () => {
   return (
     <div className="container-fluid col-12" style={{ height: 'auto', position: 'relative', zIndex: 1000 }}>
       <div className="row" style={{ height: '33.33vh', background: '#f0f0f0' }}>
-        <div className="col-2" style={{ background: '#f9f9f9', fontSize: '7px', borderRight: '1px solid #ccc', overflow: 'hidden' }}>
+        <div className="col-2" style={{ background: '#f9f9f9', fontSize: '7px', borderRight: '1px solid #ccc', overflow: 'hidden',paddingTop:'0.2cm' }}>
           <h5 style={{ fontSize: '10px', marginBottom: '4px', paddingLeft: '0.3cm' }}>Legend</h5>
           <div style={{ lineHeight: '1', fontSize: '5px', display: 'flex', gap: '3px', paddingLeft: '0.3cm' }}>
             {documentTypes.map((doc, index) => {
@@ -209,43 +215,42 @@ const DocumentChartStatic = () => {
               );
             })}
           </div>
-
+    
           <div style={{ display: 'flex', flexDirection: 'row', fontSize: '5px', paddingLeft: '0.3cm' }}>
-        {/* Stakeholders Section */}
-        <div style={{ marginRight: '1cm' }}>
-          <h6 style={{ fontSize: '8px', marginBottom: '1px' }}>Stakeholders:</h6>
-          {stakeholders.map((stakeholder, index) => (
-            <p
-              key={index}
-              style={{ fontSize: '6px', color: stakeholder.color }}
-              onClick={() => handleStakeholderClick(stakeholder.name)}
-            >
-              <span style={{ fontSize: '7px' }}>■</span> {stakeholder.name}
-            </p>
-          ))}
-        </div>
-
-           {/* Connections Section */}
-          <div>
-            <h6 style={{ fontSize: '7px', marginBottom: '0.3px' }}>Connections:</h6>
-            <p style={{ fontSize: '5px' }}>
-              <span style={{ fontSize: '5px' }}>―――</span> direct consequence
-            </p>
-            <p style={{ fontSize: '5px' }}>
-              <span style={{ fontSize: '5px' }}>---- </span> collateral consequence
-            </p>
-            <p style={{ fontSize: '5px' }}>
-              <span style={{ fontSize: '5px' }}>...... </span> Prevision
-            </p>
-            <p style={{ fontSize: '5px' }}>
-              <span style={{ fontSize: '5px' }}>-.-.-.- </span> Update
-            </p>
+            {/* Stakeholders Section */}
+            <div style={{ marginRight: '1cm', maxHeight: '150px', overflowY: 'auto', paddingRight:'15px'}}>
+              <h6 style={{ fontSize: '8px', marginBottom: '1px' }}>Stakeholders:</h6>
+              {stakeholders.map((stakeholder, index) => (
+                <p
+                  key={index}
+                  style={{ fontSize: '6px', color: stakeholder.color }}
+                  onClick={() => handleStakeholderClick(stakeholder.name)}
+                >
+                  <span style={{ fontSize: '7px' }}>■</span> {stakeholder.name}
+                </p>
+              ))}
+            </div>
+    
+            {/* Connections Section */}
+            <div>
+              <h6 style={{ fontSize: '7px', marginBottom: '0.3px' }}>Connections:</h6>
+              <p style={{ fontSize: '5px' }}>
+                <span style={{ fontSize: '5px' }}>―――</span> Direct consequence
+              </p>
+              <p style={{ fontSize: '5px' }}>
+                <span style={{ fontSize: '5px' }}>---- </span> Collateral consequence
+              </p>
+              <p style={{ fontSize: '5px' }}>
+                <span style={{ fontSize: '5px' }}>...... </span> Prevision
+              </p>
+              <p style={{ fontSize: '5px' }}>
+                <span style={{ fontSize: 'px' }}>-.-.-.- </span> Update
+              </p>
+            </div>
           </div>
         </div>
-
-        </div>
-        <div className="col-10" style={{ height: '100%', background: '#ffffff', position: 'relative', paddingLeft: '1cm' }}>
-          <svg ref={svgRef} style={{ width: '100%', height: '100%' }}></svg>
+        <div className="col-10" style={{ height: '100%', background: '#ffffff', position: 'relative', paddingLeft: '1.5cm' }}>
+          <svg ref={svgRef} style={{ width: '100%', height: '100%',  }}></svg>
         </div>
       </div>
     </div>
