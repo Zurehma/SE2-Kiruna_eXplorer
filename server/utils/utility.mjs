@@ -3,8 +3,8 @@
  */
 
 import { validationResult } from "express-validator";
-import { polygon, point, booleanPointInPolygon } from "@turf/turf";
-import kiruna from "./KirunaMunicipality.mjs";
+import { polygon, multiPolygon, point, booleanPointInPolygon } from "@turf/turf";
+import fs from "fs";
 
 /**
  * Check if the provided coordinates are inside the area of Kiruna
@@ -12,23 +12,14 @@ import kiruna from "./KirunaMunicipality.mjs";
  * @param {Number} long
  * @returns {Boolean} **true** if the coordinates provided are inside of Kiruna
  */
-const isValidKirunaCoordinates = (coordinatesArray) => {
-  const coordinates = kiruna?.features[0]?.geometry?.coordinates;
+const isValidKirunaCoordinates = (lat, long) => {
+  const file = fs.readFileSync("static/KirunaMunicipality.geojson");
+  const data = JSON.parse(file);
 
-  for (let coordinate of coordinates) {
-    console.log(coordinate);
-    const a = polygon([coordinate[0]]);
-    for (let i = 0; i < coordinatesArray.length; i++) {
-      let bool = [];
-      coordinatesArray.map((c) => {
-        const p = point([c.lat, c.long]);
-        bool.push(booleanPointInPolygon(p, a));
-      });
-      if (bool.every((value) => value === true)) {
-        return true;
-      }
-    }
-  }
+  const kirunaArea = multiPolygon(data.features[0].geometry.coordinates);
+  const selectedPoint = point([long, lat]);
+
+  return booleanPointInPolygon(selectedPoint, kirunaArea);
 };
 
 /**
@@ -81,17 +72,29 @@ const isValidCoordinatesObject = (value) => {
   return true;
 };
 
-const isValidCoordinatesArray = (coordinatesArray) => {
-  if (!Array.isArray(coordinatesArray)) {
+/**
+ * Middleware to check if an object is a valid coordinates array
+ * @param {Object} value
+ * @returns
+ */
+const isValidCoordinatesArray = (value) => {
+  if (!Array.isArray(value)) {
     throw new Error("Input is not an array.");
   }
 
-  coordinatesArray.forEach((value, index) => {
-    const lat = value.lat;
-    const long = value.long;
-    const numProperties = Object.keys(value).length;
+  if (value.length < 3) {
+    throw new Error("Invalid coordinates array object.");
+  }
 
-    if (lat === undefined || long === undefined || numProperties !== 2) {
+  value.forEach((c, index) => {
+    if (c.length !== 2) {
+      throw new Error(`Invalid coordinates ai index ${index}.`);
+    }
+
+    const lat = c[0];
+    const long = c[1];
+
+    if (lat === undefined || long === undefined) {
       throw new Error(`Invalid coordinates object at index ${index}.`);
     }
 

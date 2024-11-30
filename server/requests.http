@@ -69,8 +69,8 @@ Content-Type: application/json
 
 {
     "id1":1,
-    "ids" : [2,4,6],
-    "type" : "Direct"
+    "ids" : [4],
+    "type" : "Update"
 }
 
 ### Get link types

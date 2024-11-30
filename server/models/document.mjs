@@ -42,10 +42,14 @@ class Document {
     this.connections = connections;
     this.language = language;
     this.description = description;
-    coordinates ? (this.coordinates = JSON.parse(coordinates)) : "";
-    pages ? (this.pages = pages) : "";
-    pageFrom ? (this.pageFrom = pageFrom) : "";
-    pageTo ? (this.pageTo = pageTo) : "";
+
+    if (coordinates) this.coordinates = JSON.parse(coordinates);
+
+    if (pages) this.pages = pages;
+
+    if (pageFrom) this.pageFrom = pageFrom;
+
+    if (pageTo) this.pageTo = pageTo;
   }
 }
 
