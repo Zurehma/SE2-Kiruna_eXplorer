@@ -103,9 +103,20 @@ function MyPopup(props) {
       props.setError('Invalid document data');
     }
   };
-  
+  const stakeholderList=(stakeholderArray)=>{
+    let stakeholderList='';
+    console.log(stakeholderArray);
+    stakeholderArray.forEach((stakeholder,index)=>{
+    stakeholderList += `${stakeholder}`;
+      if(index<stakeholderArray.length-1){
+        stakeholderList+='/';
+      }
+    });
+    return stakeholderList;
+  }
   // Helper function to display "-" if value is null
   const displayValue = (value) => (value !== null ? value : '-');
+  const listOfStakeholders = stakeholderList(props.doc.stakeholders);
 
   return (
     <Row className="p-3 border rounded shadow-sm popupProp" style={{ backgroundColor: '#f9f9f9' }}>
@@ -153,7 +164,7 @@ function MyPopup(props) {
       <Col xs={12} md={4} className="myPopup">
         <h6 className="fw-bold text-secondary mb-2">{props.doc.title}</h6>
         <div className="small text-muted m-0">
-          <strong className="text-dark">Stakeholders:</strong> {props.doc.stakeholder} <br />
+          <strong className="text-dark">Stakeholders:</strong> {listOfStakeholders} <br />
           <strong className="text-dark">Scale:</strong>{' '}
           {props.doc.scale &&
           typeof props.doc.scale === 'string' &&

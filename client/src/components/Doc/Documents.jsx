@@ -27,12 +27,12 @@ function Documents(props) {
   const { id } = useParams();
   const [step, setStep] = useState(1);
   const [types, setTypes] = useState([]);
-  const [stakeholders, setStakeholders] = useState([]);
+  const [stakeholdersList, setStakeholders] = useState([]);
   const [selectedStakeholders, setSelectedStakeholders] = useState([]);
 
   const [document, setDocument] = useState({
     title: "",
-    stakeholder: "",
+    stakeholders: "",
     scale: "",
     nValue: "",
     issuanceDate: "",
@@ -41,14 +41,14 @@ function Documents(props) {
     description: "",
     language: "",
     pages: "",
-    coordinates: { lat: "", long: "" },
+    coordinates: [{ lat: "", long: "" }],
     pageFrom: "",
     pageTo: "",
   });
 
   const [errors, setErrors] = useState({
     title: "",
-    stakeholder: "",
+    stakeholders: "",
     scale: "",
     nValue: "",
     issuanceDate: "",
@@ -64,7 +64,7 @@ function Documents(props) {
   const resetState = () => {
     setDocument(() => ({
       title: "",
-      stakeholder: "",
+      stakeholders: "",
       scale: "",
       nValue: "",
       newType: "",
@@ -74,7 +74,7 @@ function Documents(props) {
       description: "",
       language: "",
       pages: "",
-      coordinates: { lat: "", long: "" },
+      coordinates: [{ lat: "", long: "" }],
       pageFrom: "",
       pageTo: "",
     }));
@@ -84,15 +84,14 @@ function Documents(props) {
     const fetchTypes = async () => {
       try {
         const response = await API.getStakeholders();
-        const formattedStakeholders = response.map((stakeholder) => ({
-          value: stakeholder.name,
-          label: stakeholder.name,
+        const formattedStakeholders = response.map((stakeholders) => ({
+          value: stakeholders.name,
+          label: stakeholders.name,
           isNew: false, // Indica che è predefinito
         }));
         setStakeholders(formattedStakeholders);
         const response2 = await API.getTypeDocuments();
         setTypes(response2);
-        console.log("types", response);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -111,7 +110,7 @@ function Documents(props) {
   const fetchDocument = async (documentId) => {
     try {
       const doc = await API.getDocumentById(documentId);
-      const coordinates = doc.coordinates || { lat: "", long: "" };
+      const coordinates = doc.coordinates || [{ lat: "", long: "" }];
       let pages = doc.pages;
       if (!doc.pages && doc.pageFrom && doc.pageTo) {
         pages = `${doc.pageFrom}-${doc.pageTo}`;
@@ -123,9 +122,9 @@ function Documents(props) {
         scale = `1:n`;
       }
       // Aggiorna gli stakeholders selezionati
-      const selected = (doc.stakeholder || []).map((stakeholder) => ({
-        value: stakeholder,
-        label: stakeholder,
+      const selected = (doc.stakeholders || []).map((stakeholders) => ({
+        value: stakeholders,
+        label: stakeholders,
         isNew: false,
       }));
       setSelectedStakeholders(selected); // Imposta lo stato
@@ -156,7 +155,9 @@ function Documents(props) {
     const selectedFiles = Array.from(e.target.files);
     const validFormats = [".mp4", ".jpeg", ".pdf", ".png", "jpg"];
     // Filter files by extension and add them only if they respect the correct format
-    const newFiles = selectedFiles.filter((file) => validFormats.some((format) => file.name.endsWith(format)));
+    const newFiles = selectedFiles.filter((file) =>
+      validFormats.some((format) => file.name.endsWith(format))
+    );
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
   };
 
@@ -189,12 +190,16 @@ function Documents(props) {
     const { name, value } = e.target;
     setDocument((prevDocument) => {
       if (name === "lat" || name === "long") {
+        const updatedCoordinates = [
+          {
+            ...prevDocument.coordinates[0], // Copia le coordinate esistenti (se presenti)
+            [name]: value || "", // Aggiorna il campo specifico (lat o long)
+          },
+        ];
+
         return {
           ...prevDocument,
-          coordinates: {
-            ...prevDocument.coordinates,
-            [name]: value || "",
-          },
+          coordinates: updatedCoordinates,
         };
       } else {
         return {
@@ -210,8 +215,8 @@ function Documents(props) {
     if (!document.title || document.title.length < 2) {
       newErrors.title = "Title is required and cannot be empty.";
     }
-    if (!document.stakeholder || document.stakeholder.length === 0) {
-      newErrors.stakeholder = "You must select at least one stakeholder.";
+    if (!document.stakeholders || document.stakeholders.length === 0) {
+      newErrors.stakeholders = "You must select at least one stakeholder.";
     }
     if (!document.description || document.description.length < 2) {
       newErrors.description = "Description is required and cannot be empty.";
@@ -235,7 +240,8 @@ function Documents(props) {
       newErrors.newType = "You must insert a new type or select one from the menu.";
     }
     if (!document.issuanceDate) {
-      newErrors.issuanceDate = "You must select a Date in a valid format (YYYY or YYYY-MM or YYYY-MM-DD).";
+      newErrors.issuanceDate =
+        "You must select a Date in a valid format (YYYY or YYYY-MM or YYYY-MM-DD).";
     }
     if (!document.language) {
       newErrors.language = "You must select a language.";
@@ -250,12 +256,10 @@ function Documents(props) {
   const validateStep3 = () => true;
 
   const handleNextStep = () => {
-    console.log("step", step);
     let isValid = false;
     if (step === 1) {
       isValid = validateStep1();
     } else if (step === 2) {
-      console.log("types", types);
       isValid = validateStep2();
     } else if (step === 3) {
       isValid = validateStep3();
@@ -263,7 +267,6 @@ function Documents(props) {
     if (isValid) {
       setStep((prev) => prev + 1);
     }
-    console.log("isValid", step);
   };
 
   const handlePreviousStep = () => setStep((prev) => prev - 1);
@@ -355,7 +358,6 @@ function Documents(props) {
         resetState();
         navigate(`/documents/all`);
       } else if (step === 4) {
-        console.log("document", document);
         const doc = await API.saveDocument(document);
         //Try to submit files
         handleFileUpload(doc);
@@ -382,7 +384,8 @@ function Documents(props) {
     if (removedNewOptions.length > 0) {
       setStakeholders((prev) =>
         prev.filter(
-          (stakeholder) => !removedNewOptions.some((removed) => removed.value === stakeholder.value)
+          (stakeholders) =>
+            !removedNewOptions.some((removed) => removed.value === stakeholders.value)
         )
       );
     }
@@ -392,7 +395,7 @@ function Documents(props) {
     // Aggiorna document.stakeholder
     handleChange({
       target: {
-        name: "stakeholder",
+        name: "stakeholders",
         value: selectedOptions?.map((opt) => opt.value) || [],
       },
     });
@@ -407,7 +410,7 @@ function Documents(props) {
     // Salva nel documento
     setDocument((prevDoc) => ({
       ...prevDoc,
-      stakeholder: [...selectedStakeholders, newStakeholder].map((opt) => opt.value),
+      stakeholders: [...selectedStakeholders, newStakeholder].map((opt) => opt.value),
     }));
   };
 
@@ -444,7 +447,7 @@ function Documents(props) {
                   handleChange={handleChange}
                   handleStake={handleStake}
                   handleCreate={handleCreate}
-                  stakeholders={stakeholders}
+                  stakeholdersList={stakeholdersList}
                   selectedStakeholders={selectedStakeholders}
                 />
               )}
@@ -458,7 +461,15 @@ function Documents(props) {
                   types={types}
                 />
               )}
-              {step === 3 && <Step3 document={document} errors={errors} handleChange={handleChange} position={position} setPosition={setPosition} />}
+              {step === 3 && (
+                <Step3
+                  document={document}
+                  errors={errors}
+                  handleChange={handleChange}
+                  position={position}
+                  setPosition={setPosition}
+                />
+              )}
               {step === 4 && (
                 <Step4
                   handleFileChange={handleFileChange}
