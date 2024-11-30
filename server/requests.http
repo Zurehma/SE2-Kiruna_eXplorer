@@ -68,9 +68,9 @@ POST http://localhost:3001/api/documents/link HTTP/1.1
 Content-Type: application/json
 
 {
-    "id1":1,
-    "ids" : [4],
-    "type" : "Update"
+    "id1":3,
+    "ids" : [1],
+    "type" : "Projection"
 }
 
 ### Get link types
