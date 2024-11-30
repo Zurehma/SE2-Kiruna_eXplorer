@@ -186,7 +186,7 @@ class DocumentRoutes {
           const { id1, ids, type } = req.body;
           
           // Find links that exist with the same document pairs and the same type
-          const existingLinks = await this.documentController.getLinks(id1); 
+          const existingLinks = await this.documentController.getLinks(id1);
           const duplicates = ids.filter((id) =>
             existingLinks.some(
               (link) => link.linkedDocID === id && link.type === type

@@ -181,10 +181,12 @@ class DocumentController {
     return new Promise(async (resolve, reject) => {
       try {
         const doc = await this.documentDAO.getDocumentByID(id1);
+        
         if (doc === undefined) {
           const error = { errCode: 404, errMessage: "Document not found!" };
           throw error;
         }
+
         const links = await this.documentDAO.getLinks(id1);
         resolve(links);
       } catch (err) {
@@ -196,6 +198,7 @@ class DocumentController {
   addLink = (id1, id2, type) => {
     return new Promise(async (resolve, reject) => {
       try {
+        console.log(id1, id2, type);
         if (id1 === id2) {
           const error = { errCode: 400, errMessage: "Document cannot be linked to itself!" };
           throw error;
