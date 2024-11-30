@@ -17,7 +17,7 @@ import AccessDenied from "./components/AccessDenied.jsx";
 import NotFound from "./components/NotFound.jsx";
 import { SingleDocument } from "./components/SingleDocument.jsx";
 import MapForm from "./components/MapForm/MapForm.jsx";
-import DocumentChartStatic from "./components/Graphvis.jsx";
+import DocumentChartStatic from "./components/Graph.jsx";
 
 function App() {
   const [currentUser, setCurrentUser] = useState("");

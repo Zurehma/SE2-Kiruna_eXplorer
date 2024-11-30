@@ -1,315 +1,255 @@
-// DocumentChart.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import '../styles/FlowDiagram.css';
-import 'bootstrap-icons/font/bootstrap-icons.css'; // Import Bootstrap Icons
-import Legend from './Legend'; // Import the Legend component
+import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import API from '../../API';
 
-const iconMap = {
-  Informative: 'bi-info-circle',
-  Prescriptive: 'bi-arrow-right-square',
-  Design: 'bi-file-earmark-text',
-  Technical: 'bi-file-earmark-code',
-  Material: 'bi-file-earmark-binary',
+// Simple hash function to generate a stable color from a string (e.g., stakeholder name)
+const stringToColor = (str) => {
+  const normalizedStr = str.trim().toLowerCase();
+  let hash = 0;
+  for (let i = 0; i < normalizedStr.length; i++) {
+    hash = normalizedStr.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  let color = '#';
+  for (let i = 0; i < 3; i++) {
+    color += ('00' + ((hash >> (i * 8)) & 0xff).toString(16)).slice(-2);
+  }
+  return color;
 };
 
-// Assign a color to each stakeholder for differentiation
-const stakeholderColors = {
-  'Kiruna kommun/Residents': '#1f77b4', // Blue
-  'Kiruna kommun': '#ff7f0e', // Orange
-  'Kiruna kommun/White Arkitekter': '#2ca02c', // Green
-  'LKAB': '#d62728', // Red
-};
-
-const DocumentChart = () => {
+const DocumentChartStatic = () => {
   const svgRef = useRef();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState({});
+  const [documentTypes, setDocumentTypes] = useState([]);
+  const [stakeholders, setStakeholders] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [links, setLinks] = useState([]);
+  const [selectedType, setSelectedType] = useState(null);
+  const [selectedStakeholder, setSelectedStakeholder] = useState(null);
+  
+  // Initialize useNavigate
+  const navigate = useNavigate();
 
-  // Expanded mocked data for a more populated chart
-  const documents = [
-    {
-      id: 1,
-      title: "Compilation of responses",
-      stakeholder: 'Kiruna kommun/Residents',
-      scale: 'Text',
-      issuanceDate: '2007-01-01',
-      type: 'Informative',
-      connections: 1,
-    },
-    {
-      id: 2,
-      title: "Detail plan for Bolaget",
-      stakeholder: 'Kiruna kommun',
-      scale: 8000,
-      issuanceDate: '2010-10-20',
-      type: 'Prescriptive',
-      connections: 1,
-    },
-    {
-      id: 3,
-      title: "Development Plan (41)",
-      stakeholder: 'Kiruna kommun/White Arkitekter',
-      scale: 7500,
-      issuanceDate: '2014-03-17',
-      type: 'Design',
-      connections: 2,
-    },
-    {
-      id: 4,
-      title: "Deformation forecast",
-      stakeholder: 'LKAB',
-      scale: 12000,
-      issuanceDate: '2014-12-01',
-      type: 'Technical',
-      connections: 0,
-    },
-    {
-      id: 5,
-      title: "Adjusted development plan",
-      stakeholder: 'Kiruna kommun/White Arkitekter',
-      scale: 7500,
-      issuanceDate: '2015-01-01',
-      type: 'Design',
-      connections: 0,
-    },
-    {
-      id: 6,
-      title: "Detail plan for square",
-      stakeholder: 'Kiruna kommun',
-      scale: 1000,
-      issuanceDate: '2016-06-22',
-      type: 'Prescriptive',
-      connections: 0,
-    },
-    {
-      id: 7,
-      title: "Environmental Impact Report",
-      stakeholder: 'LKAB',
-      scale: 5000,
-      issuanceDate: '2017-03-11',
-      type: 'Informative',
-      connections: 1,
-    },
-    {
-      id: 8,
-      title: "Community Workshop Report",
-      stakeholder: 'Kiruna kommun/Residents',
-      scale: 'Text',
-      issuanceDate: '2018-05-30',
-      type: 'Informative',
-      connections: 1,
-    },
-    {
-      id: 9,
-      title: "Feasibility Study for New Area",
-      stakeholder: 'Kiruna kommun',
-      scale: 15000,
-      issuanceDate: '2019-07-20',
-      type: 'Design',
-      connections: 2,
-    },
-  ];
+  // Define the icon map for different document types (scale)
+  const iconMap = {
+    Design: 'bi-file-earmark-text',
+    Informative: 'bi-info-circle',
+    Prescriptive: 'bi-arrow-right-square',
+    Technical: 'bi-file-earmark-code',
+    Agreement: 'bi-people-fill',
+    Conflict: 'bi-x-circle',
+    Consultation: 'bi-chat-dots',
+    Action: 'bi-exclamation-triangle',
+    Material: 'bi-file-earmark-binary',
+  };
 
-  const links = [
-    {
-      docID1: 3,
-      docID2: 1,
-      type: 'Direct',
-    },
-    {
-      docID1: 3,
-      docID2: 2,
-      type: 'Direct',
-    },
-    {
-      docID1: 7,
-      docID2: 4,
-      type: 'Collateral',
-    },
-    {
-      docID1: 9,
-      docID2: 5,
-      type: 'Update',
-    },
-    {
-      docID1: 9,
-      docID2: 8,
-      type: 'Projection',
-    },
-  ];
+  const fetchData = async () => {
+    try {
+      const [documentType, stakeholder, documents, links] = await Promise.all([
+        API.getDocumentTypes(),
+        API.getStakeholders(),
+        API.getDocuments(),
+        API.allExistingLinks()
+      ]);
+
+      // Assign stable colors to each stakeholder based on their name
+      const stakeholdersWithColors = stakeholder.map(stakeholder => ({
+        ...stakeholder,
+        color: stringToColor(stakeholder.name)
+      }));
+
+      setDocumentTypes(documentType);
+      setStakeholders(stakeholdersWithColors);
+      setChartData(documents);
+      setLinks(links);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   useEffect(() => {
-    renderChart();
-    // Cleanup function
-    return () => {
-      d3.select(svgRef.current).selectAll('*').remove();
-      d3.select('body').selectAll('.tooltip').remove();
-    };
+    fetchData();
   }, []);
 
-  const renderChart = () => {
-    const data = processData(documents);
-
+  useEffect(() => {
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove(); // Clear previous content
 
     const width = svg.node().getBoundingClientRect().width;
     const height = svg.node().getBoundingClientRect().height;
-    const margin = { top: 20, right: 30, bottom: 50, left: 60 };
+    const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
 
-    // Append group element
     const g = svg
       .attr('width', width)
       .attr('height', height)
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    const innerWidth = width - margin.left - margin.right;
-    const innerHeight = height - margin.top - margin.bottom;
+    const years = Array.from(new Set(chartData.map(d => new Date(d.issuanceDate).getFullYear())));
+    const scales = Array.from(new Set([
+      'Text',
+      ...chartData.map(d => d.scale).filter((v, i, a) => a.indexOf(v) === i)
+    ]));
 
-    // Create scales
-    const xScale = createXScale(data, innerWidth);
-    const yScale = createYScale(data, innerHeight);
+    // Ensure 'Blueprint' is included in the yScales
+    const yScales = scales.includes('Blueprint') ? scales : [...scales, 'Blueprint'];
 
-    // Create axes
-    createAxes(g, xScale, yScale, innerWidth, innerHeight);
+    const xScale = d3.scaleBand()
+      .domain(years)
+      .range([0, innerWidth])
+      .padding(0.1);
 
-    // Draw links first with offset
-    drawLinks(g, data, xScale, yScale, links);
+    const yScale = d3.scaleBand()
+      .domain(yScales)
+      .range([0, innerHeight])
+      .padding(0.2);
 
-    // Plot data points with jittering to avoid overlaps
-    plotData(g, data, xScale, yScale);
-  };
-
-  const processData = (documents) => {
-    const uniqueScales = Array.from(new Set(documents.map((d) => (typeof d.scale === 'number' ? d.scale : 0)))).sort((a, b) => a - b);
-    const yCategories = ['Text', ...uniqueScales.map((scale) => `Plan (1:${scale.toLocaleString()})`)];
-
-    return documents.map((doc) => {
-      let yCategory = doc.scale === 'Text' ? 'Text' : `Plan (1:${doc.scale.toLocaleString()})`;
-      return {
-        ...doc,
-        yCategory,
-        yCategories,
-      };
-    });
-  };
-
-  const createXScale = (data, width) => {
-    const xExtent = d3.extent(data, (d) => new Date(d.issuanceDate));
-    return d3.scaleTime().domain(xExtent).range([0, width]).nice();
-  };
-
-  const createYScale = (data, height) => {
-    const yCategories = data[0].yCategories;
-    return d3.scalePoint().domain(yCategories).range([0, height]).padding(1.5);
-  };
-
-  const createAxes = (g, xScale, yScale, width, height) => {
-    const xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat('%Y')).tickSize(-height).tickPadding(5);
-    const yAxis = d3.axisLeft(yScale).tickSize(-width).tickPadding(5);
-
-    g.append('g')
-      .attr('transform', `translate(0, ${height})`)
-      .attr('class', 'x axis')
-      .call(xAxis)
-      .call((g) => g.select('.domain').remove())
-      .call((g) => g.selectAll('.tick line').attr('stroke', '#ccc'));
-
-    g.append('g')
-      .attr('class', 'y axis')
-      .call(yAxis)
-      .call((g) => g.select('.domain').remove())
-      .call((g) => g.selectAll('.tick line').attr('stroke', '#ccc'));
-  };
-
-  const drawLinks = (g, data, xScale, yScale, links) => {
-    const idToNode = {};
-    data.forEach((d) => {
-      idToNode[d.id] = d;
-    });
-
-    g.selectAll('.link')
-      .data(links)
-      .enter()
-      .append('line')
-      .attr('class', 'link')
-      .attr('x1', (d) => xScale(new Date(idToNode[d.docID1].issuanceDate)))
-      .attr('y1', (d) => yScale(idToNode[d.docID1].yCategory) + (Math.random() * 10 - 5))
-      .attr('x2', (d) => xScale(new Date(idToNode[d.docID2].issuanceDate)))
-      .attr('y2', (d) => yScale(idToNode[d.docID2].yCategory) + (Math.random() * 10 - 5))
-      .style('stroke', '#888')
-      .style('stroke-width', 2.5)
-      .style('stroke-dasharray', (d) => {
-        switch (d.type) {
-          case 'Direct':
-            return '0';
-          case 'Collateral':
-            return '6,4';
-          case 'Projection':
-            return '3,3';
-          case 'Update':
-            return '8,4,2,4';
-          default:
-            return '0';
+    // Customizing the Y-axis ticks to display the '1:' label, but not for "Blueprint" or "Text"
+    const xAxis = d3.axisBottom(xScale).tickFormat(d3.format('d'));
+    const yAxis = d3.axisLeft(yScale)
+      .tickFormat(d => {
+        // Check if the tick is a numeric value, not "Blueprint" or "Text"
+        if (d !== 'Blueprint' && d !== 'Text') {
+          return `1:${d}`; // Add the "1:" prefix for numeric scales
         }
-      });
+        return d; // For "Blueprint" and "Text", don't add the prefix
+      })
+      .tickSize(0);  // Remove tick lines
+
+    g.append('g')
+      .attr('transform', `translate(0, ${innerHeight})`)
+      .call(xAxis);
+
+    g.append('g')
+      .call(yAxis);
+
+    const documentPositions = chartData.reduce((acc, doc) => {
+      const year = new Date(doc.issuanceDate).getFullYear();
+      const xPos = xScale(year);
+      const yPos = yScale(doc.scale);
+      acc[doc.id] = { x: xPos + xScale.bandwidth() / 2, y: yPos + yScale.bandwidth() / 2 };
+      return acc;
+    }, {});
+
+    const stakeholderColorMap = stakeholders.reduce((acc, stakeholder) => {
+      acc[stakeholder.name] = stakeholder.color;
+      return acc;
+    }, {});
+
+    chartData.forEach((doc) => {
+      const year = new Date(doc.issuanceDate).getFullYear();
+      const xPos = xScale(year);
+      const yPos = yScale(doc.scale);
+
+      const iconClass = iconMap[doc.type] || 'bi-file-earmark';
+      const stakeholderColor = doc.stakeholders ? doc.stakeholders.map(stakeholder => stakeholderColorMap[stakeholder] || 'gray') : ['gray'];
+      const iconColor = stakeholderColor.length > 0 ? stakeholderColor.join(', ') : 'gray';
+
+      g.append('foreignObject')
+        .attr('x', xPos + xScale.bandwidth() / 2 - 12)
+        .attr('y', yPos + yScale.bandwidth() / 2 - 12)
+        .attr('width', 24)
+        .attr('height', 24)
+        .append('xhtml:div')
+        .html(`<i class="bi ${iconClass}" style="font-size: 20px; color: ${iconColor};"></i>`)
+        .on('click', () => handleDocumentClick(doc)); // Add click handler to document icon
+    });
+
+    links.forEach(link => {
+      const doc1Pos = documentPositions[link.DocID1];
+      const doc2Pos = documentPositions[link.DocID2];
+
+      if (doc1Pos && doc2Pos) {
+        g.append('line')
+          .attr('x1', doc1Pos.x)
+          .attr('y1', doc1Pos.y)
+          .attr('x2', doc2Pos.x)
+          .attr('y2', doc2Pos.y)
+          .attr('stroke', 'gray')
+          .attr('stroke-width', 1)
+          .attr('stroke-dasharray', '4,4');
+      }
+    });
+  }, [chartData, links, stakeholders]);
+
+  const handleDocumentClick = (doc) => {
+    // Navigate to the document detail page using the document's ID
+    navigate(`/document/${doc.id}`);
   };
 
-  const plotData = (g, data, xScale, yScale) => {
-    g.selectAll('.node')
-      .data(data)
-      .enter()
-      .append('foreignObject')
-      .attr('x', (d) => xScale(new Date(d.issuanceDate)) - 10)
-      .attr('y', (d) => yScale(d.yCategory) - 10 + (Math.random() * 5 - 2.5))
-      .attr('width', 20)
-      .attr('height', 20)
-      .append('xhtml:div')
-      .attr('class', 'icon-node')
-      .style('color', (d) => stakeholderColors[d.stakeholder] || '#333')
-      .html((d) => `<i class="bi ${iconMap[d.type] || 'bi-info-circle'}"></i>`)
-      .on('click', (event, d) => {
-        setModalContent({
-          title: d.title,
-          stakeholder: d.stakeholder,
-          type: d.type,
-          scale: d.scale ? '1:' + d.scale.toLocaleString() : '',
-          date: d.issuanceDate,
-          connections: d.connections,
-          icon: iconMap[d.type] || 'bi-info-circle',
-        });
-        setIsModalOpen(true);
-      });
+  const handleTypeClick = (type) => {
+    setSelectedType(type);
+    // Filter chartData by selected document type
+    const filteredData = chartData.filter(doc => doc.type === type);
+    setChartData(filteredData);
+  };
+
+  const handleStakeholderClick = (stakeholder) => {
+    setSelectedStakeholder(stakeholder);
+    // Filter chartData by selected stakeholder
+    const filteredData = chartData.filter(doc => doc.stakeholders.includes(stakeholder.name));
+    setChartData(filteredData);
   };
 
   return (
-    <div className="document-chart-container">
-      <div className="legend-container">
-        <Legend stakeholderColors={stakeholderColors} />
-      </div>
-      <div className="chart-container">
-        <svg ref={svgRef}></svg>
-      </div>
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>
-              <i className={`bi ${modalContent.icon}`} style={{ marginRight: '10px' }}></i>
-              {modalContent.title}
-            </h2>
-            <div><strong>Stakeholder:</strong> {modalContent.stakeholder}</div>
-            <div><strong>Type:</strong> {modalContent.type}</div>
-            <div><strong>Scale:</strong> {modalContent.scale}</div>
-            <div><strong>Date:</strong> {modalContent.date}</div>
-            <div><strong>Connections:</strong> {modalContent.connections}</div>
-            <button onClick={() => setIsModalOpen(false)}>Close</button>
+    <div className="container-fluid col-12" style={{ height: 'auto', position: 'relative', zIndex: 1000 }}>
+      <div className="row" style={{ height: '33.33vh', background: '#f0f0f0' }}>
+        <div className="col-2" style={{ background: '#f9f9f9', fontSize: '7px', borderRight: '1px solid #ccc', overflow: 'hidden' }}>
+          <h5 style={{ fontSize: '10px', marginBottom: '4px', paddingLeft: '0.3cm' }}>Legend</h5>
+          <div style={{ lineHeight: '1', fontSize: '5px', display: 'flex', gap: '3px', paddingLeft: '0.3cm' }}>
+            {documentTypes.map((doc, index) => {
+              const iconClass = iconMap[doc.name] || 'bi-file-earmark';
+              return (
+                <p key={index} style={{ display: 'flex', alignItems: 'center', gap: '1px' }} onClick={() => handleTypeClick(doc.name)}>
+                  <i className={`bi ${iconClass}`} style={{ fontSize: '16px' }}></i> {doc.name} doc.
+                </p>
+              );
+            })}
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'row', fontSize: '5px', paddingLeft: '0.3cm' }}>
+        {/* Stakeholders Section */}
+        <div style={{ marginRight: '1cm' }}>
+          <h6 style={{ fontSize: '8px', marginBottom: '1px' }}>Stakeholders:</h6>
+          {stakeholders.map((stakeholder, index) => (
+            <p
+              key={index}
+              style={{ fontSize: '6px', color: stakeholder.color }}
+              onClick={() => handleStakeholderClick(stakeholder.name)}
+            >
+              <span style={{ fontSize: '7px' }}>■</span> {stakeholder.name}
+            </p>
+          ))}
+        </div>
+
+           {/* Connections Section */}
+          <div>
+            <h6 style={{ fontSize: '7px', marginBottom: '0.3px' }}>Connections:</h6>
+            <p style={{ fontSize: '5px' }}>
+              <span style={{ fontSize: '5px' }}>―――</span> direct consequence
+            </p>
+            <p style={{ fontSize: '5px' }}>
+              <span style={{ fontSize: '5px' }}>---- </span> collateral consequence
+            </p>
+            <p style={{ fontSize: '5px' }}>
+              <span style={{ fontSize: '5px' }}>...... </span> Prevision
+            </p>
+            <p style={{ fontSize: '5px' }}>
+              <span style={{ fontSize: '5px' }}>-.-.-.- </span> Update
+            </p>
           </div>
         </div>
-      )}
+
+        </div>
+        <div className="col-10" style={{ height: '100%', background: '#ffffff', position: 'relative', paddingLeft: '1cm' }}>
+          <svg ref={svgRef} style={{ width: '100%', height: '100%' }}></svg>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default DocumentChart;
+export default DocumentChartStatic;
