@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, useMap, Marker, Popup, Polygon } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { booleanPointInPolygon } from "@turf/turf";
+import { booleanPointInPolygon, point } from "@turf/turf";
 
 import "../../styles/MapForm.css";
 
@@ -10,6 +10,8 @@ import MapLayoutCustomPoint from "./MapLayoutCustomPoint";
 import MapLayoutPredefinedPoint from "./MapFormLayoutPredefinedPoint";
 import MapLayoutPredefinedArea from "./MapFormLayoutPredefinedArea";
 import KirunaMunicipality from "../MapUtils/KirunaMunicipality";
+import MapFormLayoutCustomArea from "./MapFormLayoutCustomArea";
+
 /**
  * Button component to resize the map
  * @param {*} isFullScreen boolean to tell is the map occupies the whole screen or the container size
@@ -82,24 +84,13 @@ const MapForm = (props) => {
   const [geoJsonData, setGeoJsonData] = useState(null);
 
   //validate coordinates: verify they're in the Kiruna Municipality
-  const validateCoordinates = (coord) => {
+  const validateCoordinates = (lat, long) => {
     if (!geoJsonData) return false;
     const multiPolygon = geoJsonData.features[0];
-    if (coord.type === "Point") {
-      // Converte le coordinate in un oggetto punto GeoJSON
-      const point = {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: coord.coordinates, // [lng, lat]
-        },
-      };
-      // Verifica se il punto è dentro il MultiPolygon
-      return booleanPointInPolygon(point, multiPolygon);
-    } else {
-      // TODO: Verifica per un'area (multi-coordinates)
-      return false;
-    }
+    // Converte le coordinate in un oggetto punto GeoJSON
+    const p = point([long, lat]);
+    // Verifica se il punto è dentro il MultiPolygon
+    return booleanPointInPolygon(p, multiPolygon);
   };
 
   const mapStyles = {
@@ -125,10 +116,10 @@ const MapForm = (props) => {
 
   const [position, setPosition] = useState(props.position || { type: null, coordinates: null, name: null });
 
-  const handleSetPoint = (lat, long, name) => {
+  const handleSetPoint = (lat, long, name = null) => {
     setPosition({ type: "Point", coordinates: { lat: lat, long: long }, name: name });
   };
-  const handleSetArea = (coordinates, name) => {
+  const handleSetArea = (coordinates, name = null) => {
     setPosition({ type: "Area", coordinates: coordinates, name: name });
   };
   const clearPosition = () => setPosition({ type: null, coordinates: null, name: null });
@@ -192,9 +183,11 @@ const MapForm = (props) => {
           {isFullscreen && currentMode === customPoint && (
             <MapLayoutCustomPoint position={position} newPoint={handleSetPoint} validateCoordinates={validateCoordinates} />
           )}
-          {isFullscreen && currentMode === customArea && <></>}
+          {isFullscreen && currentMode === customArea && (
+            <MapFormLayoutCustomArea isFullscreen={isFullscreen} position={position} newArea={handleSetArea} validateCoordinates={validateCoordinates} />
+          )}
           {/* Show the borders only when a custom point or area is concerned */}
-          {isFullscreen && (currentMode === predefinedArea || currentMode === customPoint) && (
+          {isFullscreen && (currentMode === customArea || currentMode === customPoint) && (
             <KirunaMunicipality setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} />
           )}
           {position && position.type === "Point" && (

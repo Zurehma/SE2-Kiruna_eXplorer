@@ -23,10 +23,10 @@ const MapClickHandler = ({ onPointSelected }) => {
 const MapLayoutCustomPoint = ({ position, newPoint, validateCoordinates }) => {
   const handlePointSelected = (point) => {
     // Validazione delle coordinate
-    const isValid = validateCoordinates({ type: "Point", coordinates: [point.lng, point.lat] });
+    const isValid = validateCoordinates(point.lat, point.lng);
     if (isValid) {
       // Passa direttamente il punto validato al metodo newPoint
-      newPoint(point.lat, point.lng, "CustomPoint");
+      newPoint(point.lat, point.lng);
     }
   };
 
