@@ -105,7 +105,6 @@ function MyPopup(props) {
   };
   const stakeholderList=(stakeholderArray)=>{
     let stakeholderList='';
-    console.log(stakeholderArray);
     stakeholderArray.forEach((stakeholder,index)=>{
     stakeholderList += `${stakeholder}`;
       if(index<stakeholderArray.length-1){
