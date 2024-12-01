@@ -26,7 +26,7 @@ const MapLayoutCustomPoint = ({ position, newPoint, validateCoordinates }) => {
     const isValid = validateCoordinates({ type: "Point", coordinates: [point.lng, point.lat] });
     if (isValid) {
       // Passa direttamente il punto validato al metodo newPoint
-      newPoint(point.lat,point.lng,"CustomPoint");
+      newPoint(point.lat, point.lng, "CustomPoint");
     }
   };
 
@@ -36,9 +36,7 @@ const MapLayoutCustomPoint = ({ position, newPoint, validateCoordinates }) => {
       <MapClickHandler onPointSelected={handlePointSelected} />
 
       {/* Marker del punto confermato */}
-      {position && position.type === "Point" && (
-        <Marker position={[position.coordinates.lat, position.coordinates.long]}/>
-      )}
+      {position && position.type === "Point" && <Marker position={[position.coordinates.lat, position.coordinates.long]} />}
     </>
   );
 };

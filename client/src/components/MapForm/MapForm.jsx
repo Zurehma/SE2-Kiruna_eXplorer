@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, useMap, Marker, Popup, Polygon } from "react-l
 import "leaflet/dist/leaflet.css";
 import { booleanPointInPolygon } from "@turf/turf";
 
-
 import "../../styles/MapForm.css";
 
 import { Button, Dropdown } from "react-bootstrap";
@@ -85,7 +84,7 @@ const MapForm = (props) => {
   //validate coordinates: verify they're in the Kiruna Municipality
   const validateCoordinates = (coord) => {
     if (!geoJsonData) return false;
-    const multiPolygon = geoJsonData.features[0]; 
+    const multiPolygon = geoJsonData.features[0];
     if (coord.type === "Point") {
       // Converte le coordinate in un oggetto punto GeoJSON
       const point = {
@@ -102,7 +101,6 @@ const MapForm = (props) => {
       return false;
     }
   };
-  
 
   const mapStyles = {
     satellite: "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg",
@@ -154,7 +152,7 @@ const MapForm = (props) => {
 
   useEffect(() => {
     props.setPosition(position);
-  }, [...Object.values(position)]);
+  }, [position.coordinates, position.type]);
 
   useEffect(() => {
     if (isFullscreen) {
@@ -191,10 +189,14 @@ const MapForm = (props) => {
           )}
           {isFullscreen && currentMode === predefinedPoint && <MapLayoutPredefinedPoint position={position} newPoint={handleSetPoint} />}
           {isFullscreen && currentMode === predefinedArea && <MapLayoutPredefinedArea position={position} newArea={handleSetArea} />}
-          {isFullscreen && currentMode === customPoint && <MapLayoutCustomPoint position={position} newPoint={handleSetPoint} validateCoordinates={validateCoordinates} />}
+          {isFullscreen && currentMode === customPoint && (
+            <MapLayoutCustomPoint position={position} newPoint={handleSetPoint} validateCoordinates={validateCoordinates} />
+          )}
           {isFullscreen && currentMode === customArea && <></>}
           {/* Show the borders only when a custom point or area is concerned */}
-          {isFullscreen && (currentMode === predefinedArea || currentMode ===customPoint) && <KirunaMunicipality setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} />}
+          {isFullscreen && (currentMode === predefinedArea || currentMode === customPoint) && (
+            <KirunaMunicipality setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} />
+          )}
           {position && position.type === "Point" && (
             <Marker position={[position.coordinates.lat, position.coordinates.long]} data-testid="map-marker" zIndexOffset={10}>
               <Popup>

@@ -139,7 +139,7 @@ function Documents(props) {
         nValue,
       }));
 
-      if (coordinates && typeof coordinates === "object") {
+      if (coordinates && coordinates.lat && coordinates.long) {
         setPosition({ coordinates: coordinates, type: "Point" });
       } else if (coordinates && coordinates.length > 3) {
         setPosition({ coordinates: coordinates, type: "Area" });
