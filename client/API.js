@@ -309,7 +309,6 @@ const updateDocument = async (documentId, doc) => {
     }).filter(([_, value]) => value !== "" && value !== null && value !== undefined) // Filtra campi vuoti/nulli
   );
 
-  console.log(filteredDoc);
   try {
     const response = await fetch(`${SERVER_URL}/documents/${documentId}`, {
       method: "PUT",
