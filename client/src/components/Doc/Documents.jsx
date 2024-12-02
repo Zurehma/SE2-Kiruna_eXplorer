@@ -213,6 +213,7 @@ function Documents(props) {
       newErrors.title = "Title is required and cannot be empty.";
     }
     if (!document.stakeholders || document.stakeholders.length === 0) {
+      console.log("ghjkjhgvhjkl");
       newErrors.stakeholders = "You must select at least one stakeholder.";
     }
     if (!document.description || document.description.length < 2) {
@@ -406,7 +407,7 @@ function Documents(props) {
       <Container className="d-flex align-items-center justify-content-center min-vh-100">
         <Card className="p-4 shadow-lg w-100" style={{ maxWidth: "700px" }}>
           <Card.Body>
-            <Card.Title dataTest="form" className="mb-4 text-center">
+            <Card.Title className="mb-4 text-center">
               {id ? `EDIT DOCUMENT: ${id}` : "ADD NEW DOCUMENT"}
             </Card.Title>
             {/* Step Indicator with Clickable Buttons */}

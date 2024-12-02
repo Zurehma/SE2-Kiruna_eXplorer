@@ -1,3 +1,4 @@
+/* Background e layout principale */
 .links-background {
   background: linear-gradient(to right, #006d77, #83c5be);
   min-height: 100vh;
@@ -10,9 +11,9 @@
 
 body,
 html {
-  overflow-y: auto;
   margin: 0;
   padding: 0;
+  overflow-y: auto;
 }
 
 .container {
@@ -25,9 +26,10 @@ html {
   width: 600px;
   border: none;
   display: flex;
-  align-items: top;
-  margin-top: 10px;
+  flex-direction: column;
   justify-content: center;
+  margin-top: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .links-card-title {
@@ -35,13 +37,16 @@ html {
   font-weight: bold;
   text-align: center;
   color: #006d77;
+  margin-bottom: 1rem;
 }
 
+/* Input e select (form elements) */
 .links-input,
 .links-select {
   border-radius: 5px;
   border: 1px solid #006d77;
   padding: 0.75rem;
+  font-size: 1rem;
   transition: all 0.2s ease-in-out;
 }
 
@@ -51,24 +56,30 @@ html {
   box-shadow: 0 0 5px rgba(0, 109, 119, 0.5);
 }
 
+/* Pulsanti */
 .btn-save {
   background-color: #006d77;
   border: none;
   padding: 0.6rem 2.5rem;
+  font-size: 1rem;
   transition: background-color 0.3s ease;
+  cursor: pointer;
 }
 
 .btn-save:hover {
   background-color: #005f6b;
 }
 
+/* Etichetta form */
 .links-form-label {
   font-weight: 500;
   color: #006d77;
 }
 
+/* Media queries per schermi più piccoli */
 @media (max-width: 768px) {
-  .card {
+  .card-link {
+    width: 100%; /* Fa sì che la card si adatti a schermi più piccoli */
     padding: 1rem;
   }
 
@@ -77,30 +88,30 @@ html {
   }
 }
 
+/* Dropdown */
 .dropdown-toggle {
   width: 100%;
   text-align: left;
   background-color: white;
-  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.1); /* Per un'ombra leggera */
-
   border-radius: 5px;
   border: 1px solid #006d77;
   padding: 0.75rem;
+  font-size: 1rem;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease-in-out;
-  font-size: 1rem; /* Assicura una buona leggibilità */
 }
 
+/* Dropdown Menu */
 .dropdown-menu-white {
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Per un'ombra leggera */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 8px;
   max-height: 200px;
-  overflow-y: auto; /* Aggiungi uno scroll se il contenuto è lungo */
-  z-index: 1050; /* Assicura che il menu sia sopra gli altri elementi */
+  overflow-y: auto;
+  z-index: 1050;
 }
 
-/* Rimuove la freccia di dropdown */
 .dropdown-toggle::after {
-  display: none !important; /* Aggiungi !important per forzare la sovrascrittura */
+  display: none !important; /* Rimuove la freccia del dropdown */
 }
 
 .dropdown-menu {
@@ -108,16 +119,39 @@ html {
   overflow-y: auto;
 }
 
+/* Messaggi di errore */
 .invalid-feedback {
   display: block;
   font-size: 0.875em;
   color: #dc3545;
 }
 
+/* Search bar (per la ricerca all'interno del dropdown) */
 .search-bar {
-  width: 60%;
-
-  border-radius: 10px !important; /* Elimina gli angoli arrotondati */
+  width: 100%;
+  border-radius: 0 !important; /* Rimuove gli angoli arrotondati */
+  padding: 0.75rem;
+  border: 1px solid #006d77;
   margin: 0 10px;
-  /* mx-3 my-2 w-auto */
+  font-size: 1rem;
+}
+
+/* Form control per custom menu */
+.custom-dropdown-search input {
+  border-radius: 0 !important; /* Rende i bordi quadrati per la barra di ricerca */
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #006d77;
+  margin: 0 10px;
+}
+
+/* Aggiustamenti per il menu a discesa quando il contenuto è lungo */
+.dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Focus state per form elements */
+:focus {
+  outline: none;
 }
