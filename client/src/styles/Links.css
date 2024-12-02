@@ -110,7 +110,7 @@ html {
   z-index: 1050;
 }
 
-.dropdown-toggle::after {
+.form-select::after {
   display: none !important; /* Rimuove la freccia del dropdown */
 }
 
