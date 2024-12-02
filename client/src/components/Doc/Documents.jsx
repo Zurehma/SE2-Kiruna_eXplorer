@@ -3,7 +3,6 @@ import { Form, Button, Container, Dropdown } from "react-bootstrap";
 import { DropdownButton, Card, ProgressBar, Row, Col } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../../../API.js";
-import { Map } from "./../Map.jsx";
 import "../../styles/Documents.css";
 import "leaflet/dist/leaflet.css";
 import { Polygon } from "react-leaflet";
