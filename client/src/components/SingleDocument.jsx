@@ -33,9 +33,9 @@ function SingleDocument(props) {
     return (
         loading ? <p>Loading...</p> :
         <div className='documents-background '>
-            <div className='myPopupStyle'>
+            <div className='myPopupStyle myPopupContainer'>
                 <Button onClick={() => navigate(-1)} className="back-button">
-                    <i class="bi bi-arrow-left back-icon me-1"></i>
+                    <i className="bi bi-arrow-left back-icon me-1"></i>
                     Back
                 </Button>
                 <MyPopup doc={document} setError={props.setError} loggedIn={props.loggedIn} className='myPopupStyle'/>

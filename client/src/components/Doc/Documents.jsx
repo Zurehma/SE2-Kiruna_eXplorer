@@ -3,7 +3,6 @@ import { Form, Button, Container, Dropdown } from "react-bootstrap";
 import { DropdownButton, Card, ProgressBar, Row, Col } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../../../API.js";
-import { Map } from "./../Map.jsx";
 import "../../styles/Documents.css";
 import "leaflet/dist/leaflet.css";
 import { Polygon } from "react-leaflet";
@@ -42,7 +41,7 @@ function Documents(props) {
     description: "",
     language: "",
     pages: "",
-    coordinates: [{ lat: "", long: "" }],
+    coordinates: "",
     pageFrom: "",
     pageTo: "",
   });
@@ -75,7 +74,7 @@ function Documents(props) {
       description: "",
       language: "",
       pages: "",
-      coordinates: [{ lat: "", long: "" }],
+      coordinates: "",
       pageFrom: "",
       pageTo: "",
     }));
@@ -196,16 +195,8 @@ function Documents(props) {
     const { name, value } = e.target;
     setDocument((prevDocument) => {
       if (name === "lat" || name === "long") {
-        const updatedCoordinates = [
-          {
-            ...prevDocument.coordinates[0], // Copia le coordinate esistenti (se presenti)
-            [name]: value || "", // Aggiorna il campo specifico (lat o long)
-          },
-        ];
-
         return {
           ...prevDocument,
-          coordinates: updatedCoordinates,
         };
       } else {
         return {
@@ -308,7 +299,7 @@ function Documents(props) {
   };
 
   useEffect(() => {
-    if (position) {
+    if (position.coordinates) {
       document.coordinates = position.coordinates;
     }
   }, [position.coordinates, position.type]);
