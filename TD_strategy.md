@@ -29,7 +29,6 @@ This document outlines our approach to managing and reducing technical debt acro
 
 - Identify and track **high-severity technical debt issues** that pose a significant risk to the project.
 - **Prioritize these issues** based on their impact on:
-  - Project deadlines
+  - Sprint deadlines
   - System performance
   - Code maintainability
-- Address critical issues in the **current or upcoming sprint** to mitigate risks promptly.
