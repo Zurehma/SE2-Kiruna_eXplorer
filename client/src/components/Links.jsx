@@ -71,13 +71,24 @@ function Links(props) {
     if (linkData.document1 && linkData.linkType) {
       const fetchLinkedDocuments = async () => {
         try {
-          const linkedResponse = await API.getLinksDoc(linkData.document1, linkData.linkType);
-          const linkedIds = linkedResponse.map((doc) => doc.linkedDocID);
-          setLinkedDocuments(linkedIds);
+          const linkedResponse = await API.getLinksDoc(linkData.document1);
+
+          // Filtra i documenti per tipo e rimuovi quelli già linkati
+          const filteredLinkedDocs = linkedResponse
+            .filter((doc) => doc.type === linkData.linkType) // Filtro per tipo
+            .map((doc) => doc.linkedDocID); // Prendo solo gli ID dei documenti
+
+          setLinkedDocuments(filteredLinkedDocs);
+
+          console.log("gggggggg:", filteredLinkedDocs);
+
+          // Setta i documenti filtrati
+          setLinkedDocuments(filteredLinkedDocs);
         } catch (error) {
           console.error("Error fetching linked documents:", error);
         }
       };
+
       fetchLinkedDocuments();
     } else {
       setLinkedDocuments([]);
@@ -148,20 +159,9 @@ function Links(props) {
     }));
   };
 
-  // const [isOpenDoc1, setIsOpenDoc1] = useState(false);
-  // const [isOpenDoc2, setIsOpenDoc2] = useState(false);
-
-  // const toggleMenuDoc1 = () => {
-  //   setIsOpenDoc1(!isOpenDoc1); // Gestisci apertura/chiusura di document1
-  // };
-
-  // const toggleMenuDoc2 = () => {
-  //   setIsOpenDoc2(!isOpenDoc2); // Gestisci apertura/chiusura di document2
-  // };
-
   return (
     <div className="links-background">
-      <Container className="d-flex align-items-top justify-content-center min-vh-100">
+      <Container className="links-container d-flex align-items-top justify-content-center min-vh-100">
         <Card
           className="p-4 shadow-lg w-100"
           style={{ maxWidth: "700px", maxHeight: "550px", marginTop: "50px" }}
@@ -236,7 +236,10 @@ function Links(props) {
                       </Dropdown.Toggle>
                       <Dropdown.Menu as={CustomMenu}>
                         {documents
-                          .filter((doc) => doc.id !== Number(linkData.document1))
+                          .filter(
+                            (doc) =>
+                              !linkedDocuments.includes(doc.id) && doc.id !== linkData.document1
+                          ) // Filtro per rimuovere anche linkData.document1
                           .map((doc) => (
                             <Dropdown.Item
                               key={doc.id}

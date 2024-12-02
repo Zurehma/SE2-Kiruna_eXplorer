@@ -87,71 +87,31 @@ html {
     font-size: 1.5rem;
   }
 }
-
-/* Dropdown */
-.dropdown-toggle {
-  width: 100%;
-  text-align: left;
-  background-color: white;
-  border-radius: 5px;
-  border: 1px solid #006d77;
-  padding: 0.75rem;
-  font-size: 1rem;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease-in-out;
+/* Applica gli stili SOLO all'interno del container con classe "links-container" */
+.links-container .dropdown-toggle {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #006d77 !important;
+  border-radius: 5px !important;
+  padding: 0.75rem !important;
 }
 
-/* Dropdown Menu */
-.dropdown-menu-white {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 8px;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 1050;
+.links-container .dropdown-menu {
+  background-color: #f0f0f0 !important;
+  border-radius: 5px !important;
 }
 
-.form-select::after {
+.links-container .dropdown-item {
+  color: #000000 !important;
+  padding: 10px !important;
+  background-color: #f0f0f0 !important;
+}
+
+.links-container .dropdown-item:hover {
+  background-color: #adadad !important;
+  color: #000000 !important;
+}
+
+.links-container .form-select::after {
   display: none !important; /* Rimuove la freccia del dropdown */
-}
-
-.dropdown-menu {
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-/* Messaggi di errore */
-.invalid-feedback {
-  display: block;
-  font-size: 0.875em;
-  color: #dc3545;
-}
-
-/* Search bar (per la ricerca all'interno del dropdown) */
-.search-bar {
-  width: 100%;
-  border-radius: 0 !important; /* Rimuove gli angoli arrotondati */
-  padding: 0.75rem;
-  border: 1px solid #006d77;
-  margin: 0 10px;
-  font-size: 1rem;
-}
-
-/* Form control per custom menu */
-.custom-dropdown-search input {
-  border-radius: 0 !important; /* Rende i bordi quadrati per la barra di ricerca */
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 1px solid #006d77;
-  margin: 0 10px;
-}
-
-/* Aggiustamenti per il menu a discesa quando il contenuto è lungo */
-.dropdown-menu {
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-/* Focus state per form elements */
-:focus {
-  outline: none;
 }
