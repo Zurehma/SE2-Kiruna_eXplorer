@@ -42,22 +42,12 @@ const MapFormLayoutCustomArea = (props) => {
 
         newArea(coordinates);
       });
-
-      map.on(L.Draw.Event.DRAWVERTEX, (event) => {
-        const layer = event.layers.getLayers()[0];
-        const { lat, lng } = layer.getLatLng();
-
-        if (!validateCoordinates(lat, lng)) {
-          console.log("Invalid");
-        }
-      });
     }
 
     return () => {
       if (drawControl) {
         map.removeControl(drawControl);
         map.off(L.Draw.Event.CREATED);
-        map.off(L.Draw.Event.DRAWVERTEX);
       }
     };
   }, [isFullscreen, map, position.coordinates]);

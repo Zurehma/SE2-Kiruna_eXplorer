@@ -86,7 +86,13 @@ const MapForm = (props) => {
   //validate coordinates: verify they're in the Kiruna Municipality
   const validateCoordinates = (lat, long) => {
     if (!geoJsonData) return false;
+
     const multiPolygon = geoJsonData.features[0];
+
+    if (!(lat && long)) {
+      return false;
+    }
+
     // Converte le coordinate in un oggetto punto GeoJSON
     const p = point([long, lat]);
     // Verifica se il punto è dentro il MultiPolygon
