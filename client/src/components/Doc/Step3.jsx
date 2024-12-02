@@ -1,6 +1,5 @@
 import React from "react";
 import { Form, Row, Col, Card } from "react-bootstrap";
-import { Map } from "./../Map.jsx";
 import MapForm from "../MapForm/MapForm.jsx";
 
 const Step3 = ({ errors, setPosition, position }) => (

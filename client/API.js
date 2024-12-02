@@ -322,29 +322,40 @@ const updateDocument = async (documentId, doc) => {
     throw error;
   }
 };
+const allExistingLinks = async () => {
+  return await fetch(`${SERVER_URL}/documents/allExistingLinks`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+  })
+      .then(handleInvalidResponse)
+      .then((response) => response.json());
+};
+
 
 //Export API methods
 const API = {
-  updateDocument,
-  getStakeholders,
-  getDocumentTypes,
-  getDocuments,
-  saveDocument,
-  logIn,
-  logOut,
-  getTypeDocuments,
-  getTypeScale,
-  getTypeLinks,
-  setLink,
-  getUserInfo,
-  uploadFiles,
-  getLinksDoc,
-  getAttachments,
-  downloadAttachment,
-  filterDocuments,
-  deleteAttachment,
-  getDocumentById,
-  updateDocument,
+    updateDocument,
+    getStakeholders,
+    getDocumentTypes,
+    getDocuments,
+    saveDocument,
+    logIn,
+    logOut,
+    getTypeDocuments,
+    getTypeScale,
+    getTypeLinks,
+    setLink,
+    getUserInfo,
+    uploadFiles,
+    getLinksDoc,
+    getAttachments,
+    downloadAttachment,
+    filterDocuments,
+    deleteAttachment,
+    getDocumentById,
+    updateDocument,
+    allExistingLinks
 };
 
 export default API;
