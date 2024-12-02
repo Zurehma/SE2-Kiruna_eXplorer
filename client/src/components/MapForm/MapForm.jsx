@@ -11,6 +11,7 @@ import MapLayoutPredefinedPoint from "./MapFormLayoutPredefinedPoint";
 import MapLayoutPredefinedArea from "./MapFormLayoutPredefinedArea";
 import KirunaMunicipality from "../MapUtils/KirunaMunicipality";
 import MapFormLayoutCustomArea from "./MapFormLayoutCustomArea";
+import LoadGeoJson from "../MapUtils/LoadGeoJson";
 
 /**
  * Button component to resize the map
@@ -193,8 +194,9 @@ const MapForm = (props) => {
             <MapFormLayoutCustomArea isFullscreen={isFullscreen} position={position} newArea={handleSetArea} validateCoordinates={validateCoordinates} />
           )}
           {/* Show the borders only when a custom point or area is concerned */}
-          {isFullscreen && (currentMode === customArea || currentMode === customPoint) && (
-            <KirunaMunicipality setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} />
+          <LoadGeoJson setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} />
+          {geoJsonData && isFullscreen && (currentMode === customArea || currentMode === customPoint) && (
+            <KirunaMunicipality  geoJsonData={geoJsonData} />
           )}
           {position && position.type === "Point" && (
             <Marker position={[position.coordinates.lat, position.coordinates.long]} data-testid="map-marker" zIndexOffset={10}>

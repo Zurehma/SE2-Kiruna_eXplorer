@@ -14,6 +14,7 @@ import MyViewDropdown from './MyViewDropdown';
 import KirunaMunicipality from '../MapUtils/KirunaMunicipality';
 import RecenterButton from '../MapUtils/RecenterButton';
 import API from '../../../API';
+import LoadGeoJson from '../MapUtils/LoadGeoJson';
 import { useMapEvents } from 'react-leaflet';
 
 const PopupCloseHandler = ({ onClose }) => {
@@ -204,9 +205,9 @@ function MapNavigation(props) {
                 
                 {/* Show documents without coordinates with a button that opens a modal */}
                 <MyModal noCoordDocuments={noCoordDocuments} setSelectedDoc={setSelectedDoc} setRenderNumeber={setRenderNumeber} classNameEntireMunicipality={classNameEntireMunicipality} iconMap={iconMap} renderNumber={renderNumber}/>
-                
                 {/* Draw the entire municipality, as stated in the FAQ, it should be always be visible */}
-                <KirunaMunicipality setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} setHighestPoint={setHighestPoint} />
+                <LoadGeoJson setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} />
+                {geoJsonData && <KirunaMunicipality  geoJsonData={geoJsonData} />}
                 {/*Draw the area associated with a document, if defined*/}
                 {selectedDoc && selectedDoc.area && <Polygon positions={selectedDoc.area} color="red" />}
 
