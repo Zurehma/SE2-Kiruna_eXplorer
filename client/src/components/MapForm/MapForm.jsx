@@ -141,7 +141,7 @@ const MapForm = (props) => {
     useEffect(() => {
       if (map) {
         map.invalidateSize();
-        map.setView(initialPosition, initialZoom);
+        /*map.setView(initialPosition, initialZoom);*/
       }
     }, [map]);
 
@@ -157,14 +157,14 @@ const MapForm = (props) => {
       setMapSizeClass(mapFullscreenClass);
       setOverlay("overlay");
       if (currentMode === predefinedArea) {
-        setInitalZoom(7);
+        setInitalZoom(9);
       } else {
         setInitalZoom(11);
       }
     } else {
       setMapSizeClass(mapContainerClass);
       setOverlay("without-overlay");
-      setInitalZoom(8);
+      setInitalZoom(9);
     }
   }, [isFullscreen, currentMode]);
 
