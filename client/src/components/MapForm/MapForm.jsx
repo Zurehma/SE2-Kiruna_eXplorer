@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, useMap, Marker, Popup, Polygon } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { booleanPointInPolygon } from "@turf/turf";
-
+import { booleanPointInPolygon, point } from "@turf/turf";
 
 import "../../styles/MapForm.css";
 
@@ -11,6 +10,9 @@ import MapLayoutCustomPoint from "./MapLayoutCustomPoint";
 import MapLayoutPredefinedPoint from "./MapFormLayoutPredefinedPoint";
 import MapLayoutPredefinedArea from "./MapFormLayoutPredefinedArea";
 import KirunaMunicipality from "../MapUtils/KirunaMunicipality";
+import MapFormLayoutCustomArea from "./MapFormLayoutCustomArea";
+import LoadGeoJson from "../MapUtils/LoadGeoJson";
+
 /**
  * Button component to resize the map
  * @param {*} isFullScreen boolean to tell is the map occupies the whole screen or the container size
@@ -83,26 +85,20 @@ const MapForm = (props) => {
   const [geoJsonData, setGeoJsonData] = useState(null);
 
   //validate coordinates: verify they're in the Kiruna Municipality
-  const validateCoordinates = (coord) => {
+  const validateCoordinates = (lat, long) => {
     if (!geoJsonData) return false;
-    const multiPolygon = geoJsonData.features[0]; 
-    if (coord.type === "Point") {
-      // Converte le coordinate in un oggetto punto GeoJSON
-      const point = {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: coord.coordinates, // [lng, lat]
-        },
-      };
-      // Verifica se il punto è dentro il MultiPolygon
-      return booleanPointInPolygon(point, multiPolygon);
-    } else {
-      // TODO: Verifica per un'area (multi-coordinates)
+
+    const multiPolygon = geoJsonData.features[0];
+
+    if (!(lat && long)) {
       return false;
     }
+
+    // Converte le coordinate in un oggetto punto GeoJSON
+    const p = point([long, lat]);
+    // Verifica se il punto è dentro il MultiPolygon
+    return booleanPointInPolygon(p, multiPolygon);
   };
-  
 
   const mapStyles = {
     satellite: "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg",
@@ -127,10 +123,10 @@ const MapForm = (props) => {
 
   const [position, setPosition] = useState(props.position || { type: null, coordinates: null, name: null });
 
-  const handleSetPoint = (lat, long, name) => {
+  const handleSetPoint = (lat, long, name = null) => {
     setPosition({ type: "Point", coordinates: { lat: lat, long: long }, name: name });
   };
-  const handleSetArea = (coordinates, name) => {
+  const handleSetArea = (coordinates, name = null) => {
     setPosition({ type: "Area", coordinates: coordinates, name: name });
   };
   const clearPosition = () => setPosition({ type: null, coordinates: null, name: null });
@@ -145,7 +141,7 @@ const MapForm = (props) => {
     useEffect(() => {
       if (map) {
         map.invalidateSize();
-        map.setView(initialPosition, initialZoom);
+        /*map.setView(initialPosition, initialZoom);*/
       }
     }, [map]);
 
@@ -154,21 +150,21 @@ const MapForm = (props) => {
 
   useEffect(() => {
     props.setPosition(position);
-  }, [...Object.values(position)]);
+  }, [position.coordinates, position.type]);
 
   useEffect(() => {
     if (isFullscreen) {
       setMapSizeClass(mapFullscreenClass);
       setOverlay("overlay");
       if (currentMode === predefinedArea) {
-        setInitalZoom(7);
+        setInitalZoom(9);
       } else {
         setInitalZoom(11);
       }
     } else {
       setMapSizeClass(mapContainerClass);
       setOverlay("without-overlay");
-      setInitalZoom(8);
+      setInitalZoom(9);
     }
   }, [isFullscreen, currentMode]);
 
@@ -191,10 +187,17 @@ const MapForm = (props) => {
           )}
           {isFullscreen && currentMode === predefinedPoint && <MapLayoutPredefinedPoint position={position} newPoint={handleSetPoint} />}
           {isFullscreen && currentMode === predefinedArea && <MapLayoutPredefinedArea position={position} newArea={handleSetArea} />}
-          {isFullscreen && currentMode === customPoint && <MapLayoutCustomPoint position={position} newPoint={handleSetPoint} validateCoordinates={validateCoordinates} />}
-          {isFullscreen && currentMode === customArea && <></>}
+          {isFullscreen && currentMode === customPoint && (
+            <MapLayoutCustomPoint position={position} newPoint={handleSetPoint} validateCoordinates={validateCoordinates} />
+          )}
+          {isFullscreen && currentMode === customArea && (
+            <MapFormLayoutCustomArea isFullscreen={isFullscreen} position={position} newArea={handleSetArea} validateCoordinates={validateCoordinates} />
+          )}
           {/* Show the borders only when a custom point or area is concerned */}
-          {isFullscreen && (currentMode === predefinedArea || currentMode ===customPoint) && <KirunaMunicipality setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} />}
+          <LoadGeoJson setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} />
+          {geoJsonData && isFullscreen && (currentMode === customArea || currentMode === customPoint) && (
+            <KirunaMunicipality  geoJsonData={geoJsonData} />
+          )}
           {position && position.type === "Point" && (
             <Marker position={[position.coordinates.lat, position.coordinates.long]} data-testid="map-marker" zIndexOffset={10}>
               <Popup>

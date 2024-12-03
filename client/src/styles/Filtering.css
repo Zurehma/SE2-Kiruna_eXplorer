@@ -16,11 +16,11 @@
 
 @media (min-width: 768px) {
   .filtered-result {
-      margin-left: 27%;
-      padding-left: 15px;
-      height: 100vh;
-      padding-right: 2cm;
-      background-color: #ffffff;
+    margin-left: 27%;
+    padding-left: 15px;
+    height: 100vh;
+    padding-right: 2cm;
+    background-color: #ffffff;
   }
 }
 
@@ -81,7 +81,7 @@
 .clear-icon,
 .search-icon {
   cursor: pointer;
-  color:#006d77;
+  color: #006d77;
   font-size: 24px;
   transition: color 0.2s;
 }
@@ -137,11 +137,11 @@
   color: #fff;
 }
 
-.custom-toggle:hover  {
+.custom-toggle:hover {
   background-color: #006d77;
 }
-.toggle-label:hover{
-  color:#fff;
+.toggle-label:hover {
+  color: #fff;
 }
 
 .custom-toggle.active:hover {
@@ -199,7 +199,7 @@
 /* General Styling Improvements */
 body {
   background-color: #f5f5f5; /* Light grey background to reduce the stark white contrast */
-  font-family: 'Roboto', sans-serif; /* Modern font for better readability */
+  font-family: "Roboto", sans-serif; /* Modern font for better readability */
 }
 
 /* Filter Dropdown Input Enhancements */
@@ -217,7 +217,7 @@ body {
   transition: background 0.3s;
 }
 .filter-input option:hover {
-  background-color: #006d77; 
+  background-color: #006d77;
   color: #ddd;
 }
 .filter-input::-webkit-scrollbar {
@@ -230,7 +230,6 @@ body {
 .filter-input::-webkit-scrollbar-thumb:hover {
   background: #1e40af; /* Darker blue on hover */
 }
-
 
 .filter-input:focus {
   border-color: #006d77;
@@ -268,23 +267,31 @@ body {
   }
 }
 
-#close-button-resp{
+#close-button-resp {
   color: #fff;
-  background-color:#006d77 ;
+  background-color: #006d77;
   margin-left: 1cm;
 }
 
-
-@media (max-width:280px){
-  .filtered-result{
+@media (max-width: 280px) {
+  .filtered-result {
     display: none;
   }
 }
 
-#sidebarFilterStakeholder{
+#sidebarFilterStakeholder {
   color: #006d77;
 }
 
-#sidebarFilterDocumentType{
+#sidebarFilterDocumentType {
   color: #006d77;
+}
+
+/* css fro the pagination */
+.btn-page {
+  background-color: #006d77 !important;
+  border: none;
+  padding: 0.4rem 1.5rem;
+  margin: 1.5rem; /* Spazio attorno al pulsante */
+  transition: background-color 0.3s ease;
 }

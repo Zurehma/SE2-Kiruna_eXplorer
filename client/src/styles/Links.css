@@ -1,3 +1,4 @@
+/* Background e layout principale */
 .links-background {
   background: linear-gradient(to right, #006d77, #83c5be);
   min-height: 100vh;
@@ -10,24 +11,9 @@
 
 body,
 html {
-  overflow-y: auto;
   margin: 0;
   padding: 0;
-}
-
-.container {
-  max-width: 700px;
-}
-
-.card-link {
-  border-radius: 10px;
-  height: 500px;
-  width: 600px;
-  border: none;
-  display: flex;
-  align-items: top;
-  margin-top: 10px;
-  justify-content: center;
+  overflow-y: auto;
 }
 
 .links-card-title {
@@ -35,40 +21,33 @@ html {
   font-weight: bold;
   text-align: center;
   color: #006d77;
+  margin-bottom: 1rem;
 }
 
-.links-input,
-.links-select {
-  border-radius: 5px;
-  border: 1px solid #006d77;
-  padding: 0.75rem;
-  transition: all 0.2s ease-in-out;
-}
-
-.links-input:focus,
-.links-select:focus {
-  border-color: #006d77;
-  box-shadow: 0 0 5px rgba(0, 109, 119, 0.5);
-}
-
+/* Pulsanti */
 .btn-save {
   background-color: #006d77;
   border: none;
   padding: 0.6rem 2.5rem;
+  font-size: 1rem;
   transition: background-color 0.3s ease;
+  cursor: pointer;
 }
 
 .btn-save:hover {
   background-color: #005f6b;
 }
-
-.links-form-label {
-  font-weight: 500;
-  color: #006d77;
+.cd-body {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin: auto 2rem;
 }
 
+/* Media queries per schermi più piccoli */
 @media (max-width: 768px) {
-  .card {
+  .card-link {
+    width: 100%; /* Fa sì che la card si adatti a schermi più piccoli */
     padding: 1rem;
   }
 
@@ -76,48 +55,52 @@ html {
     font-size: 1.5rem;
   }
 }
-
-.dropdown-toggle {
-  width: 100%;
-  text-align: left;
-  background-color: white;
-  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.1); /* Per un'ombra leggera */
-
-  border-radius: 5px;
-  border: 1px solid #006d77;
-  padding: 0.75rem;
-  transition: all 0.2s ease-in-out;
-  font-size: 1rem; /* Assicura una buona leggibilità */
+/* Applica gli stili SOLO all'interno del container con classe "links-container" */
+.links-container .dropdown-toggle {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #006d77 !important;
+  border-radius: 5px !important;
+  padding: 0.75rem !important;
 }
 
-.dropdown-menu-white {
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Per un'ombra leggera */
-  padding: 8px;
-  max-height: 200px;
-  overflow-y: auto; /* Aggiungi uno scroll se il contenuto è lungo */
-  z-index: 1050; /* Assicura che il menu sia sopra gli altri elementi */
+.links-container .dropdown-menu {
+  width: 100% !important; /* La larghezza del menu sarà uguale al contenitore */
+  background-color: #f0f0f0 !important;
+  border-radius: 5px !important;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra per maggiore contrasto */
 }
 
-/* Rimuove la freccia di dropdown */
-.dropdown-toggle::after {
-  display: none !important; /* Aggiungi !important per forzare la sovrascrittura */
+.links-container .dropdown-item {
+  color: #000000 !important;
+  padding: 10px !important;
+  background-color: #f0f0f0 !important;
 }
 
-.dropdown-menu {
-  max-height: 300px;
-  overflow-y: auto;
+.links-container .dropdown-item:hover {
+  background-color: #adadad !important;
+  color: #000000 !important;
 }
 
-.invalid-feedback {
-  display: block;
-  font-size: 0.875em;
-  color: #dc3545;
+.links-container .form-select::after {
+  display: none !important; /* Rimuove la freccia del dropdown */
 }
 
-.search-bar {
-  width: 60%;
+/* stile per icona */
+.step-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #006d77; /* Colore del testo e dell'icona */
+  font-family: Arial, sans-serif;
+  font-size: 14px; /* Dimensione del testo */
+  text-align: center;
+  transition: color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+}
 
-  border-radius: 10px !important; /* Elimina gli angoli arrotondati */
-  margin: 0 10px;
-  /* mx-3 my-2 w-auto */
+.step-button i {
+  font-size: 32px; /* Dimensione dell'icona */
+  margin-bottom: 8px; /* Spazio tra l'icona e il testo */
 }

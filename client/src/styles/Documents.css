@@ -47,8 +47,6 @@
   font-weight: 500;
 }
 
-/* Stile per STEPINDICATOR 2*/
-
 .step-line {
   display: flex;
   align-items: center;
@@ -82,7 +80,7 @@
   top: 0;
   left: 0;
   height: 100%;
-  width: 50%; /* Larghezza barra a metà */
+  width: 30%; /* Larghezza barra a metà */
   background-color: #006d77; /* Colore riempimento */
   transition: width 0.3s ease-in-out;
 }
@@ -91,7 +89,7 @@
   background-color: #f0f0f0;
 }
 
-/* Stile per la pagina di dettaglio del documento */
+/* Stile per la pagina del documento */
 .container {
   max-width: 700px;
 }

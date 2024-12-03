@@ -80,3 +80,20 @@
   background-color: #e9ecef;
   color: #495057;
 }
+
+.manual-latlng-layout {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+  margin: 0;
+  height: 40px; /* Same height as buttons */
+  padding: 10px 20px;
+  border-radius: 5px;
+  bottom: 10px;
+  position: absolute;
+  z-index: 900;
+}
+
+.manual-latlng-form {
+  border-radius: 5px;
+}
