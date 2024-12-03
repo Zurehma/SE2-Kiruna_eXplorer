@@ -58,7 +58,7 @@ class DocumentController {
    * @param {Number | null} pages
    * @returns {Promise<Document>} A promise that resolves to the newly created object
    */
-  addDocument = (title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
+  addDocument = ({title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo}) => {
     return new Promise((resolve, reject) => {
       const addDocument = async () => {
         try {
@@ -123,7 +123,7 @@ class DocumentController {
    * @param {Number | null} pageTo
    * @returns {Promise<null>} A promise that resolves to null
    */
-  updateDocument = (id, title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
+  updateDocument = ({id, title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo}) => {
     return new Promise((resolve, reject) => {
       const updateDocument = async () => {
         try {

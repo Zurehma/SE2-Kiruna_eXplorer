@@ -51,6 +51,14 @@ class Document {
 
     if (pageTo) this.pageTo = pageTo;
   }
+
+  /**
+   * Returns a formatted string representation of the document.
+   */
+  getSummary() {
+    return `${this.title} (${this.issuanceDate})`;
+  }
+
 }
 
 export default Document;
