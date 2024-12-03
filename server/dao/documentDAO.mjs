@@ -390,3 +390,4 @@ class DocumentDAO {
 }
 
 export default DocumentDAO;
+export { mapRowsToDocument };
