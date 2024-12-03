@@ -76,7 +76,7 @@ Content-Type: application/json
 ### Get link types
 GET http://localhost:3001/api/documents/link-types HTTP/1.1
 
-### Get all links
+### Get all links for a document
 GET http://localhost:3001/api/documents/links/1 HTTP/1.1
 
 
