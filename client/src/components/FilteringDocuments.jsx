@@ -106,9 +106,13 @@ const FilteringDocuments = (props) => {
 
   // Trigger fetching of filtered documents when filter values change
   useEffect(() => {
-    console.log("bbbbb");
     fetchFilteredDocuments();
-  }, [stakeholder, documentType, selectedDate, startDate, endDate, isSingleDate, currentPage]);
+    setTotalDocuments(0);
+  }, [stakeholder, documentType, selectedDate, startDate, endDate, isSingleDate]);
+
+  useEffect(() => {
+    fetchFilteredDocuments();
+  }, [currentPage]);
 
   const handleDateToggle = () => {
     setIsSingleDate(!isSingleDate);
@@ -141,11 +145,8 @@ const FilteringDocuments = (props) => {
 
   const handlePageChange = (newPage) => {
     const actualnum = currentPage * limit;
-    console.log("actualnum", currentPage);
-    console.log("totalDocuments", totalDocuments);
     if (newPage >= 0 && actualnum < totalDocuments) {
       setCurrentPage(newPage);
-      console.log("dddd");
     }
   };
 
@@ -449,25 +450,31 @@ const FilteringDocuments = (props) => {
           </div>
 
           {/* Paginazione */}
-          <div className="pagination-controls text-center mt-3">
-            <Button
-              variant="primary"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 0}
-              className="me-2"
-            >
-              Previous
-            </Button>
-            <span>Page {currentPage + 1}</span>
-            <Button
-              variant="primary"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={(currentPage + 1) * limit >= totalDocuments}
-              className="ms-2"
-            >
-              Next
-            </Button>
-          </div>
+          {totalDocuments > 0 && (
+            <div className="pagination-controls text-center mt-3">
+              <Row className="mt-3">
+                <Col className="text-center">
+                  <Button
+                    variant="primary"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 0}
+                    className="btn-page"
+                  >
+                    Previous
+                  </Button>
+                  <span>Page {currentPage + 1}</span>
+                  <Button
+                    variant="primary"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={(currentPage + 1) * limit >= totalDocuments}
+                    className="btn-page"
+                  >
+                    Next
+                  </Button>
+                </Col>
+              </Row>
+            </div>
+          )}
         </Col>
       </Row>
     </Container>
