@@ -1,3 +1,5 @@
+import { c } from "vite/dist/node/types.d-aGj9QkWt";
+
 const SERVER_URL = "http://localhost:3001" + "/api";
 
 /**
@@ -156,11 +158,11 @@ const setLink = async (linkData) => {
         ids: linkData.document2,
         type: linkData.linkType,
       }),
-      credentials: "include",
     });
     return handleInvalidResponse(response).json();
   } catch (error) {
-    throw error;
+    console.error("Error setting link:", error);
+    throw error
   }
 };
 
@@ -179,6 +181,7 @@ const logIn = async (credentials) => {
     });
     return handleInvalidResponse(response);
   } catch (error) {
+    console.error("Error logging in:", error);
     throw error;
   }
 };
@@ -218,7 +221,8 @@ const filterDocuments = async (filters) => {
   const queryString = queryParams.toString();
 
   // Form the URL properly by adding `?` if there are query parameters
-  const url = `${SERVER_URL}/documents${queryString ? `?${queryString}` : ""}`;
+  let url = `${SERVER_URL}/documents`;
+  if (queryString) url += `?${queryString}`;
 
   try {
     const response = await fetch(url, {
@@ -259,11 +263,12 @@ const getDocumentTypes = async () => {
 //Function to delete an attachment
 const deleteAttachment = async (docID, attachmentID) => {
   try {
-    const response = await fetch(`${SERVER_URL}/documents/${docID}/attachments/${attachmentID}`, {
+    await fetch(`${SERVER_URL}/documents/${docID}/attachments/${attachmentID}`, {
       method: "DELETE",
       credentials: "include",
     });
   } catch (error) {
+    console.error("Error deleting attachment:", error);
     throw error;
   }
 };
@@ -293,6 +298,7 @@ const saveDocument = async (doc) => {
     });
     return handleInvalidResponse(response).json();
   } catch (error) {
+    console.error("Error saving document:", error);
     throw error;
   }
 };
@@ -324,6 +330,7 @@ const updateDocument = async (documentId, doc) => {
       body: JSON.stringify(filteredDoc),
     });
   } catch (error) {
+    console.error("Error updating document:", error);
     throw error;
   }
 };
@@ -339,7 +346,6 @@ const allExistingLinks = async () => {
 
 //Export API methods
 const API = {
-  updateDocument,
   getStakeholders,
   getDocumentTypes,
   getDocuments,
