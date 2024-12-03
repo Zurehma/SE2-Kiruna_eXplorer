@@ -282,11 +282,3 @@ body {
     display: none;
   }
 }
-.home-background {
-  z-index: -1; /* Porta lo sfondo dietro */
-}
-
-.custom-navbar {
-  position: relative; /* Mantieni la navbar sopra */
-  z-index: 10;
-}

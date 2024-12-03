@@ -3,6 +3,8 @@
   background-color: white;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   padding: 10px 20px;
+  position: relative; /* Assicurati che non sia coperta */
+  z-index: 9999; /* Porta la navbar in primo piano */
 }
 
 /* Stile del brand (Kiruna) */
