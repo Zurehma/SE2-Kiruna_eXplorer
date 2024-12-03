@@ -435,7 +435,7 @@ const FilteringDocuments = (props) => {
           </div>
 
           <div className="documents-list mt-2">
-            <h5 className="text-center">PAGE: {currentPage + 1}</h5>
+            <h4 className="text-center">PAGE {currentPage + 1}</h4>
             {loading ? (
               <div className="text-center">
                 <Spinner animation="border" variant="primary" />

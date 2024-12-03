@@ -16,44 +16,12 @@ html {
   overflow-y: auto;
 }
 
-.container {
-  max-width: 700px;
-}
-
-.card-link {
-  border-radius: 10px;
-  height: 500px;
-  width: 600px;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin-top: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
 .links-card-title {
   font-size: 1.8rem;
   font-weight: bold;
   text-align: center;
   color: #006d77;
   margin-bottom: 1rem;
-}
-
-/* Input e select (form elements) */
-.links-input,
-.links-select {
-  border-radius: 5px;
-  border: 1px solid #006d77;
-  padding: 0.75rem;
-  font-size: 1rem;
-  transition: all 0.2s ease-in-out;
-}
-
-.links-input:focus,
-.links-select:focus {
-  border-color: #006d77;
-  box-shadow: 0 0 5px rgba(0, 109, 119, 0.5);
 }
 
 /* Pulsanti */
@@ -69,11 +37,11 @@ html {
 .btn-save:hover {
   background-color: #005f6b;
 }
-
-/* Etichetta form */
-.links-form-label {
-  font-weight: 500;
-  color: #006d77;
+.cd-body {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin: auto 2rem;
 }
 
 /* Media queries per schermi più piccoli */
@@ -97,8 +65,10 @@ html {
 }
 
 .links-container .dropdown-menu {
+  width: 100% !important; /* La larghezza del menu sarà uguale al contenitore */
   background-color: #f0f0f0 !important;
   border-radius: 5px !important;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra per maggiore contrasto */
 }
 
 .links-container .dropdown-item {
@@ -114,4 +84,23 @@ html {
 
 .links-container .form-select::after {
   display: none !important; /* Rimuove la freccia del dropdown */
+}
+
+/* stile per icona */
+.step-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #006d77; /* Colore del testo e dell'icona */
+  font-family: Arial, sans-serif;
+  font-size: 14px; /* Dimensione del testo */
+  text-align: center;
+  transition: color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+}
+
+.step-button i {
+  font-size: 32px; /* Dimensione dell'icona */
+  margin-bottom: 8px; /* Spazio tra l'icona e il testo */
 }

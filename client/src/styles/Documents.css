@@ -80,7 +80,7 @@
   top: 0;
   left: 0;
   height: 100%;
-  width: 50%; /* Larghezza barra a metà */
+  width: 30%; /* Larghezza barra a metà */
   background-color: #006d77; /* Colore riempimento */
   transition: width 0.3s ease-in-out;
 }

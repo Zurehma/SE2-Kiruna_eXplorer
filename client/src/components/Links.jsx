@@ -164,16 +164,21 @@ function Links(props) {
       <Container className="links-container d-flex align-items-top justify-content-center min-vh-100">
         <Card
           className="p-4 shadow-lg w-100"
-          style={{ maxWidth: "700px", maxHeight: "550px", marginTop: "50px" }}
+          style={{ maxWidth: "700px", maxHeight: "650px", marginTop: "50px" }}
         >
           <Card.Body>
             <Card.Title className="links-card-title">ADD NEW LINK</Card.Title>
-            <Form>
+            <div className="step-button">
+              <i class="bi bi-share-fill"></i>
+              LINK STEP
+            </div>
+
+            <Form className="cd-body">
               {/* Document 1 */}
               <Row className="mb-3">
                 <Col className="mb-3">
                   <Form.Group controlId="document1" className="links-form-group">
-                    <Form.Label className="links-form-label">Document 1</Form.Label>
+                    <Form.Label className="links-form-label">Document 1*</Form.Label>
                     <Dropdown>
                       <Dropdown.Toggle variant="light" className="form-select">
                         {documents.find((doc) => doc.id === Number(linkData.document1))?.title ||
@@ -199,7 +204,7 @@ function Links(props) {
               <Row className="mb-3">
                 <Col className="mb-3">
                   <Form.Group controlId="linkType" className="links-form-group">
-                    <Form.Label className="links-form-label">Link Type</Form.Label>
+                    <Form.Label className="links-form-label">Link Type*</Form.Label>
                     <Form.Select
                       name="linkType"
                       value={linkData.linkType}
@@ -223,7 +228,7 @@ function Links(props) {
               <Row className="mb-3">
                 <Col className="mb-3">
                   <Form.Group controlId="document2" className="links-form-group">
-                    <Form.Label className="links-form-label">Document 2</Form.Label>
+                    <Form.Label className="links-form-label">Document 2*</Form.Label>
                     <Dropdown>
                       <Dropdown.Toggle
                         variant="light"
