@@ -1,24 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Form, Button, Container, Dropdown } from "react-bootstrap";
-import { DropdownButton, Card, ProgressBar, Row, Col } from "react-bootstrap";
+import { Form, Button, Container} from "react-bootstrap";
+import { Card, Row, Col } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../../../API.js";
 import "../../styles/Documents.css";
 import "leaflet/dist/leaflet.css";
-import { Polygon } from "react-leaflet";
-import L from "leaflet";
-import ISO6391 from "iso-639-1";
-import Select from "react-select";
-import * as turf from "@turf/turf";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
 import Step3 from "./Step3";
 import Step4 from "./Step4";
 import StepIndicator from "./StepIndicator";
+import PropTypes from "prop-types";
 
 function Documents(props) {
-  const [scales, setScales] = useState(["Text", "Blueprints/Effects", "1:n"]);
+  const scales = ["Text", "Blueprints/Effects", "1:n"];
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [existingAttachments, setExistingAttachments] = useState([]);
@@ -481,5 +477,10 @@ function Documents(props) {
     </div>
   );
 }
+
+Documents.propTypes = {
+  setError: PropTypes.func,
+  setNewDoc: PropTypes.func,
+};
 
 export default Documents;
