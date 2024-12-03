@@ -119,9 +119,12 @@ const getAttachments = async (docID) => {
 const downloadAttachment = async (docID, attachmentID) => {
   try {
     // EFetch request to the server
-    const response = await fetch(`${SERVER_URL}/documents/${docID}/attachments/${attachmentID}/download`, {
-      method: "GET",
-    });
+    const response = await fetch(
+      `${SERVER_URL}/documents/${docID}/attachments/${attachmentID}/download`,
+      {
+        method: "GET",
+      }
+    );
 
     // 200 if the response is correct
     if (!response.ok) {
@@ -209,6 +212,8 @@ const filterDocuments = async (filters) => {
   if (filters.stakeholder) queryParams.append("stakeholder", filters.stakeholder);
   if (filters.issuanceDateFrom) queryParams.append("issuanceDateFrom", filters.issuanceDateFrom);
   if (filters.issuanceDateTo) queryParams.append("issuanceDateTo", filters.issuanceDateTo);
+  if (filters.limit) queryParams.append("limit", filters.limit);
+  if (filters.offset) queryParams.append("offset", filters.offset);
 
   const queryString = queryParams.toString();
 
@@ -324,38 +329,37 @@ const updateDocument = async (documentId, doc) => {
 };
 const allExistingLinks = async () => {
   return await fetch(`${SERVER_URL}/documents/allExistingLinks`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
   })
-      .then(handleInvalidResponse)
-      .then((response) => response.json());
+    .then(handleInvalidResponse)
+    .then((response) => response.json());
 };
-
 
 //Export API methods
 const API = {
-    updateDocument,
-    getStakeholders,
-    getDocumentTypes,
-    getDocuments,
-    saveDocument,
-    logIn,
-    logOut,
-    getTypeDocuments,
-    getTypeScale,
-    getTypeLinks,
-    setLink,
-    getUserInfo,
-    uploadFiles,
-    getLinksDoc,
-    getAttachments,
-    downloadAttachment,
-    filterDocuments,
-    deleteAttachment,
-    getDocumentById,
-    updateDocument,
-    allExistingLinks
+  updateDocument,
+  getStakeholders,
+  getDocumentTypes,
+  getDocuments,
+  saveDocument,
+  logIn,
+  logOut,
+  getTypeDocuments,
+  getTypeScale,
+  getTypeLinks,
+  setLink,
+  getUserInfo,
+  uploadFiles,
+  getLinksDoc,
+  getAttachments,
+  downloadAttachment,
+  filterDocuments,
+  deleteAttachment,
+  getDocumentById,
+  updateDocument,
+  allExistingLinks,
 };
 
 export default API;
