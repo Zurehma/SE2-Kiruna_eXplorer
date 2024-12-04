@@ -159,10 +159,6 @@ body {
   transition: transform 0.2s ease, background-color 0.3s ease;
 }
 
-.info-block:hover {
-  transform: scale(1.05); /* Effetto zoom */
-}
-
 .info-image {
   width: 100%; /* L'immagine copre tutta la larghezza del blocco */
   height: 200px; /* Altezza fissa per le immagini */
