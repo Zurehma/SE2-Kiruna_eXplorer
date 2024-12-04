@@ -153,12 +153,12 @@ describe("DocumentController", () => {
     });
 
     test("Document added successfully", async () => {
-      const exampleAddResult = { lastID: 2, changes: 1 };
+      const exampleAddResult = { lastID: 12, changes: 1 };
       const exampleDocumentData = {
         title: "title",
-        stakeholders: ["stakeholder"],
+        stakeholders: ["stakeholder", "stakeholder2"],
         scale: 100,
-        issuanceDate: "2024-02-12",
+        issuanceDate: "2016-02-12",
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
@@ -182,8 +182,9 @@ describe("DocumentController", () => {
         exampleDocumentData.pageTo
       );
 
+      Utility.isValidKirunaCoordinates = jest.fn().mockReturnValue(true);
       documentDAO.addDocument = jest.fn().mockResolvedValueOnce(exampleAddResult);
-      documentDAO.addStakeholder = jest.fn().mockResolvedValueOnce();
+      documentDAO.addStakeholder = jest.fn().mockResolvedValueOnce( {changes: 1} );
       documentDAO.getDocumentByID = jest.fn().mockResolvedValueOnce(exampleDocument);
 
       const result = await documentController.addDocument(
@@ -302,7 +303,7 @@ describe("DocumentController", () => {
       };
 
       const oldDocument = new Document(
-        oldDocumentData.lastID,
+        oldDocumentData.id,
         oldDocumentData.title,
         oldDocumentData.stakeholders,
         oldDocumentData.scale,

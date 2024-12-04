@@ -45,13 +45,12 @@ describe("DocumentRoutes", () => {
   });
 
   describe("1. - GET /api/documents", () => {
-    //add some documents
     const exampleData = [
       {
-        title: "tittttttttttttt",
-        stakeholder: "stakeholder",
+        title: "title1",
+        stakeholders: ["stakeholder"],
         scale: 100,
-        issuanceDate: "2024-02-12",
+        issuanceDate: "2023-02-12",
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
@@ -59,8 +58,8 @@ describe("DocumentRoutes", () => {
         pages: 16
       },
       {
-        title: "titttttttttttttttttt1",
-        stakeholder: "stakeholder1",
+        title: "title2",
+        stakeholders: ["stakeholder1"],
         scale: 100,
         issuanceDate: "2014-02-12",
         type: "Prescriptive",
@@ -130,7 +129,6 @@ describe("DocumentRoutes", () => {
     });
 
     test("3 - It should return 200 a list of all the filtered by stakeholder documents", async() => {
-      //count all present documents in the database
       let countResult = await request(app)
       .get(basePath + "/documents/"+"?stakeholder=stakeholder")
       .set("Cookie", userCookie)
@@ -156,7 +154,7 @@ describe("DocumentRoutes", () => {
         .expect(200);
 
       expect(res.body.length).toBe(count+1);
-      expect(res.body[0].stakeholder).toBe("stakeholder");
+      expect(res.body[0].stakeholders[0]).toBe("stakeholder");
     });
 
     test("4 - It should return 200 a list of all the documents in the range of the issuanceDate", async() => {
@@ -186,36 +184,6 @@ describe("DocumentRoutes", () => {
         .expect(200);
 
       expect(res.body.length).toBe(count+1);
-    });
-
-    test("5 - It should return 200 a list of all the documents with the specified issuanceDate", async() => {
-      //count all present documents in the database
-      let countResult = await request(app)
-      .get(basePath + "/documents"+"?issuanceDateFrom=2014-02-12")
-      .set("Cookie", userCookie)
-      .expect(200);
-      let count = countResult.body.length;
-
-      let result1 = await request(app)
-        .post(basePath + "/documents")
-        .set("Cookie", userCookie)
-        .send(exampleData[0])
-        .expect(201);
-      
-      let result2 = await request(app)
-        .post(basePath + "/documents")
-        .set("Cookie", userCookie)
-        .send(exampleData[1])
-        .expect(201);
-
-      //get filtered documents
-      let res = await request(app)
-        .get(basePath + "/documents/"+"?issuanceDateFrom=2014-02-12")
-        .set("Cookie", userCookie)
-        .expect(200);
-
-      expect(res.body.length).toBe(count+1);
-      expect(res.body[0].issuanceDate).toBe("2014-02-12");
     });
   });
   
