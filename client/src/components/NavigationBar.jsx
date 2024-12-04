@@ -1,10 +1,30 @@
-import { Navbar, Nav, Dropdown, Button } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Navbar, Nav } from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../styles/Navbar.css";
 
 export function NavigationBar(props) {
-  const location = useLocation(); // Per ottenere il percorso corrente
+  const location = useLocation();
   const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+
+  const handleScroll = () => {
+    if (window.scrollY > 50) {
+      setScrolled(true);
+    } else {
+      setScrolled(false);
+    }
+  };
+
+  useEffect(() => {
+    // Aggiungi l'ascoltatore dello scroll
+    window.addEventListener("scroll", handleScroll);
+
+    // Rimuovi l'ascoltatore quando il componente viene smontato
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const handleLogout = () => {
     props.handleLogout();
@@ -12,7 +32,7 @@ export function NavigationBar(props) {
   };
 
   return (
-    <Navbar expand="lg" className="custom-navbar">
+    <Navbar expand="lg" className={`custom-navbar ${scrolled ? "scrolled" : ""}`}>
       <Navbar.Brand as={Link} to="/" className="navbar-brand">
         Kiruna
       </Navbar.Brand>
