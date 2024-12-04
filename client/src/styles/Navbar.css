@@ -1,156 +1,87 @@
-/* Navbar styling */
+/* Stile globale della navbar */
 .custom-navbar {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  z-index: 1500;
-  background-color: #ffffff ;
-  padding: 0.5rem 1rem;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  position: fixed; /* Rende la navbar fissa */
+  top: 0; /* Posizionata in cima alla pagina */
+  left: 0;
+  width: 100%; /* Copre l'intera larghezza */
+  z-index: 1000; /* Assicura che sia sopra tutto il resto */
+  background-color: #ffffff; /* Colore di sfondo */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombra per separazione */
+  padding: 0.5rem 1rem; /* Spazio interno */
 }
 
-/* Main content padding */
-.main-content {
-  padding-top: 70px;
-  padding-left: 15px;
-  padding-right: 15px;
+body {
+  margin: 0; /* Rimuove eventuali margini predefiniti */
+  padding-top: 69px; /* Aggiunge spazio sufficiente per la navbar */
 }
 
-/* Brand logo padding */
+.scrolled {
+  background-color: #ffffff; /* Cambia colore navbar durante lo scroll */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombra più marcata */
+}
+
 .navbar-brand {
-  padding-left: 20px;
-  cursor: pointer;
   color: #006d77;
+  font-size: 28px; /* Ingrandito leggermente */
+  font-weight: bold;
+  margin-left: 15px; /* Spazio a sinistra */
+  text-decoration: none; /* Rimuove eventuali decorazioni */
 }
 
-/* Adjust nav-link padding for responsiveness */
-.navbar-nav .nav-link {
-  padding-right: 20px; /* Reduced padding for smaller screens */
+.navbar-brand:hover,
+.navbar-brand:focus {
+  color: #004950 !important; /* Colore più scuro all'hover e focus */
 }
 
-/* Icon and text styling */
-.my-arrow-dropdown {
-  color: #ffffff;
+.navbar-brand:active {
+  color: #006d77 !important; /* Mantieni il colore verde */
 }
 
-.my-icons {
-  color: #ffffff;
-  font-size: 1.2em;
-}
-
-/* Hide welcome text on smaller screens */
-@media (max-width: 992px) {
-  .welcome-text {
-    display: none;
-  }
-}
-
-/* Stack buttons vertically and adjust spacing on smaller screens */
-@media (max-width: 768px) {
-  .navbar-nav .btn {
-    margin: 0.25rem 0;  
-    width: 100%;
-    text-align: center;
-  }
-  /* Additional styling for alignment on small screens */
-  .navbar-nav {
-    align-items: center;
-    flex-direction: column;
-  }
-}
-
-.dropdown-menu {
-  background-color: #000; /* Set background color */
-  border: none; /* Remove border */
-}
-
-.dropdown-item {
-  color: #fff; /* Change text color */
-}
-
-.dropdown-item:hover {
-  background-color: rgba(255, 255, 255, 0.726); /* Change hover color */
-}
-
-
-/* Navbar brand and welcome text color */
-.custom-navbar .navbar-brand,
-.custom-navbar .welcome-text {
-  color: #006d77
-}
-
-/* Button styles for login */
-.custom-login-button {
-  background-color: #ffffff ;
-  color: #006d77 ;
-  border-style: hidden;
-}
-
-.home-button {
-  background-color: #ffffff ;
-  color: #006d77 ;
-  border-style: hidden;
-}
-.home-button:hover,
-.home-login-button:focus {
-  border-color: #005c66 ;
-}
-.custom-login-button:hover,
-.custom-login-button:focus {
-  border-color: #005c66 ;
-}
-
-/* Dropdown toggle button styles */
-.menu-dropdown-toggle {
-  color: #ffffff ;
-  border-color: #006d77 ;
-  background-color: #006d77 ;
-}
-
-.menu-dropdown-toggle:hover,
-.menu-dropdown-toggle:focus {
-  color: #ffffff ;
-  background-color: #005c66 ;
-  border-color: #005c66 ;
-}
-
-/* Dropdown menu background and text color */
-.dropdown-menu-custom {
-  background-color: #ffffff ; /* White background */
-  color: #006d77 ; /* Text color */
-  border: none; /* Remove border if desired */
-}
-
-/* Dropdown item color and hover effect */
-.dropdown-menu-custom .dropdown-item {
-  color: #006d77 ;
-}
-
-.dropdown-menu-custom .dropdown-item:hover {
-  background-color: #e0f4f3 ; /* Light teal for hover effect */
-  color: #005c66 ; /* Slightly darker teal on hover */
-}
-#home-button{
+/* Stile dei link della navbar */
+.nav-link {
   color: #006d77;
-  border-color: white;
-  border-style: hidden;
+  font-size: 20px; /* Ingrandito leggermente */
+  font-weight: 500;
+  position: relative; /* Necessario per il bordo inferiore */
+  text-transform: capitalize;
+  display: inline-block; /* Assicura che i link siano come blocchi */
+  text-align: center; /* Centra il testo */
+  min-width: 100px; /* Imposta una larghezza minima */
+  padding: 10px 15px; /* Aggiunge spazio interno */
+  margin-right: 10px; /* Spaziatura tra i link */
+  text-decoration: none; /* Rimuove eventuali decorazioni */
 }
 
-.navbar-toggler{
-  background-color:#006d77;
+/* Hover con striscia in basso */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -12px; /* Posiziona la striscia sotto il testo */
+  left: 0;
+  right: 0;
+  height: 3px; /* Spessore della striscia */
+  background-color: #006d77; /* Verde specificato */
+  transform: scaleX(0); /* Nascondi inizialmente */
 }
 
-.custom-icon-color {
-  color: #006d77 ; /* Replace with your desired color code */
+.nav-link:hover::after {
+  transform: scaleX(1); /* Mostra la striscia quando hover */
 }
 
-.custom-documents-button {
-  background-color: #ffffff ;
-  color: #006d77 ;
-  border-style: hidden;
+.nav-link:hover {
+  color: #004f55; /* Colore leggermente più scuro all'hover */
 }
 
-.custom-documents-button:hover,
-.custom-documents-button:focus {
-  border-color: #005c66 ;
+/* Stile per il link attivo */
+.nav-link.active::after {
+  transform: scaleX(1); /* Mantieni la striscia visibile */
+}
+
+.nav-link.active {
+  color: #006d77 !important; /* Colore verde per il link attivo */
+}
+
+/* Rimuove il margine dall'ultimo link */
+.nav-link:last-child {
+  margin-right: 0;
 }

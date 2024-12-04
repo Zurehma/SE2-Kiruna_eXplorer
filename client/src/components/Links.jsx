@@ -1,16 +1,37 @@
 import React, { useState, useEffect } from "react";
-import { Form, Button, Container, Card, Modal } from "react-bootstrap";
+import { Form, Button, Container, Card, Modal, Dropdown, Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import Select from "react-select";
 import API from "../../API.js";
 import "../styles/Links.css";
+
+const CustomMenu = React.forwardRef(
+  ({ children, style, className, "aria-labelledby": labeledBy }, ref) => {
+    const [value, setValue] = useState("");
+    return (
+      <div ref={ref} style={style} className={className} aria-labelledby={labeledBy}>
+        <Form.Control
+          autoFocus
+          className="search-bar"
+          placeholder="Type to filter..."
+          onChange={(e) => setValue(e.target.value)}
+          value={value}
+        />
+        <ul className="list-unstyled">
+          {React.Children.toArray(children).filter(
+            (child) => !value || child.props.children.toLowerCase().startsWith(value)
+          )}
+        </ul>
+      </div>
+    );
+  }
+);
 
 function Links(props) {
   const [documents, setDocuments] = useState([]);
   const [typeLink, setTypeLink] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
-  const [linkedDocuments, setLinkedDocuments] = useState([]); // Contiene gli ID dei documenti collegati
+  const [linkedDocuments, setLinkedDocuments] = useState([]);
   const navigate = useNavigate();
   const [linkData, setLinkData] = useState({
     document1: "",
@@ -30,14 +51,12 @@ function Links(props) {
       try {
         const response = await API.getDocuments();
         setDocuments(response);
-
         const response2 = await API.getTypeLinks();
         setTypeLink(response2);
       } catch (error) {
         console.error("Error fetching documents:", error);
       }
     };
-
     fetchDocuments();
 
     if (props.newDoc) {
@@ -49,31 +68,32 @@ function Links(props) {
   }, [props.newDoc]);
 
   useEffect(() => {
-    if (linkData.document1) {
+    if (linkData.document1 && linkData.linkType) {
       const fetchLinkedDocuments = async () => {
         try {
           const linkedResponse = await API.getLinksDoc(linkData.document1);
-          // Estrarre gli ID dei documenti collegati
-          const linkedIds = linkedResponse.map((doc) => doc.linkedDocID);
-          setLinkedDocuments(linkedIds);
+
+          // Filtra i documenti per tipo e rimuovi quelli già linkati
+          const filteredLinkedDocs = linkedResponse
+            .filter((doc) => doc.type === linkData.linkType) // Filtro per tipo
+            .map((doc) => doc.linkedDocID); // Prendo solo gli ID dei documenti
+
+          setLinkedDocuments(filteredLinkedDocs);
+
+          console.log("gggggggg:", filteredLinkedDocs);
+
+          // Setta i documenti filtrati
+          setLinkedDocuments(filteredLinkedDocs);
         } catch (error) {
           console.error("Error fetching linked documents:", error);
         }
       };
+
       fetchLinkedDocuments();
     } else {
-      setLinkedDocuments([]); // Resetta se document1 non è selezionato
+      setLinkedDocuments([]);
     }
-  }, [linkData.document1]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setLinkData((prevLinkData) => ({
-      ...prevLinkData,
-      [name]: value,
-      ...(name === "document1" ? { document2: [] } : {}), // Resetta document2 quando document1 cambia
-    }));
-  };
+  }, [linkData.document1, linkData.linkType]);
 
   const handleSaveLinks = async (e) => {
     e.preventDefault();
@@ -114,111 +134,138 @@ function Links(props) {
 
   const handleClose = () => navigate("/");
 
+  const handleDocument1Change = (docId) => {
+    setLinkData({
+      document1: docId,
+      linkType: "",
+      document2: [],
+    });
+  };
+
+  const handleLinkTypeChange = (type) => {
+    setLinkData((prevLinkData) => ({
+      ...prevLinkData,
+      linkType: type,
+      document2: [], // Reset document2 when linkType changes
+    }));
+  };
+
+  const handleDocument2Toggle = (docId) => {
+    setLinkData((prevLinkData) => ({
+      ...prevLinkData,
+      document2: prevLinkData.document2.includes(docId)
+        ? prevLinkData.document2.filter((id) => id !== docId)
+        : [...prevLinkData.document2, docId],
+    }));
+  };
+
   return (
     <div className="links-background">
-      <Container className="d-flex align-items-top justify-content-center min-vh-100">
-        <Card className="card-link p-4 shadow-sm">
+      <Container className="links-container d-flex align-items-top justify-content-center min-vh-100">
+        <Card
+          className="p-4 shadow-lg w-100"
+          style={{ maxWidth: "700px", maxHeight: "650px", marginTop: "50px" }}
+        >
           <Card.Body>
             <Card.Title className="links-card-title">ADD NEW LINK</Card.Title>
-            <Form>
+            <div className="step-button">
+              <i class="bi bi-share-fill"></i>
+              LINK STEP
+            </div>
+
+            <Form className="cd-body">
               {/* Document 1 */}
-              <Form.Group controlId="document1" className="links-form-group">
-                <Form.Label className="links-form-label">Document 1</Form.Label>
-                <Form.Select
-                  name="document1"
-                  value={linkData.document1}
-                  onChange={handleChange}
-                  isInvalid={!!errors.document1}
-                >
-                  {!props.newDoc && <option value="">Select Document 1</option>}
-                  {documents.map((doc) => (
-                    <option name='optionsDoc1' key={doc.id} value={doc.id}>
-                      {doc.title}
-                    </option>
-                  ))}
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.document1}
-                </Form.Control.Feedback>
-              </Form.Group>
+              <Row className="mb-3">
+                <Col className="mb-3">
+                  <Form.Group controlId="document1" className="links-form-group">
+                    <Form.Label className="links-form-label">Document 1*</Form.Label>
+                    <Dropdown>
+                      <Dropdown.Toggle variant="light" className="form-select">
+                        {documents.find((doc) => doc.id === Number(linkData.document1))?.title ||
+                          "Select Document 1"}
+                      </Dropdown.Toggle>
 
-              {/* Document 2 */}
-              <Form.Group controlId="document2" className="links-form-group">
-                <Form.Label className="links-form-label">Document 2</Form.Label>
-                <Select
-                  name="document2"
-                  value={documents
-                    .filter((doc) => linkData.document2.includes(doc.id))
-                    .map((doc) => ({ value: doc.id, label: doc.title }))}
-                  onChange={(selectedOptions) =>
-                    setLinkData((prevLinkData) => ({
-                      ...prevLinkData,
-                      document2: selectedOptions.map((option) => option.value),
-                    }))
-                  }
-                  options={documents
-                    .filter(
-                      (doc) =>
-                        doc.id !== Number(linkData.document1) &&
-                        !linkedDocuments.includes(doc.id)
-                    )
-                    .map((doc) => ({
-                      value: doc.id,
-                      label: doc.title,
-                    }))}
-                  isMulti
-                  className="basic-multi-select"
-                  classNamePrefix="select"
-                  isInvalid={!!errors.document2}
-                  isDisabled={!linkData.document1}
-                  styles={{
-                    placeholder: (base, state) => ({
-                      ...base,
-                      color: state.isDisabled ? 'grey' : 'black', // Grigio quando disabilitato, nero altrimenti
-                    }),
-                    control: (base, state) => ({
-                      ...base,
-                      backgroundColor: state.isDisabled ? '#f5f5f5' : 'white', // Facoltativo, per cambiare lo sfondo
-                    }),
-                  }}
-                />
-
-                {/* Messaggio di errore */}
-                {errors.document2 && (
-                  <div className="invalid-feedback d-block">
-                    {errors.document2}
-                  </div>
-                )}
-              </Form.Group>
+                      <Dropdown.Menu as={CustomMenu}>
+                        {documents.map((doc) => (
+                          <Dropdown.Item key={doc.id} onClick={() => handleDocument1Change(doc.id)}>
+                            {doc.title}
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    {errors.document1 && (
+                      <div className="invalid-feedback d-block">{errors.document1}</div>
+                    )}
+                  </Form.Group>
+                </Col>
+              </Row>
 
               {/* Link Type */}
-              <Form.Group controlId="linkType" className="links-form-group">
-                <Form.Label className="links-form-label">Link Type</Form.Label>
-                <Form.Select
-                  name="linkType"
-                  value={linkData.linkType}
-                  onChange={handleChange}
-                  isInvalid={!!errors.linkType}
-                >
-                  <option value="">Select a type of Link</option>
-                  {typeLink.map((type, index) => (
-                    <option name='optionLink' key={index} value={type.name}>
-                      {type.name}
-                    </option>
-                  ))}
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.linkType}
-                </Form.Control.Feedback>
-              </Form.Group>
+              <Row className="mb-3">
+                <Col className="mb-3">
+                  <Form.Group controlId="linkType" className="links-form-group">
+                    <Form.Label className="links-form-label">Link Type*</Form.Label>
+                    <Form.Select
+                      name="linkType"
+                      value={linkData.linkType}
+                      onChange={(e) => handleLinkTypeChange(e.target.value)}
+                      isInvalid={!!errors.linkType}
+                      disabled={!linkData.document1}
+                    >
+                      <option value="">Select a type of Link</option>
+                      {typeLink.map((type, index) => (
+                        <option key={index} value={type.name}>
+                          {type.name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control.Feedback type="invalid">{errors.linkType}</Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              {/* Document 2 */}
+              <Row className="mb-3">
+                <Col className="mb-3">
+                  <Form.Group controlId="document2" className="links-form-group">
+                    <Form.Label className="links-form-label">Document 2*</Form.Label>
+                    <Dropdown>
+                      <Dropdown.Toggle
+                        variant="light"
+                        className="form-select"
+                        disabled={!linkData.linkType}
+                      >
+                        {linkData.document2.length > 0
+                          ? `${linkData.document2.length} Documents Selected`
+                          : "Select Documents"}
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu as={CustomMenu}>
+                        {documents
+                          .filter(
+                            (doc) =>
+                              !linkedDocuments.includes(doc.id) && doc.id !== linkData.document1
+                          ) // Filtro per rimuovere anche linkData.document1
+                          .map((doc) => (
+                            <Dropdown.Item
+                              key={doc.id}
+                              onClick={() => handleDocument2Toggle(doc.id)}
+                            >
+                              {linkData.document2.includes(doc.id) ? "✓ " : ""}
+                              {doc.title}
+                            </Dropdown.Item>
+                          ))}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    {errors.document2 && (
+                      <div className="invalid-feedback d-block">{errors.document2}</div>
+                    )}
+                  </Form.Group>
+                </Col>
+              </Row>
 
               {/* Save Button */}
               <div className="text-center mt-5">
-                <Button
-                  variant="primary"
-                  onClick={handleSaveLinks}
-                  className="btn-save"
-                >
+                <Button variant="primary" onClick={handleSaveLinks} className="btn-save">
                   Save Link
                 </Button>
               </div>
@@ -240,19 +287,11 @@ function Links(props) {
           </Modal.Body>
           <Modal.Footer>
             {saveStatus === "Completed" ? (
-              <Button
-                variant="primary"
-                onClick={handleNewLink}
-                className="btn-saveLink"
-              >
+              <Button variant="primary" onClick={handleNewLink} className="btn-saveLink">
                 Save New Link
               </Button>
             ) : (
-              <Button
-                variant="primary"
-                onClick={handleNewLink}
-                className="btn-saveLink"
-              >
+              <Button variant="primary" onClick={handleNewLink} className="btn-saveLink">
                 Try again!
               </Button>
             )}

@@ -1,76 +1,106 @@
+/* Background e layout principale */
+.links-background {
+  background: linear-gradient(to right, #006d77, #83c5be);
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
 
+body,
+html {
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
 
-  
-   .links-background {
-    background: linear-gradient(to right, #006d77, #83c5be);
-    min-height: 100vh;
-    padding: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow-y: auto;
-  }
-  
-  body, html {
-    overflow-y: auto;
-    margin: 0;
-    padding: 0;
-  } 
+.links-card-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-align: center;
+  color: #006d77;
+  margin-bottom: 1rem;
+}
 
+/* Pulsanti */
+.btn-save {
+  background-color: #006d77;
+  border: none;
+  padding: 0.6rem 2.5rem;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-save:hover {
+  background-color: #005f6b;
+}
+.cd-body {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin: auto 2rem;
+}
+
+/* Media queries per schermi più piccoli */
+@media (max-width: 768px) {
   .card-link {
-    border-radius: 10px;
-    height: 450px;
-    width: 500px;
-    border: none;
-    display: flex;
-    align-items: top; 
-    margin-top: 10px ;
-    justify-content: center;
+    width: 100%; /* Fa sì che la card si adatti a schermi più piccoli */
+    padding: 1rem;
   }
-    
 
   .links-card-title {
-    font-size: 1.8rem;
-    font-weight: bold;
-    text-align: center;
-    color: #006d77;
+    font-size: 1.5rem;
   }
-  
-  .links-input, .links-select {
-    border-radius: 5px;
-    border: 1px solid #006d77;
-    padding: 0.75rem;
-    transition: all 0.2s ease-in-out;
-  }
-  
-  .links-input:focus, .links-select:focus {
-    border-color: #006d77;
-    box-shadow: 0 0 5px rgba(0, 109, 119, 0.5);
-  }
-  
-  .btn-save{
-    background-color: #006d77;
-    border: none;
-    padding: 0.6rem 2.5rem;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btn-save:hover {
-    background-color: #005f6b;
-  }
-  
-  .links-form-label {
-    font-weight: 500;
-    color: #006d77;
-  }
-  
-  @media (max-width: 768px) {
-    .card {
-      padding: 1rem;
-    }
-  
-    .links-card-title {
-      font-size: 1.5rem;
-    }
-  }
-   
+}
+/* Applica gli stili SOLO all'interno del container con classe "links-container" */
+.links-container .dropdown-toggle {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #006d77 !important;
+  border-radius: 5px !important;
+  padding: 0.75rem !important;
+}
+
+.links-container .dropdown-menu {
+  width: 100% !important; /* La larghezza del menu sarà uguale al contenitore */
+  background-color: #f0f0f0 !important;
+  border-radius: 5px !important;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra per maggiore contrasto */
+}
+
+.links-container .dropdown-item {
+  color: #000000 !important;
+  padding: 10px !important;
+  background-color: #f0f0f0 !important;
+}
+
+.links-container .dropdown-item:hover {
+  background-color: #adadad !important;
+  color: #000000 !important;
+}
+
+.links-container .form-select::after {
+  display: none !important; /* Rimuove la freccia del dropdown */
+}
+
+/* stile per icona */
+.step-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #006d77; /* Colore del testo e dell'icona */
+  font-family: Arial, sans-serif;
+  font-size: 14px; /* Dimensione del testo */
+  text-align: center;
+  transition: color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+}
+
+.step-button i {
+  font-size: 32px; /* Dimensione dell'icona */
+  margin-bottom: 8px; /* Spazio tra l'icona e il testo */
+}

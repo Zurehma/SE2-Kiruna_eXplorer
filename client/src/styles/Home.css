@@ -1,243 +1,300 @@
-/* Animations */
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-@keyframes fadeOut {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-@keyframes slideUp {
-  0% { transform: translateY(20px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes slideDown {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(20px); opacity: 0; }
-}
-
-/* Vendor-prefixed animations for older browsers */
-@-webkit-keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-@-webkit-keyframes fadeOut {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-@-moz-keyframes slideUp {
-  0% { transform: translateY(20px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-
-@-moz-keyframes slideDown {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(20px); opacity: 0; }
-}
-
-/* Animation Classes */
-.fade-in {
-  animation: fadeIn 1.5s ease-in forwards;
-  pointer-events: none;
-  will-change: opacity;
-}
-
-.fade-out {
-  animation: fadeOut 1.5s ease-out forwards;
-  pointer-events: none;
-  will-change: opacity;
-}
-
-.slide-up {
-  animation: slideUp 1.5s ease-in-out forwards;
-  pointer-events: none;
-  will-change: transform, opacity;
-}
-
-.slide-down {
-  animation: slideDown 1.5s ease-in-out forwards;
-  pointer-events: none;
-  will-change: transform, opacity;
-}
-
-/* Base Styles */
-html, body {
+/* Base styles */
+html,
+body {
   margin: 0;
   padding: 0;
+  height: 100%;
   overflow-x: hidden;
+  font-family: Arial, sans-serif;
 }
 
-/* Home Background */
-.home-background {
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-  transition: background-image 1.5s ease;
-  -webkit-transition: background-image 1.5s ease;
-  -moz-transition: background-image 1.5s ease;
-  -o-transition: background-image 1.5s ease;
-  pointer-events: none;
+.homepage {
+  height: 165vh; /* Pagina più lunga per permettere lo scrolling */
+  width: 100%;
+  overflow: hidden; /* Rimuove spazi extra */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/* Home Container */
-.home-container {
+/* Sezione superiore con immagine di sfondo */
+.background-section {
+  position: relative;
+  height: 90vh;
+  background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.05) 70%,
+      /* Gradiente più delicato, parte al 75% dell'altezza */ rgba(255, 255, 255, 1) 100%
+        /* Fine del gradiente al 100% */
+    ),
+    url("/kiruna.jpg") no-repeat center center/cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  text-align: center;
+  padding-bottom: 60px; /* Spazio dal bordo inferiore */
+}
+
+/* ///////    Stile per i bottoni  /////////*/
+.styled-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  color: black;
+  border: none;
+  border-radius: 25px;
+  margin: auto 30px;
+  padding: 10px 30px; /* Aumentato il padding orizzontale */
+  min-width: 350px; /* Larghezza minima per evitare che il testo vada a capo */
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.styled-button:hover {
+  background-color: white; /* Colore al passaggio del mouse */
+  transform: scale(1.05); /* Effetto zoom */
+}
+
+/* Stile per la riga e le colonne */
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  flex-wrap: nowrap; /* Impedisce l'avvolgimento dei bottoni */
+  gap: 5px; /* Spaziatura tra i bottoni */
+}
+
+.button-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1; /* I bottoni occupano lo stesso spazio */
+  max-width: 50%; /* Larghezza massima del 50% */
+}
+
+/* Stile per l'icona */
+.button-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #006d77; /* Colore dello sfondo dell'icona */
+  color: white; /* Colore del simbolo */
+  border-radius: 50%; /* Forma circolare */
+  font-size: 1.2rem; /* Dimensione del simbolo */
+  width: 25px;
+  height: 25px;
+  margin-left: 10px; /* Spazio tra il testo e l'icona */
+}
+
+.button-icon:hover {
+  background-color: #004f55; /* Cambia colore dell'icona su hover */
+}
+
+/* Media query per schermi piccoli */
+@media (max-width: 768px) {
+  .styled-button {
+    padding: 5px 15px; /* Riduce il padding */
+    font-size: 1rem; /* Riduce la dimensione del testo */
+    min-width: 200px; /* Riduce la larghezza minima */
+  }
+
+  .button-icon {
+    font-size: 1rem; /* Riduce la dimensione dell'icona */
+    width: 20px; /* Riduce la dimensione del contenitore icona */
+    height: 20px;
+  }
+
+  .button-row {
+    gap: 2px; /* Riduce lo spazio tra i bottoni */
+  }
+}
+/* Sezione contenuto seconda schermata*/
+.content-section {
+  height: calc(100vh - 25vh); /* Calcola in base alla finestra e alla striscia */
+  flex: 1; /* Occupa lo spazio rimanente tra header e footer */
+  padding: 100px;
+  margin: 0; /* Rimuovi margin extra */
+  background-color: #f9f9f9;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px); /* WebKit support */
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  max-width: 600px;
-  width: 90%;
-  position: absolute;
-  left: 50%;
-  top: 55%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  pointer-events: all;
-  will-change: backdrop-filter;
+  box-sizing: border-box; /* Include padding nel calcolo delle dimensioni */
 }
 
-/* Title Styles */
-.home-title {
-  font-size: 2.2rem;
-  font-weight: bold;
-  color: #006d77;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-/* Buttons */
-.redirect-button,
-.read-more-button,
-.back-home-button {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 12px 25px;
-  font-size: 1.1rem;
-  color: #ffffff;
-  border: none;
-  border-radius: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.redirect-button {
-  background-color: #006d77;
-}
-
-.read-more-button {
-  background-color: #34495e;
-  display: inline-flex;
-  align-items: center;
-}
-
-.back-home-button {
-  background-color: #006d77;
-}
-
-.read-more-icon {
-  margin-left: 8px;
-}
-
-/* Info Box */
-.info-box {
-  padding: 15px;
-  background: rgba(8, 140, 201, 0.8);
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  color: #ffffff;
+.content-section p {
   font-size: 1rem;
+  color: #555;
+  line-height: 1.5;
+  max-width: 800px;
   text-align: center;
-  animation: fadeIn 1.5s ease-in forwards;
 }
 
-/* Responsive Styles */
+/* Sezione con immagini e testo diviso in tre parti */
+.image-text-section {
+  display: flex;
+  flex-wrap: wrap; /* Per gestire la disposizione su dispositivi più piccoli */
+  justify-content: space-around;
+  align-items: stretch;
+  background-color: #ffffff; /* Sfondo bianco */
+  padding: 50px 20px;
+  gap: 20px;
+}
+
+.info-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30%; /* Ogni blocco occupa il 30% dello spazio */
+  background: #f9f9f9; /* Colore di sfondo per contrastare */
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Per evitare che l'immagine o il contenuto esca dai bordi */
+  text-align: center;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.info-image {
+  width: 100%; /* L'immagine copre tutta la larghezza del blocco */
+  height: 200px; /* Altezza fissa per le immagini */
+  object-fit: cover; /* Adatta l'immagine al contenitore */
+}
+
+.info-text {
+  padding: 20px;
+}
+
+.info-text h3 {
+  font-size: 1.5rem;
+  color: #006d77; /* Colore coerente con il tema */
+  margin-bottom: 15px;
+}
+
+.info-text p {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .info-block {
+    width: 45%; /* Riduci la larghezza dei blocchi su schermi più piccoli */
+  }
+}
+
 @media (max-width: 768px) {
-  .home-container {
-    padding: 20px;
-    max-width: 80%;
+  .info-block {
+    width: 100%; /* Ogni blocco occupa l'intera larghezza su dispositivi stretti */
+  }
+}
+
+/* Regola responsive per la sezione superiore */
+@media (max-width: 768px) {
+  .background-section {
+    height: 70vh; /* Riduci l'altezza per adattare ai dispositivi più piccoli */
   }
 
-  .home-title {
-    font-size: 1.8rem;
+  .content-overlay h1 {
+    font-size: 1.8rem; /* Riduci la dimensione del testo */
+  }
+}
+
+/* Gestione responsive della sezione immagini */
+@media (max-width: 768px) {
+  .image-text-section {
+    flex-direction: column; /* Disposizione verticale */
+    align-items: center; /* Centra i blocchi */
   }
 
-  .redirect-button,
-  .read-more-button,
-  .back-home-button {
-    padding: 10px 20px;
-    font-size: 1rem;
+  .info-block {
+    width: 80%; /* Blocchi più stretti su schermi piccoli */
   }
 
-  .info-box {
-    font-size: 0.9rem;
+  .info-image {
+    height: 150px; /* Riduci l'altezza delle immagini */
+  }
+}
+
+/* ////// FOOTER /////// */
+.footer {
+  background-color: #006d77;
+  color: #ffffff;
+  text-align: center;
+  padding: 20px 0;
+  font-size: 1.5rem;
+  position: relative;
+  width: 100%;
+  margin-top: auto; /* Spinge il footer in fondo */
+  min-height: 150px; /* Imposta un'altezza minima */
+}
+
+.footer-content h5 {
+  margin: 5px 0;
+  font-size: 1.2rem;
+}
+
+.footer-content p {
+  margin: 5px 0;
+  font-size: 1rem;
+}
+
+.footer-icons {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.footer-icons a {
+  color: white;
+  font-size: 1.5rem;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.footer-icons a:hover {
+  color: white; /* Colore hover */
+  transform: scale(1.2); /* Effetto zoom al passaggio del mouse */
+}
+.footer-icons img.logo-icon {
+  width: 30px; /* Larghezza del logo */
+  height: auto; /* Mantiene le proporzioni */
+  transition: transform 0.2s ease, opacity 0.3s ease;
+  opacity: 0.8; /* Leggermente trasparente */
+}
+
+.footer-icons img.logo-icon:hover {
+  transform: scale(1.2); /* Effetto zoom al passaggio del mouse */
+  opacity: 1; /* Torna opaco */
+}
+.politecnico-link {
+  color: inherit; /* Mantieni il colore del testo circostante */
+  text-decoration: none; /* Rimuove la sottolineatura di default */
+  font-weight: bold; /* Aggiungi un po' di enfasi al testo */
+  transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+.politecnico-link:hover {
+  transform: scale(1.2); /* Effetto zoom al passaggio del mouse */
+  color: blue;
+}
+
+/* Responsive Footer */
+@media (max-width: 768px) {
+  .footer {
+    font-size: 1.2rem;
+    padding: 15px 0;
   }
 }
 
 @media (max-width: 480px) {
-  .home-title {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-  }
-
-  .home-container {
-    padding: 15px;
-    width: 90%;
-  }
-
-  .redirect-button,
-  .read-more-button,
-  .back-home-button {
-    padding: 8px 15px;
-    font-size: 0.9rem;
-  }
-
-  .info-box {
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 350px) {
-  .home-title {
-    font-size: 1.2rem;
-  }
-
-  .home-container {
-    padding: 10px;
-    width: 95%;
-  }
-
-  .redirect-button,
-  .read-more-button,
-  .back-home-button {
-    padding: 6px 10px;
-    font-size: 0.8rem;
-  }
-
-  .info-box {
-    font-size: 0.8rem;
-  }
-}
-
-/* For very small mobile screens */
-@media (max-width: 250px) {
-  .home-container {
-    display: none;
+  .footer {
+    font-size: 1rem;
+    padding: 10px 0;
   }
 }
