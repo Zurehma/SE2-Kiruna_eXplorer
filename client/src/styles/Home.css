@@ -20,71 +20,103 @@ body {
 /* Sezione superiore con immagine di sfondo */
 .background-section {
   position: relative;
-  height: 90vh; /* Occupa tutta la finestra iniziale */
-  background: url("/kiruna.jpg") no-repeat center center/cover; /* Immagine di sfondo */
-}
-
-/* Striscia orizzontale (overlay) */
-.content-overlay {
-  position: absolute;
-  bottom: 0; /* Parte dal basso */
-  width: 100%;
-  height: 25vh; /* Occupa 1/4 della schermata */
-  background: linear-gradient(to bottom, #ecd5d5bc, white);
+  height: 90vh;
+  background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.05) 70%,
+      /* Gradiente più delicato, parte al 75% dell'altezza */ rgba(255, 255, 255, 1) 100%
+        /* Fine del gradiente al 100% */
+    ),
+    url("/kiruna.jpg") no-repeat center center/cover;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   text-align: center;
-  box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.2); /* Effetto ombra */
+  padding-bottom: 60px; /* Spazio dal bordo inferiore */
 }
 
-/* Testo e pulsante nella striscia */
-.content-overlay h1 {
-  font-size: 2.5rem;
-  color: #006d77; /* Colore del titolo */
-  margin-bottom: 20px;
-  margin-top: 20px;
+.buttons {
+  display: flex;
+  gap: 15px;
 }
 
-.map-button {
-  padding: 10px 50px;
-  font-size: 1rem;
+.buttons button {
+  background-color: #006d77;
   color: white;
-  background-color: #006d77; /* Colore del bottone */
+  padding: 10px 20px;
   border: none;
   border-radius: 25px;
   cursor: pointer;
+  font-size: 1rem;
+  align-items: center !important;
+  text-align: center !important;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.buttons button:hover {
+  background-color: #004f55;
+  transform: scale(1.1);
+}
+
+/* Stile per la riga e le colonne */
+.button-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.button-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Stile per i bottoni */
+.styled-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  color: black;
+  border: none;
+  border-radius: 25px;
+  margin: auto 100px;
+  padding: 10px 30px; /* Aumentato il padding orizzontale */
+  min-width: 350px; /* Larghezza minima per evitare che il testo vada a capo */
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.map-button:hover {
-  background-color: #004f55; /* Colore bottone hover */
-  transform: scale(1.05); /* Leggero zoom sul bottone */
+.styled-button:hover {
+  background-color: white; /* Colore al passaggio del mouse */
+  transform: scale(1.05); /* Effetto zoom */
 }
 
-.scroll-button {
-  color: #006d77 !important;
-  display: flex;
-  flex-direction: column;
+/* Stile per l'icona */
+.button-icon {
+  display: inline-flex;
+  justify-content: center;
   align-items: center;
-  background: none;
-  border: none;
-  cursor: pointer;
-  z-index: 2;
-  transition: transform 0.3s ease, color 0.3s ease;
-  font-size: 2rem; /* Aumentato la dimensione del testo */
-  margin: 2px; /* Aggiunto margine per creare spazio attorno al bottone */
+  background-color: #006d77; /* Colore dello sfondo dell'icona */
+  color: white; /* Colore del simbolo */
+  border-radius: 50%; /* Forma circolare */
+  font-size: 1.2rem; /* Dimensione del simbolo */
+  width: 25px;
+  height: 25px;
+  margin-left: 10px; /* Spazio tra il testo e l'icona */
 }
 
-.scroll-button:hover {
-  color: #004f55; /* Colore bottone hover */
-  transform: scale(1.2); /* Ingrandito l'effetto zoom durante l'hover */
+.button-icon:hover {
+  background-color: #004f55; /* Cambia colore dell'icona su hover */
 }
 
-/* Sezione contenuto */
+/* Sezione contenuto seconda schermata*/
 .content-section {
-  height: calc(100vh - 50vh); /* Calcola in base alla finestra e alla striscia */
+  height: calc(100vh - 25vh); /* Calcola in base alla finestra e alla striscia */
   flex: 1; /* Occupa lo spazio rimanente tra header e footer */
   padding: 100px;
   margin: 0; /* Rimuovi margin extra */
@@ -94,12 +126,6 @@ body {
   justify-content: center;
   align-items: center;
   box-sizing: border-box; /* Include padding nel calcolo delle dimensioni */
-}
-
-.content-section h2 {
-  font-size: 1.8rem;
-  margin-bottom: 15px;
-  color: #333;
 }
 
 .content-section p {
@@ -159,6 +185,11 @@ body {
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden; /* Per evitare che l'immagine o il contenuto esca dai bordi */
   text-align: center;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.info-block:hover {
+  transform: scale(1.05); /* Effetto zoom */
 }
 
 .info-image {
@@ -193,5 +224,32 @@ body {
 @media (max-width: 768px) {
   .info-block {
     width: 100%; /* Ogni blocco occupa l'intera larghezza su dispositivi stretti */
+  }
+}
+
+/* Regola responsive per la sezione superiore */
+@media (max-width: 768px) {
+  .background-section {
+    height: 70vh; /* Riduci l'altezza per adattare ai dispositivi più piccoli */
+  }
+
+  .content-overlay h1 {
+    font-size: 1.8rem; /* Riduci la dimensione del testo */
+  }
+}
+
+/* Gestione responsive della sezione immagini */
+@media (max-width: 768px) {
+  .image-text-section {
+    flex-direction: column; /* Disposizione verticale */
+    align-items: center; /* Centra i blocchi */
+  }
+
+  .info-block {
+    width: 80%; /* Blocchi più stretti su schermi piccoli */
+  }
+
+  .info-image {
+    height: 150px; /* Riduci l'altezza delle immagini */
   }
 }

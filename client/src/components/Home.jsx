@@ -1,6 +1,7 @@
 import React from "react";
 import "../styles/Home.css";
 import { useNavigate } from "react-router-dom";
+import { Col, Row } from "react-bootstrap";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -18,15 +19,24 @@ const Home = () => {
     <div className="homepage">
       {/* Parte superiore con immagine di sfondo */}
       <div className="background-section">
-        <div className="content-overlay">
-          <h1>Kiruna: A Town in Motion</h1>
-          <button onClick={() => navigate("/map")} className="map-button">
-            Show Map
-          </button>
-          <button onClick={scrollToContent} className="scroll-button">
-            <i class="bi bi-arrow-down"></i>
-          </button>
-        </div>
+        <Row className="button-row">
+          <Col md={6} className="button-col">
+            <button onClick={() => navigate("/map")} className="styled-button">
+              Relocation of Kiruna
+              <span className="button-icon">
+                <i class="bi bi-geo-alt"></i>{" "}
+              </span>
+            </button>
+          </Col>
+          <Col md={6} className="button-col">
+            <button onClick={scrollToContent} className="styled-button">
+              About us
+              <span className="button-icon">
+                <i class="bi bi-arrow-down"></i>
+              </span>
+            </button>
+          </Col>
+        </Row>
       </div>
 
       {/* Altre informazioni */}
