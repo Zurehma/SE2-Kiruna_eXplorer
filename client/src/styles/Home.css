@@ -47,7 +47,7 @@ body {
   border-radius: 25px;
   margin: auto 30px;
   padding: 10px 30px; /* Aumentato il padding orizzontale */
-  min-width: 350px; /* Larghezza minima per evitare che il testo vada a capo */
+  min-width: 330px; /* Larghezza minima per evitare che il testo vada a capo */
   font-size: 1.5rem;
   cursor: pointer;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
@@ -66,7 +66,7 @@ body {
   align-items: center;
   margin-top: 20px;
   flex-wrap: nowrap; /* Impedisce l'avvolgimento dei bottoni */
-  gap: 5px; /* Spaziatura tra i bottoni */
+  gap: 10px; /* Spaziatura tra i bottoni */
 }
 
 .button-col {
@@ -96,23 +96,32 @@ body {
 }
 
 /* Media query per schermi piccoli */
+
 @media (max-width: 768px) {
   .styled-button {
     padding: 5px 15px; /* Riduce il padding */
-    font-size: 1rem; /* Riduce la dimensione del testo */
-    min-width: 200px; /* Riduce la larghezza minima */
+    font-size: 1.2rem; /* Riduce la dimensione del testo */
+    min-width: 250px; /* Riduce la larghezza minima */
   }
 
   .button-icon {
     font-size: 1rem; /* Riduce la dimensione dell'icona */
-    width: 20px; /* Riduce la dimensione del contenitore icona */
-    height: 20px;
+    width: 30px; /* Riduce la dimensione del contenitore icona */
+    height: 30px;
   }
 
   .button-row {
-    gap: 2px; /* Riduce lo spazio tra i bottoni */
+    flex-wrap: wrap; /* Permette ai bottoni di avvolgersi */
+    flex-direction: column; /* Dispone i bottoni in colonna */
+    align-items: center; /* Centra i bottoni in colonna */
+    gap: 10px; /* Aggiunge spazio verticale tra i bottoni */
+  }
+
+  .button-col {
+    max-width: 100%; /* I bottoni occupano tutta la larghezza */
   }
 }
+
 /* Sezione contenuto seconda schermata*/
 .content-section {
   height: calc(100vh - 25vh); /* Calcola in base alla finestra e alla striscia */
