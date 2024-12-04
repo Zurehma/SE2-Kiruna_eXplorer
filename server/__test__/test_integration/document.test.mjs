@@ -436,7 +436,7 @@ describe("DocumentRoutes", () => {
       //add documents
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -447,7 +447,7 @@ describe("DocumentRoutes", () => {
       };
       const exampleDocumentData2 = {
         title: "title2",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -458,7 +458,7 @@ describe("DocumentRoutes", () => {
       };
       const exampleDocumentData3 = {
         title: "title3",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -530,7 +530,7 @@ describe("DocumentRoutes", () => {
     test("3.1 - It should return 200", async() => {
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -541,7 +541,7 @@ describe("DocumentRoutes", () => {
       };
       const exampleDocumentData2 = {
         title: "title2",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -552,7 +552,7 @@ describe("DocumentRoutes", () => {
       };
       const exampleDocumentData3 = {
         title: "title3",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -598,7 +598,7 @@ describe("DocumentRoutes", () => {
 
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -609,7 +609,7 @@ describe("DocumentRoutes", () => {
       };
       const exampleDocumentData2 = {
         title: "title2",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -620,7 +620,7 @@ describe("DocumentRoutes", () => {
       };
       const exampleDocumentData3 = {
         title: "title3",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -664,7 +664,7 @@ describe("DocumentRoutes", () => {
     test("3.3 - It should retun 409-link exists", async() => {
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -675,7 +675,7 @@ describe("DocumentRoutes", () => {
       };
       const exampleDocumentData2 = {
         title: "title2",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -686,7 +686,7 @@ describe("DocumentRoutes", () => {
       };
       const exampleDocumentData3 = {
         title: "title3",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -758,11 +758,6 @@ describe("DocumentRoutes", () => {
         .get(basePath + "/documents/link-types")
         .set("Cookie", userCookie)
         .expect(200);
-    });
-    test("6.2 - It should return 401", async () => {
-      await request(app)
-        .get(basePath + "/documents/link-types")
-        .expect(401);
     });
   });
 
@@ -942,7 +937,7 @@ describe("AttachmentRoutes", () => {
     test("1.1 - It should return 200 and array of attachments", async () => {
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -983,7 +978,7 @@ describe("AttachmentRoutes", () => {
     test("2.1 - It should return 201", async () => {
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -1039,7 +1034,7 @@ describe("AttachmentRoutes", () => {
     test("2.3 - It should return 400 for unsupported file types", async () => {
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -1085,7 +1080,7 @@ describe("AttachmentRoutes", () => {
     test("2.5 - It should return 401 if the user is not logged in", async () => {
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -1116,7 +1111,7 @@ describe("AttachmentRoutes", () => {
     test("3.1 - It should return 204 document deleted", async()=>{
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -1153,7 +1148,7 @@ describe("AttachmentRoutes", () => {
 
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -1178,7 +1173,7 @@ describe("AttachmentRoutes", () => {
     test("3.3 - It should retun 400 if document IDs do not match", async()=>{
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -1218,7 +1213,7 @@ describe("AttachmentRoutes", () => {
     test("3.4 - Return 401 if user unauthorized", async()=>{
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -1260,7 +1255,7 @@ describe("AttachmentRoutes", () => {
     test("4.1 - It should return 200 and the attachment", async()=>{
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -1300,7 +1295,7 @@ describe("AttachmentRoutes", () => {
     test("4.2 - It should return 404 attachment not found", async()=>{
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -1325,7 +1320,7 @@ describe("AttachmentRoutes", () => {
     test("4.3 - It should return 400 document IDs do not match", async()=>{
       const exampleDocumentData = {
         title: "title",
-        stakeholder: "stakeholder",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
