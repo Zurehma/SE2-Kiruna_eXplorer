@@ -877,6 +877,17 @@ describe("DocumentRoutes", () => {
       
 
   });
+
+  describe("8. - GET /api/documents/allExistingLinks", () => {
+    test("8.1 - It should return 200", async () =>{
+      //get all links
+      let resultGetLinks = await request(app)
+        .get(basePath + "/documents/allExistingLinks")
+        .set("Cookie", userCookie)
+        .expect(200);
+    })
+  });
+
       
 
 
