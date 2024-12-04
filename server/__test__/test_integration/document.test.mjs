@@ -47,8 +47,8 @@ describe("DocumentRoutes", () => {
   describe("1. - GET /api/documents", () => {
     const exampleData = [
       {
-        title: "tittttttttttttt",
-        stakeholder: "stakeholder",
+        title: "title1",
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2023-02-12",
         type: "Informative",
@@ -58,8 +58,8 @@ describe("DocumentRoutes", () => {
         pages: 16
       },
       {
-        title: "titttttttttttttttttt1",
-        stakeholder: "stakeholder1",
+        title: "title2",
+        stakeholders: ["stakeholder1"],
         scale: 100,
         issuanceDate: "2014-02-12",
         type: "Prescriptive",
@@ -130,7 +130,7 @@ describe("DocumentRoutes", () => {
 
     test("3 - It should return 200 a list of all the filtered by stakeholder documents", async() => {
       let countResult = await request(app)
-      .get(basePath + "/documents/"+"?stakeholders=stakeholder")
+      .get(basePath + "/documents/"+"?stakeholder=stakeholder")
       .set("Cookie", userCookie)
       .expect(200);
       let count = countResult.body.length;
@@ -154,7 +154,7 @@ describe("DocumentRoutes", () => {
         .expect(200);
 
       expect(res.body.length).toBe(count+1);
-      expect(res.body[0].stakeholder).toBe("stakeholder");
+      expect(res.body[0].stakeholders[0]).toBe("stakeholder");
     });
 
     test("4 - It should return 200 a list of all the documents in the range of the issuanceDate", async() => {
