@@ -4,7 +4,7 @@
   top: 0; /* Posizionata in cima alla pagina */
   left: 0;
   width: 100%; /* Copre l'intera larghezza */
-  z-index: 1000; /* Assicura che sia sopra tutto il resto */
+  z-index: 1000000; /* Assicura che sia sopra tutto il resto */
   background-color: #ffffff; /* Colore di sfondo */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombra per separazione */
   padding: 0.5rem 1rem; /* Spazio interno */
