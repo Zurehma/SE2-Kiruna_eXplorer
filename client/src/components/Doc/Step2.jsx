@@ -139,6 +139,7 @@ const Step2 = ({ document, errors, handleChange, handleAddNew, scales, types }) 
             {/* Dropdown per l'anno */}
             <Col className="mb-3" md={4}>
               <Form.Select
+                name="issuanceDateYear"
                 as="select"
                 className="input-multi"
                 isInvalid={!!errors.issuanceDate}
@@ -180,6 +181,7 @@ const Step2 = ({ document, errors, handleChange, handleAddNew, scales, types }) 
             <Col className="mb-3" md={4}>
               <Form.Select
                 as="select"
+                name="issuanceDateMonth"
                 className="input-multi"
                 value={document.issuanceDate?.split("-")[1] || ""}
                 onChange={(e) => {
@@ -222,6 +224,7 @@ const Step2 = ({ document, errors, handleChange, handleAddNew, scales, types }) 
             <Col className="mb-3" md={4}>
               <Form.Select
                 as="select"
+                name="issuanceDateDay"
                 className="input-multi"
                 value={document.issuanceDate?.split("-")[2] || ""}
                 onChange={(e) => {
