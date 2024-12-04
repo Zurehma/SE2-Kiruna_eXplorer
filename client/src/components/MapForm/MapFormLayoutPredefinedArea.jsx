@@ -7,16 +7,15 @@ import "../../styles/MapForm.css";
 const MapLayoutPredefinedArea = (props) => {
   const { position, newArea } = props;
   const [predefinedAreas, setPredefinedAreas] = useState(undefined);
-  const [choosenArea, setChoosenArea] = useState(position.type==='Polygon' ? position : undefined);
+  const [choosenArea, setChoosenArea] = useState(position.type === "Area" ? position : undefined);
   //useEffect on position
   useEffect(() => {
     if (position?.type === "Area") {
       setChoosenArea(position.name);
-    }else{
-      setChoosenArea(undefined)
+    } else {
+      setChoosenArea(undefined);
     }
-  }, [position]);
-
+  }, [position.coordinates]);
 
   useEffect(() => {
     const fetchPredefinedAreas = async () => {

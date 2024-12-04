@@ -45,16 +45,6 @@ function Links(props) {
     linkType: "",
     err: "",
   });
-  const [isOpenDoc1, setIsOpenDoc1] = useState(false);
-  const [isOpenDoc2, setIsOpenDoc2] = useState(false);
-
-  const toggleMenuDoc1 = () => {
-    setIsOpenDoc1(!isOpenDoc1); // Gestisci apertura/chiusura di document1
-  };
-
-  const toggleMenuDoc2 = () => {
-    setIsOpenDoc2(!isOpenDoc2); // Gestisci apertura/chiusura di document2
-  };
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -68,6 +58,7 @@ function Links(props) {
       }
     };
     fetchDocuments();
+
     if (props.newDoc) {
       setLinkData((prevLinkData) => ({
         ...prevLinkData,
@@ -80,13 +71,24 @@ function Links(props) {
     if (linkData.document1 && linkData.linkType) {
       const fetchLinkedDocuments = async () => {
         try {
-          const linkedResponse = await API.getLinksDoc(linkData.document1, linkData.linkType);
-          const linkedIds = linkedResponse.map((doc) => doc.linkedDocID);
-          setLinkedDocuments(linkedIds);
+          const linkedResponse = await API.getLinksDoc(linkData.document1);
+
+          // Filtra i documenti per tipo e rimuovi quelli già linkati
+          const filteredLinkedDocs = linkedResponse
+            .filter((doc) => doc.type === linkData.linkType) // Filtro per tipo
+            .map((doc) => doc.linkedDocID); // Prendo solo gli ID dei documenti
+
+          setLinkedDocuments(filteredLinkedDocs);
+
+          console.log("gggggggg:", filteredLinkedDocs);
+
+          // Setta i documenti filtrati
+          setLinkedDocuments(filteredLinkedDocs);
         } catch (error) {
           console.error("Error fetching linked documents:", error);
         }
       };
+
       fetchLinkedDocuments();
     } else {
       setLinkedDocuments([]);
@@ -132,39 +134,60 @@ function Links(props) {
 
   const handleClose = () => navigate("/");
 
+  const handleDocument1Change = (docId) => {
+    setLinkData({
+      document1: docId,
+      linkType: "",
+      document2: [],
+    });
+  };
+
+  const handleLinkTypeChange = (type) => {
+    setLinkData((prevLinkData) => ({
+      ...prevLinkData,
+      linkType: type,
+      document2: [], // Reset document2 when linkType changes
+    }));
+  };
+
+  const handleDocument2Toggle = (docId) => {
+    setLinkData((prevLinkData) => ({
+      ...prevLinkData,
+      document2: prevLinkData.document2.includes(docId)
+        ? prevLinkData.document2.filter((id) => id !== docId)
+        : [...prevLinkData.document2, docId],
+    }));
+  };
+
   return (
     <div className="links-background">
-      <Container className="d-flex align-items-top justify-content-center min-vh-100">
+      <Container className="links-container d-flex align-items-top justify-content-center min-vh-100">
         <Card
           className="p-4 shadow-lg w-100"
-          style={{ maxWidth: "700px", maxHeight: "550px", marginTop: "50px" }}
+          style={{ maxWidth: "700px", maxHeight: "650px", marginTop: "50px" }}
         >
           <Card.Body>
             <Card.Title className="links-card-title">ADD NEW LINK</Card.Title>
-            <Form>
+            <div className="step-button">
+              <i class="bi bi-share-fill"></i>
+              LINK STEP
+            </div>
+
+            <Form className="cd-body">
               {/* Document 1 */}
               <Row className="mb-3">
                 <Col className="mb-3">
                   <Form.Group controlId="document1" className="links-form-group">
-                    <Form.Label className="links-form-label">Document 1</Form.Label>
-                    <Dropdown show={isOpenDoc1} onToggle={toggleMenuDoc1}>
-                      <Dropdown.Toggle variant="light" className="form-select no-arrow">
+                    <Form.Label className="links-form-label">Document 1*</Form.Label>
+                    <Dropdown>
+                      <Dropdown.Toggle variant="light" className="form-select">
                         {documents.find((doc) => doc.id === Number(linkData.document1))?.title ||
                           "Select Document 1"}
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu as={CustomMenu}>
                         {documents.map((doc) => (
-                          <Dropdown.Item
-                            key={doc.id}
-                            onClick={() =>
-                              setLinkData((prevLinkData) => ({
-                                ...prevLinkData,
-                                document1: doc.id,
-                                document2: [], // Reset document2
-                              }))
-                            }
-                          >
+                          <Dropdown.Item key={doc.id} onClick={() => handleDocument1Change(doc.id)}>
                             {doc.title}
                           </Dropdown.Item>
                         ))}
@@ -181,17 +204,11 @@ function Links(props) {
               <Row className="mb-3">
                 <Col className="mb-3">
                   <Form.Group controlId="linkType" className="links-form-group">
-                    <Form.Label className="links-form-label">Link Type</Form.Label>
+                    <Form.Label className="links-form-label">Link Type*</Form.Label>
                     <Form.Select
                       name="linkType"
                       value={linkData.linkType}
-                      onChange={(e) =>
-                        setLinkData((prevLinkData) => ({
-                          ...prevLinkData,
-                          linkType: e.target.value,
-                          document2: [], // Reset document2
-                        }))
-                      }
+                      onChange={(e) => handleLinkTypeChange(e.target.value)}
                       isInvalid={!!errors.linkType}
                       disabled={!linkData.document1}
                     >
@@ -211,9 +228,13 @@ function Links(props) {
               <Row className="mb-3">
                 <Col className="mb-3">
                   <Form.Group controlId="document2" className="links-form-group">
-                    <Form.Label className="links-form-label">Document 2</Form.Label>
-                    <Dropdown show={isOpenDoc2} onToggle={toggleMenuDoc2}>
-                      <Dropdown.Toggle variant="light" className="form-select">
+                    <Form.Label className="links-form-label">Document 2*</Form.Label>
+                    <Dropdown>
+                      <Dropdown.Toggle
+                        variant="light"
+                        className="form-select"
+                        disabled={!linkData.linkType}
+                      >
                         {linkData.document2.length > 0
                           ? `${linkData.document2.length} Documents Selected`
                           : "Select Documents"}
@@ -222,20 +243,12 @@ function Links(props) {
                         {documents
                           .filter(
                             (doc) =>
-                              doc.id !== Number(linkData.document1) &&
-                              !linkedDocuments.includes(doc.id)
-                          )
+                              !linkedDocuments.includes(doc.id) && doc.id !== linkData.document1
+                          ) // Filtro per rimuovere anche linkData.document1
                           .map((doc) => (
                             <Dropdown.Item
                               key={doc.id}
-                              onClick={() =>
-                                setLinkData((prevLinkData) => ({
-                                  ...prevLinkData,
-                                  document2: prevLinkData.document2.includes(doc.id)
-                                    ? prevLinkData.document2.filter((id) => id !== doc.id)
-                                    : [...prevLinkData.document2, doc.id],
-                                }))
-                              }
+                              onClick={() => handleDocument2Toggle(doc.id)}
                             >
                               {linkData.document2.includes(doc.id) ? "✓ " : ""}
                               {doc.title}

@@ -9,8 +9,9 @@
     overflow-x:auto;
 }
 
+
 .myPopupStyle {
-    max-width: 70%;
+    max-width: 80%;
     max-height: 60%;
     overflow-y: auto;
     overflow-x: auto;
@@ -19,6 +20,17 @@
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+
+.myPopupContainer {
+    max-height: 400px; /* Imposta l'altezza massima desiderata */
+    overflow-y: auto; /* Permette lo scroll verticale quando il contenuto supera l'altezza */
+    padding: 10px; /* Aggiungi un po' di padding se necessario */
+    border: 1px solid #ccc; /* Opzionale: aggiungi un bordo */
+    background-color: #fff; /* Sfondo per distinguere il contenitore */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Opzionale: aggiungi un'ombra */
+    border-radius: 8px; /* Opzionale: arrotonda gli angoli */
+}
+
 
 @media (max-width: 768px) {
     .myPopupStyle {

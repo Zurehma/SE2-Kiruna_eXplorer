@@ -28,13 +28,16 @@ class UserController {
   }
 
   registerUser = (name, surname, role, username, password) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await this.userDAO.createUser(name, surname, role, username, password);
-        resolve();
-      } catch (error) {
-        reject(error);
-      }
+    return new Promise((resolve, reject) => {
+      const registerUser = async () => {
+        try {
+          await this.userDAO.createUser(name, surname, role, username, password);
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      };
+      registerUser();
     });
   };
 }

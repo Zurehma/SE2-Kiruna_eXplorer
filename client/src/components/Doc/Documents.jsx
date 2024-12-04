@@ -1,25 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Form, Button, Container, Dropdown } from "react-bootstrap";
-import { DropdownButton, Card, ProgressBar, Row, Col } from "react-bootstrap";
+import { Form, Button, Container} from "react-bootstrap";
+import { Card, Row, Col } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../../../API.js";
-import { Map } from "./../Map.jsx";
 import "../../styles/Documents.css";
 import "leaflet/dist/leaflet.css";
-import { Polygon } from "react-leaflet";
-import L from "leaflet";
-import ISO6391 from "iso-639-1";
-import Select from "react-select";
-import * as turf from "@turf/turf";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
 import Step3 from "./Step3";
 import Step4 from "./Step4";
 import StepIndicator from "./StepIndicator";
+import PropTypes from "prop-types";
 
 function Documents(props) {
-  const [scales, setScales] = useState(["Text", "Blueprints/Effects", "1:n"]);
+  const scales = ["Text", "Blueprints/Effects", "1:n"];
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [existingAttachments, setExistingAttachments] = useState([]);
@@ -42,7 +37,7 @@ function Documents(props) {
     description: "",
     language: "",
     pages: "",
-    coordinates: [{ lat: "", long: "" }],
+    coordinates: "",
     pageFrom: "",
     pageTo: "",
   });
@@ -75,7 +70,7 @@ function Documents(props) {
       description: "",
       language: "",
       pages: "",
-      coordinates: [{ lat: "", long: "" }],
+      coordinates: "",
       pageFrom: "",
       pageTo: "",
     }));
@@ -139,12 +134,10 @@ function Documents(props) {
         nValue,
       }));
 
-      if (coordinates && typeof coordinates === "object") {
-        setPosition({ coordinates: { lat: coordinates.lat, long: coordinates.long }, type: "Point" });
-      } else if (coordinates && coordinates.length == 1) {
-        setPosition({ coordinates: { lat: coordinates[0].long, long: coordinates[0].lat }, type: "Point" });
-      } else if (coordinates && coordinates.length > 1) {
-        setPosition({ coordinates: coordinates.map((c) => [c.lat, c.long]), type: "Area" });
+      if (coordinates && coordinates.lat && coordinates.long) {
+        setPosition({ coordinates: coordinates, type: "Point" });
+      } else if (coordinates && coordinates.length > 3) {
+        setPosition({ coordinates: coordinates, type: "Area" });
       }
     } catch (error) {
       console.error("Error fetching document:", error);
@@ -198,16 +191,8 @@ function Documents(props) {
     const { name, value } = e.target;
     setDocument((prevDocument) => {
       if (name === "lat" || name === "long") {
-        const updatedCoordinates = [
-          {
-            ...prevDocument.coordinates[0], // Copia le coordinate esistenti (se presenti)
-            [name]: value || "", // Aggiorna il campo specifico (lat o long)
-          },
-        ];
-
         return {
           ...prevDocument,
-          coordinates: updatedCoordinates,
         };
       } else {
         return {
@@ -224,6 +209,7 @@ function Documents(props) {
       newErrors.title = "Title is required and cannot be empty.";
     }
     if (!document.stakeholders || document.stakeholders.length === 0) {
+      console.log("ghjkjhgvhjkl");
       newErrors.stakeholders = "You must select at least one stakeholder.";
     }
     if (!document.description || document.description.length < 2) {
@@ -310,10 +296,10 @@ function Documents(props) {
   };
 
   useEffect(() => {
-    if (position && position.coordinates) {
+    if (position.coordinates) {
       document.coordinates = position.coordinates;
     }
-  }, [...Object.values(position)]);
+  }, [position.coordinates, position.type]);
 
   const handleFileUpload = async (doc) => {
     if (files.length > 0) {
@@ -417,7 +403,7 @@ function Documents(props) {
       <Container className="d-flex align-items-center justify-content-center min-vh-100">
         <Card className="p-4 shadow-lg w-100" style={{ maxWidth: "700px" }}>
           <Card.Body>
-            <Card.Title dataTest="form" className="mb-4 text-center">
+            <Card.Title className="mb-4 text-center">
               {id ? `EDIT DOCUMENT: ${id}` : "ADD NEW DOCUMENT"}
             </Card.Title>
             {/* Step Indicator with Clickable Buttons */}
@@ -491,5 +477,10 @@ function Documents(props) {
     </div>
   );
 }
+
+Documents.propTypes = {
+  setError: PropTypes.func,
+  setNewDoc: PropTypes.func,
+};
 
 export default Documents;

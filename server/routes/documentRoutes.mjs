@@ -76,19 +76,19 @@ class DocumentRoutes {
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
-          .addDocument(
-            req.body.title,
-            req.body.stakeholders,
-            req.body.scale,
-            req.body.issuanceDate,
-            req.body.type,
-            req.body.language,
-            req.body.description,
-            req.body.coordinates || null,
-            req.body.pages || null,
-            req.body.pageFrom || null,
-            req.body.pageTo || null
-          )
+          .addDocument({
+            title: req.body.title,
+            stakeholders: req.body.stakeholders,
+            scale: req.body.scale,
+            issuanceDate: req.body.issuanceDate,
+            type: req.body.type,
+            language: req.body.language,
+            description: req.body.description,
+            coordinates: req.body.coordinates || null,
+            pages: req.body.pages || null,
+            pageFrom: req.body.pageFrom || null,
+            pageTo: req.body.pageTo || null
+          })
           .then((document) => {
             res.status(201).json(document);
           })
@@ -150,20 +150,20 @@ class DocumentRoutes {
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
-          .updateDocument(
-            Number(req.params.docID),
-            req.body.title,
-            req.body.stakeholders,
-            req.body.scale,
-            req.body.issuanceDate,
-            req.body.type,
-            req.body.language,
-            req.body.description,
-            req.body.coordinates || null,
-            req.body.pages || null,
-            req.body.pageFrom || null,
-            req.body.pageTo || null
-          )
+          .updateDocument({
+            id: Number(req.params.docID),
+            title: req.body.title,
+            stakeholders: req.body.stakeholders,
+            scale: req.body.scale,
+            issuanceDate: req.body.issuanceDate,
+            type: req.body.type,
+            language: req.body.language,
+            description: req.body.description,
+            coordinates: req.body.coordinates || null,
+            pages: req.body.pages || null,
+            pageFrom: req.body.pageFrom || null,
+            pageTo: req.body.pageTo || null
+          })
           .then(() => res.status(204).end())
           .catch((err) => next(err));
       }

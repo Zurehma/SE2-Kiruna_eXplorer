@@ -35,7 +35,7 @@ const Step1 = ({
         <Col className="mb-3">
           <Form.Group controlId="stakeholder">
             <Form.Label>Stakeholders*</Form.Label>
-            <div className={!!errors.stakeholder ? "is-invalid" : ""}>
+            <div className={!!errors.stakeholders ? "is-invalid" : ""}>
               <CreatableSelect
                 isMulti
                 options={stakeholdersList}
@@ -47,8 +47,8 @@ const Step1 = ({
                 classNamePrefix="react-select"
               />
             </div>
-            {errors.stakeholder && (
-              <div className="invalid-feedback d-block">{errors.stakeholder}</div>
+            {errors.stakeholders && (
+              <div className="invalid-feedback d-block">{errors.stakeholders}</div>
             )}
           </Form.Group>
         </Col>

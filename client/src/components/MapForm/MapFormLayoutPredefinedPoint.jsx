@@ -21,17 +21,17 @@ const blueMarkerIcon = new L.Icon({
 });
 
 const MapLayoutPredefinedPoint = (props) => {
-  const { position,newPoint } = props;
+  const { position, newPoint } = props;
   const [predefinedPoints, setPredefinedPoints] = useState(undefined);
-  const [choosenPosition, setChoosenPosition] = useState(position?.type==='Point' ? position.name : undefined);
+  const [choosenPosition, setChoosenPosition] = useState(position?.type === "Point" ? position.name : undefined);
 
   useEffect(() => {
     if (position?.type === "Point") {
       setChoosenPosition(position.name);
-    }else{
-      setChoosenPosition(undefined)
+    } else {
+      setChoosenPosition(undefined);
     }
-  }, [position]);
+  }, [position.coordinates]);
 
   useEffect(() => {
     const fetchPredefinedPoints = async () => {
@@ -47,7 +47,7 @@ const MapLayoutPredefinedPoint = (props) => {
 
     fetchPredefinedPoints();
   }, []);
-  
+
   return (
     <>
       {predefinedPoints &&

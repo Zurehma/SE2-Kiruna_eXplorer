@@ -9,31 +9,37 @@ class DocumentController {
   }
 
   getDocumentById = (id) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const document = await this.documentDAO.getDocumentByID(id);
+    return new Promise((resolve, reject) => {
+      const fetchDocument = async () => {
+        try {
+          const document = await this.documentDAO.getDocumentByID(id);
 
-        if (document === undefined) {
-          const error = { errCode: 404, errMessage: "Document not found." };
-          throw error;
+          if (document === undefined) {
+            const error = { errCode: 404, errMessage: "Document not found." };
+            throw error;
+          }
+
+          resolve(document);
+        } catch (err) {
+          reject(err);
         }
-
-        resolve(document);
-      } catch (err) {
-        reject(err);
-      }
+      };
+      fetchDocument();
     });
   };
 
   getDocuments = (type, stakeholder, issuanceDateFrom, issuanceDateTo, limit, offset) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        let queryParameter = { type, stakeholder, issuanceDateFrom, issuanceDateTo };
-        const documents = await this.documentDAO.getDocuments(queryParameter, limit, offset);
-        resolve(documents);
-      } catch (err) {
-        reject(err);
-      }
+    return new Promise((resolve, reject) => {
+      const fetchDocuments = async () => {
+        try {
+          let queryParameter = { type, stakeholder, issuanceDateFrom, issuanceDateTo };
+          const documents = await this.documentDAO.getDocuments(queryParameter, limit, offset);
+          resolve(documents);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      fetchDocuments();
     });
   };
 
@@ -52,49 +58,52 @@ class DocumentController {
    * @param {Number | null} pages
    * @returns {Promise<Document>} A promise that resolves to the newly created object
    */
-  addDocument = (title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        if (dayjs().isBefore(issuanceDate)) {
-          const error = { errCode: 400, errMessage: "Date error." };
-          throw error;
+  addDocument = ({title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo}) => {
+    return new Promise((resolve, reject) => {
+      const addDocument = async () => {
+        try {
+          if (dayjs().isBefore(issuanceDate)) {
+            const error = { errCode: 400, errMessage: "Date error." };
+            throw error;
+          }
+
+          if (coordinates && Array.isArray(coordinates)) {
+            coordinates.forEach((c) => {
+              if (!Utility.isValidKirunaCoordinates(c[0], c[1])) {
+                const error = { errCode: 400, errMessage: "Coordinates error." };
+                throw error;
+              }
+            });
+          } else if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
+            const error = { errCode: 400, errMessage: "Coordinates error." };
+            throw error;
+          }
+
+          const result = await this.documentDAO.addDocument(
+            title,
+            scale,
+            issuanceDate,
+            type,
+            language,
+            description,
+            coordinates ? JSON.stringify(coordinates) : null,
+            pages,
+            pageFrom,
+            pageTo
+          );
+
+          for (let stakeholder of stakeholders) {
+            await this.documentDAO.addStakeholder(result.lastID, stakeholder);
+          }
+
+          const document = await this.documentDAO.getDocumentByID(result.lastID);
+
+          resolve(document);
+        } catch (err) {
+          reject(err);
         }
-
-        if (coordinates && Array.isArray(coordinates)) {
-          coordinates.forEach((c) => {
-            if (!Utility.isValidKirunaCoordinates(c[0], c[1])) {
-              const error = { errCode: 400, errMessage: "Coordinates error." };
-              throw error;
-            }
-          });
-        } else if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
-          const error = { errCode: 400, errMessage: "Coordinates error." };
-          throw error;
-        }
-
-        const result = await this.documentDAO.addDocument(
-          title,
-          scale,
-          issuanceDate,
-          type,
-          language,
-          description,
-          coordinates ? JSON.stringify(coordinates) : null,
-          pages,
-          pageFrom,
-          pageTo
-        );
-
-        for (let stakeholder of stakeholders) {
-          await this.documentDAO.addStakeholder(result.lastID, stakeholder);
-        }
-
-        const document = await this.documentDAO.getDocumentByID(result.lastID);
-
-        resolve(document);
-      } catch (err) {
-        reject(err);
-      }
+      };
+      addDocument();
     });
   };
 
@@ -114,57 +123,61 @@ class DocumentController {
    * @param {Number | null} pageTo
    * @returns {Promise<null>} A promise that resolves to null
    */
-  updateDocument = (id, title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        if (dayjs().isBefore(issuanceDate)) {
-          const error = { errCode: 400, errMessage: "Date error." };
-          throw error;
+  updateDocument = ({id, title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo}) => {
+    return new Promise((resolve, reject) => {
+      const updateDocument = async () => {
+        try {
+          if (dayjs().isBefore(issuanceDate)) {
+            const error = { errCode: 400, errMessage: "Date error." };
+            throw error;
+          }
+
+          if (coordinates && Array.isArray(coordinates)) {
+            coordinates.forEach((c) => {
+              if (!Utility.isValidKirunaCoordinates(c[0], c[1])) {
+                const error = { errCode: 400, errMessage: "Coordinates error." };
+                throw error;
+              }
+            });
+          } else if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
+            const error = { errCode: 400, errMessage: "Coordinates error." };
+            throw error;
+          }
+
+          const oldDocument = await this.documentDAO.getDocumentByID(id);
+
+          if (oldDocument == undefined) {
+            const error = { errCode: 404, errMessage: "Document not found." };
+            throw error;
+          }
+
+          await this.documentDAO.updateDocument(
+            id,
+            title,
+            scale,
+            issuanceDate,
+            type,
+            language,
+            description,
+            coordinates ? JSON.stringify(coordinates) : null,
+            pages,
+            pageFrom,
+            pageTo
+          );
+
+          await this.documentDAO.deleteStakeholders(id);
+
+          for (let stakeholder of stakeholders) {
+            await this.documentDAO.addStakeholder(id, stakeholder);
+          }
+
+          resolve(null);
+        } catch (err) {
+          reject(err);
         }
+      };
+      updateDocument();
 
-        if (coordinates && Array.isArray(coordinates)) {
-          coordinates.forEach((c) => {
-            if (!Utility.isValidKirunaCoordinates(c[0], c[1])) {
-              const error = { errCode: 400, errMessage: "Coordinates error." };
-              throw error;
-            }
-          });
-        } else if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
-          const error = { errCode: 400, errMessage: "Coordinates error." };
-          throw error;
-        }
-
-        const oldDocument = await this.documentDAO.getDocumentByID(id);
-
-        if (oldDocument == undefined) {
-          const error = { errCode: 404, errMessage: "Document not found." };
-          throw error;
-        }
-
-        await this.documentDAO.updateDocument(
-          id,
-          title,
-          scale,
-          issuanceDate,
-          type,
-          language,
-          description,
-          coordinates ? JSON.stringify(coordinates) : null,
-          pages,
-          pageFrom,
-          pageTo
-        );
-
-        await this.documentDAO.deleteStakeholders(id);
-
-        for (let stakeholder of stakeholders) {
-          await this.documentDAO.addStakeholder(id, stakeholder);
-        }
-
-        resolve(null);
-      } catch (err) {
-        reject(err);
-      }
     });
   };
 
@@ -192,121 +205,80 @@ class DocumentController {
    * @returns
    */
   getLinks = (id1) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const doc = await this.documentDAO.getDocumentByID(id1);
+    return new Promise((resolve, reject) => {
+      const getLinks = async () => {
+        try {
+          const doc = await this.documentDAO.getDocumentByID(id1);
 
-        if (doc === undefined) {
-          const error = { errCode: 404, errMessage: "Document not found!" };
-          throw error;
+          if (doc === undefined) {
+            const error = { errCode: 404, errMessage: "Document not found!" };
+            throw error;
+          }
+
+          const links = await this.documentDAO.getLinks(id1);
+          resolve(links);
+        } catch (err) {
+          reject(err);
         }
-
-        const links = await this.documentDAO.getLinks(id1);
-        resolve(links);
-      } catch (err) {
-        reject(err);
-      }
+      };
+      getLinks();
     });
   };
 
   addLink = (id1, id2, type) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        console.log(id1, id2, type);
-        if (id1 === id2) {
-          const error = { errCode: 400, errMessage: "Document cannot be linked to itself!" };
-          throw error;
-        }
-
-        const doc1 = await this.documentDAO.getDocumentByID(id1);
-        const doc2 = await this.documentDAO.getDocumentByID(id2);
-
-        if (doc1 === undefined || doc2 === undefined) {
-          const error = { errCode: 404, errMessage: "Document not found!" };
-          throw error;
-        }
-
-        const existingLinks = await this.documentDAO.getLinks(id1);
-        if (existingLinks.some((link) => link.id2 === id2 && link.type === type)) {
-          const error = { errCode: 409, errMessage: "Link already exists!" };
-          throw error;
-        }
-
-        const result = await this.documentDAO.addLink(id1, id2, type);
-        if (result.changes === 0) {
-          const error = {};
-          throw error;
-        }
-        resolve(id1, id2, type);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  };
-
-  getAllExistingLinks = () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const links = await this.documentDAO.getAllLinks();
-        console.log(links);
-
-        // Group the links by document ID
-        const groupedLinks = links.reduce((acc, row) => {
-          // Initialize the document's object if it doesn't exist
-          if (!acc[row.documentID]) {
-            acc[row.documentID] = {
-              documentTitle: row.documentTitle,
-              links: [],
-            };
+    return new Promise((resolve, reject) => {
+      const addLink = async () => {
+        try {
+          console.log(id1, id2, type);
+          if (id1 === id2) {
+            const error = { errCode: 400, errMessage: "Document cannot be linked to itself!" };
+            throw error;
           }
 
-          // Add each linked document information
-          acc[row.documentID].links.push({
-            linkedDocID: row.linkedDocID,
-            linkedTitle: row.linkedTitle,
-            type: row.type,
-          });
+          const doc1 = await this.documentDAO.getDocumentByID(id1);
+          const doc2 = await this.documentDAO.getDocumentByID(id2);
 
-          return acc;
-        }, {});
+          if (doc1 === undefined || doc2 === undefined) {
+            const error = { errCode: 404, errMessage: "Document not found!" };
+            throw error;
+          }
 
-        // Step 1: Sort the links for each document in ascending order of linkedDocID
-        Object.keys(groupedLinks).forEach((docID) => {
-          groupedLinks[docID].links.sort((a, b) => a.linkedDocID - b.linkedDocID);
-        });
+          const existingLinks = await this.documentDAO.getLinks(id1);
+          if (existingLinks.some((link) => link.id2 === id2 && link.type === type)) {
+            const error = { errCode: 409, errMessage: "Link already exists!" };
+            throw error;
+          }
 
-        // Step 2: Format the result as desired
-        const formattedResponse = {};
-        Object.keys(groupedLinks).forEach((docID) => {
-          formattedResponse[docID] = {
-            documentTitle: groupedLinks[docID].documentTitle,
-            links: groupedLinks[docID].links.map((link) => ({
-              linkedDocID: link.linkedDocID,
-              linkedTitle: link.linkedTitle,
-              type: link.type,
-            })),
-          };
-        });
-
-        resolve(formattedResponse);
-      } catch (err) {
-        reject(err);
-      }
+          const result = await this.documentDAO.addLink(id1, id2, type);
+          if (result.changes === 0) {
+            const error = {};
+            throw error;
+          }
+          resolve(id1, id2, type);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      addLink();
     });
   };
 
+
   getAllLinks = () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const links = await this.documentDAO.getAllLinks();
-        if (links === undefined) {
-          const error = { errCode: 404, errMessage: "Links not found!" };
-          throw error;
+    return new Promise((resolve, reject) => {
+      const getAllLinks = async () => {
+        try {
+          const links = await this.documentDAO.getAllLinks();
+          if (links === undefined) {
+            const error = { errCode: 404, errMessage: "Links not found!" };
+            throw error;
+          }
+          resolve(links);
+        } catch (err) {
+          reject(err);
         }
-        resolve(links);
-      } catch (err) {
-        reject(err);
-      }
+      };
+      getAllLinks();
     });
   };
 }

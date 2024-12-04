@@ -265,47 +265,22 @@ Returns the list of all specific link types.
 
 - Request Parameters: _None_
 - Request Body Content: _None_
-- Response Body Content: The response is a JSON object where each key is a documentID. Each documentID corresponds to a document with its title and links. The links is an array of linkedDocIds and titles
+- Response Body Content: The response is a an array of links. Each link has a DocID1, DocID2 and the type of the link.
 - Example:
 
 ```json
-  {
-  "1": {
-    "documentTitle": "title",
-    "links": [
-      {
-        "linkedDocID": 2,
-        "linkedTitle": "Detail plan for Bolagsomradet Gruvstad-spark (18)",
-        "type": "Direct"
-      },
-      {
-        "linkedDocID": 5,
-        "linkedTitle": "Adjusted development plan (47)",
-        "type": "Direct"
-      },
-      {
-        "linkedDocID": 6,
-        "linkedTitle": "Detail plan for square and commercial street (50)",
-        "type": "Direct"
-      }
-    ]
+  [
+    {
+    "DocID1": 1,
+    "DocID2": 2,
+    "type": "Direct"
   },
-  "3": {
-    "documentTitle": "Development Plan (41)",
-    "links": [
-      {
-        "linkedDocID": 1,
-        "linkedTitle": "title",
-        "type": "Direct"
-      },
-      {
-        "linkedDocID": 2,
-        "linkedTitle": "Detail plan for Bolagsomradet Gruvstad-spark (18)",
-        "type": "Direct"
-      }
-    ]
-  }
-}
+  {
+    "DocID1": 1,
+    "DocID2": 3,
+    "type": "Projection"
+  },
+  ]
 ```
 - Access Constraints: _None_
 - Additional Constraints: _None_
@@ -340,7 +315,7 @@ Returns the list of all specific link types.
 - Access Constraints: Can only be called by a logged in user whose role is Urban Planner.
 - Additional Constraints:
   - It should return a `404` error when document ID does not exist
-  - It should return a `409` error when the link already exists
+  - It should return a `409` error when the link of the same type already exists between a pair of documents
   - It should return a `422` error if the link type is invalid
 
 ### Attachment APIs
