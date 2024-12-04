@@ -453,9 +453,25 @@ Start the download of a specific attachment.
 
 ### Table `Link`
 
-- Fields: docID1-docID2-type
-- Primary key: docID1,docID2
-- Description: The tables stores the link between 2 documents and the link type. The link type can be one of: [`Direct`, `Collateral`, `Projection`, `Update`]
+- Fields: linkID-docID1-docID2-type
+- Primary key: linkID
+- Description: The table stores the link between 2 documents and the link type. The link type references the Link_Type table and can be one of: [`Direct`, `Collateral`, `Projection`, `Update`]
+
+### Table `Link_Type`
+
+- Fields: name
+- Primary key: name
+- Description: Stores the different link types
+
+### Table `Attachment`
+
+- Fields:  docID-id-name-path-format
+- Primary key: id
+- Description: The table stores information about attachments being added for a document. 
+  - docID: document to which the attachment refers to
+  - name: name of the document
+  - path: path to the document
+  - format: format of the document
 
 ### Access Credentials
 

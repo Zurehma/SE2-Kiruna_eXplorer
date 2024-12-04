@@ -1,25 +1,33 @@
 # SE2-Kiruna_eXplorer
 
-## Database Tables
+## Overview
+Kiruna Explorer is a document management application designed to support the relocation project of Kiruna, Sweden. The platform enables users to view, add, modify, and study documents related to various aspects of the relocation process. 
 
-### Table `User`
+## Features
+- Users can view on the map documents related to different areas of Kiruna
+- Users can view on the diagram the relationship between different documents
+- Urban Planners can login and access a variety of other features that include:
+  - Adding documents
+  - Modifying documents
+  - Adding links between documents
+  - Uploading resources for documents
+  - Filtering and searching for documents
 
-- Fields: id-name-surname-username-password-salt-role
-- Primary key: id
-- Description: Each user is uniquely identified through an ID. Role is a string and can be one of: [`Urban Planner`]
+## Installation
+The Kiruna Explorer project can be set up quickly using Docker. Follow the instructions provided in the `Docker_Instructions.md` file to build and run the application in a containerized environment.
 
-### Table `Document`
+## Testing Strategy
+1. Unit and Integration Testing (Backend):  
+    Conducted using Jest to verify the functionality and integration of individual modules and services.
 
-- Fields: id-title-stakeholder-scale-issuanceDate-type-connections-language-pages-description-lat-long
-- Primary key: id
-- Description: The table stores information on each document. The information is the one from the cards along with longitude & latitude (NULL default means the document covers the whole area).  
-  Each document is uniquely identified by an ID.
+2. Frontend Testing:  
+    Initially performed with React Testing Library, but due to complex component dependencies, manual testing was adopted from the third sprint onward.
 
-### Table `Link`
+3. Manual End-to-End (E2E) Testing:  
+    Detailed manual E2E testing scenarios and results are documented in the `e2e_test` directory.
 
-- Fields: docID1-docID2-type
-- Primary key: docID1,docID2
-- Description: The tables stores the link between 2 documents and the link type. The link type can be one of: [`Direct`, `Collateral`, `Projection`, `Update`]
+4. Automated End-to-End (E2E) Testing:  
+    Utilizes Cypress for automated testing of user flows and critical functionalities to ensure seamless user experience across different environments.
 
 ### Access Credentials
 

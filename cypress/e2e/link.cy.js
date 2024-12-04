@@ -1,30 +1,21 @@
-describe('Link test', () => {
-  it('passes', () => {
+describe('Link document tests', () => {
+  it('Correct linking of documents', () => {
     cy.visit('/login')
     cy.get("#username").type("johndoe");
     cy.get("#password").type("password");
     cy.get('button[type="submit"]').click();
 
-    cy.get(".dropdown-toggle").click();
-    cy.get(".dropdown-item").contains("Add Link").click();
-  
-    cy.get('[name="document1"]')
-    .find('[name=optionsDoc1]')
-    .then((option) => {
-      const secondOptionValue = option[0].value; 
-      cy.get('[name="document1"]').select(secondOptionValue);
-    });
-    
-    cy.get('.basic-multi-select').should('not.be.disabled');
-    cy.get('.basic-multi-select').click();
-    cy.get('.select__menu').find('.select__option').first().click();
+    cy.contains('Add Link').should('be.visible');
+    cy.contains('Add Link').click();
 
-    cy.get('[name="linkType"]')
-    .find('[name=optionLink]')
-    .then((option) => {
-      const secondOptionValue = option[0].value; 
-      cy.get('[name="linkType"]').select(secondOptionValue);
-    });
+    cy.get('.form-select').first().click();
+    cy.get('.dropdown-menu .dropdown-item').first().click();
+
+    cy.get('select[name="linkType"]').as('dropdown');
+    cy.get('@dropdown').select('Direct'); 
+
+    cy.get('.form-select').eq(2).click();
+    cy.get('.dropdown-menu').eq(1).find('.dropdown-item').eq(1).click();
 
     cy.contains('button', 'Save Link').click();
   })
@@ -35,17 +26,36 @@ describe('Link test', () => {
     cy.get("#password").type("password");
     cy.get('button[type="submit"]').click();
 
-    cy.get(".dropdown-toggle").click();
-    cy.get(".dropdown-item").contains("Add Link").click();
-  
-    cy.get('[name="document1"]')
-    .find('[name=optionsDoc1]')
-    .then((option) => {
-      const secondOptionValue = option[0].value; 
-      cy.get('[name="document1"]').select(secondOptionValue);
-    });
+    cy.contains('Add Link').should('be.visible');
+    cy.contains('Add Link').click();
+
+    cy.get('.form-select').first().click();
+    cy.get('.dropdown-menu .dropdown-item').first().click();
 
     cy.contains('button', 'Save Link').click();
     cy.contains('You must select at least one document.').should('be.visible');
+  })
+
+  it('Select more than one document in Document 2', () => {
+    cy.visit('/login')
+    cy.get("#username").type("johndoe");
+    cy.get("#password").type("password");
+    cy.get('button[type="submit"]').click();
+
+    cy.contains('Add Link').should('be.visible');
+    cy.contains('Add Link').click();
+
+    cy.get('.form-select').first().click();
+    cy.get('.dropdown-menu .dropdown-item').first().click();
+
+    cy.get('select[name="linkType"]').as('dropdown');
+    cy.get('@dropdown').select('Direct'); 
+
+    cy.get('.form-select').eq(2).click();
+    cy.get('.dropdown-menu').eq(1).find('.dropdown-item').eq(0).click();
+    cy.get('.form-select').eq(2).click();
+    cy.get('.dropdown-menu').eq(1).find('.dropdown-item').eq(1).click();
+
+    cy.contains('button', 'Save Link').click();
   })
 })
