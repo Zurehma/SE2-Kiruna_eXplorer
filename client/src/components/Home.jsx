@@ -20,11 +20,11 @@ const Home = () => {
       <div className="background-section">
         <div className="content-overlay">
           <h1>Kiruna: A Town in Motion</h1>
-          <button onClick={() => navigate("/map")} className="scroll-button">
+          <button onClick={() => navigate("/map")} className="map-button">
             Show Map
           </button>
           <button onClick={scrollToContent} className="scroll-button">
-            <i class="bi bi-arrow-down-circle-fill"></i>
+            <i class="bi bi-arrow-down"></i>
           </button>
         </div>
       </div>
