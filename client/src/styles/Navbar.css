@@ -1,17 +1,30 @@
 /* Stile globale della navbar */
 .custom-navbar {
-  background-color: white;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 10px 20px;
-  position: relative; /* Assicurati che non sia coperta */
-  z-index: 9999; /* Porta la navbar in primo piano */
+  position: fixed; /* Rende la navbar fissa */
+  top: 0; /* Posizionata in cima alla pagina */
+  left: 0;
+  width: 100%; /* Copre l'intera larghezza */
+  z-index: 1000; /* Assicura che sia sopra tutto il resto */
+  background-color: #ffffff; /* Colore di sfondo */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombra per separazione */
+  padding: 0.5rem 1rem; /* Spazio interno */
 }
 
-/* Stile del brand (Kiruna) */
+body {
+  margin: 0; /* Rimuove eventuali margini predefiniti */
+  padding-top: 69px; /* Aggiunge spazio sufficiente per la navbar */
+}
+
+.scrolled {
+  background-color: #ffffff; /* Cambia colore navbar durante lo scroll */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombra più marcata */
+}
+
 .navbar-brand {
   color: #006d77;
-  font-size: 26px; /* Ingrandito leggermente */
+  font-size: 28px; /* Ingrandito leggermente */
   font-weight: bold;
+  margin-left: 15px; /* Spazio a sinistra */
   text-decoration: none; /* Rimuove eventuali decorazioni */
 }
 
