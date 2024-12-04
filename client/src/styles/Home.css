@@ -256,7 +256,7 @@ body {
 }
 
 .footer-icons a {
-  color: #333;
+  color: white;
   font-size: 1.5rem;
   transition: color 0.3s ease, transform 0.2s ease;
 }
@@ -275,6 +275,17 @@ body {
 .footer-icons img.logo-icon:hover {
   transform: scale(1.2); /* Effetto zoom al passaggio del mouse */
   opacity: 1; /* Torna opaco */
+}
+.politecnico-link {
+  color: inherit; /* Mantieni il colore del testo circostante */
+  text-decoration: none; /* Rimuove la sottolineatura di default */
+  font-weight: bold; /* Aggiungi un po' di enfasi al testo */
+  transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+.politecnico-link:hover {
+  transform: scale(1.2); /* Effetto zoom al passaggio del mouse */
+  color: blue;
 }
 
 /* Responsive Footer */

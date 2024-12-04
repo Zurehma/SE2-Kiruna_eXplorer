@@ -76,27 +76,31 @@ const Home = () => {
       <footer className="footer">
         <div className="footer-content">
           <h5>Kiruna eXplorer</h5>
-          <p>Politecnico di Torino | Corso Duca degli Abruzzi, 24 | 10129 Torino</p>
+          <p>
+            <a
+              href="https://www.polito.it"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="politecnico-link"
+            >
+              Politecnico di Torino
+            </a>
+            | Corso Duca degli Abruzzi, 24 | 10129 Torino
+          </p>
           <div className="footer-icons">
             <a
               href="https://github.com/Zurehma/SE2-Kiruna_eXplorer"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <i class="bi bi-github"></i>
-            </a>
-            <a href="https://www.polito.it" target="_blank" rel="noopener noreferrer">
-              <img src="/polito-logo.png" alt="Politecnico di Torino" className="logo-icon" />
+              <i className="bi bi-github"></i>
             </a>
             <a
               href="https://en.wikipedia.org/wiki/Kiruna"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <i class="bi bi-globe"></i>
-            </a>
-            <a href="#top" onClick={scrollToContent}>
-              <i class="bi bi-arrow-up-circle"></i>
+              <i className="bi bi-globe"></i>
             </a>
           </div>
         </div>
