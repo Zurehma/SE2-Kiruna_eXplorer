@@ -12,6 +12,17 @@ class DocumentRoutes {
   getRouter = () => this.router;
 
   initRoutes = () => {
+    this.router.get("/allExistingLinks", (req, res, next) => {
+      this.documentController
+        .getAllLinks()
+        .then((links) => {
+          res.status(200).json(links);
+        })
+        .catch((err) => {
+          next(err);
+        });
+    });
+
     this.router.get(
       "/",
       [
@@ -19,11 +30,22 @@ class DocumentRoutes {
         query("stakeholder").optional().isString().withMessage("Stakeholder must be a string"),
         query("issuanceDateFrom").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
         query("issuanceDateTo").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
+        query("limit").optional().isInt({ gt: 0 }).withMessage("Limit must be a positive integer"),
+        query("offset")
+          .optional()
+          .isInt({ min: 0 })
+          .withMessage("Offset must be a non-negative integer")
+          .custom((value, { req }) => {
+            if (!req.query.limit) {
+              throw new Error("Offset is required when limit is specified");
+            }
+            return true;
+          }),
       ],
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
-          .getDocuments(req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo)
+          .getDocuments(req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo, req.query.limit, req.query.offset)
           .then((document) => {
             res.status(200).json(document);
           })
@@ -37,32 +59,36 @@ class DocumentRoutes {
       "/",
       Utility.isLoggedIn,
       body("title").isString().notEmpty(),
-      body("stakeholder").isString().notEmpty(),
+      body("stakeholders").isArray().notEmpty(),
+      body("stakeholders.*").isString().notEmpty(),
       oneOf([body("scale").isString().notEmpty(), body("scale").isInt({ gt: 0 })]),
       oneOf([body("issuanceDate").isISO8601({ strict: true }), body("issuanceDate").isString().notEmpty().custom(Utility.isValidYearMonthOrYear)]),
       body("type").isString().notEmpty(),
       body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
-      body("coordinates").optional().isObject().custom(Utility.isValidCoordinatesObject),
+      oneOf([
+        body("coordinates").optional().custom(Utility.isValidCoordinatesObject),
+        body("coordinates").optional().custom(Utility.isValidCoordinatesArray),
+      ]),
       body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
       body("pageFrom").optional().isInt({ gt: 0 }),
       body("pageTo").optional().isInt({ gt: 0 }),
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
-          .addDocument(
-            req.body.title,
-            req.body.stakeholder,
-            req.body.scale,
-            req.body.issuanceDate,
-            req.body.type,
-            req.body.language,
-            req.body.description,
-            req.body.coordinates || null,
-            req.body.pages || null,
-            req.body.pageFrom || null,
-            req.body.pageTo || null
-          )
+          .addDocument({
+            title: req.body.title,
+            stakeholders: req.body.stakeholders,
+            scale: req.body.scale,
+            issuanceDate: req.body.issuanceDate,
+            type: req.body.type,
+            language: req.body.language,
+            description: req.body.description,
+            coordinates: req.body.coordinates || null,
+            pages: req.body.pages || null,
+            pageFrom: req.body.pageFrom || null,
+            pageTo: req.body.pageTo || null
+          })
           .then((document) => {
             res.status(201).json(document);
           })
@@ -70,21 +96,21 @@ class DocumentRoutes {
       }
     );
 
-    this.router.get("/document-types", Utility.isLoggedIn, (req, res, next) => {
+    this.router.get("/document-types", (req, res, next) => {
       this.documentController
         .getDocumentTypes()
         .then((documentTypes) => res.status(200).json(documentTypes))
         .catch((err) => next(err));
     });
 
-    this.router.get("/stakeholders", Utility.isLoggedIn, (req, res, next) => {
+    this.router.get("/stakeholders", (req, res, next) => {
       this.documentController
         .getStakeholders()
         .then((stakeholders) => res.status(200).json(stakeholders))
         .catch((err) => next(err));
     });
 
-    this.router.get("/link-types", Utility.isLoggedIn, (req, res, next) => {
+    this.router.get("/link-types", (req, res, next) => {
       this.documentController
         .getLinkTypes()
         .then((linkTypes) => res.status(200).json(linkTypes))
@@ -107,33 +133,37 @@ class DocumentRoutes {
       Utility.isLoggedIn,
       param("docID").isInt({ gt: 0 }),
       body("title").isString().notEmpty(),
-      body("stakeholder").isString().notEmpty(),
+      body("stakeholders").isArray().notEmpty(),
+      body("stakeholders.*").isString().notEmpty(),
       oneOf([body("scale").isString().notEmpty(), body("scale").optional().isInt({ gt: 0 })]),
       oneOf([body("issuanceDate").isISO8601({ strict: true }), body("issuanceDate").isString().notEmpty().custom(Utility.isValidYearMonthOrYear)]),
       body("type").isString().notEmpty(),
       body("language").isString().notEmpty(),
       body("description").isString().notEmpty(),
-      body("coordinates").optional().isObject().custom(Utility.isValidCoordinatesObject),
+      oneOf([
+        body("coordinates").optional().custom(Utility.isValidCoordinatesObject),
+        body("coordinates").optional().custom(Utility.isValidCoordinatesArray),
+      ]),
       body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
       body("pageFrom").optional().isInt({ gt: 0 }),
       body("pageTo").optional().isInt({ gt: 0 }),
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
-          .updateDocument(
-            Number(req.params.docID),
-            req.body.title,
-            req.body.stakeholder,
-            req.body.scale,
-            req.body.issuanceDate,
-            req.body.type,
-            req.body.language,
-            req.body.description,
-            req.body.coordinates || null,
-            req.body.pages || null,
-            req.body.pageFrom || null,
-            req.body.pageTo || null
-          )
+          .updateDocument({
+            id: Number(req.params.docID),
+            title: req.body.title,
+            stakeholders: req.body.stakeholders,
+            scale: req.body.scale,
+            issuanceDate: req.body.issuanceDate,
+            type: req.body.type,
+            language: req.body.language,
+            description: req.body.description,
+            coordinates: req.body.coordinates || null,
+            pages: req.body.pages || null,
+            pageFrom: req.body.pageFrom || null,
+            pageTo: req.body.pageTo || null
+          })
           .then(() => res.status(204).end())
           .catch((err) => next(err));
       }
@@ -162,14 +192,13 @@ class DocumentRoutes {
         try {
           const { id1, ids, type } = req.body;
 
-          // Check if any of the provided IDs already have a link
+          // Find links that exist with the same document pairs and the same type
           const existingLinks = await this.documentController.getLinks(id1);
-          const existingIDs = existingLinks.map((link) => link.linkedDocID);
+          const duplicates = ids.filter((id) => existingLinks.some((link) => link.linkedDocID === id && link.type === type));
 
-          const duplicates = ids.filter((id) => existingIDs.includes(id));
           if (duplicates.length > 0) {
             return res.status(409).json({
-              message: `Link already exists for ID(s): ${duplicates.join(", ")}`,
+              message: `Link already exists for ID(s): ${duplicates.join(", ")} with type '${type}'`,
             });
           }
 

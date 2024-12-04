@@ -59,3 +59,5 @@
 **Expected Results:**
 - The "Filter" button should not be visible or accessible.
 - Users should not be able to apply filters to document markers on the map.
+
+## Tests related to the functionalities of the map developed during the third sprint for the normal user (not logged in) are reported in the file manual_map_logged_in_user.md, since the new functionalities are the same both for citizens/visitors and urban planners.

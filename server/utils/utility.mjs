@@ -3,7 +3,8 @@
  */
 
 import { validationResult } from "express-validator";
-import { polygon, point, booleanPointInPolygon } from "@turf/turf";
+import { polygon, multiPolygon, point, booleanPointInPolygon } from "@turf/turf";
+import fs from "fs";
 
 /**
  * Check if the provided coordinates are inside the area of Kiruna
@@ -12,17 +13,13 @@ import { polygon, point, booleanPointInPolygon } from "@turf/turf";
  * @returns {Boolean} **true** if the coordinates provided are inside of Kiruna
  */
 const isValidKirunaCoordinates = (lat, long) => {
-  const kirunaCoordinates = [
-    [67.87328157366065, 20.20047943270466],
-    [67.84024426842895, 20.35839687019359],
-    [67.82082254726043, 20.181254701184297],
-    [67.87328157366065, 20.20047943270466],
-  ];
+  const file = fs.readFileSync("static/KirunaMunicipality.geojson");
+  const data = JSON.parse(file);
 
-  const a = polygon([kirunaCoordinates]);
-  const p = point([lat, long]);
+  const kirunaArea = multiPolygon(data.features[0].geometry.coordinates);
+  const selectedPoint = point([long, lat]);
 
-  return booleanPointInPolygon(p, a);
+  return booleanPointInPolygon(selectedPoint, kirunaArea);
 };
 
 /**
@@ -71,6 +68,44 @@ const isValidCoordinatesObject = (value) => {
   if (lat > 90 || lat < -90 || long > 180 || long < -180) {
     throw new Error("Invalid latitude and longitude values.");
   }
+
+  return true;
+};
+
+/**
+ * Middleware to check if an object is a valid coordinates array
+ * @param {Object} value
+ * @returns
+ */
+const isValidCoordinatesArray = (value) => {
+  if (!Array.isArray(value)) {
+    throw new Error("Input is not an array.");
+  }
+
+  if (value.length < 3) {
+    throw new Error("Invalid coordinates array object.");
+  }
+
+  value.forEach((c, index) => {
+    if (c.length !== 2) {
+      throw new Error(`Invalid coordinates ai index ${index}.`);
+    }
+
+    const lat = c[0];
+    const long = c[1];
+
+    if (lat === undefined || long === undefined) {
+      throw new Error(`Invalid coordinates object at index ${index}.`);
+    }
+
+    if (typeof lat !== "number" || typeof long !== "number") {
+      throw new Error(`Invalid latitude or longitude types at index ${index}.`);
+    }
+
+    if (lat > 90 || lat < -90 || long > 180 || long < -180) {
+      throw new Error(`Invalid latitude or longitude values at index ${index}.`);
+    }
+  });
 
   return true;
 };
@@ -167,6 +202,7 @@ const Utility = {
   isBodyEmpty,
   validateRequest,
   errorHandler,
+  isValidCoordinatesArray,
 };
 
 export default Utility;

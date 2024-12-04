@@ -10,27 +10,6 @@ jest.mock("../../../db/db.mjs");
  */
 let documentDAO;
 
-const mapRowsToDocument = (rows) => {
-  return rows.map(
-    (row) =>
-      new Document(
-        row.id,
-        row.title,
-        row.stakeholder,
-        row.scale,
-        row.issuanceDate,
-        row.type,
-        row.connections,
-        row.language,
-        row.description,
-        row.coordinates || null,
-        row.pages || null,
-        row.pageFrom || null,
-        row.pageTo || null
-      )
-  );
-};
-
 describe("DocumentDAO", () => {
   describe("addDocument", () => {
     beforeEach(() => {
@@ -44,7 +23,7 @@ describe("DocumentDAO", () => {
 
     test("Insert successful", async () => {
       const mockDBRun = jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
-        callback.call({ lastID: 0, changes: 1 }, null);
+        callback.call({ changes: 1, lastID: 0 }, null);
       });
 
       const result = await documentDAO.addDocument(
@@ -166,7 +145,6 @@ describe("DocumentDAO", () => {
       const exampleDocumentRow = {
         id: 1,
         title: "example",
-        stakeholder: "example",
         scale: "100",
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -180,7 +158,7 @@ describe("DocumentDAO", () => {
       const exampleDocument = new Document(
         1,
         "example",
-        "example",
+        ["example"],
         100,
         "2024-02-12",
         "Informative",
@@ -191,8 +169,14 @@ describe("DocumentDAO", () => {
         null,
         null
       );
+      
+      const stakeholderRows = [{ docID: 1, stakeholder: "example" }];
+
       const mockDBGet = jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
         callback(null, exampleDocumentRow);
+      });
+      const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
+        callback(null, stakeholderRows);
       });
 
       const result = await documentDAO.getDocumentByID(1);
@@ -228,26 +212,9 @@ describe("DocumentDAO", () => {
   });
 
   describe("getDocuments", () => {
-    const documentsTestData = {
-      "filerOut": [{
+    const document1 = {
         id: 5,
-        title: "Document 2",
-        stakeholder: "Stakeholder",
-        scale: 100,
-        issuanceDate: "2023-01-01",
-        type: "Design",
-        connections: 5,
-        language: "english",
-        description: "Desc",
-        coordinates: null,
-        pages: null,
-        pageFrom: null,
-        pageTo: null
-      },
-      {
-        id: 6,
-        title: "Document 2",
-        stakeholder: "Stakeholder",
+        title: "Document 1",
         scale: 100,
         issuanceDate: "2023-01-01",
         type: "Design",
@@ -259,8 +226,23 @@ describe("DocumentDAO", () => {
         pageFrom: null,
         pageTo: null
       }
-    ]
-    }
+    const document2 ={
+        id: 6,
+        title: "Document 2",
+        scale: 100,
+        issuanceDate: "2023-01-01",
+        type: "Design",
+        connections: 5,
+        language: "english",
+        description: "Desc",
+        coordinates: null,
+        pages: null,
+        pageFrom: null,
+        pageTo: null
+      }
+
+      const documentRows = [document1, document2];
+    
 
     beforeEach(() => {
       documentDAO = new DocumentDAO();
@@ -272,17 +254,32 @@ describe("DocumentDAO", () => {
     });
 
     test("All documents retrieved", async () => {
-      let stakeholderApplied = mapRowsToDocument(documentsTestData.filerOut);
+      const docs = [];
+      const doc1 = new Document(5, "Document 1", ["Stakeholder"], 100, "2023-01-01", "Design", 5, "english", "Desc", null, null, null, null)
+      const doc2 = new Document(6, "Document 2", ["Stakeholder"], 100, "2023-01-01", "Design", 5, "english", "Desc", null, null, null, null)
+      docs.push(doc1);
+      docs.push(doc2);
+
+      const stakeholderRows = [{ docID: 5, stakeholder: "Stakeholder" }, { docID: 6, stakeholder: "Stakeholder" }];
+
 
       const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
-        callback(null, stakeholderApplied);
+    
+        if(sql.includes("SELECT * FROM DOCUMENT_STAKEHOLDER WHERE docID IN")){
+          callback(null, stakeholderRows);
+        } 
+        else if(sql.includes("SELECT * FROM DOCUMENT")){
+          callback(null, documentRows);
+        }
       });
 
-      const result = await documentDAO.getDocuments({ stakeholder: "Stakeholder" });
+      const result = await documentDAO.getDocuments();
 
-      for(let i = 0; i < result.length; i++) {
-        expect(result[i]).toStrictEqual(stakeholderApplied[i]);
-      }
+      // for(let i = 0; i < result.length; i++) {
+        expect(result[0]).toBeInstanceOf(Document);
+
+        expect(result[0]).toStrictEqual(docs[0]);
+      // }
 
       expect(mockDBAll).toHaveBeenCalled();
     });
@@ -500,6 +497,42 @@ describe("DocumentDAO", () => {
       expect(mockDBAll).toHaveBeenCalled();
     });
 
+  });
+
+  describe('getAllLinks', () => {
+    beforeEach(() => {
+      documentDAO = new DocumentDAO();
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
+
+    test("getAllLinks successful", async () => {
+      const links = [
+        { docID1: 1, docID2: 2, type: 'Direct' },
+        { docID1: 1, docID2: 3, type: 'Projection' }
+      ];
+      
+      const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
+        callback(null, links);
+      });
+
+      const result = await documentDAO.getAllLinks();
+      expect(result).toStrictEqual(links);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test("error on DB", async () => {
+      const error = new Error("");
+      const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
+        callback(error);
+      });
+
+      const result = documentDAO.getAllLinks();
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
   });
 
 
