@@ -36,44 +36,7 @@ body {
   padding-bottom: 60px; /* Spazio dal bordo inferiore */
 }
 
-.buttons {
-  display: flex;
-  gap: 15px;
-}
-
-.buttons button {
-  background-color: #006d77;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 1rem;
-  align-items: center !important;
-  text-align: center !important;
-  transition: transform 0.2s ease, background-color 0.3s ease;
-}
-
-.buttons button:hover {
-  background-color: #004f55;
-  transform: scale(1.1);
-}
-
-/* Stile per la riga e le colonne */
-.button-row {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  margin-top: 20px;
-}
-
-.button-col {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Stile per i bottoni */
+/* ///////    Stile per i bottoni  /////////*/
 .styled-button {
   display: flex;
   align-items: center;
@@ -82,7 +45,7 @@ body {
   color: black;
   border: none;
   border-radius: 25px;
-  margin: auto 100px;
+  margin: auto 30px;
   padding: 10px 30px; /* Aumentato il padding orizzontale */
   min-width: 350px; /* Larghezza minima per evitare che il testo vada a capo */
   font-size: 1.5rem;
@@ -94,6 +57,24 @@ body {
 .styled-button:hover {
   background-color: white; /* Colore al passaggio del mouse */
   transform: scale(1.05); /* Effetto zoom */
+}
+
+/* Stile per la riga e le colonne */
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  flex-wrap: nowrap; /* Impedisce l'avvolgimento dei bottoni */
+  gap: 5px; /* Spaziatura tra i bottoni */
+}
+
+.button-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1; /* I bottoni occupano lo stesso spazio */
+  max-width: 50%; /* Larghezza massima del 50% */
 }
 
 /* Stile per l'icona */
@@ -114,6 +95,24 @@ body {
   background-color: #004f55; /* Cambia colore dell'icona su hover */
 }
 
+/* Media query per schermi piccoli */
+@media (max-width: 768px) {
+  .styled-button {
+    padding: 5px 15px; /* Riduce il padding */
+    font-size: 1rem; /* Riduce la dimensione del testo */
+    min-width: 200px; /* Riduce la larghezza minima */
+  }
+
+  .button-icon {
+    font-size: 1rem; /* Riduce la dimensione dell'icona */
+    width: 20px; /* Riduce la dimensione del contenitore icona */
+    height: 20px;
+  }
+
+  .button-row {
+    gap: 2px; /* Riduce lo spazio tra i bottoni */
+  }
+}
 /* Sezione contenuto seconda schermata*/
 .content-section {
   height: calc(100vh - 25vh); /* Calcola in base alla finestra e alla striscia */
