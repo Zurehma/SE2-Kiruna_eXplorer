@@ -253,7 +253,7 @@ describe("DocumentController", () => {
     test("Invalid Kiruna coordinates", async () => {
       const exampleDocumentData = {
         title: "title",
-        stakeholder: ["stakeholder"],
+        stakeholders: ["stakeholder"],
         scale: 100,
         issuanceDate: "2024-02-12",
         type: "Informative",
@@ -366,7 +366,7 @@ describe("DocumentController", () => {
       const oldDocumentData = {
         id: 1,
         title: "Document 1",
-        stakeholder: "Stakeholder",
+        stakeholders: ["Stakeholder"],
         scale: 100,
         issuanceDate: "2023-01-01",
         type: "Design",
@@ -384,7 +384,7 @@ describe("DocumentController", () => {
       const result = documentController.updateDocument(
         1,
         "Document 1 Updated",
-        "Stakeholder Updated",
+        ["Stakeholder Updated"],
         200,
         dayjs().add(1, "day").format("YYYY-MM-DD"),
         "Design",
@@ -407,7 +407,7 @@ describe("DocumentController", () => {
       const oldDocumentData = {
         id: 2,
         title: "Document 1",
-        stakeholder: "Stakeholder",
+        stakeholders: ["Stakeholder"],
         scale: 100,
         issuanceDate: "2023-01-01",
         type: "Design",
@@ -427,7 +427,7 @@ describe("DocumentController", () => {
         documentController.updateDocument(
           2,
           "Document 1 Updated",
-          "Kiruna kommun",
+          ["Kiruna kommun"],
           200,
           "2023-01-03",
           "Design",
