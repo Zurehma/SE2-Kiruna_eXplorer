@@ -1,4 +1,3 @@
-import { c } from "vite/dist/node/types.d-aGj9QkWt";
 
 const SERVER_URL = "http://localhost:3001" + "/api";
 
