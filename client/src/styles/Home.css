@@ -135,34 +135,6 @@ body {
   text-align: center;
 }
 
-/* Footer Styles */
-.footer {
-  background-color: #006d77;
-  color: #ffffff;
-  text-align: center;
-  padding: 20px 0;
-  font-size: 1.5rem;
-  position: relative;
-  width: 100%;
-  margin-top: auto; /* Spinge il footer in fondo */
-  min-height: 150px; /* Imposta un'altezza minima */
-}
-
-/* Responsive Footer */
-@media (max-width: 768px) {
-  .footer {
-    font-size: 1.2rem;
-    padding: 15px 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .footer {
-    font-size: 1rem;
-    padding: 10px 0;
-  }
-}
-
 /* Sezione con immagini e testo diviso in tre parti */
 .image-text-section {
   display: flex;
@@ -250,5 +222,72 @@ body {
 
   .info-image {
     height: 150px; /* Riduci l'altezza delle immagini */
+  }
+}
+
+/* ////// FOOTER /////// */
+.footer {
+  background-color: #006d77;
+  color: #ffffff;
+  text-align: center;
+  padding: 20px 0;
+  font-size: 1.5rem;
+  position: relative;
+  width: 100%;
+  margin-top: auto; /* Spinge il footer in fondo */
+  min-height: 150px; /* Imposta un'altezza minima */
+}
+
+.footer-content h5 {
+  margin: 5px 0;
+  font-size: 1.2rem;
+}
+
+.footer-content p {
+  margin: 5px 0;
+  font-size: 1rem;
+}
+
+.footer-icons {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.footer-icons a {
+  color: #333;
+  font-size: 1.5rem;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.footer-icons a:hover {
+  color: white; /* Colore hover */
+  transform: scale(1.2); /* Effetto zoom al passaggio del mouse */
+}
+.footer-icons img.logo-icon {
+  width: 30px; /* Larghezza del logo */
+  height: auto; /* Mantiene le proporzioni */
+  transition: transform 0.2s ease, opacity 0.3s ease;
+  opacity: 0.8; /* Leggermente trasparente */
+}
+
+.footer-icons img.logo-icon:hover {
+  transform: scale(1.2); /* Effetto zoom al passaggio del mouse */
+  opacity: 1; /* Torna opaco */
+}
+
+/* Responsive Footer */
+@media (max-width: 768px) {
+  .footer {
+    font-size: 1.2rem;
+    padding: 15px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    font-size: 1rem;
+    padding: 10px 0;
   }
 }
