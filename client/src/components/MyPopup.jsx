@@ -136,7 +136,7 @@ function MyPopup(props) {
           {renderIcon()}
         </div>
 
-        <h6 className="fw-bold text-secondary mb-2 mt-2">Attachmets:</h6>
+        <h6 className="fw-bold text-secondary mb-2 mt-2">Attachments:</h6>
         {attachments.length === 0 && <p className="small text-muted mt-2">No attachments added yet</p>}
         <ul className="list-unstyled">
           {attachments.map((attachment) => (
