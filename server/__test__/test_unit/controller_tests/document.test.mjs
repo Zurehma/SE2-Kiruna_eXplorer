@@ -591,4 +591,51 @@ describe("DocumentController", () => {
       expect(documentDAO.addLink).toHaveBeenCalledWith(exampleLink.id1, exampleLink.id2, exampleLink.type);
     });
   });
+
+  describe("getAllLinks", () => {
+    afterEach(()=>{
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    })
+
+    test("All links retrieved successfully", async () => {
+      const exampleLinks = [
+        { docID1: 1, docID2: 2, type: "Direct" },
+        { docID1: 1, docID2: 3, type: "Projection" },
+      ]
+
+      const documentDAO = new DocumentDAO();
+      documentDAO.getAllLinks = jest.fn().mockResolvedValue(exampleLinks);
+
+      const documentController = new DocumentController();
+      documentController.documentDAO = documentDAO;
+      const result = await documentController.getAllLinks();
+
+      expect(documentDAO.getAllLinks).toHaveBeenCalled();
+      expect(result).toEqual(exampleLinks);
+
+    });
+
+    test("No links", async () => {
+      const documentDAO = new DocumentDAO();
+      documentDAO.getAllLinks = jest.fn().mockResolvedValue([]);
+
+      const documentController = new DocumentController();
+      documentController.documentDAO = documentDAO;
+      const result = await documentController.getAllLinks();
+
+      expect(documentDAO.getAllLinks).toHaveBeenCalled();
+      expect(result).toEqual([]);
+    });
+
+    test("Links not found", async () => {
+      const documentDAO = new DocumentDAO();
+      documentDAO.getAllLinks = jest.fn().mockResolvedValue(undefined);
+
+      const documentController = new DocumentController();
+      documentController.documentDAO = documentDAO;
+      await expect(documentController.getAllLinks()).rejects.toEqual({ errCode: 404, errMessage: "Links not found!" });
+    });
+  });
+  
 });

@@ -409,16 +409,47 @@ Start the download of a specific attachment.
 
 ### Table `User`
 
-- Fields: id-name-surname-username-password-salt-role
+- Fields: id-name-surname-username-role-password-salt
 - Primary key: id
 - Description: Each user is uniquely identified through an ID. Role is a string and can be one of: [`Urban Planner`]
 
 ### Table `Document`
 
-- Fields: id-title-stakeholder-scale-issuanceDate-type-connections-language-pages-description-lat-long
+- Fields: id-title-scale-issuanceDate-type-connections-language-description-coordinates-pages-pageFrom-pageTo
 - Primary key: id
-- Description: The table stores information on each document. The information is the one from the cards along with longitude & latitude (NULL default means the document covers the whole area).  
-  Each document is uniquely identified by an ID.
+- Description: The table stores information on each document. The information is the one from the cards along with an object of coordinates (NULL default means the document covers the whole area).  
+  - id: Each documents is uniquely identified through an id
+  - title: Title of the document
+  - scale: Can be one of "Text", "Blueprints/Effects" or a number representing n in "1:n"
+  - issuanceDate: can be YYYY, YYYY-MM or YYYY-MM-DD
+  - type: Represents the type of the document
+  - connections: Represents the number of connections a document has with other documents
+  - language: Represents the language of the document
+  - description: description of the document
+  - coordinates: 
+  - pages: The number of pages in the document. Optional field. If this exists then pageFrom and pageTo should be NULL
+  - pageFrom: Starting of range of pages. Optional field but must exist if pageTo exists. If a range exists then pages should be NULL
+  - pageTo: Ending of range of pages. Optional field but must exist if pageFrom exists. If a range exists then pages should be NULL
+
+### Table `Document_Stakeholder`
+
+- Fields: docID-stakeholder
+- Primary key: docID, stakeholder
+- Description: Stores the relationship between the document and stakeholders. A document can have more than one stakeholder
+  - docID: Foreign key that references the DOCUMENT table
+  - stakeholder: Name of the stakeholder. Foreign key that references STAKEHOLDER table
+
+### Table `Stakeholder`
+
+- Fields: name
+- Primary key: name
+- Description: Stores the different stakeholders
+
+### Table `Document_Type`
+
+- Fields: name
+- Primary key: name
+- Description: Stores the different document types
 
 ### Table `Link`
 

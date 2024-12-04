@@ -515,5 +515,41 @@ describe("DocumentDAO", () => {
 
   });
 
+  describe('getAllLinks', () => {
+    beforeEach(() => {
+      documentDAO = new DocumentDAO();
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
+
+    test("getAllLinks successful", async () => {
+      const links = [
+        { docID1: 1, docID2: 2, type: 'Direct' },
+        { docID1: 1, docID2: 3, type: 'Projection' }
+      ];
+      
+      const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
+        callback(null, links);
+      });
+
+      const result = await documentDAO.getAllLinks();
+      expect(result).toStrictEqual(links);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test("error on DB", async () => {
+      const error = new Error("");
+      const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
+        callback(error);
+      });
+
+      const result = documentDAO.getAllLinks();
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+  });
+
 
 });
