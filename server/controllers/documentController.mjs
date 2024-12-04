@@ -229,7 +229,6 @@ class DocumentController {
     return new Promise((resolve, reject) => {
       const addLink = async () => {
         try {
-          console.log(id1, id2, type);
           if (id1 === id2) {
             const error = { errCode: 400, errMessage: "Document cannot be linked to itself!" };
             throw error;
