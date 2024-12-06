@@ -17,7 +17,7 @@ sections:
   - Stories Done: 11
   - Total Stories Completed of Project: 14 (Up till KX11)
 - Total points committed vs done 
-  - Committed: 24
+  - Committed: 24 (12 points of previous sprint stories)
   - Done: 24
 - Nr of hours planned vs spent (as a team)
   - Planned: 96h 30m
