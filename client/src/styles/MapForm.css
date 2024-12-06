@@ -6,7 +6,7 @@
   padding: 0;
   top: 0;
   left: 0;
-  z-index: 900;
+  z-index: 1000000;
 }
 
 /* Fullscreen state (fixed positioning) */
@@ -19,7 +19,7 @@
   transform: translate(-50%, -50%); /* Centra la mappa */
   margin: 0;
   padding: 0;
-  z-index: 1600;
+  z-index: 1000000;
   background-color: white; /* Assicurati che abbia uno sfondo visibile */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Aggiungi un'ombra per effetto di focus */
 }
@@ -31,7 +31,7 @@
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.7); /* Sfondo scuro traslucido */
-  z-index: 1500; /* Deve essere più basso rispetto alla mappa ma sopra il resto del contenuto */
+  z-index: 1000000; /* Deve essere più basso rispetto alla mappa ma sopra il resto del contenuto */
 }
 
 .without-overlay {
