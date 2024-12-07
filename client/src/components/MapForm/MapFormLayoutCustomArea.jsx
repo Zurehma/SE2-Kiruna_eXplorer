@@ -13,7 +13,7 @@ const MapFormLayoutCustomArea = (props) => {
   const map = useMap();
   const drawControlRef = useRef(null); // Ref per tracciare il controllo di disegno
   const drawnItemsRef = useRef(new L.FeatureGroup()); // Ref per il gruppo di layer
-
+  
   useEffect(() => {
     const drawnItems = drawnItemsRef.current;
     map.addLayer(drawnItems);

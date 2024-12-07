@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polygon } from 'react-leaflet';
 import L from 'leaflet';
+import { Tooltip } from 'react-leaflet';
 
 import '../../styles/MapNavigation.css';
 import { MyPopup } from '../MyPopup';
@@ -214,9 +215,13 @@ function MapNavigation(props) {
                 {/* Draw clusters or icons depending on the zoom: also the exact same position is managed in this case */}
                 <MarkerClusterGroup>
                     {coordDocuments.map((doc) => (
-                        <Marker key={doc.id} position={[doc.lat, doc.long]} icon={createCustomIcon(doc.type)}
+                        <Marker key={`${doc.id}-${doc.title}`} position={[doc.lat, doc.long]} icon={createCustomIcon(doc.type)}
                             eventHandlers={{click: () => {setSelectedDoc(doc); setRenderNumeber(renderNumber+1);}
-                        }}/>
+                        }}>
+                            <Tooltip direction="top" offset={[0, -20]} opacity={1}>
+                                {doc.title} {/* Assicurati che ogni documento abbia un attributo 'title' disponibile */}
+                            </Tooltip>
+                        </Marker>
                     ))}
                 </MarkerClusterGroup>
                 
