@@ -128,7 +128,7 @@ const MapForm = (props) => {
   const handleSetArea = (coordinates, name = null) => {
     setPosition({ type: "Area", coordinates: coordinates, name: name });
   };
-  const clearPosition = () => setPosition({ type: null, coordinates: null, name: null });
+  const clearPosition = () => {setPosition({ type: null, coordinates: null, name: null }); setSelectedDoc(null);};
 
   const resetOnChange = () => {
     clearPosition();

@@ -3,40 +3,12 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'leaflet/dist/leaflet.css';
 
 import MarkerClusterGroup from "react-leaflet-cluster";
-import { Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
+import { Marker, Popup } from 'react-leaflet';
+import { Tooltip } from 'react-leaflet';
 
 import '../../styles/MapNavigation.css';
-import API from '../../../API';
-
-// Icon mapping based on document type
-const iconMap = {
-    Design: 'bi-file-earmark-text',
-    Informative: 'bi-info-circle',
-    Prescriptive: 'bi-arrow-right-square',
-    Technical: 'bi-file-earmark-code',
-    Agreement: 'bi-people-fill',
-    Conflict: 'bi-x-circle',
-    Consultation: 'bi-chat-dots',
-    Action: 'bi-exclamation-triangle',
-    Material: 'bi-file-earmark-binary',
-};
-
-// Function to create a custom divIcon with a specific icon inside
-const createCustomIcon = (type, selected) => {
-    const iconClass = iconMap[type] || 'bi-file-earmark';
-    const backgroundColor = selected ? 'yellow' : 'white'; // Cambia il colore di sfondo
-
-    return L.divIcon({
-        html: `
-            <div style="display: flex; align-items: center; justify-content: center; background: ${backgroundColor}; 
-                width: 25px; height: 25px; border-radius: 50%; border: 2px solid black;">
-                <i class="bi ${iconClass}" style="color: black; font-size: 12px;"></i>
-            </div>`,
-        className: '' // Clear default class
-    });
-};
-
+import fetchData from '../MapUtils/DataFetching';
+import  {createCustomIcon}  from '../MapUtils/CustomIcon';
 
 
 //It takes newPoint and newArea as props, which are functions to set the new point or area in the parent component 
@@ -44,45 +16,12 @@ function MapLayoutPredefinedPosition(props) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [renderNumber,setRenderNumeber] = useState(0);
+    const [error, setError] = useState(null);
 
     // Fetch documents from the API
     useEffect(() => {
         setLoading(true);    
-        const fetchData = async () => {
-            try {
-                const documents = await API.filterDocuments('All');
-                const updatedDocuments = documents.map(doc => {
-                    console.log(documents)
-                    if (!doc.coordinates || doc.coordinates.length === 0) {
-                        return { ...doc, lat: null, long: null };
-                    } else {
-                        if (doc.coordinates.length > 1) {
-                            // Function to find the highest point in a polygon, where the popup and the marker will be shown
-                            const highestPoint = doc.coordinates.reduce((max, [lat, long]) => {
-                                return lat > max.lat ? { lat, long } : max;
-                            }, { lat: doc.coordinates[0][0], long: doc.coordinates[0][1] });
-            
-                            const area = doc.coordinates.map(([lat, long]) => [lat, long]);
-            
-                            return {
-                                ...doc, lat: highestPoint.lat, long: highestPoint.long,area};
-                        } else {
-                            // Single coordinate
-                            const { lat, long } = doc.coordinates;
-                            return { 
-                                ...doc, lat, long
-                            };
-                        }
-                    }
-                });
-                setData(updatedDocuments);
-            } catch (error) {
-                console.error('Error fetching documents:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
+        fetchData('All',setData, setError, setLoading);
     }, []);
     // Filter documents with coordinates
     const coordDocuments = data.filter(doc => doc.lat != null && doc.long != null);
@@ -110,7 +49,11 @@ function MapLayoutPredefinedPosition(props) {
                         <Marker key={doc.id} position={[doc.lat, doc.long]} 
                             icon={doc.id === props.selectedDoc?.id ? createCustomIcon(doc.type, true) : createCustomIcon(doc.type, false)}
                             eventHandlers={{click: () => {handleClick(doc)}
-                        }}/>
+                        }}>
+                            <Tooltip direction="top" offset={[0, -20]} opacity={1}>
+                                {doc.title} 
+                            </Tooltip>
+                        </Marker>
                     ))}
                 </MarkerClusterGroup>
                 
