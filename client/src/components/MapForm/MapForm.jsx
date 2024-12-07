@@ -5,14 +5,14 @@ import { booleanPointInPolygon, point } from "@turf/turf";
 
 import "../../styles/MapForm.css";
 
-import { Button, Dropdown } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import MapLayoutCustomPoint from "./MapLayoutCustomPoint";
 import MapLayoutPredefinedPosition from "./MapLayoutPredefinedPosition";
 import KirunaMunicipality from "../MapUtils/KirunaMunicipality";
 import MapFormLayoutCustomArea from "./MapFormLayoutCustomArea";
 import LoadGeoJson from "../MapUtils/LoadGeoJson";
 import MapControlPanel from "./SideBarMenu";
-
+import RecenterButton from '../MapUtils/RecenterButton';
 
 /**
  * Button component to resize the map
@@ -62,6 +62,7 @@ const MapForm = (props) => {
   const [mapView, setMapView] = useState("satellite");
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [selectedDoc, setSelectedDoc] = useState(null); 
+  const positionActual = [67.85, 20.217];
 
   //validate coordinates: verify they're in the Kiruna Municipality
   const validateCoordinates = (lat, long) => {
@@ -110,7 +111,6 @@ const MapForm = (props) => {
     setPosition({ type: "Area", coordinates: coordinates, name: name });
   };
   const clearPosition = () => {setPosition({ type: null, coordinates: null, name: null }); setSelectedDoc(null);};
-
 
   const ResizeMap = () => {
     const map = useMap();
@@ -171,6 +171,7 @@ const MapForm = (props) => {
           )}
           {position && position.coordinates && !isFullscreen && <ClearPositionButton clearPosition={clearPosition} />}
           <TileLayer url={mapStyles[mapView]} />
+          <RecenterButton initialPosition={initialPosition} positionActual={positionActual} setPositionActual={setInitalPosition} zoomLevel={initialZoom} setZoomLevel={setInitalZoom} draw={currentMode === 'Custom area'} />
           <ResizeMap />
         </MapContainer>
       </div>

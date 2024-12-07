@@ -171,7 +171,7 @@ function MapNavigation(props) {
                 )}
 
                 {/* Button to re-center the map */}
-                <RecenterButton positionActual={positionActual} setPositionActual={setPositionActual} setZoomLevel={setZoomLevel} zoomLevel={zoomLevel} initialPosition={initialPosition}/>
+                <RecenterButton positionActual={positionActual} setPositionActual={setPositionActual} setZoomLevel={setZoomLevel} zoomLevel={zoomLevel} initialPosition={initialPosition} draw={false}/>
             </MapContainer>}
         </>
     );
