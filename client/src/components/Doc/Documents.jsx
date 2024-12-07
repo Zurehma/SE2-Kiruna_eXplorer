@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Button, Container} from "react-bootstrap";
+import { Form, Button, Container } from "react-bootstrap";
 import { Card, Row, Col } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../../../API.js";
@@ -38,8 +38,6 @@ function Documents(props) {
     language: "",
     pages: "",
     coordinates: "",
-    pageFrom: "",
-    pageTo: "",
   });
 
   const [errors, setErrors] = useState({
@@ -71,8 +69,6 @@ function Documents(props) {
       language: "",
       pages: "",
       coordinates: "",
-      pageFrom: "",
-      pageTo: "",
     }));
   };
 
@@ -107,10 +103,6 @@ function Documents(props) {
     try {
       const doc = await API.getDocumentById(documentId);
       const coordinates = doc.coordinates;
-      let pages = doc.pages;
-      if (!doc.pages && doc.pageFrom && doc.pageTo) {
-        pages = `${doc.pageFrom}-${doc.pageTo}`;
-      }
       let scale = doc.scale;
       let nValue = "";
       if (scale !== "Text" && scale !== "Blueprints/Effects") {
@@ -129,7 +121,6 @@ function Documents(props) {
       setDocument((prevDocument) => ({
         ...doc,
         coordinates,
-        pages,
         scale,
         nValue,
       }));
@@ -158,7 +149,9 @@ function Documents(props) {
     const selectedFiles = Array.from(e.target.files);
     const validFormats = [".mp4", ".jpeg", ".pdf", ".png", "jpg"];
     // Filter files by extension and add them only if they respect the correct format
-    const newFiles = selectedFiles.filter((file) => validFormats.some((format) => file.name.endsWith(format)));
+    const newFiles = selectedFiles.filter((file) =>
+      validFormats.some((format) => file.name.endsWith(format))
+    );
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
   };
 
@@ -234,13 +227,14 @@ function Documents(props) {
       newErrors.newType = "You must insert a new type or select one from the menu.";
     }
     if (!document.issuanceDate) {
-      newErrors.issuanceDate = "You must select a Date in a valid format (YYYY or YYYY-MM or YYYY-MM-DD).";
+      newErrors.issuanceDate =
+        "You must select a Date in a valid format (YYYY or YYYY-MM or YYYY-MM-DD).";
     }
     if (!document.language) {
       newErrors.language = "You must select a language.";
     }
     if (document.pages && !validatePages(document.pages)) {
-      newErrors.pages = "Please enter a valid number or range (e.g., 35 or 35-45).";
+      newErrors.pages = "Please enter a valid number of page (e.g., 35 or 1-35).";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -264,35 +258,24 @@ function Documents(props) {
 
   const handlePreviousStep = () => setStep((prev) => prev - 1);
 
+  // cambia in modo da poter avere o 1 o 1-34 o 1-34-45
   const validatePages = (value) => {
     if (!value) {
       // Campo vuoto è accettato
       return true;
     }
 
-    const singleNumberRegex = /^\d+$/; // Controlla un singolo numero
-    const rangeRegex = /^\d+\s*-\s*\d+$/; // Controlla un range con un trattino
+    // Espressione regolare per accettare un singolo numero o più numeri separati da trattini
+    const pagesRegex = /^(\d+)(\s*-\s*\d+)*$/;
 
-    if (singleNumberRegex.test(value)) {
-      // Caso: valore singolo
-      document.pages = parseInt(value, 10); // Salva come numero
-      document.pageFrom = "";
-      document.pageTo = "";
+    if (pagesRegex.test(value)) {
+      // Input valido
+      document.pages = value;
       return true;
-    } else if (rangeRegex.test(value)) {
-      // Caso: range con trattino
-      const [start, end] = value.split("-").map((num) => parseInt(num.trim(), 10));
-      if (start < end) {
-        document.pages = "";
-        document.pageFrom = start;
-        document.pageTo = end;
-        return true;
-      } else {
-        return false; // Errore se il range è invalido (es. 45-35)
-      }
-    } else {
-      return false; // Input non valido
     }
+
+    // Input non valido
+    return false;
   };
 
   useEffect(() => {
@@ -367,11 +350,18 @@ function Documents(props) {
   //Gestisce la selezione degli stakeholders
   const handleStake = (selectedOptions) => {
     // Trova le opzioni rimosse
-    const removedOptions = selectedStakeholders.filter((opt) => !(selectedOptions || []).some((sel) => sel.value === opt.value));
+    const removedOptions = selectedStakeholders.filter(
+      (opt) => !(selectedOptions || []).some((sel) => sel.value === opt.value)
+    );
     // Rimuove solo quelli creati manualmente
     const removedNewOptions = removedOptions.filter((opt) => opt.isNew);
     if (removedNewOptions.length > 0) {
-      setStakeholders((prev) => prev.filter((stakeholders) => !removedNewOptions.some((removed) => removed.value === stakeholders.value)));
+      setStakeholders((prev) =>
+        prev.filter(
+          (stakeholders) =>
+            !removedNewOptions.some((removed) => removed.value === stakeholders.value)
+        )
+      );
     }
     // Aggiorna le opzioni selezionate
     setSelectedStakeholders(selectedOptions || []);
@@ -436,9 +426,24 @@ function Documents(props) {
                 />
               )}
               {step === 2 && (
-                <Step2 document={document} errors={errors} handleChange={handleChange} handleAddNew={handleAddNew} scales={scales} types={types} />
+                <Step2
+                  document={document}
+                  errors={errors}
+                  handleChange={handleChange}
+                  handleAddNew={handleAddNew}
+                  scales={scales}
+                  types={types}
+                />
               )}
-              {step === 3 && <Step3 document={document} errors={errors} handleChange={handleChange} position={position} setPosition={setPosition} />}
+              {step === 3 && (
+                <Step3
+                  document={document}
+                  errors={errors}
+                  handleChange={handleChange}
+                  position={position}
+                  setPosition={setPosition}
+                />
+              )}
               {step === 4 && (
                 <Step4
                   handleFileChange={handleFileChange}
