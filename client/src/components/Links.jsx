@@ -132,7 +132,7 @@ function Links(props) {
     setLinkData({ document1: "", document2: [], linkType: "" });
   };
 
-  const handleClose = () => navigate("/");
+  const handleClose = () => navigate("/map");
 
   const handleDocument1Change = (docId) => {
     setLinkData({
@@ -296,7 +296,7 @@ function Links(props) {
               </Button>
             )}
             <Button variant="secondary" onClick={handleClose}>
-              Go to Home
+              Go to Graph
             </Button>
           </Modal.Footer>
         </Modal>
