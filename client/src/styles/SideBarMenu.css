@@ -1,0 +1,58 @@
+.map-control-panel {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    z-index: 10000000;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    border-radius: 5px;
+    padding: 10px;
+  }
+  
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .input-error,
+  .input-error:focus { /* Applica lo stesso stile anche quando l'input è in focus */
+      background-color: #ffcccc; /* Colore rosso chiaro per indicare errore */
+      border-color: #ff0000; /* Bordi rossi per maggiore visibilità */
+  }
+
+  .input-label {
+    font-weight: bold; /* Imposta un font in grassetto per le etichette */
+    display: block; /* Assicura che l'etichetta appaia sopra il campo di input */
+    margin-bottom: 5px; /* Spazio tra l'etichetta e il campo di input */
+}
+
+.error-message {
+    color: #ff0000; /* Colore rosso per i messaggi di errore */
+    font-size: 0.8rem; /* Riduce la dimensione del font per i messaggi di errore */
+    margin-top: 5px; /* Spazio tra il campo di input e il messaggio di errore */
+}
+
+  .mode-button {
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid transparent; /* Invisible border by default */
+    color: black;
+    margin-right: 5px; /* Spacing between buttons */
+  }
+  
+  .mode-button:hover {
+    background-color: transparent;
+    color: black;
+  }
+  
+  .mode-button.active {
+    border-bottom-color: black; /* Underline for active state */
+  }
+  
+  .clear-button-container {
+    margin-top: 10px; /* Spacing between mode buttons and clear button */
+  }
+  
+  .clear-button {
+    width: auto; /* Makes the button wider, centered below the mode buttons */
+  }
+  

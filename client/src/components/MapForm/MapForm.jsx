@@ -11,6 +11,8 @@ import MapLayoutPredefinedPosition from "./MapLayoutPredefinedPosition";
 import KirunaMunicipality from "../MapUtils/KirunaMunicipality";
 import MapFormLayoutCustomArea from "./MapFormLayoutCustomArea";
 import LoadGeoJson from "../MapUtils/LoadGeoJson";
+import MapControlPanel from "./SideBarMenu";
+
 
 /**
  * Button component to resize the map
@@ -23,11 +25,7 @@ const ResizeButton = (props) => {
 
   return (
     <>
-      <Button
-        type="button"
-        variant="light"
-        size="sm"
-        className="resize-button"
+      <Button type="button" variant="light" size="sm" className="resize-button"
         onClick={(e) => {
           e.stopPropagation();
           toggleResize();
@@ -56,26 +54,7 @@ const ClearPositionButton = (props) => {
   );
 };
 
-const DropdownMapMode = (props) => {
-  const { modeList, currentMode, setCurrentMode } = props;
 
-  return (
-    <>
-      <Dropdown drop="up" size="sm" onSelect={(eventKey) => setCurrentMode(eventKey)} className="map-mode-dropdown">
-        <Dropdown.Toggle variant="light" id="dropdown-map-mode-button">
-          {currentMode || "Change mode"}
-        </Dropdown.Toggle>
-        <Dropdown.Menu className="dropdown-menu">
-          {modeList.map((mode) => (
-            <Dropdown.Item key={mode} eventKey={mode} className="dropdown-item">
-              {mode}
-            </Dropdown.Item>
-          ))}
-        </Dropdown.Menu>
-      </Dropdown>
-    </>
-  );
-};
 
 const MapForm = (props) => {
   const [initialPosition, setInitalPosition] = useState([67.85, 20.217]);
@@ -117,22 +96,21 @@ const MapForm = (props) => {
   const predefinedPosition = "Predefined position";
   const customPoint = "Custom point";
   const customArea = "Custom area";
-  const modeList = [predefinedPosition, customPoint, customArea];
-  const [currentMode, setCurrentMode] = useState(undefined);
+  const explore = "Explore";
+  const modeList = [explore, predefinedPosition, customPoint, customArea];
+  const [currentMode, setCurrentMode] = useState(explore);
 
   const [position, setPosition] = useState(props.position || { type: null, coordinates: null, name: null });
 
   const handleSetPoint = (lat, long, name = null) => {
     setPosition({ type: "Point", coordinates: { lat: lat, long: long }, name: name });
   };
+
   const handleSetArea = (coordinates, name = null) => {
     setPosition({ type: "Area", coordinates: coordinates, name: name });
   };
   const clearPosition = () => {setPosition({ type: null, coordinates: null, name: null }); setSelectedDoc(null);};
 
-  const resetOnChange = () => {
-    clearPosition();
-  };
 
   const ResizeMap = () => {
     const map = useMap();
@@ -167,18 +145,8 @@ const MapForm = (props) => {
       <div className={mapSizeClass}>
         <MapContainer key={isFullscreen} center={initialPosition} zoom={initialZoom} maxZoom={18} style={{ height: "100%", width: "100%" }}>
           <ResizeButton isFullscreen={isFullscreen} toggleResize={() => setIsFullscreen(!isFullscreen)} />
-          {isFullscreen && (
-            <DropdownMapMode
-              modeList={modeList}
-              currentMode={currentMode}
-              setCurrentMode={(mode) => {
-                if (currentMode !== mode) {
-                  resetOnChange();
-                  setCurrentMode(mode);
-                }
-              }}
-            />
-          )}
+          
+          {isFullscreen && <MapControlPanel modeList={modeList} currentMode={currentMode} setCurrentMode={setCurrentMode} clearPosition={clearPosition} position={position} newPoint={handleSetPoint} validateCoordinates={validateCoordinates}  />}
           {isFullscreen && currentMode === predefinedPosition && <MapLayoutPredefinedPosition selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} newPoint={handleSetPoint} newArea={handleSetArea} />}
           {isFullscreen && currentMode === customPoint && (
             <MapLayoutCustomPoint position={position} newPoint={handleSetPoint} validateCoordinates={validateCoordinates} />
@@ -201,7 +169,7 @@ const MapForm = (props) => {
               {position.name && <Popup>Name: {position.name}</Popup>}
             </Polygon>
           )}
-          {position && position.coordinates && <ClearPositionButton clearPosition={clearPosition} />}
+          {position && position.coordinates && !isFullscreen && <ClearPositionButton clearPosition={clearPosition} />}
           <TileLayer url={mapStyles[mapView]} />
           <ResizeMap />
         </MapContainer>

@@ -99,6 +99,12 @@ const MapFormLayoutCustomArea = (props) => {
       map.removeLayer(drawnItems);
     };
   }, [isFullscreen, map]);
+  
+  useEffect(() => {
+    if (position.coordinates === null) {
+      drawnItemsRef.current.clearLayers(); // This removes all layers from the feature group
+    }
+  }, [position.coordinates]);
 
   return null;
 };
