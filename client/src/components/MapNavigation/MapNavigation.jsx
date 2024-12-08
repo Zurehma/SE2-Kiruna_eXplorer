@@ -58,8 +58,6 @@ function MapNavigation(props) {
     const [selectedType, setSelectedType] = useState('All'); // New state for selected type
     const [geoJsonData, setGeoJsonData] = useState(null);
     const [highestPoint, setHighestPoint] = useState(null);
-
-    
     //Handle views in the map
     const [mapView, setMapView] = useState("satellite");
     const mapStyles = {
@@ -120,7 +118,7 @@ function MapNavigation(props) {
         <>
             {loading && (<p>Loading...</p>)}
             {!loading && 
-            <MapContainer center={positionActual} zoom={zoomLevel} style={{ height: '65vh', width: '100%' }}>
+            <MapContainer center={positionActual} zoom={zoomLevel} style={{ height: '91vh', width: '100%' }}>
                 
                 {/* Add the tile layer based on the selected view */}
                 <TileLayer url={mapStyles[mapView]}/>
