@@ -68,7 +68,7 @@ class DocumentController {
           let validateCoordinates = true;
 
           if (coordinates && Array.isArray(coordinates)) {
-            validateCoordinates = coordinates.map((c) => Utility.isValidKirunaCoordinates(c[0], c[1])).includes(false);
+            validateCoordinates = !coordinates.map((c) => Utility.isValidKirunaCoordinates(c[0], c[1])).includes(false);
           } else if (coordinates) {
             validateCoordinates = Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long);
           }
