@@ -70,9 +70,7 @@ class DocumentRoutes {
         body("coordinates").optional().custom(Utility.isValidCoordinatesObject),
         body("coordinates").optional().custom(Utility.isValidCoordinatesArray),
       ]),
-      body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
-      body("pageFrom").optional().isInt({ gt: 0 }),
-      body("pageTo").optional().isInt({ gt: 0 }),
+      body("pages").optional().isString().notEmpty().custom(Utility.isValidPages),
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
@@ -86,8 +84,6 @@ class DocumentRoutes {
             description: req.body.description,
             coordinates: req.body.coordinates || null,
             pages: req.body.pages || null,
-            pageFrom: req.body.pageFrom || null,
-            pageTo: req.body.pageTo || null
           })
           .then((document) => {
             res.status(201).json(document);
@@ -120,12 +116,8 @@ class DocumentRoutes {
     this.router.get("/:id", param("id").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
       this.documentController
         .getDocumentById(req.params.id)
-        .then((document) => {
-          res.status(200).json(document);
-        })
-        .catch((err) => {
-          next(err);
-        });
+        .then((document) => res.status(200).json(document))
+        .catch((err) => next(err));
     });
 
     this.router.put(
@@ -144,9 +136,7 @@ class DocumentRoutes {
         body("coordinates").optional().custom(Utility.isValidCoordinatesObject),
         body("coordinates").optional().custom(Utility.isValidCoordinatesArray),
       ]),
-      body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
-      body("pageFrom").optional().isInt({ gt: 0 }),
-      body("pageTo").optional().isInt({ gt: 0 }),
+      body("pages").optional().isString().notEmpty().custom(Utility.isValidPages),
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
@@ -161,8 +151,6 @@ class DocumentRoutes {
             description: req.body.description,
             coordinates: req.body.coordinates || null,
             pages: req.body.pages || null,
-            pageFrom: req.body.pageFrom || null,
-            pageTo: req.body.pageTo || null
           })
           .then(() => res.status(204).end())
           .catch((err) => next(err));

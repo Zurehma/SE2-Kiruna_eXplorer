@@ -3,7 +3,7 @@
  */
 
 import { validationResult } from "express-validator";
-import { polygon, multiPolygon, point, booleanPointInPolygon } from "@turf/turf";
+import { multiPolygon, point, booleanPointInPolygon } from "@turf/turf";
 import fs from "fs";
 
 /**
@@ -111,48 +111,12 @@ const isValidCoordinatesArray = (value) => {
 };
 
 /**
- * Middleware to check if the body has the correct configuration for the page parameters
- * @param {*} value
- * @param {*} param1
+ * Middleware to check if a string matches the pages format required
+ * @param {String} value
  */
-const isValidPageParameter = (value, { req }) => {
-  const pages = value;
-  const pageFrom = req.body.pageFrom;
-  const pageTo = req.body.pageTo;
-
-  if ((pages && pageFrom) || (pages && pageTo)) {
-    throw new Error("");
-  }
-
-  if ((pageFrom || pageTo) && !(pageFrom && pageTo)) {
-    throw new Error("");
-  }
-
-  return true;
-};
-
-/**
- * Middleware to check if the request body is empty
- * @param {*} value
- */
-const isBodyEmpty = (value) => {
-  if (
-    value.hasOwnProperty("title") ||
-    value.hasOwnProperty("stakeholder") ||
-    value.hasOwnProperty("scale") ||
-    value.hasOwnProperty("issuanceDate") ||
-    value.hasOwnProperty("type") ||
-    value.hasOwnProperty("language") ||
-    value.hasOwnProperty("description") ||
-    value.hasOwnProperty("coordinates") ||
-    value.hasOwnProperty("pages") ||
-    value.hasOwnProperty("pageFrom") ||
-    value.hasOwnProperty("pageTo")
-  ) {
-    return true;
-  }
-
-  throw new Error("");
+const isValidPages = (value) => {
+  const regex = "^[0-9]+(-[0-9]+)*$";
+  return value.test(regex);
 };
 
 /**
@@ -198,8 +162,7 @@ const Utility = {
   isLoggedIn,
   isValidYearMonthOrYear,
   isValidCoordinatesObject,
-  isValidPageParameter,
-  isBodyEmpty,
+  isValidPages,
   validateRequest,
   errorHandler,
   isValidCoordinatesArray,
