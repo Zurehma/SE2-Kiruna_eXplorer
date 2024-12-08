@@ -105,6 +105,13 @@ export function NavigationBar(props) {
               </Nav.Link>
               <Nav.Link
                 as={Link}
+                to="/graph"
+                className={`nav-link ${location.pathname === "/graph" ? "active" : ""}`}
+              >
+                Graph
+              </Nav.Link>
+              <Nav.Link
+                as={Link}
                 to="/login"
                 className={`nav-link ${location.pathname === "/login" ? "active" : ""}`}
               >
