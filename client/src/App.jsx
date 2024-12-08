@@ -122,11 +122,8 @@ function App() {
         <Route path="/" element={
           <>
             <Home setError={setError} />
-            
           </>
         } />
-
-
           <Route
             path="/login"
             element={

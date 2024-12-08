@@ -4,7 +4,8 @@ import 'leaflet/dist/leaflet.css';
 
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polygon } from 'react-leaflet';
-import L from 'leaflet';
+import { Tooltip } from 'react-leaflet';
+import { useMapEvents } from 'react-leaflet';
 
 import '../../styles/MapNavigation.css';
 import { MyPopup } from '../MyPopup';
@@ -15,7 +16,8 @@ import KirunaMunicipality from '../MapUtils/KirunaMunicipality';
 import RecenterButton from '../MapUtils/RecenterButton';
 import API from '../../../API';
 import LoadGeoJson from '../MapUtils/LoadGeoJson';
-import { useMapEvents } from 'react-leaflet';
+import {createCustomIcon,iconMap} from '../MapUtils/CustomIcon';
+import fetchData from '../MapUtils/DataFetching';
 
 const PopupCloseHandler = ({ onClose }) => {
     const map = useMap();
@@ -43,34 +45,6 @@ const MapClickHandler = ({ onMapClick }) => {
     });
     return null;
 };
-
-
-// Icon mapping based on document type
-const iconMap = {
-    Design: 'bi-file-earmark-text',
-    Informative: 'bi-info-circle',
-    Prescriptive: 'bi-arrow-right-square',
-    Technical: 'bi-file-earmark-code',
-    Agreement: 'bi-people-fill',
-    Conflict: 'bi-x-circle',
-    Consultation: 'bi-chat-dots',
-    Action: 'bi-exclamation-triangle',
-    Material: 'bi-file-earmark-binary',
-};
-
-// Function to create a custom divIcon with a specific icon inside
-const createCustomIcon = (type) => {
-    const iconClass = iconMap[type] || 'bi-file-earmark';
-    return L.divIcon({
-        html: `<div style="display: flex; align-items: center; justify-content: center; background: white; width: 25px; height: 25px; border-radius: 50%; border: 2px solid black;">
-                    <i class="bi ${iconClass}" style="color: black; font-size: 12px;"></i>
-               </div>`,
-        className: '' // Clear default class
-    });
-};
-
-
-
 
 function MapNavigation(props) {
     const initialPosition = [67.850, 20.217];
@@ -134,57 +108,14 @@ function MapNavigation(props) {
     useEffect(() => {
         setLoading(true);
         setSelectedDoc(null); // Clear the selected document whenever the filter changes
-    
-        const fetchData = async () => {
-            try {
-                const filters = selectedType === 'All' ? {} : { type: selectedType };
-                const documents = await API.filterDocuments(filters);
-                const updatedDocuments = documents.map(doc => {
-                    if (!doc.coordinates || doc.coordinates.length === 0) {
-                        return { ...doc, lat: null, long: null };
-                    } else {
-                        if (doc.coordinates.length > 1) {
-                            // Function to find the highest point in a polygon, where the popup and the marker will be shown
-                            const highestPoint = doc.coordinates.reduce((max, [lat, long]) => {
-                                return lat > max.lat ? { lat, long } : max;
-                            }, { lat: doc.coordinates[0][0], long: doc.coordinates[0][1] });
-            
-                            const area = doc.coordinates.map(([lat, long]) => [lat, long]);
-            
-                            return {
-                                ...doc,
-                                lat: highestPoint.lat,
-                                long: highestPoint.long,
-                                area
-                            };
-                        } else {
-                            // Single coordinate
-                            const { lat, long } = doc.coordinates;
-                            return { 
-                                ...doc, lat, long
-                            };
-                        }
-                    }
-                });
-                setData(updatedDocuments);
-            } catch (error) {
-                props.setError(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
+        fetchData(selectedType,setData,props.setError,setLoading);
     }, [selectedType]); // Fetch documents when selectedType changes
     // Filter documents without coordinates
     const noCoordDocuments = data.filter(doc => doc.lat == null && doc.long == null);
     // Filter documents with coordinates
     const coordDocuments = data.filter(doc => doc.lat != null && doc.long != null);
-    
-
-    
     const classNameEntireMunicipality = props.loggedIn ? 'myDropdownDocuments' : 'myDropdownFilter';
-    
-    
+
     return (
         <>
             {loading && (<p>Loading...</p>)}
@@ -214,9 +145,14 @@ function MapNavigation(props) {
                 {/* Draw clusters or icons depending on the zoom: also the exact same position is managed in this case */}
                 <MarkerClusterGroup>
                     {coordDocuments.map((doc) => (
-                        <Marker key={doc.id} position={[doc.lat, doc.long]} icon={createCustomIcon(doc.type)}
+                        <Marker key={`${doc.id}-${doc.title}`} position={[doc.lat, doc.long]} 
+                            icon={doc.id === selectedDoc?.id ? createCustomIcon(doc.type, true) : createCustomIcon(doc.type, false)}
                             eventHandlers={{click: () => {setSelectedDoc(doc); setRenderNumeber(renderNumber+1);}
-                        }}/>
+                        }}>
+                            <Tooltip direction="top" offset={[0, -20]} opacity={1}>
+                                {doc.title} 
+                            </Tooltip>
+                        </Marker>
                     ))}
                 </MarkerClusterGroup>
                 
