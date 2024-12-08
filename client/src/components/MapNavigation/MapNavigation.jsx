@@ -18,6 +18,7 @@ import API from '../../../API';
 import LoadGeoJson from '../MapUtils/LoadGeoJson';
 import {createCustomIcon,iconMap} from '../MapUtils/CustomIcon';
 import fetchData from '../MapUtils/DataFetching';
+import { use } from 'react';
 
 const PopupCloseHandler = ({ onClose }) => {
     const map = useMap();
@@ -115,7 +116,9 @@ function MapNavigation(props) {
     // Filter documents with coordinates
     const coordDocuments = data.filter(doc => doc.lat != null && doc.long != null);
     const classNameEntireMunicipality = props.loggedIn ? 'myDropdownDocuments' : 'myDropdownFilter';
-
+    useEffect(() => {
+        console.log('position changed')
+    }, [positionActual]);
     return (
         <>
             {loading && (<p>Loading...</p>)}

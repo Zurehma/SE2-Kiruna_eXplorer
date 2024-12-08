@@ -15,7 +15,6 @@
   }
   .input-error,
   .input-error:focus { /* Applica lo stesso stile anche quando l'input è in focus */
-      background-color: #ffcccc; /* Colore rosso chiaro per indicare errore */
       border-color: #ff0000; /* Bordi rossi per maggiore visibilità */
   }
 

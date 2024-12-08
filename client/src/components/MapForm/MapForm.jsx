@@ -62,7 +62,7 @@ const MapForm = (props) => {
   const [mapView, setMapView] = useState("satellite");
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [selectedDoc, setSelectedDoc] = useState(null); 
-  const positionActual = [67.85, 20.217];
+  const KirunaCenter = [67.85, 20.217];
 
   //validate coordinates: verify they're in the Kiruna Municipality
   const validateCoordinates = (lat, long) => {
@@ -171,7 +171,7 @@ const MapForm = (props) => {
           )}
           {position && position.coordinates && !isFullscreen && <ClearPositionButton clearPosition={clearPosition} />}
           <TileLayer url={mapStyles[mapView]} />
-          <RecenterButton initialPosition={initialPosition} positionActual={positionActual} setPositionActual={setInitalPosition} zoomLevel={initialZoom} setZoomLevel={setInitalZoom} draw={currentMode === 'Custom area'} />
+          <RecenterButton initialPosition={KirunaCenter} positionActual={KirunaCenter} setPositionActual={setInitalPosition} zoomLevel={initialZoom} setZoomLevel={setInitalZoom} draw={currentMode === 'Custom area'} />
           <ResizeMap />
         </MapContainer>
       </div>
