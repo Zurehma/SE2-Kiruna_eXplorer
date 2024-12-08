@@ -28,12 +28,12 @@ class DocumentController {
     });
   };
 
-  getDocuments = (type, stakeholder, issuanceDateFrom, issuanceDateTo, limit, offset) => {
+  getDocuments = (pageNo, title, description, type, stakeholder, issuanceDateFrom, issuanceDateTo) => {
     return new Promise((resolve, reject) => {
       const fetchDocuments = async () => {
         try {
-          let queryParameter = { type, stakeholder, issuanceDateFrom, issuanceDateTo };
-          const documents = await this.documentDAO.getDocuments(queryParameter, limit, offset);
+          let queryParameters = { title, description, type, stakeholder, issuanceDateFrom, issuanceDateTo };
+          const documents = await this.documentDAO.getDocuments(pageNo ? Number(pageNo) : 1, queryParameters);
           resolve(documents);
         } catch (err) {
           reject(err);

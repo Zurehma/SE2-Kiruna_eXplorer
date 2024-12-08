@@ -25,33 +25,27 @@ class DocumentRoutes {
 
     this.router.get(
       "/",
-      [
-        query("type").optional().isString().withMessage("Type must be a string"),
-        query("stakeholder").optional().isString().withMessage("Stakeholder must be a string"),
-        query("issuanceDateFrom").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
-        query("issuanceDateTo").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
-        query("limit").optional().isInt({ gt: 0 }).withMessage("Limit must be a positive integer"),
-        query("offset")
-          .optional()
-          .isInt({ min: 0 })
-          .withMessage("Offset must be a non-negative integer")
-          .custom((value, { req }) => {
-            if (!req.query.limit) {
-              throw new Error("Offset is required when limit is specified");
-            }
-            return true;
-          }),
-      ],
+      query("pageNo").optional().isInt({ gt: 0 }),
+      query("title").optional().isString().withMessage("Type must be a string"),
+      query("description").optional().isString().withMessage("Type must be a string"),
+      query("type").optional().isString().withMessage("Type must be a string"),
+      query("stakeholder").optional().isString().withMessage("Stakeholder must be a string"),
+      query("issuanceDateFrom").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
+      query("issuanceDateTo").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
-          .getDocuments(req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo, req.query.limit, req.query.offset)
-          .then((document) => {
-            res.status(200).json(document);
-          })
-          .catch((err) => {
-            next(err);
-          });
+          .getDocuments(
+            req.query.pageNo,
+            req.query.title,
+            req.query.description,
+            req.query.type,
+            req.query.stakeholder,
+            req.query.issuanceDateFrom,
+            req.query.issuanceDateTo
+          )
+          .then((document) => res.status(200).json(document))
+          .catch((err) => next(err));
       }
     );
 
@@ -85,9 +79,7 @@ class DocumentRoutes {
             coordinates: req.body.coordinates || null,
             pages: req.body.pages || null,
           })
-          .then((document) => {
-            res.status(201).json(document);
-          })
+          .then((document) => res.status(201).json(document))
           .catch((err) => next(err));
       }
     );

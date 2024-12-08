@@ -20,6 +20,16 @@ const mapRowsToDocument = (documentRows, stakeholderRows) => {
   );
 };
 
+const getPagination = (pageNo, totalElements) => {
+  const PAGE_SIZE = 2;
+  const totalPages = Math.ceil(totalElements / PAGE_SIZE);
+  const limit = PAGE_SIZE;
+  const offset = pageNo >= totalPages ? PAGE_SIZE * (totalPages - 1) : PAGE_SIZE * (pageNo - 1);
+  const next = pageNo >= totalPages ? false : true;
+
+  return { limit: limit, offset: offset, pageNo: pageNo > totalPages ? totalPages : pageNo, totalPages: totalPages, next: next };
+};
+
 class DocumentDAO {
   constructor() {}
   /**
@@ -51,75 +61,116 @@ class DocumentDAO {
     });
   };
 
-  getDocuments = async (queryParameter, limit, offset) => {
-    try {
-      const { type, stakeholder, issuanceDateFrom, issuanceDateTo } = queryParameter || {};
-      let sql = "SELECT * FROM DOCUMENT";
-      const sqlConditions = [];
-      const sqlParams = [];
-      const sqlLimit = [];
+  /**
+   * Get a page of documents
+   * @param {Number} pageNo
+   * @param {Object} queryParameters
+   * @returns {Promise<Object>} A promise that resolves to the page object
+   */
+  getDocuments = (pageNo, queryParameters) => {
+    return new Promise((resolve, reject) => {
+      (async () => {
+        try {
+          const { title, description, type, stakeholder, issuanceDateFrom, issuanceDateTo } = queryParameters || {};
+          let query1 = "SELECT DISTINCT DOCUMENT.* FROM DOCUMENT";
+          let query2 = "SELECT COUNT(DISTINCT DOCUMENT.id) AS total FROM DOCUMENT";
+          let params = [];
+          let conditions = [];
 
-      if (type) {
-        sqlConditions.push("DOCUMENT.type = ?");
-        sqlParams.push(type);
-      }
-      if (stakeholder) {
-        sqlConditions.push("DOCUMENT_STAKEHOLDER.stakeholder = ?");
-        sqlParams.push(stakeholder);
-      }
-      if (issuanceDateFrom) {
-        sqlConditions.push("DOCUMENT.issuanceDate >= ?");
-        sqlParams.push(issuanceDateFrom);
-      }
-      if (issuanceDateTo) {
-        sqlConditions.push("DOCUMENT.issuanceDate <= ?");
-        sqlParams.push(issuanceDateTo);
-      }
-      if (limit) {
-        sqlLimit.push(" LIMIT ?");
-        sqlParams.push(limit);
-      }
-      if (offset) {
-        sqlLimit.push(" OFFSET ?");
-        sqlParams.push(offset);
-      }
+          if (title) {
+            params.push(`%${title}%`);
+            conditions.push("DOCUMENT.title LIKE ?");
+          }
 
-      if (sqlConditions.length > 0) {
-        sql += " JOIN DOCUMENT_STAKEHOLDER ON DOCUMENT.id = DOCUMENT_STAKEHOLDER.docID";
-        sql += " WHERE " + sqlConditions.join(" AND ");
-      }
-      if (sqlLimit.length > 0) {
-        sql += sqlLimit.join("");
-      }
+          if (description) {
+            params.push(`%${description}%`);
+            conditions.push("DOCUMENT.description LIKE ?");
+          }
 
-      const rows = await new Promise((resolve, reject) => {
-        db.all(sql, sqlParams, (err, rows) => {
-          if (err) return reject(err);
-          resolve(rows);
-        });
-      });
+          if (type) {
+            params.push(type);
+            conditions.push("DOCUMENT.type = ?");
+          }
 
-      return await this.getStakeholdersOfDocument(rows);
-    } catch (err) {
-      throw err;
-    }
-  };
+          if (stakeholder) {
+            params.push(stakeholder);
+            conditions.push("DOCUMENT_STAKEHOLDER.stakeholder = ?");
+          }
 
-  getStakeholdersOfDocument = async (rows) => {
-    try {
-      const idArray = rows.map((row) => row.id);
-      const query2 = `SELECT * FROM DOCUMENT_STAKEHOLDER WHERE docID IN (${idArray.map(() => "?").join(",")})`;
+          if (issuanceDateFrom) {
+            params.push(issuanceDateFrom);
+            conditions.push("DOCUMENT.issuanceDate >= ?");
+          }
 
-      const stakeholderRows = await new Promise((resolve, reject) => {
-        db.all(query2, idArray, (err, rows) => {
-          if (err) return reject(err);
-          resolve(rows);
-        });
-      });
-      return mapRowsToDocument(rows, stakeholderRows);
-    } catch (err) {
-      throw err;
-    }
+          if (issuanceDateTo) {
+            params.push(issuanceDateTo);
+            conditions.push("DOCUMENT.issuanceDate <= ?");
+          }
+
+          if (conditions.length > 0) {
+            query1 += " JOIN DOCUMENT_STAKEHOLDER ON DOCUMENT.id = DOCUMENT_STAKEHOLDER.docID";
+            query1 += " WHERE " + conditions.join(" AND ");
+            query2 += " JOIN DOCUMENT_STAKEHOLDER ON DOCUMENT.id = DOCUMENT_STAKEHOLDER.docID";
+            query2 += " WHERE " + conditions.join(" AND ");
+          }
+
+          const totalElements = await new Promise((resolve, reject) => {
+            db.get(query2, params, (err, row) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(row.total);
+              }
+            });
+          });
+
+          const pagination = getPagination(pageNo, totalElements);
+
+          query1 += " LIMIT ? OFFSET ?";
+          params.push(pagination.limit);
+          params.push(pagination.offset);
+
+          const elements = await new Promise((resolve, reject) => {
+            db.all(query1, params, (err, documentRows) => {
+              if (err) {
+                reject(err);
+              } else if (documentRows.length === 0) {
+                resolve([]);
+              } else {
+                const documentIds = documentRows.map((d) => d.id);
+                const query3 = `SELECT * FROM DOCUMENT_STAKEHOLDER WHERE docID IN (${documentIds.map((_) => "?").join(", ")})`;
+
+                db.all(query3, documentIds, (err, stakeholderRows) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve(mapRowsToDocument(documentRows, stakeholderRows));
+                  }
+                });
+              }
+            });
+          });
+
+          const result = {
+            pageNo: pagination.pageNo,
+            totalPages: pagination.totalPages,
+            elements: elements,
+          };
+
+          if (pagination.next) {
+            result.next =
+              `/api/documents?pageNo=${pageNo + 1}` +
+              Object.keys(queryParameters)
+                .map((key) => (key && queryParameters[key] ? `&${key}=${queryParameters[key]}` : ""))
+                .join("");
+          }
+
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        }
+      })();
+    });
   };
 
   /**
