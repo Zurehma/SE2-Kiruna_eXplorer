@@ -1,0 +1,14 @@
+.legend-modal-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-doc-icon {
+    color: #333;
+  }
+  
+  .stakeholder-icon {
+    font-size: 1.2rem;
+  }
+  

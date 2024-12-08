@@ -18,7 +18,8 @@ import NotFound from "./components/NotFound.jsx";
 import { SingleDocument } from "./components/SingleDocument.jsx";
 import MapForm from "./components/MapForm/MapForm.jsx";
 import DocumentChartStatic from "./components/Graph.jsx";
-import MapAndGraph from "./components/MapAndGraph.jsx";
+// import MapAndGraph from "./components/MapAndGraph.jsx";
+// import MapAndGraph from "./components/MapAndGraph.jsx";
 
 
 function App() {
@@ -122,11 +123,8 @@ function App() {
         <Route path="/" element={
           <>
             <Home setError={setError} />
-            
           </>
         } />
-
-
           <Route
             path="/login"
             element={
@@ -142,7 +140,7 @@ function App() {
               />
             }
           />
-          <Route path="/map" element={<MapAndGraph setError={setError} loggedIn={loggedIn} />} />
+          <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn} />} />
           <Route path="/mapform" element={<MapForm position={position} setPosition={setPosition} />} />
           <Route
             path="/documents"
@@ -179,6 +177,7 @@ function App() {
             }
           />
           <Route path="*" element={<NotFound />} />
+          <Route path="graph" element={<DocumentChartStatic role={role}/>}/>
         </Routes>
       </Container>
     </div>

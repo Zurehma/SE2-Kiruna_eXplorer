@@ -1,19 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useMap } from 'react-leaflet';
 
-// Custom hook to recenter the map
-const RecenterMap = ({ position, zoom }) => {
-    const map = useMap();
-    useEffect(() => {
-        map.setView(position, zoom); // Set the map view to the new position and zoom
-    }, [map, position, zoom]);
+function RecenterButton(props) {
+    const map = useMap(); // Ottenere l'accesso all'istanza della mappa
+    const buttonClass = props.draw === true ? 'myRecenterButtonCustomArea' : 'myRecenterButton';
 
-    return null;
-}
-
-function RecenterButton(props) { //it takes setPositionActual,setZoomLevel,positionActual,zoomLevel as props
-  
-    // Function to recenter the map on Kiruna with zoom reset to 13
     const recenterMap = () => {
         const validZoom = (zoom) => zoom >= 0;
         const validPosition = (position) => 
@@ -22,8 +13,8 @@ function RecenterButton(props) { //it takes setPositionActual,setZoomLevel,posit
             position.every(coord => typeof coord === 'number' && coord >= -90 && coord <= 90);
 
         if (validPosition(props.initialPosition) && validZoom(11)) {
-            props.setPositionActual(props.initialPosition);
-            props.setZoomLevel(11);
+            console.log('Recentering map to initial position');
+            map.setView(props.initialPosition, 11); // Imposta direttamente la vista della mappa
         } else {
             console.error('Invalid position or zoom level');
         }
@@ -31,13 +22,11 @@ function RecenterButton(props) { //it takes setPositionActual,setZoomLevel,posit
 
     return(
         <>
-            {/*Button to recenter the map*/}
-            <RecenterMap position={props.positionActual} zoom={props.zoomLevel} />
-            <button onClick={(event)=>{recenterMap(); event.preventDefault();}} className='myRecenterButton' type="button">
+            {/*Bottone per ricentrare la mappa*/}
+            <button onClick={(event) => { recenterMap(); event.preventDefault(); }} className={buttonClass} type="button">
                 <i className="bi bi-compass myMapIcons"></i>
             </button>
         </>
-
     );
 };
 

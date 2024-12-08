@@ -4,7 +4,8 @@ import 'leaflet/dist/leaflet.css';
 
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polygon } from 'react-leaflet';
-import L from 'leaflet';
+import { Tooltip } from 'react-leaflet';
+import { useMapEvents } from 'react-leaflet';
 
 import '../../styles/MapNavigation.css';
 import { MyPopup } from '../MyPopup';
@@ -15,7 +16,22 @@ import KirunaMunicipality from '../MapUtils/KirunaMunicipality';
 import RecenterButton from '../MapUtils/RecenterButton';
 import API from '../../../API';
 import LoadGeoJson from '../MapUtils/LoadGeoJson';
-import { useMapEvents } from 'react-leaflet';
+import {createCustomIcon,iconMap} from '../MapUtils/CustomIcon';
+import fetchData from '../MapUtils/DataFetching';
+
+const closeIcon = L.divIcon({
+    className: 'custom-close-icon', // Classe personalizzata per evitare gli stili di default di Leaflet
+    html: `
+        <div class="icon-container" style="position: relative; width: 20px; height: 20px; background-color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" viewBox="0 0 16 16">
+                <path d="M2.293 2.293a1 1 0 0 1 1.414 0L8 6.586l4.293-4.293a1 1 0 0 1 1.414 1.414L9.414 8l4.293 4.293a1 1 0 0 1-1.414 1.414L8 9.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L6.586 8 2.293 3.707a1 1 0 0 1 0-1.414z"/>
+            </svg>
+            <span class="tooltip-text" style="visibility: hidden; width: auto; background-color: black; color: white; text-align: center; border-radius: 6px; padding: 5px 0; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -50px;">Close area</span>
+        </div>
+    `,
+    iconSize: [10, 10],
+    iconAnchor: [15, 15] 
+});
 
 const PopupCloseHandler = ({ onClose }) => {
     const map = useMap();
@@ -44,34 +60,6 @@ const MapClickHandler = ({ onMapClick }) => {
     return null;
 };
 
-
-// Icon mapping based on document type
-const iconMap = {
-    Design: 'bi-file-earmark-text',
-    Informative: 'bi-info-circle',
-    Prescriptive: 'bi-arrow-right-square',
-    Technical: 'bi-file-earmark-code',
-    Agreement: 'bi-people-fill',
-    Conflict: 'bi-x-circle',
-    Consultation: 'bi-chat-dots',
-    Action: 'bi-exclamation-triangle',
-    Material: 'bi-file-earmark-binary',
-};
-
-// Function to create a custom divIcon with a specific icon inside
-const createCustomIcon = (type) => {
-    const iconClass = iconMap[type] || 'bi-file-earmark';
-    return L.divIcon({
-        html: `<div style="display: flex; align-items: center; justify-content: center; background: white; width: 25px; height: 25px; border-radius: 50%; border: 2px solid black;">
-                    <i class="bi ${iconClass}" style="color: black; font-size: 12px;"></i>
-               </div>`,
-        className: '' // Clear default class
-    });
-};
-
-
-
-
 function MapNavigation(props) {
     const initialPosition = [67.850, 20.217];
     const [data, setData] = useState([]);
@@ -84,8 +72,23 @@ function MapNavigation(props) {
     const [selectedType, setSelectedType] = useState('All'); // New state for selected type
     const [geoJsonData, setGeoJsonData] = useState(null);
     const [highestPoint, setHighestPoint] = useState(null);
+    //states to handle KX11
+    const [selectedAreas, setSelectedAreas] = useState([]);
+    //Add a new area when a marker is clicked, if it exists
+    const handleMarkerClick = (doc) => {
+        const areaExists = selectedAreas.some(area => area.docId === doc.id);
+        if (!areaExists) {
+            const lowestPoint = doc.area.reduce((lowest, coord) => coord[0] < lowest[0] ? coord : lowest);
+            setSelectedAreas(prevAreas => [...prevAreas, { docId: doc.id, area: doc.area, lowestPoint }]);
+        }
+    };
 
-    
+    //Remove an area when the toggle is clicked
+    const handleCloseClick = (docId) => {
+        setSelectedAreas(selectedAreas.filter(area => area.docId !== docId));
+    };
+
+
     //Handle views in the map
     const [mapView, setMapView] = useState("satellite");
     const mapStyles = {
@@ -134,62 +137,21 @@ function MapNavigation(props) {
     useEffect(() => {
         setLoading(true);
         setSelectedDoc(null); // Clear the selected document whenever the filter changes
-    
-        const fetchData = async () => {
-            try {
-                const filters = selectedType === 'All' ? {} : { type: selectedType };
-                const documents = await API.filterDocuments(filters);
-                const updatedDocuments = documents.map(doc => {
-                    if (!doc.coordinates || doc.coordinates.length === 0) {
-                        return { ...doc, lat: null, long: null };
-                    } else {
-                        if (doc.coordinates.length > 1) {
-                            // Function to find the highest point in a polygon, where the popup and the marker will be shown
-                            const highestPoint = doc.coordinates.reduce((max, [lat, long]) => {
-                                return lat > max.lat ? { lat, long } : max;
-                            }, { lat: doc.coordinates[0][0], long: doc.coordinates[0][1] });
-            
-                            const area = doc.coordinates.map(([lat, long]) => [lat, long]);
-            
-                            return {
-                                ...doc,
-                                lat: highestPoint.lat,
-                                long: highestPoint.long,
-                                area
-                            };
-                        } else {
-                            // Single coordinate
-                            const { lat, long } = doc.coordinates;
-                            return { 
-                                ...doc, lat, long
-                            };
-                        }
-                    }
-                });
-                setData(updatedDocuments);
-            } catch (error) {
-                props.setError(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
+        fetchData(selectedType,setData,props.setError,setLoading);
     }, [selectedType]); // Fetch documents when selectedType changes
     // Filter documents without coordinates
     const noCoordDocuments = data.filter(doc => doc.lat == null && doc.long == null);
     // Filter documents with coordinates
     const coordDocuments = data.filter(doc => doc.lat != null && doc.long != null);
-    
-
-    
     const classNameEntireMunicipality = props.loggedIn ? 'myDropdownDocuments' : 'myDropdownFilter';
-    
-    
+    useEffect(() => {
+        console.log('position changed')
+    }, [positionActual]);
     return (
         <>
             {loading && (<p>Loading...</p>)}
             {!loading && 
-            <MapContainer center={positionActual} zoom={zoomLevel} style={{ height: '65vh', width: '100%' }}>
+            <MapContainer center={positionActual} zoom={zoomLevel} style={{ height: '91vh', width: '100%' }}>
                 
                 {/* Add the tile layer based on the selected view */}
                 <TileLayer url={mapStyles[mapView]}/>
@@ -209,14 +171,28 @@ function MapNavigation(props) {
                 <LoadGeoJson setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} />
                 {geoJsonData && <KirunaMunicipality  geoJsonData={geoJsonData} />}
                 {/*Draw the area associated with a document, if defined*/}
-                {selectedDoc && selectedDoc.area && <Polygon positions={selectedDoc.area} color="red" />}
+                {selectedAreas.map(area => (
+                    <>
+                        <Polygon key={area.docId} positions={area.area} color="red"/>
+                        <Marker key={`close-${area.docId}`} position={area.lowestPoint} icon={closeIcon}
+                            eventHandlers={{
+                                click: () => handleCloseClick(area.docId)
+                            }}
+                        />
+                    </>
+                ))}
 
                 {/* Draw clusters or icons depending on the zoom: also the exact same position is managed in this case */}
                 <MarkerClusterGroup>
                     {coordDocuments.map((doc) => (
-                        <Marker key={doc.id} position={[doc.lat, doc.long]} icon={createCustomIcon(doc.type)}
-                            eventHandlers={{click: () => {setSelectedDoc(doc); setRenderNumeber(renderNumber+1);}
-                        }}/>
+                        <Marker key={`${doc.id}-${doc.title}`} position={[doc.lat, doc.long]} 
+                            icon={doc.id === selectedDoc?.id ? createCustomIcon(doc.type, true) : createCustomIcon(doc.type, false)}
+                            eventHandlers={{click: () => {setSelectedDoc(doc); setRenderNumeber(renderNumber+1); if(doc.area){handleMarkerClick(doc);}}
+                        }}>
+                            <Tooltip direction="top" offset={[0, -20]} opacity={1}>
+                                {doc.title} 
+                            </Tooltip>
+                        </Marker>
                     ))}
                 </MarkerClusterGroup>
                 
@@ -235,7 +211,7 @@ function MapNavigation(props) {
                 )}
 
                 {/* Button to re-center the map */}
-                <RecenterButton positionActual={positionActual} setPositionActual={setPositionActual} setZoomLevel={setZoomLevel} zoomLevel={zoomLevel} initialPosition={initialPosition}/>
+                <RecenterButton positionActual={positionActual} setPositionActual={setPositionActual} setZoomLevel={setZoomLevel} zoomLevel={zoomLevel} initialPosition={initialPosition} draw={false}/>
             </MapContainer>}
         </>
     );
