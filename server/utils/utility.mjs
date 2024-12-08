@@ -43,8 +43,8 @@ const isLoggedIn = (req, res, next) => {
  * @returns
  */
 const isValidYearMonthOrYear = (value) => {
-  const regex = "^d{4}(-(0[1-9]|1[0-2]))?$";
-  return value.test(regex);
+  const regex = new RegExp("^d{4}(-(0[1-9]|1[0-2]))?$");
+  return regex.test(value);
 };
 
 /**
@@ -115,8 +115,8 @@ const isValidCoordinatesArray = (value) => {
  * @param {String} value
  */
 const isValidPages = (value) => {
-  const regex = "^[0-9]+(-[0-9]+)*$";
-  return value.test(regex);
+  const regex = new RegExp("^[0-9]+(-[0-9]+)*$");
+  return regex.test(value);
 };
 
 /**

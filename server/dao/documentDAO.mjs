@@ -186,16 +186,14 @@ class DocumentDAO {
    * @param {String} description
    * @param {Array<String> | null} coordinates
    * @param {Number | null} pages
-   * @param {Number | null} pageFrom
-   * @param {Number | null} pageTo
    * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the last document inserted and the number of lines changed
    */
-  addDocument = (title, scale, issuanceDate, type, language, description, coordinates = null, pages = null, pageFrom = null, pageTo = null) => {
+  addDocument = (title, scale, issuanceDate, type, language, description, coordinates = null, pages = null) => {
     return new Promise((resolve, reject) => {
       const query1 =
-        "INSERT INTO DOCUMENT (title, scale, issuanceDate, type, connections, language, description, coordinates, pages, pageFrom, pageTo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO DOCUMENT (title, scale, issuanceDate, type, connections, language, description, coordinates, pages) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-      db.run(query1, [title, scale, issuanceDate, type, 0, language, description, coordinates, pages, pageFrom, pageTo], function (err) {
+      db.run(query1, [title, scale, issuanceDate, type, 0, language, description, coordinates, pages], function (err) {
         if (err) {
           reject(err);
         } else {
@@ -215,16 +213,14 @@ class DocumentDAO {
    * @param {String} description
    * @param {Array<String> | null} coordinates
    * @param {Number | null} pages
-   * @param {Number | null} pageFrom
-   * @param {Number | null} pageTo
    * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the document updated and the number of lines changed
    */
-  updateDocument = (id, title, scale, issuanceDate, type, language, description, coordinates = null, pages = null, pageFrom = null, pageTo = null) => {
+  updateDocument = (id, title, scale, issuanceDate, type, language, description, coordinates = null, pages = null) => {
     return new Promise((resolve, reject) => {
       const query =
-        "UPDATE DOCUMENT SET title = ?, scale = ?, issuanceDate = ?, type = ?, language = ?, description = ?, coordinates = ?, pages = ?, pageFrom = ?, pageTo = ? WHERE id = ?";
+        "UPDATE DOCUMENT SET title = ?, scale = ?, issuanceDate = ?, type = ?, language = ?, description = ?, coordinates = ?, pages = ? WHERE id = ?";
 
-      db.run(query, [title, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo, id], function (err) {
+      db.run(query, [title, scale, issuanceDate, type, language, description, coordinates, pages, id], function (err) {
         if (err) {
           reject(err);
         } else {
