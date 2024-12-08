@@ -204,6 +204,16 @@
     padding: 0;
 }
 
+.custom-close-icon .icon-container:hover .tooltip-text {
+    visibility: visible;
+}
+
+.custom-close-icon .icon-container:hover svg {
+    fill: red; /* Cambia colore al passaggio del mouse */
+}
+
+
+
 .myRecenterButtonCustomArea{
     position: absolute;
     top: 180px;

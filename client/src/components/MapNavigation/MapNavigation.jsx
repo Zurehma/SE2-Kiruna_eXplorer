@@ -18,7 +18,20 @@ import API from '../../../API';
 import LoadGeoJson from '../MapUtils/LoadGeoJson';
 import {createCustomIcon,iconMap} from '../MapUtils/CustomIcon';
 import fetchData from '../MapUtils/DataFetching';
-import { use } from 'react';
+
+const closeIcon = L.divIcon({
+    className: 'custom-close-icon', // Classe personalizzata per evitare gli stili di default di Leaflet
+    html: `
+        <div class="icon-container" style="position: relative; width: 20px; height: 20px; background-color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" viewBox="0 0 16 16">
+                <path d="M2.293 2.293a1 1 0 0 1 1.414 0L8 6.586l4.293-4.293a1 1 0 0 1 1.414 1.414L9.414 8l4.293 4.293a1 1 0 0 1-1.414 1.414L8 9.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L6.586 8 2.293 3.707a1 1 0 0 1 0-1.414z"/>
+            </svg>
+            <span class="tooltip-text" style="visibility: hidden; width: auto; background-color: black; color: white; text-align: center; border-radius: 6px; padding: 5px 0; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -50px;">Close area</span>
+        </div>
+    `,
+    iconSize: [10, 10],
+    iconAnchor: [15, 15] 
+});
 
 const PopupCloseHandler = ({ onClose }) => {
     const map = useMap();
@@ -59,6 +72,23 @@ function MapNavigation(props) {
     const [selectedType, setSelectedType] = useState('All'); // New state for selected type
     const [geoJsonData, setGeoJsonData] = useState(null);
     const [highestPoint, setHighestPoint] = useState(null);
+    //states to handle KX11
+    const [selectedAreas, setSelectedAreas] = useState([]);
+    //Add a new area when a marker is clicked, if it exists
+    const handleMarkerClick = (doc) => {
+        const areaExists = selectedAreas.some(area => area.docId === doc.id);
+        if (!areaExists) {
+            const lowestPoint = doc.area.reduce((lowest, coord) => coord[0] < lowest[0] ? coord : lowest);
+            setSelectedAreas(prevAreas => [...prevAreas, { docId: doc.id, area: doc.area, lowestPoint }]);
+        }
+    };
+
+    //Remove an area when the toggle is clicked
+    const handleCloseClick = (docId) => {
+        setSelectedAreas(selectedAreas.filter(area => area.docId !== docId));
+    };
+
+
     //Handle views in the map
     const [mapView, setMapView] = useState("satellite");
     const mapStyles = {
@@ -141,14 +171,23 @@ function MapNavigation(props) {
                 <LoadGeoJson setGeoJsonData={setGeoJsonData} geoJsonData={geoJsonData} />
                 {geoJsonData && <KirunaMunicipality  geoJsonData={geoJsonData} />}
                 {/*Draw the area associated with a document, if defined*/}
-                {selectedDoc && selectedDoc.area && <Polygon positions={selectedDoc.area} color="red" />}
+                {selectedAreas.map(area => (
+                    <>
+                        <Polygon key={area.docId} positions={area.area} color="red"/>
+                        <Marker key={`close-${area.docId}`} position={area.lowestPoint} icon={closeIcon}
+                            eventHandlers={{
+                                click: () => handleCloseClick(area.docId)
+                            }}
+                        />
+                    </>
+                ))}
 
                 {/* Draw clusters or icons depending on the zoom: also the exact same position is managed in this case */}
                 <MarkerClusterGroup>
                     {coordDocuments.map((doc) => (
                         <Marker key={`${doc.id}-${doc.title}`} position={[doc.lat, doc.long]} 
                             icon={doc.id === selectedDoc?.id ? createCustomIcon(doc.type, true) : createCustomIcon(doc.type, false)}
-                            eventHandlers={{click: () => {setSelectedDoc(doc); setRenderNumeber(renderNumber+1);}
+                            eventHandlers={{click: () => {setSelectedDoc(doc); setRenderNumeber(renderNumber+1); if(doc.area){handleMarkerClick(doc);}}
                         }}>
                             <Tooltip direction="top" offset={[0, -20]} opacity={1}>
                                 {doc.title} 
