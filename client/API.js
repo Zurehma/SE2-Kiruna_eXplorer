@@ -353,7 +353,6 @@ const API = {
   getLinksDoc,
   getAttachments,
   downloadAttachment,
-  filterDocuments,
   deleteAttachment,
   getDocumentById,
   updateDocument,

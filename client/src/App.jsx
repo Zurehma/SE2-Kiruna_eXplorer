@@ -110,7 +110,7 @@ function App() {
           <Alert
             variant="danger"
             className="fixed-top mt-3"
-            style={{ zIndex: 1500 }}
+            style={{ zIndex: 150000000000 }}
             dismissible
             onClose={() => setError(null)}
           >

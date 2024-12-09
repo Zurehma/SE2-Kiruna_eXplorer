@@ -24,7 +24,7 @@ const Home = () => {
             <button onClick={() => navigate("/map")} className="styled-button">
               Relocation of Kiruna
               <span className="button-icon">
-                <i class="bi bi-geo-alt"></i>{" "}
+                <i className="bi bi-geo-alt"></i>{" "}
               </span>
             </button>
           </Col>
@@ -32,7 +32,7 @@ const Home = () => {
             <button onClick={scrollToContent} className="styled-button">
               About us
               <span className="button-icon">
-                <i class="bi bi-arrow-down"></i>
+                <i className="bi bi-arrow-down"></i>
               </span>
             </button>
           </Col>
