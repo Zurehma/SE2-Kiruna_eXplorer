@@ -21,7 +21,7 @@ function Documents(props) {
   const { id } = useParams();
   const [step, setStep] = useState(1);
   const [types, setTypes] = useState([]);
-  const [stakeholdersList, setStakeholders] = useState([]);
+  const [stakeholdersList, setStakeholdersList] = useState([]);
   const [selectedStakeholders, setSelectedStakeholders] = useState([]);
   const [position, setPosition] = useState({ type: null, coordinates: null, name: null });
 
@@ -50,7 +50,6 @@ function Documents(props) {
     coordinates: "",
     description: "",
     pages: "",
-    nValue: "",
     newType: "",
   });
 
@@ -63,7 +62,6 @@ function Documents(props) {
       newType: "",
       issuanceDate: "",
       type: "",
-      newType: "",
       description: "",
       language: "",
       pages: "",
@@ -80,7 +78,7 @@ function Documents(props) {
           label: stakeholders.name,
           isNew: false, // Indica che è predefinito
         }));
-        setStakeholders(formattedStakeholders);
+        setStakeholdersList(formattedStakeholders);
         const response2 = await API.getTypeDocuments();
         setTypes(response2);
       } catch (error) {
@@ -124,7 +122,7 @@ function Documents(props) {
         nValue,
       }));
 
-      if (coordinates && coordinates.lat && coordinates.long) {
+      if (coordinates?.lat && coordinates?.long) {
         setPosition({ coordinates: coordinates, type: "Point" });
       } else if (coordinates && coordinates.length > 3) {
         setPosition({ coordinates: coordinates, type: "Area" });
@@ -355,12 +353,7 @@ function Documents(props) {
     // Rimuove solo quelli creati manualmente
     const removedNewOptions = removedOptions.filter((opt) => opt.isNew);
     if (removedNewOptions.length > 0) {
-      setStakeholders((prev) =>
-        prev.filter(
-          (stakeholders) =>
-            !removedNewOptions.some((removed) => removed.value === stakeholders.value)
-        )
-      );
+      setStakeholdersList((prev) => prev.filter((stakeholders) => !removedNewOptions.some((removed) => removed.value === stakeholders.value)));
     }
     // Aggiorna le opzioni selezionate
     setSelectedStakeholders(selectedOptions || []);
@@ -377,7 +370,7 @@ function Documents(props) {
   // Aggiunge un nuovo stakeholder
   const handleCreate = (inputValue) => {
     const newStakeholder = { value: inputValue, label: inputValue, isNew: true };
-    setStakeholders((prev) => [...prev, newStakeholder]);
+    setStakeholdersList((prev) => [...prev, newStakeholder]);
     setSelectedStakeholders((prev) => [...prev, newStakeholder]);
 
     // Salva nel documento
