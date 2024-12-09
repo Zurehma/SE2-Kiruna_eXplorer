@@ -2,8 +2,20 @@ import React from "react";
 import "../styles/Home.css";
 import { useNavigate } from "react-router-dom";
 import { Col, Row } from "react-bootstrap";
+import { useLocation } from "react-router";
+import { useState, useEffect } from "react";
+import Login from "./Login";
 
-const Home = () => {
+const Home = ({
+  username,
+  password,
+  setUsername,
+  setPassword,
+  handleLogin,
+  toggleLoginPane,
+  isLoginOpen,
+  closeLoginPane,
+}) => {
   const navigate = useNavigate();
   const scrollToContent = () => {
     const section = document.getElementById("content-section");
@@ -24,7 +36,7 @@ const Home = () => {
             <button onClick={() => navigate("/map")} className="styled-button">
               Relocation of Kiruna
               <span className="button-icon">
-                <i class="bi bi-geo-alt"></i>{" "}
+                <i className="bi bi-geo-alt"></i>{" "}
               </span>
             </button>
           </Col>
@@ -32,12 +44,24 @@ const Home = () => {
             <button onClick={scrollToContent} className="styled-button">
               About us
               <span className="button-icon">
-                <i class="bi bi-arrow-down"></i>
+                <i className="bi bi-arrow-down"></i>
               </span>
             </button>
           </Col>
         </Row>
       </div>
+
+      {/* Login */}
+      <Login
+        username={username}
+        password={password}
+        setUsername={setUsername}
+        setPassword={setPassword}
+        handleLogin={handleLogin}
+        toggleLoginPane={toggleLoginPane}
+        isLoginOpen={isLoginOpen}
+        closeLoginPane={closeLoginPane}
+      />
 
       {/* Altre informazioni */}
       {/* Aggiungi una nuova sezione centrale con immagini e testo diviso in tre parti */}

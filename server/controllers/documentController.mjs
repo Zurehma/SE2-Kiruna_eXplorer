@@ -28,12 +28,12 @@ class DocumentController {
     });
   };
 
-  getDocuments = (type, stakeholder, issuanceDateFrom, issuanceDateTo, limit, offset) => {
+  getDocuments = (pageNo, title, description, type, stakeholder, issuanceDateFrom, issuanceDateTo) => {
     return new Promise((resolve, reject) => {
       const fetchDocuments = async () => {
         try {
-          let queryParameter = { type, stakeholder, issuanceDateFrom, issuanceDateTo };
-          const documents = await this.documentDAO.getDocuments(queryParameter, limit, offset);
+          let queryParameters = { title, description, type, stakeholder, issuanceDateFrom, issuanceDateTo };
+          const documents = await this.documentDAO.getDocuments(pageNo ? Number(pageNo) : 1, queryParameters);
           resolve(documents);
         } catch (err) {
           reject(err);
@@ -52,13 +52,11 @@ class DocumentController {
    * @param {String} type
    * @param {String} language
    * @param {String} description
-   * @param {Array<String> | null} coordinates
-   * @param {Number | null} pages
-   * @param {Number | null} pages
+   * @param {Object | Array<String> | null} coordinates
    * @param {Number | null} pages
    * @returns {Promise<Document>} A promise that resolves to the newly created object
    */
-  addDocument = ({title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo}) => {
+  addDocument = ({ title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages }) => {
     return new Promise((resolve, reject) => {
       const addDocument = async () => {
         try {
@@ -67,14 +65,15 @@ class DocumentController {
             throw error;
           }
 
+          let validateCoordinates = true;
+
           if (coordinates && Array.isArray(coordinates)) {
-            coordinates.forEach((c) => {
-              if (!Utility.isValidKirunaCoordinates(c[0], c[1])) {
-                const error = { errCode: 400, errMessage: "Coordinates error." };
-                throw error;
-              }
-            });
-          } else if (coordinates && !Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long)) {
+            validateCoordinates = !coordinates.map((c) => Utility.isValidKirunaCoordinates(c[0], c[1])).includes(false);
+          } else if (coordinates) {
+            validateCoordinates = Utility.isValidKirunaCoordinates(coordinates.lat, coordinates.long);
+          }
+
+          if (!validateCoordinates) {
             const error = { errCode: 400, errMessage: "Coordinates error." };
             throw error;
           }
@@ -87,9 +86,7 @@ class DocumentController {
             language,
             description,
             coordinates ? JSON.stringify(coordinates) : null,
-            pages,
-            pageFrom,
-            pageTo
+            pages
           );
 
           for (let stakeholder of stakeholders) {
@@ -117,13 +114,11 @@ class DocumentController {
    * @param {String} type
    * @param {String} language
    * @param {String} description
-   * @param {Array<String> | null} coordinates
+   * @param {Object | Array<String> | null} coordinates
    * @param {Number | null} pages
-   * @param {Number | null} pageFrom
-   * @param {Number | null} pageTo
    * @returns {Promise<null>} A promise that resolves to null
    */
-  updateDocument = ({id, title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo}) => {
+  updateDocument = ({ id, title, stakeholders, scale, issuanceDate, type, language, description, coordinates, pages }) => {
     return new Promise((resolve, reject) => {
       const updateDocument = async () => {
         try {
@@ -160,9 +155,7 @@ class DocumentController {
             language,
             description,
             coordinates ? JSON.stringify(coordinates) : null,
-            pages,
-            pageFrom,
-            pageTo
+            pages
           );
 
           await this.documentDAO.deleteStakeholders(id);
@@ -177,7 +170,6 @@ class DocumentController {
         }
       };
       updateDocument();
-
     });
   };
 
@@ -261,7 +253,6 @@ class DocumentController {
       addLink();
     });
   };
-
 
   getAllLinks = () => {
     return new Promise((resolve, reject) => {

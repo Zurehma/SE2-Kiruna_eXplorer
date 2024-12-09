@@ -19,7 +19,6 @@ export function NavigationBar(props) {
   useEffect(() => {
     // Aggiungi l'ascoltatore dello scroll
     window.addEventListener("scroll", handleScroll);
-
     // Rimuovi l'ascoltatore quando il componente viene smontato
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -34,7 +33,7 @@ export function NavigationBar(props) {
   return (
     <Navbar expand="lg" className={`custom-navbar ${scrolled ? "scrolled" : ""}`}>
       <Navbar.Brand as={Link} to="/" className="navbar-brand">
-        Kiruna
+        Kiruna eXplorer
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
@@ -81,7 +80,7 @@ export function NavigationBar(props) {
                 to="/documents/all"
                 className={`nav-link ${location.pathname === "/documents/all" ? "active" : ""}`}
               >
-                View All
+                All Documents
               </Nav.Link>
               <Nav.Link onClick={handleLogout} className="nav-link">
                 Logout
@@ -111,9 +110,8 @@ export function NavigationBar(props) {
                 Graph
               </Nav.Link>
               <Nav.Link
-                as={Link}
-                to="/login"
-                className={`nav-link ${location.pathname === "/login" ? "active" : ""}`}
+                onClick={props.toggleLoginPane}
+                className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
               >
                 Login
               </Nav.Link>

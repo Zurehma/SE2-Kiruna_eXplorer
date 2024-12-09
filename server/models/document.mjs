@@ -15,24 +15,8 @@ class Document {
    * @param {String} description
    * @param {String | null} coordinates
    * @param {Number | null} pages
-   * @param {Number | null} pageFrom
-   * @param {Number | null} pageTo
    */
-  constructor(
-    id,
-    title,
-    stakeholders,
-    scale,
-    issuanceDate,
-    type,
-    connections,
-    language,
-    description,
-    coordinates = null,
-    pages = null,
-    pageFrom = null,
-    pageTo = null
-  ) {
+  constructor(id, title, stakeholders, scale, issuanceDate, type, connections, language, description, coordinates = null, pages = null) {
     this.id = id;
     this.title = title;
     this.stakeholders = stakeholders;
@@ -46,10 +30,6 @@ class Document {
     if (coordinates) this.coordinates = JSON.parse(coordinates);
 
     if (pages) this.pages = pages;
-
-    if (pageFrom) this.pageFrom = pageFrom;
-
-    if (pageTo) this.pageTo = pageTo;
   }
 
   /**
@@ -58,7 +38,6 @@ class Document {
   getSummary() {
     return `${this.title} (${this.issuanceDate})`;
   }
-
 }
 
 export default Document;

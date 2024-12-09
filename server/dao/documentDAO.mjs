@@ -15,11 +15,19 @@ const mapRowsToDocument = (documentRows, stakeholderRows) => {
         row.language,
         row.description,
         row.coordinates || null,
-        row.pages || null,
-        row.pageFrom || null,
-        row.pageTo || null
+        row.pages || null
       )
   );
+};
+
+const getPagination = (pageNo, totalElements) => {
+  const PAGE_SIZE = 2;
+  const totalPages = Math.ceil(totalElements / PAGE_SIZE);
+  const limit = PAGE_SIZE;
+  const offset = pageNo >= totalPages ? PAGE_SIZE * (totalPages - 1) : PAGE_SIZE * (pageNo - 1);
+  const next = pageNo >= totalPages ? false : true;
+
+  return { limit: limit, offset: offset, pageNo: pageNo > totalPages ? totalPages : pageNo, totalPages: totalPages, next: next };
 };
 
 class DocumentDAO {
@@ -53,76 +61,117 @@ class DocumentDAO {
     });
   };
 
-  getDocuments = async (queryParameter, limit, offset) => {
-    try {
-        const { type, stakeholder, issuanceDateFrom, issuanceDateTo } = queryParameter || {};
-        let sql = "SELECT * FROM DOCUMENT";
-        const sqlConditions = [];
-        const sqlParams = [];
-        const sqlLimit = [];
+  /**
+   * Get a page of documents
+   * @param {Number} pageNo
+   * @param {Object} queryParameters
+   * @returns {Promise<Object>} A promise that resolves to the page object
+   */
+  getDocuments = (pageNo, queryParameters) => {
+    return new Promise((resolve, reject) => {
+      (async () => {
+        try {
+          const { title, description, type, stakeholder, issuanceDateFrom, issuanceDateTo } = queryParameters || {};
+          let query1 = "SELECT DISTINCT DOCUMENT.* FROM DOCUMENT";
+          let query2 = "SELECT COUNT(DISTINCT DOCUMENT.id) AS total FROM DOCUMENT";
+          let params = [];
+          let conditions = [];
 
-        if (type) {
-            sqlConditions.push("DOCUMENT.type = ?");
-            sqlParams.push(type);
-        }
-        if (stakeholder) {
-            sqlConditions.push("DOCUMENT_STAKEHOLDER.stakeholder = ?");
-            sqlParams.push(stakeholder);
-        }
-        if (issuanceDateFrom) {
-            sqlConditions.push("DOCUMENT.issuanceDate >= ?");
-            sqlParams.push(issuanceDateFrom);
-        }
-        if (issuanceDateTo) {
-            sqlConditions.push("DOCUMENT.issuanceDate <= ?");
-            sqlParams.push(issuanceDateTo);
-        }
-        if (limit) {
-            sqlLimit.push(" LIMIT ?");
-            sqlParams.push(limit);
-        }
-        if (offset) {
-            sqlLimit.push(" OFFSET ?");
-            sqlParams.push(offset);
-        }
+          if (title) {
+            params.push(`%${title}%`);
+            conditions.push("DOCUMENT.title LIKE ?");
+          }
 
-        if (sqlConditions.length > 0) {
-            sql += " JOIN DOCUMENT_STAKEHOLDER ON DOCUMENT.id = DOCUMENT_STAKEHOLDER.docID";
-            sql += " WHERE " + sqlConditions.join(" AND ");
-        }
-        if (sqlLimit.length > 0) {
-            sql += sqlLimit.join("");
-        }
+          if (description) {
+            params.push(`%${description}%`);
+            conditions.push("DOCUMENT.description LIKE ?");
+          }
 
-        const rows = await new Promise((resolve, reject) => {
-            db.all(sql, sqlParams, (err, rows) => {
-                if (err) return reject(err);
-                resolve(rows);
+          if (type) {
+            params.push(type);
+            conditions.push("DOCUMENT.type = ?");
+          }
+
+          if (stakeholder) {
+            params.push(stakeholder);
+            conditions.push("DOCUMENT_STAKEHOLDER.stakeholder = ?");
+          }
+
+          if (issuanceDateFrom) {
+            params.push(issuanceDateFrom);
+            conditions.push("DOCUMENT.issuanceDate >= ?");
+          }
+
+          if (issuanceDateTo) {
+            params.push(issuanceDateTo);
+            conditions.push("DOCUMENT.issuanceDate <= ?");
+          }
+
+          if (conditions.length > 0) {
+            query1 += " JOIN DOCUMENT_STAKEHOLDER ON DOCUMENT.id = DOCUMENT_STAKEHOLDER.docID";
+            query1 += " WHERE " + conditions.join(" AND ");
+            query2 += " JOIN DOCUMENT_STAKEHOLDER ON DOCUMENT.id = DOCUMENT_STAKEHOLDER.docID";
+            query2 += " WHERE " + conditions.join(" AND ");
+          }
+
+          const totalElements = await new Promise((resolve, reject) => {
+            db.get(query2, params, (err, row) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(row.total);
+              }
             });
-        });
+          });
 
-        return await this.getStakeholdersOfDocument(rows);
+          const pagination = getPagination(pageNo, totalElements);
 
-    } catch (err) {
-        throw err;
-    }};
+          query1 += " LIMIT ? OFFSET ?";
+          params.push(pagination.limit);
+          params.push(pagination.offset);
 
-  getStakeholdersOfDocument = async (rows) => {
-    try {
-        const idArray = rows.map((row) => row.id); 
-        const query2 = `SELECT * FROM DOCUMENT_STAKEHOLDER WHERE docID IN (${idArray.map(() => '?').join(',')})`;
+          const elements = await new Promise((resolve, reject) => {
+            db.all(query1, params, (err, documentRows) => {
+              if (err) {
+                reject(err);
+              } else if (documentRows.length === 0) {
+                resolve([]);
+              } else {
+                const documentIds = documentRows.map((d) => d.id);
+                const query3 = `SELECT * FROM DOCUMENT_STAKEHOLDER WHERE docID IN (${documentIds.map((_) => "?").join(", ")})`;
 
-        const stakeholderRows = await new Promise((resolve, reject) => {
-            db.all(query2, idArray, (err, rows) => {
-                if (err) return reject(err);
-                resolve(rows);
+                db.all(query3, documentIds, (err, stakeholderRows) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve(mapRowsToDocument(documentRows, stakeholderRows));
+                  }
+                });
+              }
             });
-        });
-        return mapRowsToDocument(rows, stakeholderRows);
-    } catch (err) {
-        throw err;
-    }
-};
+          });
+
+          const result = {
+            pageNo: pagination.pageNo,
+            totalPages: pagination.totalPages,
+            elements: elements,
+          };
+
+          if (pagination.next) {
+            result.next =
+              `/api/documents?pageNo=${pageNo + 1}` +
+              Object.keys(queryParameters)
+                .map((key) => (key && queryParameters[key] ? `&${key}=${queryParameters[key]}` : ""))
+                .join("");
+          }
+
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        }
+      })();
+    });
+  };
 
   /**
    * Get already present document types
@@ -188,16 +237,14 @@ class DocumentDAO {
    * @param {String} description
    * @param {Array<String> | null} coordinates
    * @param {Number | null} pages
-   * @param {Number | null} pageFrom
-   * @param {Number | null} pageTo
    * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the last document inserted and the number of lines changed
    */
-  addDocument = (title, scale, issuanceDate, type, language, description, coordinates = null, pages = null, pageFrom = null, pageTo = null) => {
+  addDocument = (title, scale, issuanceDate, type, language, description, coordinates = null, pages = null) => {
     return new Promise((resolve, reject) => {
       const query1 =
-        "INSERT INTO DOCUMENT (title, scale, issuanceDate, type, connections, language, description, coordinates, pages, pageFrom, pageTo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        "INSERT INTO DOCUMENT (title, scale, issuanceDate, type, connections, language, description, coordinates, pages) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-      db.run(query1, [title, scale, issuanceDate, type, 0, language, description, coordinates, pages, pageFrom, pageTo], function (err) {
+      db.run(query1, [title, scale, issuanceDate, type, 0, language, description, coordinates, pages], function (err) {
         if (err) {
           reject(err);
         } else {
@@ -217,16 +264,14 @@ class DocumentDAO {
    * @param {String} description
    * @param {Array<String> | null} coordinates
    * @param {Number | null} pages
-   * @param {Number | null} pageFrom
-   * @param {Number | null} pageTo
    * @returns {Promise<{ changes: Number, lastID: Number }>} A promise that resolves to the id of the document updated and the number of lines changed
    */
-  updateDocument = (id, title, scale, issuanceDate, type, language, description, coordinates = null, pages = null, pageFrom = null, pageTo = null) => {
+  updateDocument = (id, title, scale, issuanceDate, type, language, description, coordinates = null, pages = null) => {
     return new Promise((resolve, reject) => {
       const query =
-        "UPDATE DOCUMENT SET title = ?, scale = ?, issuanceDate = ?, type = ?, language = ?, description = ?, coordinates = ?, pages = ?, pageFrom = ?, pageTo = ? WHERE id = ?";
+        "UPDATE DOCUMENT SET title = ?, scale = ?, issuanceDate = ?, type = ?, language = ?, description = ?, coordinates = ?, pages = ? WHERE id = ?";
 
-      db.run(query, [title, scale, issuanceDate, type, language, description, coordinates, pages, pageFrom, pageTo, id], function (err) {
+      db.run(query, [title, scale, issuanceDate, type, language, description, coordinates, pages, id], function (err) {
         if (err) {
           reject(err);
         } else {
@@ -344,7 +389,7 @@ class DocumentDAO {
       FROM LINK
       ORDER BY DocID1 ASC, DocID2 ASC;
     `;
-  
+
       db.all(query, [], (err, rows) => {
         if (err) {
           reject(err);
@@ -353,8 +398,7 @@ class DocumentDAO {
         }
       });
     });
-  }
-  
+  };
 
   /**
    * Insert a new link between two documents
@@ -385,8 +429,6 @@ class DocumentDAO {
       });
     });
   };
-
-
 }
 
 export default DocumentDAO;
