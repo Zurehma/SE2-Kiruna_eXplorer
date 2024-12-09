@@ -1,155 +1,71 @@
-.login-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+/* Form */
+.login-pane {
+  background-color: transparent !important;
+  border: none;
+  box-shadow: none;
+}
+
+.login-form {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 0;
-  overflow-y: hidden;
-}
-
-/* Apply the blurred background using a pseudo-element */
-.login-background::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
+  flex-direction: column;
+  gap: 30px;
   width: 100%;
-  height: 100%;
-  background-image: url('/kirunalogin.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(4px); /* Apply blur effect only to this layer */
-  z-index: -1; /* Ensure the blur layer is behind the login container */
-}
-
-/* Dark overlay for better contrast */
-.login-background::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Semi-transparent dark overlay */
-  z-index: 0;
-}
-
-/* Enhanced form container styling */
-/* .login-container {
-  position: relative;
-  background: linear-gradient(to bottom right, #ffffff, #f0f0f0);
+  max-width: 400px;
   padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-  max-width: 800px;
-  width: 100%;
-  text-align: center;
-  z-index: 1;
-} */
-
-/* Typography enhancements */
-/* Enhanced form container styling */
-.login-container {
-  position: relative;
-  background: linear-gradient(to bottom right, #ffffff, #f0f0f0);
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-  max-width: 800px;
-  width: 100%;
-  text-align: center;
-  z-index: 2;
-  width: 10cm;
-  height: auto;
+  background-color: #ffffff;
+  margin-top: 45%;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.form-label {
-  font-family: 'Roboto', sans-serif;
-  font-weight: 500;
-  font-size: 1.1rem;
-  color: #555;
+/* Titolo del form */
+.login-title {
+  text-align: center;
+  font-size: 2rem;
+  color: #006d77;
+  margin-bottom: 20px;
 }
 
-/* Input field styling */
+/* Stile per i campi del form */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .form-control {
-  border-radius: 30px;
-  height: 50px;
-  font-size: 1rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ddd;
-  margin-bottom: 15px;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
 }
 
 .form-control:focus {
-  box-shadow: 0 0 0 2px rgba(32, 166, 255, 0.3);
-  border-color: #153c57;
+  border-color: #006d77;
+  outline: none;
 }
 
-/* Button enhancements */
-.btn-black {
-  background: linear-gradient(to right, #2c3e50, #34495e);
+/* Pulsante di login */
+.login-button {
+  padding: 12px 20px;
+  background-color: #006d77;
+  color: white;
+  font-size: 16px;
   border: none;
-  width: 100%;
-  font-size: 1.2rem;
-  font-weight: 600;
-  padding: 12px;
-  border-radius: 30px;
-  color: #fff;
-  transition: all 0.3s ease;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.btn-black:hover {
-  background: linear-gradient(to right, #34495e, #2c3e50);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+/* Hover per il pulsante */
+.login-button:hover {
+  background-color: #004f55;
+  transform: translateY(-2px);
 }
 
-/* Alert styling */
-.alert-danger {
-  font-size: 0.9rem;
-}
-
-/* Mobile responsiveness */
-@media (max-width: 576px) {
-  .login-background {
-    overflow-y: auto;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-
-  .login-container {
-    padding: 20px;
-    margin: auto;
-    width: 90%;
-    border-radius: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  }
-
-  .login-container h1 {
-    font-size: 1.8rem;
-  }
-
-  .btn-black {
-    font-size: 1rem;
-  }
-
-  .form-label,
-  .form-control {
-    font-size: 1rem;
-  }
-}
-
-/* Global styling for better font rendering */
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  font-family: 'Roboto', sans-serif;
+/* Focus per il pulsante */
+.login-button:focus {
+  outline: none;
 }
