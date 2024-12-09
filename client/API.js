@@ -1,5 +1,4 @@
-
-const SERVER_URL = "http://localhost:3001" + "/api";
+const SERVER_URL = "http://localhost:3001";
 
 /**
  * Utility function to check if an answer from the server is invalid.
@@ -16,14 +15,42 @@ function handleInvalidResponse(response) {
 }
 
 // Function to get all documents
-const getDocuments = async () => {
-  return await fetch(`${SERVER_URL}/documents`)
+const getDocuments = async (filters = undefined, all = false) => {
+  const documents = [];
+  let nextURI = `${SERVER_URL}/api/documents`;
+
+  if (filters) {
+    const queryParams = new URLSearchParams();
+
+    if (filters.type) queryParams.append("type", filters.type);
+    if (filters.stakeholder) queryParams.append("stakeholder", filters.stakeholder);
+    if (filters.issuanceDateFrom) queryParams.append("issuanceDateFrom", filters.issuanceDateFrom);
+    if (filters.issuanceDateTo) queryParams.append("issuanceDateTo", filters.issuanceDateTo);
+    if (filters.pageNo) queryParams.append("pageNo", filters.pageNo);
+
+    const queryString = queryParams.toString();
+    nextURI += `?${queryString}`;
+  }
+
+  if (all) {
+    do {
+      const data = await fetch(nextURI)
+        .then(handleInvalidResponse)
+        .then((response) => response.json());
+      documents.push(...data.elements);
+      nextURI = data.next ? `${SERVER_URL}${data.next}` : undefined;
+    } while (nextURI);
+
+    return documents;
+  }
+
+  return await fetch(nextURI)
     .then(handleInvalidResponse)
     .then((response) => response.json());
 };
 
 const getDocumentById = async (id) => {
-  return await fetch(`${SERVER_URL}/documents/${id}`)
+  return await fetch(`${SERVER_URL}/api/documents/${id}`)
     .then(handleInvalidResponse)
     .then((response) => response.json())
     .catch((error) => {
@@ -35,7 +62,7 @@ const getDocumentById = async (id) => {
 //Upload files
 const uploadFiles = async (docID, formData) => {
   try {
-    const response = await fetch(`${SERVER_URL}/documents/${docID}/attachments`, {
+    const response = await fetch(`${SERVER_URL}/api/documents/${docID}/attachments`, {
       method: "POST",
       credentials: "include",
       headers: {},
@@ -62,7 +89,7 @@ const uploadFiles = async (docID, formData) => {
 };
 
 const getTypeDocuments = async () => {
-  return await fetch(`${SERVER_URL}/documents/document-types`, {
+  return await fetch(`${SERVER_URL}/api/documents/document-types`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -73,7 +100,7 @@ const getTypeDocuments = async () => {
 
 // Function to get types of scales
 const getTypeScale = async () => {
-  return await fetch(`${SERVER_URL}/documents/scale-types`, {
+  return await fetch(`${SERVER_URL}/api/documents/scale-types`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -84,7 +111,7 @@ const getTypeScale = async () => {
 
 // Function to get types of links
 const getTypeLinks = async () => {
-  return await fetch(`${SERVER_URL}/documents/link-types`, {
+  return await fetch(`${SERVER_URL}/api/documents/link-types`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -95,7 +122,7 @@ const getTypeLinks = async () => {
 
 // Function to get linked documents
 const getLinksDoc = async (documentId) => {
-  return await fetch(`${SERVER_URL}/documents/links/${documentId}`, {
+  return await fetch(`${SERVER_URL}/api/documents/links/${documentId}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   })
@@ -107,7 +134,7 @@ const getLinksDoc = async (documentId) => {
  * Function to get the attachments of a document given its ID.
  */
 const getAttachments = async (docID) => {
-  return await fetch(`${SERVER_URL}/documents/${docID}/attachments`, {
+  return await fetch(`${SERVER_URL}/api/documents/${docID}/attachments`, {
     method: "GET",
   })
     .then(handleInvalidResponse)
@@ -120,12 +147,9 @@ const getAttachments = async (docID) => {
 const downloadAttachment = async (docID, attachmentID) => {
   try {
     // EFetch request to the server
-    const response = await fetch(
-      `${SERVER_URL}/documents/${docID}/attachments/${attachmentID}/download`,
-      {
-        method: "GET",
-      }
-    );
+    const response = await fetch(`${SERVER_URL}/api/documents/${docID}/attachments/${attachmentID}/download`, {
+      method: "GET",
+    });
 
     // 200 if the response is correct
     if (!response.ok) {
@@ -148,7 +172,7 @@ const downloadAttachment = async (docID, attachmentID) => {
 
 const setLink = async (linkData) => {
   try {
-    const response = await fetch(`${SERVER_URL}/documents/link`, {
+    const response = await fetch(`${SERVER_URL}/api/documents/link`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -161,7 +185,7 @@ const setLink = async (linkData) => {
     return handleInvalidResponse(response).json();
   } catch (error) {
     console.error("Error setting link:", error);
-    throw error
+    throw error;
   }
 };
 
@@ -170,7 +194,7 @@ const setLink = async (linkData) => {
  */
 const logIn = async (credentials) => {
   try {
-    const response = await fetch(SERVER_URL + "/sessions/login", {
+    const response = await fetch(SERVER_URL + "/api/sessions/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -189,7 +213,7 @@ const logIn = async (credentials) => {
  * This function destroy the current user's session (executing the log-out).
  */
 const logOut = async () => {
-  return await fetch(SERVER_URL + "/sessions/logout", {
+  return await fetch(SERVER_URL + "/api/sessions/logout", {
     method: "DELETE",
     credentials: "include",
   }).then(handleInvalidResponse);
@@ -199,47 +223,16 @@ const logOut = async () => {
  * This function retrieves the information of the currently logged-in user.
  */
 const getUserInfo = async () => {
-  return await fetch(SERVER_URL + "/sessions/current", {
+  return await fetch(SERVER_URL + "/api/sessions/current", {
     credentials: "include",
   })
     .then(handleInvalidResponse)
     .then((response) => response.json());
 };
 
-// Function to filter documents
-const filterDocuments = async (filters) => {
-  const queryParams = new URLSearchParams();
-
-  if (filters.type) queryParams.append("type", filters.type);
-  if (filters.stakeholder) queryParams.append("stakeholder", filters.stakeholder);
-  if (filters.issuanceDateFrom) queryParams.append("issuanceDateFrom", filters.issuanceDateFrom);
-  if (filters.issuanceDateTo) queryParams.append("issuanceDateTo", filters.issuanceDateTo);
-  if (filters.limit) queryParams.append("limit", filters.limit);
-  if (filters.offset) queryParams.append("offset", filters.offset);
-
-  const queryString = queryParams.toString();
-
-  // Form the URL properly by adding `?` if there are query parameters
-  let url = `${SERVER_URL}/documents`;
-  if (queryString) url += `?${queryString}`;
-
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    });
-
-    return handleInvalidResponse(response).json();
-  } catch (error) {
-    console.error("Error filtering documents:", error);
-    throw error;
-  }
-};
-
 // Function to get all stakeholders
 const getStakeholders = async () => {
-  return await fetch(`${SERVER_URL}/documents/stakeholders`, {
+  return await fetch(`${SERVER_URL}/api/documents/stakeholders`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -250,7 +243,7 @@ const getStakeholders = async () => {
 
 // Function to get all document types
 const getDocumentTypes = async () => {
-  return await fetch(`${SERVER_URL}/documents/document-types`, {
+  return await fetch(`${SERVER_URL}/api/documents/document-types`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -262,7 +255,7 @@ const getDocumentTypes = async () => {
 //Function to delete an attachment
 const deleteAttachment = async (docID, attachmentID) => {
   try {
-    await fetch(`${SERVER_URL}/documents/${docID}/attachments/${attachmentID}`, {
+    await fetch(`${SERVER_URL}/api/documents/${docID}/attachments/${attachmentID}`, {
       method: "DELETE",
       credentials: "include",
     });
@@ -289,7 +282,7 @@ const saveDocument = async (doc) => {
     }).filter(([_, value]) => value !== "" && value !== null && value !== undefined) // Filtra campi vuoti/nulli
   );
   try {
-    const response = await fetch(`${SERVER_URL}/documents/`, {
+    const response = await fetch(`${SERVER_URL}/api/documents/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -320,7 +313,7 @@ const updateDocument = async (documentId, doc) => {
   );
 
   try {
-    const response = await fetch(`${SERVER_URL}/documents/${documentId}`, {
+    const response = await fetch(`${SERVER_URL}/api/documents/${documentId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -334,7 +327,7 @@ const updateDocument = async (documentId, doc) => {
   }
 };
 const allExistingLinks = async () => {
-  return await fetch(`${SERVER_URL}/documents/allExistingLinks`, {
+  return await fetch(`${SERVER_URL}/api/documents/allExistingLinks`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     credentials: "include",

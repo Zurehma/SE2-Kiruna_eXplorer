@@ -51,7 +51,7 @@ const DocumentChartStatic = (props) => {
       const [documentType, stakeholder, documents, links] = await Promise.all([
         API.getDocumentTypes(),
         API.getStakeholders(),
-        API.getDocuments(),
+        API.getDocuments(undefined, true),
         API.allExistingLinks(),
       ]);
 
