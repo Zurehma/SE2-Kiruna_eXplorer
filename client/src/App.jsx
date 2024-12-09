@@ -4,7 +4,6 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useNavigate, Link } from "react-router-dom";
 import { Container, Alert } from "react-bootstrap";
-
 import Links from "./components/Links.jsx";
 import Home from "./components/Home";
 import Documents from "./components/Doc/Documents.jsx";
@@ -151,7 +150,7 @@ function App() {
             }
           />
 
-          <Route path="/map" element={<MapAndGraph setError={setError} loggedIn={loggedIn} />} />
+          <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn} />} />
           <Route
             path="/mapform"
             element={<MapForm position={position} setPosition={setPosition} />}
