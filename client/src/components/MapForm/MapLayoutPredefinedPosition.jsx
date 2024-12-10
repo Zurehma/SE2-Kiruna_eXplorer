@@ -26,7 +26,6 @@ function MapLayoutPredefinedPosition(props) {
         fetchData('All',setData, setError, setLoading);
     }, []);
     // Filter documents with coordinates
-    console.log(data)
     const coordDocuments = !filtering ? data.filter(doc => doc.lat != null && doc.long != null) : filteredDocuments.filter(doc => doc.lat != null && doc.long != null);
 
     const handleClick = (doc) => {
@@ -67,7 +66,11 @@ function MapLayoutPredefinedPosition(props) {
                         const myKey = props.selectedDoc.id+renderNumber;
                         return (
                             <Popup position={pos} maxWidth={800} key={myKey}  closeButton={true} autoClose={false} closeOnEscapeKey={false} closeOnClick={false}>
-                                <p>{props.selectedDoc.title}</p>
+                                <p>
+                                    {props.selectedDoc.title}
+                                    <br></br>
+                                    {props.selectedDoc?.area ? `Area` : `Position:${props.selectedDoc.lat}-${props.selectedDoc.long}`}
+                                </p>
                             </Popup>
                         );
                     })()
