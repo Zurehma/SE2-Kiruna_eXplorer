@@ -4,17 +4,27 @@ import { useNavigate } from "react-router-dom";
 import API from "../../API.js";
 import "../styles/Links.css";
 
-const CustomMenu = React.forwardRef(({ children, style, className, "aria-labelledby": labeledBy }, ref) => {
-  const [value, setValue] = useState("");
-  return (
-    <div ref={ref} style={style} className={className} aria-labelledby={labeledBy}>
-      <Form.Control autoFocus className="search-bar" placeholder="Type to filter..." onChange={(e) => setValue(e.target.value)} value={value} />
-      <ul className="list-unstyled">
-        {React.Children.toArray(children).filter((child) => !value || child.props.children.toLowerCase().startsWith(value))}
-      </ul>
-    </div>
-  );
-});
+const CustomMenu = React.forwardRef(
+  ({ children, style, className, "aria-labelledby": labeledBy }, ref) => {
+    const [value, setValue] = useState("");
+    return (
+      <div ref={ref} style={style} className={className} aria-labelledby={labeledBy}>
+        <Form.Control
+          autoFocus
+          className="search-bar"
+          placeholder="Type to filter..."
+          onChange={(e) => setValue(e.target.value)}
+          value={value}
+        />
+        <ul className="list-unstyled">
+          {React.Children.toArray(children).filter(
+            (child) => !value || child.props.children.toLowerCase().startsWith(value)
+          )}
+        </ul>
+      </div>
+    );
+  }
+);
 
 function Links(props) {
   const [documents, setDocuments] = useState([]);
@@ -122,7 +132,7 @@ function Links(props) {
     setLinkData({ document1: "", document2: [], linkType: "" });
   };
 
-  const handleClose = () => navigate("/map");
+  const handleClose = () => navigate("/graph");
 
   const handleDocument1Change = (docId) => {
     setLinkData({
@@ -143,14 +153,19 @@ function Links(props) {
   const handleDocument2Toggle = (docId) => {
     setLinkData((prevLinkData) => ({
       ...prevLinkData,
-      document2: prevLinkData.document2.includes(docId) ? prevLinkData.document2.filter((id) => id !== docId) : [...prevLinkData.document2, docId],
+      document2: prevLinkData.document2.includes(docId)
+        ? prevLinkData.document2.filter((id) => id !== docId)
+        : [...prevLinkData.document2, docId],
     }));
   };
 
   return (
     <div className="links-background">
       <Container className="links-container d-flex align-items-top justify-content-center min-vh-100">
-        <Card className="p-4 shadow-lg w-100" style={{ maxWidth: "700px", maxHeight: "650px", marginTop: "50px" }}>
+        <Card
+          className="p-4 shadow-lg w-100"
+          style={{ maxWidth: "700px", maxHeight: "650px", marginTop: "50px" }}
+        >
           <Card.Body>
             <Card.Title className="links-card-title">ADD NEW LINK</Card.Title>
             <div className="step-button">
@@ -166,7 +181,8 @@ function Links(props) {
                     <Form.Label className="links-form-label">Document 1*</Form.Label>
                     <Dropdown>
                       <Dropdown.Toggle variant="light" className="form-select">
-                        {documents.find((doc) => doc.id === Number(linkData.document1))?.title || "Select Document 1"}
+                        {documents.find((doc) => doc.id === Number(linkData.document1))?.title ||
+                          "Select Document 1"}
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu as={CustomMenu}>
@@ -177,7 +193,9 @@ function Links(props) {
                         ))}
                       </Dropdown.Menu>
                     </Dropdown>
-                    {errors.document1 && <div className="invalid-feedback d-block">{errors.document1}</div>}
+                    {errors.document1 && (
+                      <div className="invalid-feedback d-block">{errors.document1}</div>
+                    )}
                   </Form.Group>
                 </Col>
               </Row>
@@ -212,21 +230,35 @@ function Links(props) {
                   <Form.Group controlId="document2" className="links-form-group">
                     <Form.Label className="links-form-label">Document 2*</Form.Label>
                     <Dropdown>
-                      <Dropdown.Toggle variant="light" className="form-select" disabled={!linkData.linkType}>
-                        {linkData.document2.length > 0 ? `${linkData.document2.length} Documents Selected` : "Select Documents"}
+                      <Dropdown.Toggle
+                        variant="light"
+                        className="form-select"
+                        disabled={!linkData.linkType}
+                      >
+                        {linkData.document2.length > 0
+                          ? `${linkData.document2.length} Documents Selected`
+                          : "Select Documents"}
                       </Dropdown.Toggle>
                       <Dropdown.Menu as={CustomMenu}>
                         {documents
-                          .filter((doc) => !linkedDocuments.includes(doc.id) && doc.id !== linkData.document1) // Filtro per rimuovere anche linkData.document1
+                          .filter(
+                            (doc) =>
+                              !linkedDocuments.includes(doc.id) && doc.id !== linkData.document1
+                          ) // Filtro per rimuovere anche linkData.document1
                           .map((doc) => (
-                            <Dropdown.Item key={doc.id} onClick={() => handleDocument2Toggle(doc.id)}>
+                            <Dropdown.Item
+                              key={doc.id}
+                              onClick={() => handleDocument2Toggle(doc.id)}
+                            >
                               {linkData.document2.includes(doc.id) ? "✓ " : ""}
                               {doc.title}
                             </Dropdown.Item>
                           ))}
                       </Dropdown.Menu>
                     </Dropdown>
-                    {errors.document2 && <div className="invalid-feedback d-block">{errors.document2}</div>}
+                    {errors.document2 && (
+                      <div className="invalid-feedback d-block">{errors.document2}</div>
+                    )}
                   </Form.Group>
                 </Col>
               </Row>
@@ -244,10 +276,14 @@ function Links(props) {
         {/* Modal */}
         <Modal show={showModal} onHide={handleClose} centered>
           <Modal.Header closeButton>
-            <Modal.Title className="links-modal-title">{saveStatus === "Completed" ? "Success" : "Error"}</Modal.Title>
+            <Modal.Title className="links-modal-title">
+              {saveStatus === "Completed" ? "Success" : "Error"}
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body className="links-modal-body">
-            {saveStatus === "Completed" ? "Link saved successfully!" : `Failed to save the link. ${errors.err || ""}`}
+            {saveStatus === "Completed"
+              ? "Link saved successfully!"
+              : `Failed to save the link. ${errors.err || ""}`}
           </Modal.Body>
           <Modal.Footer>
             {saveStatus === "Completed" ? (
