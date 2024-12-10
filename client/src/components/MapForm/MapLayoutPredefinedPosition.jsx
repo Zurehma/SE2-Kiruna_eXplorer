@@ -18,6 +18,7 @@ function MapLayoutPredefinedPosition(props) {
     const [renderNumber,setRenderNumeber] = useState(0);
     const [error, setError] = useState(null);
     const [filteredDocuments,setFilteredDocuments] = useState([]);
+    const [filtering,setFiltering] = useState(false);
 
     // Fetch documents from the API
     useEffect(() => {
@@ -25,7 +26,8 @@ function MapLayoutPredefinedPosition(props) {
         fetchData('All',setData, setError, setLoading);
     }, []);
     // Filter documents with coordinates
-    const coordDocuments = data.filter(doc => doc.lat != null && doc.long != null);
+    console.log(data)
+    const coordDocuments = !filtering ? data.filter(doc => doc.lat != null && doc.long != null) : filteredDocuments.filter(doc => doc.lat != null && doc.long != null);
 
     const handleClick = (doc) => {
         props.setSelectedDoc(doc); 
@@ -46,7 +48,7 @@ function MapLayoutPredefinedPosition(props) {
                 <>
                 {/* Draw clusters or icons depending on the zoom: also the exact same position is managed in this case */}
                 <MarkerClusterGroup>
-                    {filteredDocuments.map((doc) => (
+                    {coordDocuments.map((doc) => (
                         <Marker key={doc.id} position={[doc.lat, doc.long]} 
                             icon={doc.id === props.selectedDoc?.id ? createCustomIcon(doc.type, true) : createCustomIcon(doc.type, false)}
                             eventHandlers={{click: () => {handleClick(doc)}
@@ -57,7 +59,7 @@ function MapLayoutPredefinedPosition(props) {
                         </Marker>
                     ))}
                 </MarkerClusterGroup>
-                <SearchBar documents={coordDocuments} setFilteredDocuments={setFilteredDocuments} />
+                <SearchBar documents={data} setFilteredDocuments={setFilteredDocuments} setFiltering={setFiltering} />
                 
                 {/* Popup with the document title, we will add also pos */}
                 {props.selectedDoc!==null && ((() => {

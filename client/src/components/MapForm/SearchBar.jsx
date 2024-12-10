@@ -1,13 +1,17 @@
 import "../../styles/SearchBar.css";
 
 import React, { useState } from 'react';
-import './SearchBar.css'; // Assicurati che il percorso sia corretto
 
-const SearchBar = ({ documents, setFilteredDocuments }) => {
+const SearchBar = ({ documents, setFilteredDocuments,setFiltering }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleSearch = (event) => {
         const value = event.target.value.toLowerCase();
+        if(value === ''){
+            setFiltering(false);
+        }else{
+            setFiltering(true);
+        }
         setSearchTerm(value);
         const filteredDocs = documents.filter(doc => doc.title.toLowerCase().includes(value));
         setFilteredDocuments(filteredDocs);

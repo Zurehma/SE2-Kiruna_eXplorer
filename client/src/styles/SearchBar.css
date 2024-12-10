@@ -1,11 +1,35 @@
 /* SearchBar.css */
 .search-input {
     position: absolute;
-    top: 13px;
-    right: 30px;
+    top: 12px;
+    left: 60px;
     z-index: 100000000;
     border-radius: 8px;
-    width: 200px; /* Imposta la larghezza desiderata qui */
-    height: 30px;
+    width: 220px; 
+    height: 32px;
     padding: 5px 10px;
+    font-size: 14px;
+    color: #495057;
+    font-family: Arial, sans-serif;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+    background-color: white; /* Imposta un colore di sfondo base */
+    border: 1px solid #ced4da; /* Colore del bordo base */
 }
+
+.search-input:hover {
+    border-color: #007bff; /* Blu al passaggio del mouse */
+}
+
+.search-input:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.8); /* Effetto focus blu */
+    background-color: #f8f9fa; /* Sfondo più chiaro al focus */
+}
+
+.search-input::placeholder {
+    color: #adb5bd; /* Colore del placeholder */
+    font-style: italic; /* Stile del testo del placeholder */
+}
+
+
