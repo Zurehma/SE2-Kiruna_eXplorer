@@ -84,6 +84,13 @@ class DocumentRoutes {
       }
     );
 
+    this.router.delete("/:id", Utility.isLoggedIn, param("id").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
+      this.documentController
+        .deleteDocument(req.params.id)
+        .then(() => res.status(204).end())
+        .catch((err) => next(err));
+    });
+
     this.router.get("/document-types", (req, res, next) => {
       this.documentController
         .getDocumentTypes()
@@ -199,6 +206,14 @@ class DocumentRoutes {
         }
       }
     );
+
+    this.router.delete("/link/:linkID", Utility.isLoggedIn, param("linkID").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
+      this.documentController
+        .deleteLink(Number(req.params.linkID))
+        .then(() => res.status(204).end())
+        .catch((err) => next(err));
+    }
+  );
   };
 }
 
