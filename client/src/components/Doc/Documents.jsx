@@ -327,7 +327,7 @@ function Documents(props) {
           }
         });
         resetState();
-        navigate(`/documents/all`);
+        navigate(-1);
       } else if (step === 4) {
         const doc = await API.saveDocument(document);
         //Try to submit files
