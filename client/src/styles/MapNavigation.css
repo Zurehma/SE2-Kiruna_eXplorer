@@ -212,6 +212,9 @@
     fill: red; /* Cambia colore al passaggio del mouse */
 }
 
+.mapFormPopup{
+    background: white;
+}
 
 
 .myRecenterButtonCustomArea{

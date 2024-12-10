@@ -2,8 +2,20 @@ import React from "react";
 import "../styles/Home.css";
 import { useNavigate } from "react-router-dom";
 import { Col, Row } from "react-bootstrap";
+import { useLocation } from "react-router";
+import { useState, useEffect } from "react";
+import Login from "./Login";
 
-const Home = () => {
+const Home = ({
+  username,
+  password,
+  setUsername,
+  setPassword,
+  handleLogin,
+  toggleLoginPane,
+  isLoginOpen,
+  closeLoginPane,
+}) => {
   const navigate = useNavigate();
   const scrollToContent = () => {
     const section = document.getElementById("content-section");
@@ -38,6 +50,18 @@ const Home = () => {
           </Col>
         </Row>
       </div>
+
+      {/* Login */}
+      <Login
+        username={username}
+        password={password}
+        setUsername={setUsername}
+        setPassword={setPassword}
+        handleLogin={handleLogin}
+        toggleLoginPane={toggleLoginPane}
+        isLoginOpen={isLoginOpen}
+        closeLoginPane={closeLoginPane}
+      />
 
       {/* Altre informazioni */}
       {/* Aggiungi una nuova sezione centrale con immagini e testo diviso in tre parti */}

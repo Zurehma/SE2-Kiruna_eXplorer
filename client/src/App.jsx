@@ -2,11 +2,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useNavigate, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { Container, Alert } from "react-bootstrap";
 
 import Links from "./components/Links.jsx";
-import { Login } from "./components/Login";
 import Home from "./components/Home";
 import Documents from "./components/Doc/Documents.jsx";
 import { NavigationBar } from "./components/NavigationBar.jsx";
@@ -20,7 +19,6 @@ import MapForm from "./components/MapForm/MapForm.jsx";
 import DocumentChartStatic from "./components/Graph/Graph.jsx";
 
 function App() {
-  const [currentUser, setCurrentUser] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -29,32 +27,41 @@ function App() {
   const [role, setRole] = useState("");
   const [newDoc, setNewDoc] = useState("");
   const [hideDocBar, sethideDocBar] = useState(false);
-  const [editDoc, setEditDoc] = useState("");
   const navigate = useNavigate();
   const [logging, setLogging] = useState(false);
-  const [position, setPosition] = useState(undefined);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  const toggleLoginPane = () => {
+    setIsLoginOpen((prev) => !prev);
+  };
+
+  const closeLoginPane = () => {
+    setIsLoginOpen(false);
+  };
 
   const handleLogin = async (credentials) => {
     try {
-      // Attempt to log in with provided credentials
       const response = await API.logIn(credentials);
 
-      // Check if the login was successful
       if (!response.ok) {
         throw new Error("Login failed. Please check your credentials.");
       }
 
-      // After successful login, fetch user information
       const user = await API.getUserInfo();
-      setCurrentUser(user);
       setLoggedIn(true);
       setRole(user.role);
-      navigate("/");
+
+      setIsLoginOpen(false); // Chiude la finestra di login
+
+      // Redirect to home and close the login pane
+      // navigate("/", { state: { openLogin: false } });
+
+      console.log("Login successfullll");
     } catch (error) {
-      // Handle errors (either from login or fetching user info)
       setloggedinError(error.message || "Login failed. Please check your credentials.");
     }
   };
+
   useEffect(() => {
     setLogging(true);
     const checkLogin = async () => {
@@ -101,6 +108,9 @@ function App() {
         role={role}
         sethideDocBar={sethideDocBar}
         hideDocBar={sethideDocBar}
+        toggleLoginPane={toggleLoginPane}
+        isLoginOpen={isLoginOpen}
+        closeLoginPane={closeLoginPane}
       />
       <Container fluid className="flex-grow-1 d-flex flex-column px-0">
         {error && (
@@ -112,28 +122,24 @@ function App() {
           <Route
             path="/"
             element={
-              <>
-                <Home setError={setError} />
-              </>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <Login
-                handleLogin={handleLogin}
+              <Home
+                setError={setError}
                 username={username}
-                setUsername={setUsername}
                 password={password}
+                setUsername={setUsername}
                 setPassword={setPassword}
+                handleLogin={handleLogin}
+                toggleLoginPane={toggleLoginPane}
+                isLoginOpen={isLoginOpen}
+                closeLoginPane={closeLoginPane}
                 setRole={setRole}
                 loggedinError={loggedinError}
                 setloggedinError={setloggedinError}
               />
             }
           />
+
           <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn} />} />
-          <Route path="/mapform" element={<MapForm position={position} setPosition={setPosition} />} />
           <Route path="/documents" element={loggedIn ? <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} /> : <AccessDenied />} />
           <Route path="/document/:id" element={<SingleDocument setError={setError} loggedIn={loggedIn} />} />
           <Route path="/documents/links" element={loggedIn ? <Links newDoc={newDoc} setNewDoc={setNewDoc} /> : <AccessDenied />} />

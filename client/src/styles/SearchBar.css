@@ -1,12 +1,14 @@
 /* SearchBar.css */
 .search-input {
     position: absolute;
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.8);
     top: 12px;
     left: 60px;
     z-index: 100000000;
     border-radius: 8px;
     width: 220px; 
-    height: 32px;
+    height: 29px;
     padding: 5px 10px;
     font-size: 14px;
     color: #495057;
