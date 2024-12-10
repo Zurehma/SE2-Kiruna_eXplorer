@@ -5,6 +5,7 @@ import { Col, Row } from "react-bootstrap";
 import { useLocation } from "react-router";
 import { useState, useEffect } from "react";
 import Login from "./Login";
+import UserForm from "./UserForm";
 
 const Home = ({
   username,
@@ -15,6 +16,8 @@ const Home = ({
   toggleLoginPane,
   isLoginOpen,
   closeLoginPane,
+  isAddUserOpen,
+  closeAddUserPane,
 }) => {
   const navigate = useNavigate();
   const scrollToContent = () => {
@@ -41,9 +44,18 @@ const Home = ({
             </button>
           </Col>
           <Col md={6} className="button-col">
-            <button onClick={scrollToContent} className="styled-button">
-              About us
+            <button onClick={() => navigate("/map")} className="styled-button">
+              Relocation of Kiruna
               <span className="button-icon">
+                <i className="bi bi-geo-alt"></i>{" "}
+              </span>
+            </button>
+          </Col>
+        </Row>
+        <Row className="arrow-row">
+          <Col md={6} className="arrow-col">
+            <button onClick={scrollToContent} className="styled-arrow">
+              <span className="arrow-icon">
                 <i className="bi bi-arrow-down"></i>
               </span>
             </button>
@@ -61,6 +73,12 @@ const Home = ({
         toggleLoginPane={toggleLoginPane}
         isLoginOpen={isLoginOpen}
         closeLoginPane={closeLoginPane}
+      />
+
+      <UserForm
+        toggleLoginPane={toggleLoginPane}
+        isAddUserOpen={isAddUserOpen}
+        closeAddUserPane={closeAddUserPane}
       />
 
       {/* Altre informazioni */}

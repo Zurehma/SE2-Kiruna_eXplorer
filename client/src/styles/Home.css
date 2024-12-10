@@ -95,6 +95,40 @@ body {
   background-color: #004f55; /* Cambia colore dell'icona su hover */
 }
 
+/* Stile per arrow  */
+.arrow-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #006d77; /* Colore dello sfondo dell'icona */
+  color: white; /* Colore del simbolo */
+  border-radius: 50%; /* Forma circolare */
+  font-size: 1.2rem; /* Dimensione del simbolo */
+  width: 50px;
+  height: 50px;
+}
+
+.arrow-icon:hover {
+  background-color: #004f55; /* Cambia colore dell'icona su hover */
+}
+
+.styled-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent; /* Colore opaco del pulsante */
+  box-shadow: none; /* Rimuove completamente l'ombra */
+  border: none;
+  border-radius: 25px;
+  margin: auto 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.styled-arrow:hover {
+  transform: scale(1.1); /* Effetto zoom */
+}
+
 /* Media query per schermi piccoli */
 
 @media (max-width: 768px) {
