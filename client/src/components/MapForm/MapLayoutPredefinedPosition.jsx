@@ -9,7 +9,7 @@ import { Tooltip } from 'react-leaflet';
 import '../../styles/MapNavigation.css';
 import fetchData from '../MapUtils/DataFetching';
 import  {createCustomIcon}  from '../MapUtils/CustomIcon';
-
+import SearchBar from "./SearchBar";
 
 //It takes newPoint and newArea as props, which are functions to set the new point or area in the parent component 
 function MapLayoutPredefinedPosition(props) {
@@ -17,6 +17,7 @@ function MapLayoutPredefinedPosition(props) {
     const [loading, setLoading] = useState(false);
     const [renderNumber,setRenderNumeber] = useState(0);
     const [error, setError] = useState(null);
+    const [filteredDocuments,setFilteredDocuments] = useState([]);
 
     // Fetch documents from the API
     useEffect(() => {
@@ -45,7 +46,7 @@ function MapLayoutPredefinedPosition(props) {
                 <>
                 {/* Draw clusters or icons depending on the zoom: also the exact same position is managed in this case */}
                 <MarkerClusterGroup>
-                    {coordDocuments.map((doc) => (
+                    {filteredDocuments.map((doc) => (
                         <Marker key={doc.id} position={[doc.lat, doc.long]} 
                             icon={doc.id === props.selectedDoc?.id ? createCustomIcon(doc.type, true) : createCustomIcon(doc.type, false)}
                             eventHandlers={{click: () => {handleClick(doc)}
@@ -56,6 +57,7 @@ function MapLayoutPredefinedPosition(props) {
                         </Marker>
                     ))}
                 </MarkerClusterGroup>
+                <SearchBar documents={coordDocuments} setFilteredDocuments={setFilteredDocuments} />
                 
                 {/* Popup with the document title, we will add also pos */}
                 {props.selectedDoc!==null && ((() => {
