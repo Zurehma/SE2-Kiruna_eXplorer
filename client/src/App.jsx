@@ -17,10 +17,7 @@ import AccessDenied from "./components/AccessDenied.jsx";
 import NotFound from "./components/NotFound.jsx";
 import { SingleDocument } from "./components/SingleDocument.jsx";
 import MapForm from "./components/MapForm/MapForm.jsx";
-import DocumentChartStatic from "./components/Graph.jsx";
-// import MapAndGraph from "./components/MapAndGraph.jsx";
-// import MapAndGraph from "./components/MapAndGraph.jsx";
-
+import DocumentChartStatic from "./components/Graph/Graph.jsx";
 
 function App() {
   const [currentUser, setCurrentUser] = useState("");
@@ -35,7 +32,7 @@ function App() {
   const [editDoc, setEditDoc] = useState("");
   const navigate = useNavigate();
   const [logging, setLogging] = useState(false);
-  const [position,setPosition] = useState(undefined);
+  const [position, setPosition] = useState(undefined);
 
   const handleLogin = async (credentials) => {
     try {
@@ -107,24 +104,19 @@ function App() {
       />
       <Container fluid className="flex-grow-1 d-flex flex-column px-0">
         {error && (
-          <Alert
-            variant="danger"
-            className="fixed-top mt-3"
-            style={{ zIndex: 150000000000 }}
-            dismissible
-            onClose={() => setError(null)}
-          >
+          <Alert variant="danger" className="fixed-top mt-3" style={{ zIndex: 150000000000 }} dismissible onClose={() => setError(null)}>
             <p>{error.message}</p>
           </Alert>
         )}
         <Routes>
-
-
-        <Route path="/" element={
-          <>
-            <Home setError={setError} />
-          </>
-        } />
+          <Route
+            path="/"
+            element={
+              <>
+                <Home setError={setError} />
+              </>
+            }
+          />
           <Route
             path="/login"
             element={
@@ -142,42 +134,15 @@ function App() {
           />
           <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn} />} />
           <Route path="/mapform" element={<MapForm position={position} setPosition={setPosition} />} />
-          <Route
-            path="/documents"
-            element={
-              loggedIn ? (
-                <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
-              ) : (
-                <AccessDenied />
-              )
-            }
-          />
-          <Route
-            path="/document/:id"
-            element={<SingleDocument setError={setError} loggedIn={loggedIn} />}
-          />
-          <Route
-            path="/documents/links"
-            element={loggedIn ? <Links newDoc={newDoc} setNewDoc={setNewDoc} /> : <AccessDenied />}
-          />
+          <Route path="/documents" element={loggedIn ? <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} /> : <AccessDenied />} />
+          <Route path="/document/:id" element={<SingleDocument setError={setError} loggedIn={loggedIn} />} />
+          <Route path="/documents/links" element={loggedIn ? <Links newDoc={newDoc} setNewDoc={setNewDoc} /> : <AccessDenied />} />
 
-          <Route
-            path="/documents/all"
-            element={loggedIn ? <FilteringDocuments loggedIn={loggedIn} /> : <AccessDenied />}
-          />
+          <Route path="/documents/all" element={loggedIn ? <FilteringDocuments loggedIn={loggedIn} /> : <AccessDenied />} />
 
-          <Route
-            path="/documents/:id"
-            element={
-              loggedIn ? (
-                <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
-              ) : (
-                <AccessDenied />
-              )
-            }
-          />
+          <Route path="/documents/:id" element={loggedIn ? <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} /> : <AccessDenied />} />
           <Route path="*" element={<NotFound />} />
-          <Route path="graph" element={<DocumentChartStatic role={role}/>}/>
+          <Route path="graph" element={<DocumentChartStatic role={role} />} />
         </Routes>
       </Container>
     </div>
