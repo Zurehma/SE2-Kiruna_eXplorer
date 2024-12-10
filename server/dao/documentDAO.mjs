@@ -281,6 +281,20 @@ class DocumentDAO {
     });
   };
 
+  deleteDocument = (id) => {
+    return new Promise((resolve, reject) => {
+      const query = "DELETE FROM DOCUMENT WHERE id = ?";
+
+      db.run(query, [id], function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this.changes);
+        }
+      });
+    });
+  }
+
   /**
    * Add a new stakeholder for an existing document
    * @param {Number} docID
@@ -429,6 +443,19 @@ class DocumentDAO {
       });
     });
   };
+
+  deleteLink = (linkID) => {
+    return new Promise((resolve, reject) => {
+      const query = "DELETE FROM LINK WHERE linkID = ?";
+      db.run(query, [linkID], function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this.changes);
+        }
+      });
+    });
+  }
 }
 
 export default DocumentDAO;
