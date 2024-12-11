@@ -50,7 +50,6 @@ function App() {
       const user = await API.getUserInfo();
       setLoggedIn(true);
       setRole(user.role);
-
       setIsLoginOpen(false); // Chiude la finestra di login
 
       // Redirect to home and close the login pane

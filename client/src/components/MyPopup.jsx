@@ -96,13 +96,22 @@ function MyPopup(props) {
       props.setError('Invalid document data');
     }
   };
+
   const handleNavigation = (id) => {
     navigate(`/document/${id}`);
   };
   const handleDeleteClick = () => {
     if (props.doc && props.doc.id && props.doc.id > 0) {
-      //Call to the API to delete the document
-
+      API.deleteDocument(props.doc.id).then(() => {
+        const path = window.location.pathname.split('/');
+        if(path.length === 3 && path[1] === 'document' && !isNaN(parseInt(path[2]))){
+          navigate(-1);}
+        else{
+          props.setReload(!props.reload);
+        }
+      }).catch((error) => {
+        props.setError(error);
+      });  
     }else{
       props.setError('Invalid document data');
     }
@@ -203,7 +212,7 @@ function MyPopup(props) {
       {/* Edit Button Column */}
       {props.loggedIn && (
       <Col xs={12} md={remainingWidth} className="d-flex align-items-start justify-content-center">
-        <Row>
+        <Row className='me-1'>
           <Col xs={6} className="d-flex justify-content-center">
             <Button
               name="edit-button" variant="outline-primary" className="action-button shadow-sm" aria-label="edit"
