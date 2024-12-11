@@ -17,25 +17,35 @@ const Legend = ({ documentTypes, stakeholders, showLegendModal, setShowLegendMod
 
   return (
     <>
-      {/* Floating Legend Button */}
+      {/* Redesigned Legend Button */}
       <button
-        className="btn btn-sm legend-floating-button"
+        className="legend-floating-button"
         onClick={() => setShowLegendModal(true)}
         style={{
           position: "absolute",
           top: "20px",
           right: "20px",
-          backgroundColor: "#fff",
-          border: "2px solid #ccc",
-          borderRadius: "50%",
-          width: "50px",
-          height: "50px",
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
+          background: "linear-gradient(to bottom, #ffffff, #f2f2f2)",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          width: "40px",
+          height: "40px",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           zIndex: 9999,
           cursor: "pointer",
+          fontFamily: "'Inter', sans-serif",
+          transition: "transform 0.2s, background 0.2s",
+          padding: "0"
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.background = "linear-gradient(to bottom, #f8f8f8, #ededed)";
+          e.currentTarget.style.transform = "scale(1.05)";
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.background = "linear-gradient(to bottom, #ffffff, #f2f2f2)";
+          e.currentTarget.style.transform = "scale(1)";
         }}
       >
         <i className="bi bi-info-lg" style={{ color: "#333", fontSize: "1.2rem" }}></i>
@@ -48,17 +58,22 @@ const Legend = ({ documentTypes, stakeholders, showLegendModal, setShowLegendMod
           tabIndex="-1"
           role="dialog"
           aria-modal="true"
-          style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
+          style={{ 
+            display: "block", 
+            backgroundColor: "rgba(0,0,0,0.5)", 
+            paddingTop: "80px",
+            zIndex: 10000
+          }}
         >
-          <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div className="modal-content" style={{ borderRadius: "10px", overflow: "hidden" }}>
+          <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable" style={{ maxWidth: "350px", margin: "auto" }}>
+            <div className="modal-content" style={{ borderRadius: "10px", overflow: "hidden", maxHeight: "80vh", fontFamily: "'Inter', sans-serif" }}>
               <div className="modal-header" style={{ background: "#f8f9fa" }}>
-                <h5 className="modal-title">Legend</h5>
+                <h5 className="modal-title" style={{ fontFamily: "'Inter', sans-serif", fontWeight: "600" }}>Legend</h5>
                 <button type="button" className="btn-close" aria-label="Close" onClick={() => setShowLegendModal(false)}></button>
               </div>
-              <div className="modal-body">
+              <div className="modal-body" style={{ overflowY: "auto", fontSize: "14px" }}>
                 {/* Document Types */}
-                <h6>Document Types</h6>
+                <h6 style={{ fontWeight: "600" }}>Document Types</h6>
                 <div className="d-flex flex-wrap gap-2 mb-3">
                   {documentTypes.map((doc, index) => {
                     const iconClass = iconMap[doc.name] || "bi-file-earmark";
@@ -72,7 +87,7 @@ const Legend = ({ documentTypes, stakeholders, showLegendModal, setShowLegendMod
                 </div>
 
                 {/* Stakeholders */}
-                <h6>Stakeholders</h6>
+                <h6 style={{ fontWeight: "600" }}>Stakeholders</h6>
                 <div className="row mb-3">
                   {stakeholders.map((stakeholder, index) => (
                     <div key={index} className="col-6 d-flex align-items-center gap-1 mb-1">
@@ -85,7 +100,7 @@ const Legend = ({ documentTypes, stakeholders, showLegendModal, setShowLegendMod
                 </div>
 
                 {/* Connections */}
-                <h6>Connections</h6>
+                <h6 style={{ fontWeight: "600" }}>Connections</h6>
                 <div>
                   <p className="d-flex justify-content-between mb-1">
                     <span>Direct consequence</span>

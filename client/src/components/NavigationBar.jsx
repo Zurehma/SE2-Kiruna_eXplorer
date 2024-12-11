@@ -103,6 +103,13 @@ export function NavigationBar(props) {
                 Map
               </Nav.Link>
               <Nav.Link
+                as={Link}
+                to="/graph"
+                className={`nav-link ${location.pathname === "/graph" ? "active" : ""}`}
+              >
+                Graph
+              </Nav.Link>
+              <Nav.Link
                 onClick={props.toggleLoginPane}
                 className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
               >
