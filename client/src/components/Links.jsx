@@ -79,13 +79,10 @@ function Links(props) {
             .map((doc) => doc.linkedDocID); // Prendo solo gli ID dei documenti
 
           setLinkedDocuments(filteredLinkedDocs);
-
-          console.log("gggggggg:", filteredLinkedDocs);
-
           // Setta i documenti filtrati
           setLinkedDocuments(filteredLinkedDocs);
         } catch (error) {
-          console.error("Error fetching linked documents:", error);
+          console.error("Error fetching connected documents:", error);
         }
       };
 
@@ -106,7 +103,7 @@ function Links(props) {
       newErrors.document2 = "You must select at least one document.";
     }
     if (!linkData.linkType) {
-      newErrors.linkType = "You must select a type of link.";
+      newErrors.linkType = "You must select a type of connection.";
     }
     setErrors(newErrors);
 
@@ -120,7 +117,7 @@ function Links(props) {
       props.setNewDoc("");
     } catch (error) {
       if (error.message === "Conflict") {
-        setErrors({ err: "The link already exists." });
+        setErrors({ err: "The connection already exists." });
       }
       setSaveStatus("Not Completed");
       setShowModal(true);
@@ -167,10 +164,10 @@ function Links(props) {
           style={{ maxWidth: "700px", maxHeight: "650px", marginTop: "50px" }}
         >
           <Card.Body>
-            <Card.Title className="links-card-title">ADD NEW LINK</Card.Title>
+            <Card.Title className="links-card-title">ADD NEW CONNECTION</Card.Title>
             <div className="step-button">
               <i class="bi bi-share-fill"></i>
-              LINK STEP
+              CONNECTION STEP
             </div>
 
             <Form className="cd-body">
@@ -204,7 +201,7 @@ function Links(props) {
               <Row className="mb-3">
                 <Col className="mb-3">
                   <Form.Group controlId="linkType" className="links-form-group">
-                    <Form.Label className="links-form-label">Link Type*</Form.Label>
+                    <Form.Label className="links-form-label">Connection Type*</Form.Label>
                     <Form.Select
                       name="linkType"
                       value={linkData.linkType}
@@ -212,7 +209,7 @@ function Links(props) {
                       isInvalid={!!errors.linkType}
                       disabled={!linkData.document1}
                     >
-                      <option value="">Select a type of Link</option>
+                      <option value="">Select a type of connection</option>
                       {typeLink.map((type, index) => (
                         <option key={index} value={type.name}>
                           {type.name}
@@ -266,7 +263,7 @@ function Links(props) {
               {/* Save Button */}
               <div className="text-center mt-5">
                 <Button variant="primary" onClick={handleSaveLinks} className="btn-save">
-                  Save Link
+                  Save Connection
                 </Button>
               </div>
             </Form>
@@ -282,13 +279,13 @@ function Links(props) {
           </Modal.Header>
           <Modal.Body className="links-modal-body">
             {saveStatus === "Completed"
-              ? "Link saved successfully!"
-              : `Failed to save the link. ${errors.err || ""}`}
+              ? "Connection saved successfully!"
+              : `Failed to save the connection. ${errors.err || ""}`}
           </Modal.Body>
           <Modal.Footer>
             {saveStatus === "Completed" ? (
               <Button variant="primary" onClick={handleNewLink} className="btn-saveLink">
-                Save New Link
+                Add New Connection
               </Button>
             ) : (
               <Button variant="primary" onClick={handleNewLink} className="btn-saveLink">
@@ -296,7 +293,7 @@ function Links(props) {
               </Button>
             )}
             <Button variant="secondary" onClick={handleClose}>
-              Go to Graph
+              Go to Diagram
             </Button>
           </Modal.Footer>
         </Modal>

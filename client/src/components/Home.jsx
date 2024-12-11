@@ -38,7 +38,7 @@ const Home = ({
         <Row className="button-row">
           <Col md={6} className="button-col">
             <button onClick={() => navigate("/map")} className="styled-button">
-              Relocation of Kiruna
+              Relocation Map
               <span className="button-icon">
                 <i className="bi bi-geo-alt"></i>{" "}
               </span>
@@ -46,7 +46,7 @@ const Home = ({
           </Col>
           <Col md={6} className="button-col">
             <button onClick={() => navigate("/graph")} className="styled-button">
-              Go to Graph
+              View Diagram
               <span className="button-icon">
                 <i class="bi bi-bezier"></i>{" "}
               </span>
