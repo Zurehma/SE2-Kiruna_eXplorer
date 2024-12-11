@@ -201,7 +201,6 @@ function Documents(props) {
       newErrors.title = "Title is required and cannot be empty.";
     }
     if (!document.stakeholders || document.stakeholders.length === 0) {
-      console.log("ghjkjhgvhjkl");
       newErrors.stakeholders = "You must select at least one stakeholder.";
     }
     if (!document.description || document.description.length < 2) {
