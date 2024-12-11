@@ -172,7 +172,7 @@ function App() {
               loggedIn ? (
                 <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
               ) : (
-                <AccessDenied />
+                <AccessDenied toggleLoginPane={toggleLoginPane} />
               )
             }
           />
@@ -182,12 +182,24 @@ function App() {
           />
           <Route
             path="/documents/links"
-            element={loggedIn ? <Links newDoc={newDoc} setNewDoc={setNewDoc} /> : <AccessDenied />}
+            element={
+              loggedIn ? (
+                <Links newDoc={newDoc} setNewDoc={setNewDoc} />
+              ) : (
+                <AccessDenied toggleLoginPane={toggleLoginPane} />
+              )
+            }
           />
 
           <Route
             path="/documents/all"
-            element={loggedIn ? <FilteringDocuments loggedIn={loggedIn} /> : <AccessDenied />}
+            element={
+              loggedIn ? (
+                <FilteringDocuments loggedIn={loggedIn} />
+              ) : (
+                <AccessDenied toggleLoginPane={toggleLoginPane} />
+              )
+            }
           />
 
           <Route
@@ -196,7 +208,7 @@ function App() {
               loggedIn ? (
                 <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
               ) : (
-                <AccessDenied />
+                <AccessDenied toggleLoginPane={toggleLoginPane} />
               )
             }
           />
