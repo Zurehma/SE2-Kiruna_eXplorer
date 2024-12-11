@@ -15,7 +15,6 @@ import FilteringDocuments from "./components/FilteringDocuments.jsx";
 import AccessDenied from "./components/AccessDenied.jsx";
 import NotFound from "./components/NotFound.jsx";
 import { SingleDocument } from "./components/SingleDocument.jsx";
-import MapForm from "./components/MapForm/MapForm.jsx";
 import DocumentChartStatic from "./components/Graph/Graph.jsx";
 
 function App() {
@@ -147,7 +146,7 @@ function App() {
 
           <Route path="/documents/:id" element={loggedIn ? <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} /> : <AccessDenied />} />
           <Route path="*" element={<NotFound />} />
-          <Route path="graph" element={<DocumentChartStatic role={role} />} />
+          <Route path="graph" element={<DocumentChartStatic role={role} loggedIn={loggedIn} />} />
         </Routes>
       </Container>
     </div>

@@ -8,6 +8,7 @@ import "../../styles/DocumentChartStatic.css";
 import Legend from "./Legend";
 import GraphConfig from "./GraphUtils/GraphConfig";
 import GraphUtils from "./GraphUtils/GraphUtils";
+import MyFilterDropdown from "../MapNavigation/MyFilterDropdown";
 
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
@@ -16,19 +17,18 @@ const DocumentChartStatic = (props) => {
   const [chartData, setChartData] = useState([]);
   const [links, setLinks] = useState([]);
   const [showLegendModal, setShowLegendModal] = useState(false);
+  const [selectedType, setSelectedType] = useState("All");
 
   const navigate = useNavigate();
-
   // We'll store current document coordinates in this dictionary:
   // { docId: { x: number, y: number } }
   const docCoords = {};
 
   const fetchData = async () => {
     try {
-      const [documentType, stakeholder, documents, links] = await Promise.all([
+      const [documentType, stakeholder, links] = await Promise.all([
         API.getDocumentTypes(),
         API.getStakeholders(),
-        API.getDocuments(undefined, true),
         API.allExistingLinks(),
       ]);
 
@@ -39,12 +39,21 @@ const DocumentChartStatic = (props) => {
 
       setDocumentTypes(documentType);
       setStakeholders(stakeholdersWithColors);
-      setChartData(documents);
       setLinks(links);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+
+  //Separated useEffect to handle the change of the selectedType
+  useEffect(() => {
+    const filters = selectedType === "All" ? {} : { type: selectedType };
+    API.getDocuments(filters, true).then((docs) => {
+      setChartData(docs);
+    }).catch((error) => {
+      console.error("Error fetching data:", error);
+    });
+  }, [selectedType]);
 
   useEffect(() => {
     fetchData();
@@ -289,6 +298,7 @@ const DocumentChartStatic = (props) => {
 
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
+      <MyFilterDropdown loggedIn={props.loggedIn} typeDoc={documentTypes} selectedType={selectedType} setSelectedType={setSelectedType}/>
       <div className="graph-inner-wrapper">
         <Legend documentTypes={documentTypes} stakeholders={stakeholders} showLegendModal={showLegendModal} setShowLegendModal={setShowLegendModal} />
         <div style={{ width: "100%", height: "100%" }}>
