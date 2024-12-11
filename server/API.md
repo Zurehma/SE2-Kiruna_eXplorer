@@ -207,6 +207,18 @@ Update an existing document by providing a new object.
   - It should return a 400 error when `issuanceDate` is after the current date.
   - It should return a 400 error when `coordinates` are located in a different place than Kiruna.
 
+#### DELETE `api/documents/:docID`
+
+Delete an existing document.
+
+- Request Parameters:
+  - `docID`: a number that represent the ID of the document.
+- Request Body Content: _None_
+- Response Body Content: _None_
+- Access Constraints: Can only be called by a logged in user.
+- Additional Constraints:
+  - It should return a 404 error when the document does not exist.
+
 #### GET `api/documents/link-types`
 
 Returns the list of all specific link types.
@@ -319,6 +331,18 @@ Returns the list of all specific link types.
   - It should return a `404` error when document ID does not exist
   - It should return a `409` error when the link of the same type already exists between a pair of documents
   - It should return a `422` error if the link type is invalid
+
+#### DELETE `api/documents/link/:linkID`
+
+Delete an existing link.
+
+- Request Parameters:
+  - `linkID`: a number that represent the ID of the link.
+- Request Body Content: _None_
+- Response Body Content: _None_
+- Access Constraints: Can only be called by a logged in user.
+- Additional Constraints:
+  - It should return a 404 error when the link does not exist.
 
 ### Attachment APIs
 

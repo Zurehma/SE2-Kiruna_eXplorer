@@ -173,6 +173,24 @@ class DocumentController {
     });
   };
 
+  deleteDocument = (id) => {
+    return new Promise((resolve, reject) => {
+      const deleteDocument = async () => {
+        try {
+          let deletedDoc = await this.documentDAO.deleteDocument(id);
+          if (deletedDoc === 0) {
+            const error = { errCode: 404, errMessage: "Document not found!" };
+            throw error;
+          }
+          resolve(null);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      deleteDocument();
+    });
+  }
+
   /**
    * Get the list of already available document types
    * @returns {Promise<Array<String>>} A promise that resolves to an array of strings
@@ -271,6 +289,24 @@ class DocumentController {
       getAllLinks();
     });
   };
+
+  deleteLink = (linkID) => {
+    return new Promise((resolve, reject) => {
+      const deleteLink = async () => {
+        try {
+          let deletedLink = await this.documentDAO.deleteLink(linkID);
+          if (deletedLink === 0) {
+            const error = { errCode: 404, errMessage: "Link not found!" };
+            throw error;
+          }
+          resolve(null);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      deleteLink();
+    });
+  }
 }
 
 export default DocumentController;

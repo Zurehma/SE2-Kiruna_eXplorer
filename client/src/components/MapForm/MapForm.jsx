@@ -14,6 +14,7 @@ import LoadGeoJson from "../MapUtils/LoadGeoJson";
 import MapControlPanel from "./SideBarMenu";
 import RecenterButton from '../MapUtils/RecenterButton';
 
+
 /**
  * Button component to resize the map
  * @param {*} isFullScreen boolean to tell is the map occupies the whole screen or the container size
@@ -64,6 +65,7 @@ const MapForm = (props) => {
   const [selectedDoc, setSelectedDoc] = useState(null); 
   const KirunaCenter = [67.85, 20.217];
 
+
   //validate coordinates: verify they're in the Kiruna Municipality
   const validateCoordinates = (lat, long) => {
     if (!geoJsonData) return false;
@@ -94,7 +96,7 @@ const MapForm = (props) => {
   const [mapSizeClass, setMapSizeClass] = useState(mapContainerClass);
   const [overlay, setOverlay] = useState("without-overlay");
 
-  const predefinedPosition = "Predefined position";
+  const predefinedPosition = "Existing position";
   const customPoint = "Custom point";
   const customArea = "Custom area";
   const explore = "Explore";
@@ -171,7 +173,7 @@ const MapForm = (props) => {
           )}
           {position && position.coordinates && !isFullscreen && <ClearPositionButton clearPosition={clearPosition} />}
           <TileLayer url={mapStyles[mapView]} />
-          <RecenterButton initialPosition={KirunaCenter} positionActual={KirunaCenter} setPositionActual={setInitalPosition} zoomLevel={initialZoom} setZoomLevel={setInitalZoom} draw={currentMode === 'Custom area'} />
+          <RecenterButton initialPosition={KirunaCenter} positionActual={KirunaCenter} setPositionActual={setInitalPosition} zoomLevel={initialZoom} setZoomLevel={setInitalZoom} draw={currentMode === 'Custom area' && isFullscreen} />
           <ResizeMap />
         </MapContainer>
       </div>

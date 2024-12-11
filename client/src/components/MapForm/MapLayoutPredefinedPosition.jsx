@@ -9,7 +9,7 @@ import { Tooltip } from 'react-leaflet';
 import '../../styles/MapNavigation.css';
 import fetchData from '../MapUtils/DataFetching';
 import  {createCustomIcon}  from '../MapUtils/CustomIcon';
-
+import SearchBar from "./SearchBar";
 
 //It takes newPoint and newArea as props, which are functions to set the new point or area in the parent component 
 function MapLayoutPredefinedPosition(props) {
@@ -17,14 +17,19 @@ function MapLayoutPredefinedPosition(props) {
     const [loading, setLoading] = useState(false);
     const [renderNumber,setRenderNumeber] = useState(0);
     const [error, setError] = useState(null);
+    const [filteredDocuments,setFilteredDocuments] = useState([]);
+    const [filtering,setFiltering] = useState(false);
 
     // Fetch documents from the API
     useEffect(() => {
         setLoading(true);    
         fetchData('All',setData, setError, setLoading);
+        if(error){
+            console.error(error);
+        }
     }, []);
     // Filter documents with coordinates
-    const coordDocuments = data.filter(doc => doc.lat != null && doc.long != null);
+    const coordDocuments = !filtering ? data.filter(doc => doc.lat != null && doc.long != null) : filteredDocuments.filter(doc => doc.lat != null && doc.long != null);
 
     const handleClick = (doc) => {
         props.setSelectedDoc(doc); 
@@ -56,14 +61,19 @@ function MapLayoutPredefinedPosition(props) {
                         </Marker>
                     ))}
                 </MarkerClusterGroup>
+                <SearchBar documents={data} setFilteredDocuments={setFilteredDocuments} setFiltering={setFiltering} />
                 
                 {/* Popup with the document title, we will add also pos */}
                 {props.selectedDoc!==null && ((() => {
                         const pos = [props.selectedDoc.lat, props.selectedDoc.long];
                         const myKey = props.selectedDoc.id+renderNumber;
                         return (
-                            <Popup position={pos} maxWidth={800} key={myKey}  closeButton={true} autoClose={false} closeOnEscapeKey={false} closeOnClick={false}>
-                                <p>{props.selectedDoc.title}</p>
+                            <Popup position={pos} className='mapFormPopup' maxWidth={800} key={myKey}  closeButton={true} autoClose={false} closeOnEscapeKey={false} closeOnClick={false}>
+                                <p>
+                                    {props.selectedDoc.title}
+                                    <br></br>
+                                    {props.selectedDoc?.area ? `Area` : `Position:${props.selectedDoc.lat}-${props.selectedDoc.long}`}
+                                </p>
                             </Popup>
                         );
                     })()
