@@ -15,10 +15,7 @@ const AccessDenied = () => {
         style={{ maxWidth: '300px' }}
         />
       <p>
-        Please log in to continue or return to the homepage.       </p>
-      <Button variant="primary" onClick={() => navigate('/login')} className="me-2">
-        Go to Login
-      </Button>
+        Please log in to continue.       </p>
       <Button variant="secondary" onClick={() => navigate('/')}>
         Return to Home
       </Button>
