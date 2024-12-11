@@ -89,10 +89,21 @@ function MyPopup(props) {
   const navigate = useNavigate();
   
   
-  const handleClick = () => {
+  const handleEditClick = () => {
     if (props.doc && props.doc.id && props.doc.id > 0) {
       navigate(`/documents/${props.doc.id}`, { state: { docId: props.doc.id } });
     } else {
+      props.setError('Invalid document data');
+    }
+  };
+  const handleNavigation = (id) => {
+    navigate(`/document/${id}`);
+  };
+  const handleDeleteClick = () => {
+    if (props.doc && props.doc.id && props.doc.id > 0) {
+      //Call to the API to delete the document
+
+    }else{
       props.setError('Invalid document data');
     }
   };
@@ -111,31 +122,18 @@ function MyPopup(props) {
   const listOfStakeholders = stakeholderList(props.doc.stakeholders);
   
   return (
-    <Row className="p-3 border rounded shadow-sm popupProp" style={{ backgroundColor: '#f9f9f9' }}>
+    <Row className="p-3 border rounded shadow-sm popupProp popupBackStyle">
       {/* Icon Column */}
-      <Col
-        xs={12}
-        md={3}
-        className="myPopup mt-1"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',  // Disposizione verticale per gli altri elementi
-          alignItems: 'flex-start',  // Allineamento a sinistra per la lista
-          paddingTop: '0.5rem',
-        }}
-      >
-        {/* Icona centrata orizzontalmente */}
-        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+      <Col xs={12} md={3} className="myPopup mt-1 attachmentStyle">
+        <div className='iconPupoupStyle'>
           {renderIcon()}
         </div>
-
         <h6 className="fw-bold text-secondary mb-2 mt-2">Attachments:</h6>
         {attachments.length === 0 && <p className="small text-muted mt-2">No attachments added yet</p>}
         <ul className="list-unstyled">
           {attachments.map((attachment) => (
             <li key={attachment.id} className="mb-2">
-              <a
-                href="#"
+              <a href="#"
                 onClick={(e) => {
                   e.preventDefault();
                   handleDownload(props.doc.id, attachment.id);
@@ -149,9 +147,6 @@ function MyPopup(props) {
           ))}
         </ul>
       </Col>
-
-
-
       {/* Details Column */}
       <Col xs={12} md={4} className="myPopup">
         <h6 className="fw-bold text-secondary mb-2">{props.doc.title}</h6>
@@ -159,12 +154,10 @@ function MyPopup(props) {
           <strong className="text-dark">Stakeholders:</strong> {listOfStakeholders} <br />
           <strong className="text-dark">Scale:</strong>{' '}
           {props.doc.scale &&
-          typeof props.doc.scale === 'string' &&
-          props.doc.scale.toUpperCase() !== 'TEXT' &&
-          props.doc.scale.toUpperCase() !== 'BLUEPRINT/EFFECTS'
-            ? `1:${props.doc.scale}`
-            : props.doc.scale}{' '}
-          <br />
+            typeof props.doc.scale === 'string' &&
+            props.doc.scale.toUpperCase() !== 'TEXT' &&
+            props.doc.scale.toUpperCase() !== 'BLUEPRINT/EFFECTS'
+              ? `1:${props.doc.scale}`: props.doc.scale}{' '}<br />
           <strong className="text-dark">Issuance Date:</strong> {props.doc.issuanceDate} <br />
           <strong className="text-dark">Type:</strong> {props.doc.type} <br />
         </div>
@@ -173,14 +166,9 @@ function MyPopup(props) {
             <strong className="text-dark">Connections:</strong> {props.doc.connections}
             {props.doc.connections > 0 && !loading && (
               <Dropdown className="d-inline ms-2">
-                <Dropdown.Toggle
-                  variant="link"
-                  aria-label="connections"
-                  id="dropdown-toggle-connection"
-                  className="p-0"
+                <Dropdown.Toggle variant="link" aria-label="connections" id="dropdown-toggle-connection" className="p-0 dropStyle"
                   onClick={() => setShowLinks(!showLinks)}
-                  style={{ color: 'black', fontSize: '1rem' }}
-                  data-testid="connections-toggle-button"
+                  data-testid="connections-toggle-button "
                 >
                 </Dropdown.Toggle>
               </Dropdown>
@@ -192,15 +180,11 @@ function MyPopup(props) {
           <ul className="small text-muted ms-3">
             {links.map((link) => (
               <li key={link.linkedDocID}>
-              <span
-                style={{ color: "#007bff", cursor: "pointer", textDecoration: "underline" }}
-                onClick={() => handleNavigation(link.linkedDocID)}
-              >
-                {link.title}
-              </span>{" "}
-              - {link.type}
-            </li>
-            ))}
+                <span className='linkStyle'
+                  onClick={() => handleNavigation(link.linkedDocID)}
+                >{link.title}
+                </span>{" "} - {link.type}
+              </li>))}
           </ul>
         )}
         <p className='text-muted small m-0'>
@@ -210,32 +194,33 @@ function MyPopup(props) {
           {props.doc.area? 'Area' : props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'  }
         </p>
       </Col>
-
       {/* Description Column */}
       <Col xs={12} md={widthLastColumn} className="position-relative">
         <p className="mt-3 small text-muted">
           <strong className="text-dark">Description:</strong> {props.doc.description}
         </p>
       </Col>
-
       {/* Edit Button Column */}
       {props.loggedIn && (
       <Col xs={12} md={remainingWidth} className="d-flex align-items-start justify-content-center">
-        <Button
-          name="edit-button"
-          variant="outline-primary"
-          className="shadow-sm edit-button" // Added custom class for targeted CSS
-          aria-label="edit" 
-          style={{
-            padding: '0.5rem',
-            borderRadius: '50%',
-            width: '2.5rem',
-            height: '2.5rem',
-          }}
-          onClick={handleClick}
-        >
-          <i className="bi bi-pencil-square edit-icon" style={{ fontSize: '1.25rem' }}></i>
-        </Button>
+        <Row>
+          <Col xs={6} className="d-flex justify-content-center">
+            <Button
+              name="edit-button" variant="outline-primary" className="action-button shadow-sm" aria-label="edit"
+              onClick={handleEditClick}
+            >
+              <i className="bi bi-pencil-square action-icon"></i>
+            </Button>
+          </Col>
+          <Col xs={6} className="d-flex justify-content-center">
+            <Button
+              name="delete-button" variant="outline-danger" className="action-button shadow-sm" aria-label="delete"
+              onClick={handleDeleteClick}
+            >
+              <i className="bi bi-trash action-icon"></i>
+            </Button>
+          </Col>
+        </Row>
       </Col>)}
     </Row>
   );
