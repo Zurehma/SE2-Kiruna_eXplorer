@@ -10,6 +10,7 @@ import UserForm from "./UserForm";
 const Home = ({
   username,
   password,
+  role,
   setUsername,
   setPassword,
   handleLogin,
@@ -44,10 +45,10 @@ const Home = ({
             </button>
           </Col>
           <Col md={6} className="button-col">
-            <button onClick={() => navigate("/map")} className="styled-button">
-              Relocation of Kiruna
+            <button onClick={() => navigate("/graph")} className="styled-button">
+              Go to Graph
               <span className="button-icon">
-                <i className="bi bi-geo-alt"></i>{" "}
+                <i class="bi bi-bezier"></i>{" "}
               </span>
             </button>
           </Col>
@@ -75,14 +76,16 @@ const Home = ({
         closeLoginPane={closeLoginPane}
       />
 
-      <UserForm
-        toggleLoginPane={toggleLoginPane}
-        isAddUserOpen={isAddUserOpen}
-        closeAddUserPane={closeAddUserPane}
-      />
+      {/* Registrazione  RICORDATI DI CAMBIARE !== CON ===*/}
+      {role !== "admin" && (
+        <UserForm
+          toggleLoginPane={toggleLoginPane}
+          isAddUserOpen={isAddUserOpen}
+          closeAddUserPane={closeAddUserPane}
+        />
+      )}
 
       {/* Altre informazioni */}
-      {/* Aggiungi una nuova sezione centrale con immagini e testo diviso in tre parti */}
       <div id="content-section" className="image-text-section">
         <div className="info-block">
           <img src="/cause.png" alt="Mining operations" className="info-image" />
@@ -115,6 +118,8 @@ const Home = ({
           </div>
         </div>
       </div>
+
+      {/* Footer */}
       <footer className="footer">
         <div className="footer-content">
           <h5>Kiruna eXplorer</h5>
