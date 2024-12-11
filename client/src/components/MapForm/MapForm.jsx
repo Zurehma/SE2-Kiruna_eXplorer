@@ -96,7 +96,7 @@ const MapForm = (props) => {
   const [mapSizeClass, setMapSizeClass] = useState(mapContainerClass);
   const [overlay, setOverlay] = useState("without-overlay");
 
-  const predefinedPosition = "Predefined position";
+  const predefinedPosition = "Existing position";
   const customPoint = "Custom point";
   const customArea = "Custom area";
   const explore = "Explore";
@@ -173,7 +173,7 @@ const MapForm = (props) => {
           )}
           {position && position.coordinates && !isFullscreen && <ClearPositionButton clearPosition={clearPosition} />}
           <TileLayer url={mapStyles[mapView]} />
-          <RecenterButton initialPosition={KirunaCenter} positionActual={KirunaCenter} setPositionActual={setInitalPosition} zoomLevel={initialZoom} setZoomLevel={setInitalZoom} draw={currentMode === 'Custom area'} />
+          <RecenterButton initialPosition={KirunaCenter} positionActual={KirunaCenter} setPositionActual={setInitalPosition} zoomLevel={initialZoom} setZoomLevel={setInitalZoom} draw={currentMode === 'Custom area' && isFullscreen} />
           <ResizeMap />
         </MapContainer>
       </div>
