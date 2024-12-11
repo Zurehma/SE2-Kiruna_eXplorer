@@ -12,7 +12,6 @@ const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
     email: "",
     password: "",
   });
-  console.log("newUser", isAddUserOpen);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -22,7 +21,6 @@ const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
         throw new Error("Update new user failed. Please check the informations.");
       }
       setIsLoginOpen(false); // Chiude la finestra di login
-      console.log("llll");
     } catch (error) {
       setloggedinError(error.message || "Login failed. Please check your credentials.");
     }

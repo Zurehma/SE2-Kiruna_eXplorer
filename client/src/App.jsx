@@ -68,8 +68,6 @@ function App() {
 
       // Redirect to home and close the login pane
       // navigate("/", { state: { openLogin: false } });
-
-      console.log("Login successfullll");
     } catch (error) {
       setloggedinError(error.message || "Login failed. Please check your credentials.");
     }
