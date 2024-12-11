@@ -8,6 +8,20 @@ export function NavigationBar(props) {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
 
+  const handleLoginClick = () => {
+    if (location.pathname !== "/") {
+      navigate("/"); // Redirige solo se non sei già sulla home
+    }
+    props.toggleLoginPane(); // Apre la sliding pane
+  };
+
+  const handleNewUserClick = () => {
+    if (location.pathname !== "/") {
+      navigate("/"); // Redirige solo se non sei già sulla home
+    }
+    props.toggleAddUserPane(); // Apre la sliding pane
+  };
+
   const handleScroll = () => {
     if (window.scrollY > 50) {
       setScrolled(true);
@@ -19,7 +33,6 @@ export function NavigationBar(props) {
   useEffect(() => {
     // Aggiungi l'ascoltatore dello scroll
     window.addEventListener("scroll", handleScroll);
-
     // Rimuovi l'ascoltatore quando il componente viene smontato
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -28,26 +41,27 @@ export function NavigationBar(props) {
 
   const handleLogout = () => {
     props.handleLogout();
+    props.closeAddUserPane();
     navigate("/");
   };
 
   return (
     <Navbar expand="lg" className={`custom-navbar ${scrolled ? "scrolled" : ""}`}>
       <Navbar.Brand as={Link} to="/" className="navbar-brand">
-        Kiruna
+        Kiruna eXplorer
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="ms-auto">
           {props.loggedIn ? (
             <>
-              <Nav.Link
+              {/* <Nav.Link
                 as={Link}
                 to="/"
                 className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
               >
                 Home
-              </Nav.Link>
+              </Nav.Link> */}
               <Nav.Link
                 as={Link}
                 to="/map"
@@ -60,29 +74,35 @@ export function NavigationBar(props) {
                 to="/graph"
                 className={`nav-link ${location.pathname === "/graph" ? "active" : ""}`}
               >
-                Graph
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/documents"
-                className={`nav-link ${location.pathname === "/documents" ? "active" : ""}`}
-              >
-                Add Document
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/documents/links"
-                className={`nav-link ${location.pathname === "/documents/links" ? "active" : ""}`}
-              >
-                Add Link
+                Diagram
               </Nav.Link>
               <Nav.Link
                 as={Link}
                 to="/documents/all"
                 className={`nav-link ${location.pathname === "/documents/all" ? "active" : ""}`}
               >
-                View All
+                Documents List
               </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/documents"
+                className={`nav-link ${location.pathname === "/documents" ? "active" : ""}`}
+              >
+                New Document
+              </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/documents/links"
+                className={`nav-link ${location.pathname === "/documents/links" ? "active" : ""}`}
+              >
+                New Connection
+              </Nav.Link>
+              {/* RICORDATI DI CAMBIARE !== CON === */}
+              {props.role !== "admin" && (
+                <Nav.Link onClick={handleNewUserClick} className="nav-link">
+                  New User
+                </Nav.Link>
+              )}
               <Nav.Link onClick={handleLogout} className="nav-link">
                 Logout
               </Nav.Link>
@@ -103,11 +123,7 @@ export function NavigationBar(props) {
               >
                 Map
               </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/login"
-                className={`nav-link ${location.pathname === "/login" ? "active" : ""}`}
-              >
+              <Nav.Link onClick={handleLoginClick} className="nav-link">
                 Login
               </Nav.Link>
             </>
