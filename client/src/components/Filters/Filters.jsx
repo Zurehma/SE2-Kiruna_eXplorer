@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import API from "../../../API";
 
-function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
+function Filters({ setFilters, onLoadingChange }) {
   const [stakeholder, setStakeholder] = useState("");
   const [documentType, setDocumentType] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
@@ -13,85 +13,55 @@ function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
   const [endDate, setEndDate] = useState(null);
   const [isSingleDate, setIsSingleDate] = useState(true);
 
-  // Lists fetched from the backend
   const [stakeholdersList, setStakeholdersList] = useState([]);
   const [documentTypesList, setDocumentTypesList] = useState([]);
 
-  const [totalDocuments, setTotalDocuments] = useState(0);
-
   const formatDate = (date) => (date ? format(date, "yyyy-MM-dd") : null);
 
-  const fetchDefaultLists = async () => {
-    try {
-      const [stakeholders, documentTypes] = await Promise.all([
-        API.getStakeholders(),
-        API.getDocumentTypes(),
-      ]);
-      setStakeholdersList(stakeholders);
-      setDocumentTypesList(documentTypes);
-    } catch (error) {
-      console.error("Error fetching stakeholders or document types:", error);
-    }
-  };
-
-  const fetchFilteredDocuments = async () => {
-    onLoadingChange(true);
-    const filters = {
-      type: documentType || undefined,
-      stakeholder: stakeholder || undefined,
-      issuanceDateFrom: isSingleDate ? formatDate(selectedDate) : formatDate(startDate),
-      issuanceDateTo: isSingleDate ? formatDate(selectedDate) : formatDate(endDate),
+  // Fetch stakeholders and document types on component mount
+  useEffect(() => {
+    const fetchDefaultLists = async () => {
+      try {
+        const [stakeholders, documentTypes] = await Promise.all([
+          API.getStakeholders(),
+          API.getDocumentTypes(),
+        ]);
+        setStakeholdersList(stakeholders);
+        setDocumentTypesList(documentTypes);
+      } catch (error) {
+        console.error("Error fetching stakeholders or document types:", error);
+      }
     };
 
-    const filteredParams = Object.fromEntries(
-      Object.entries(filters).filter(([_, value]) => value !== undefined && value !== "")
-    );
-
-    try {
-      // First fetch all docs to get total count
-      const allDocs = await API.filterDocuments(filteredParams);
-      setTotalDocuments(allDocs.length);
-
-      // Then fetch only the requested page
-      const paginatedFilters = { ...filteredParams, limit, offset: currentPage * limit };
-      const response = await API.filterDocuments(paginatedFilters);
-
-      onDocumentsUpdate(response, allDocs.length);
-    } catch (error) {
-      console.error("Error fetching filtered documents:", error);
-      onDocumentsUpdate([], 0);
-    } finally {
-      onLoadingChange(false);
-    }
-  };
-
-  useEffect(() => {
     fetchDefaultLists();
   }, []);
 
+  // Update filters whenever any filter state changes
   useEffect(() => {
-    fetchFilteredDocuments();
-  }, [stakeholder, documentType, selectedDate, startDate, endDate, isSingleDate, currentPage]);
+    const updateFilters = () => {
+      const filters = {
+        type: documentType || undefined,
+        stakeholder: stakeholder || undefined,
+        issuanceDateFrom: isSingleDate ? formatDate(selectedDate) : formatDate(startDate),
+        issuanceDateTo: isSingleDate ? formatDate(selectedDate) : formatDate(endDate),
+      };
 
-  const handleSingleDateChange = (date) => {
-    setSelectedDate(date);
-  };
+      // Remove undefined or empty string values
+      const filteredParams = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== undefined && value !== "")
+      );
 
-  const handleDateRangeChange = (dates) => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end);
-  };
+      setFilters(filteredParams);
+    };
 
-  const handleResetDate = () => {
-    setSelectedDate(null);
-    setStartDate(null);
-    setEndDate(null);
-  };
+    updateFilters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stakeholder, documentType, selectedDate, startDate, endDate, isSingleDate]);
 
   return (
     <Card className="filter-card">
       <Card.Body>
+        {/* Stakeholder Filter */}
         <Form.Group controlId="sidebarFilterStakeholder" className="mt-3">
           <Form.Label>Stakeholder</Form.Label>
           <Form.Control
@@ -101,15 +71,15 @@ function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
             className="filter-input"
           >
             <option value="">All Stakeholders</option>
-            {stakeholdersList.map((stakeholderItem, index) => (
-              <option key={index} value={stakeholderItem.name}>
+            {stakeholdersList.map((stakeholderItem) => (
+              <option key={stakeholderItem.id} value={stakeholderItem.name}>
                 {stakeholderItem.name}
               </option>
             ))}
           </Form.Control>
         </Form.Group>
 
-        {/* Document Type Dropdown */}
+        {/* Document Type Filter */}
         <Form.Group controlId="sidebarFilterDocumentType" className="mt-3">
           <Form.Label>Document Type</Form.Label>
           <Form.Control
@@ -119,15 +89,15 @@ function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
             className="filter-input"
           >
             <option value="">All Document Types</option>
-            {documentTypesList.map((typeItem, index) => (
-              <option key={index} value={typeItem.name}>
+            {documentTypesList.map((typeItem) => (
+              <option key={typeItem.id} value={typeItem.name}>
                 {typeItem.name}
               </option>
             ))}
           </Form.Control>
         </Form.Group>
 
-        {/* Date Selection Toggle */}
+        {/* Date Type Toggle */}
         <Form.Group controlId="sidebarFilterDateType" className="mt-3">
           <Form.Label className="filter-label">Select Date Type</Form.Label>
           <div className="custom-toggle-container">
@@ -148,14 +118,14 @@ function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
           </div>
         </Form.Group>
 
-        {/* Date Picker with Reset Icon */}
+        {/* Date Picker */}
         <Form.Group controlId="sidebarFilterDate" className="mt-3 position-relative">
           <Form.Label>{isSingleDate ? "Select Date" : "Select Date Range"}</Form.Label>
           {isSingleDate ? (
             <div className="d-flex align-items-center position-relative" style={{ gap: "5px" }}>
               <DatePicker
                 selected={selectedDate}
-                onChange={handleSingleDateChange}
+                onChange={(date) => setSelectedDate(date)}
                 dateFormat="yyyy-MM-dd"
                 className="form-control date-picker-input"
                 placeholderText="Select Date"
@@ -168,7 +138,7 @@ function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
                 <i
                   className="bi bi-x-lg"
                   style={{ cursor: "pointer" }}
-                  onClick={handleResetDate}
+                  onClick={() => setSelectedDate(null)}
                 ></i>
               )}
             </div>
@@ -176,7 +146,11 @@ function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
             <div className="d-flex align-items-center position-relative" style={{ gap: "5px" }}>
               <DatePicker
                 selected={startDate}
-                onChange={handleDateRangeChange}
+                onChange={(dates) => {
+                  const [start, end] = dates;
+                  setStartDate(start);
+                  setEndDate(end);
+                }}
                 startDate={startDate}
                 endDate={endDate}
                 selectsRange
@@ -193,7 +167,10 @@ function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
                 <i
                   className="bi bi-x-lg"
                   style={{ cursor: "pointer" }}
-                  onClick={handleResetDate}
+                  onClick={() => {
+                    setStartDate(null);
+                    setEndDate(null);
+                  }}
                 ></i>
               )}
             </div>

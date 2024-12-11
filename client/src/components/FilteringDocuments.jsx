@@ -1,31 +1,100 @@
-import React, { useState } from "react";
-import { Container, Row, Col, Form, InputGroup, Spinner, Card, Offcanvas, Button } from "react-bootstrap";
+import React, { useState, useEffect, useMemo } from "react";
+import {Container,Row,Col,Form,InputGroup,Spinner,Card,Offcanvas,Button,Alert,} 
+from "react-bootstrap";
+import Filters from "./Filters/Filters.jsx";
 import { MyPopup } from "./MyPopup";
 import "../styles/Filtering.css";
-import Filters from "./Filters/Filters.jsx"; // Import the new Filters component
+import API from "../../API.js";
 
 const FilteringDocuments = (props) => {
+  const [filters, setFilters] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-
   const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  
-  const limit = 3;
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalDocuments, setTotalDocuments] = useState(0);
+  const [pageNo, setPageNo] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleSearch = (e) => setSearchQuery(e.target.value);
+  const limit = 3; // Number of documents per page
 
-  const filteredDocs = documents.filter((doc) =>
-    doc.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Debounce search input to optimize API calls
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
 
-  const handlePageChange = (newPage) => {
-    const actualnum = newPage * limit;
-    if (newPage >= 0 && actualnum < totalDocuments) {
-      setCurrentPage(newPage);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPageNo(1); // Reset to first page on search
+    }, 300); // 300ms debounce delay
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+  // Combine filters and searchQuery using useMemo to prevent unnecessary re-renders
+  const combinedFilters = useMemo(() => ({
+    ...filters,
+    title: debouncedSearch || undefined, // Use undefined to exclude from query params if empty
+  }), [filters, debouncedSearch]);
+
+  // Function to fetch documents from API
+  const fetchDocuments = async (currentPage) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Prepare query parameters
+      const params = {
+        ...combinedFilters,
+        pageNo: currentPage,limit
+      };
+
+      // Remove undefined or empty string values
+      const filteredParams = Object.fromEntries(
+        Object.entries(params).filter(([_, value]) => value !== undefined && value !== "")
+      );
+
+      const response = await API.getDocuments(filteredParams);
+
+      // Validate response structure
+      if (
+        response &&
+        typeof response.pageNo === "number" &&
+        typeof response.totalPages === "number" &&
+        Array.isArray(response.elements)
+      ) {
+        setDocuments(response.elements);
+        setPageNo(response.pageNo);
+        setTotalPages(response.totalPages);
+      } else {
+        throw new Error("Invalid response structure from API.");
+      }
+    } catch (err) {
+      console.error("Error fetching documents:", err);
+      setError("Failed to fetch documents. Please try again later.");
+      setDocuments([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Fetch documents whenever combinedFilters or pageNo changes
+  useEffect(() => {
+    fetchDocuments(pageNo);
+  }, [combinedFilters, pageNo]); // Removed ESLint disable
+
+  // Handle filter changes
+  const handleFiltersUpdate = (newFilters) => {
+    setFilters(newFilters);
+    setPageNo(1); // Reset to first page on filter change
+  };
+
+  // Handle page changes
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setPageNo(newPage);
   };
 
   return (
@@ -43,22 +112,13 @@ const FilteringDocuments = (props) => {
               <Offcanvas.Title>Filter Documents</Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
-              <Filters
-                limit={limit}
-                currentPage={currentPage}
-                onLoadingChange={setLoading}
-                onDocumentsUpdate={(newDocs, total) => {
-                  setDocuments(newDocs);
-                  setTotalDocuments(total);
-                }}
-              />
+              <Filters setFilters={handleFiltersUpdate} onLoadingChange={setLoading} />
               <Button
                 id="close-button-resp"
-                onClick={() => {
-                  setShowFilters(false);
-                }}
+                onClick={() => setShowFilters(false)}
+                className="mt-3"
               >
-                Close filtering page
+                Close Filtering
               </Button>
             </Offcanvas.Body>
           </Offcanvas>
@@ -69,68 +129,73 @@ const FilteringDocuments = (props) => {
           <Card className="filter-card">
             <Card.Body>
               <h5 className="filter-title">Filter Documents</h5>
-              <Filters
-                limit={limit}
-                currentPage={currentPage}
-                onLoadingChange={setLoading}
-                onDocumentsUpdate={(newDocs, total) => {
-                  setDocuments(newDocs);
-                  setTotalDocuments(total);
-                }}
-              />
+              <Filters setFilters={handleFiltersUpdate} onLoadingChange={setLoading} />
             </Card.Body>
           </Card>
         </Col>
 
         {/* Results Section */}
         <Col xs={12} md={9} className="filtered-result">
+          {/* Error Alert */}
+          {error && (
+            <Alert variant="danger" onClose={() => setError(null)} dismissible>
+              {error}
+            </Alert>
+          )}
+
+          {/* Search Bar */}
           <div className="search-section-modern">
             <InputGroup className="mb-3">
               <Form.Control
                 placeholder="Search by title..."
                 value={searchQuery}
-                onChange={handleSearch}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="search-input-modern"
               />
-              <div className="icons-container">
-                <i className="bi bi-x-lg clear-icon" onClick={() => setSearchQuery("")}></i>
-              </div>
+              {searchQuery && (
+                <Button variant="outline-secondary" onClick={() => setSearchQuery("")}>
+                  <i className="bi bi-x-lg"></i>
+                </Button>
+              )}
             </InputGroup>
           </div>
 
+          {/* Documents List */}
           <div className="documents-list mt-2">
-            <h4 className="text-center">PAGE {currentPage + 1}</h4>
+            <h4 className="text-center">PAGE {pageNo} of {totalPages}</h4>
             {loading ? (
               <div className="text-center">
                 <Spinner animation="border" variant="primary" />
               </div>
-            ) : filteredDocs.length > 0 ? (
-              filteredDocs.map((doc, index) => (
-                <MyPopup key={index} doc={doc} loggedIn={props.loggedIn} />
+            ) : documents.length > 0 ? (
+              documents.map((doc) => (
+                <MyPopup key={doc.id} doc={doc} loggedIn={props.loggedIn} />
               ))
             ) : (
-              <p>No documents found</p>
+              <p className="text-center">No documents found</p>
             )}
           </div>
 
-          {/* Pagination */}
-          {totalDocuments > 0 && (
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
             <div className="pagination-controls text-center mt-3">
               <Row className="mt-3">
-                <Col className="text-center">
+                <Col className="text-center d-flex justify-content-center align-items-center gap-3">
                   <Button
                     variant="primary"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 0}
+                    onClick={() => handlePageChange(pageNo - 1)}
+                    disabled={pageNo === 1}
                     className="btn-page"
                   >
                     Previous
                   </Button>
-                  <span>Page {currentPage + 1}</span>
+                  <span>
+                    Page {pageNo} of {totalPages}
+                  </span>
                   <Button
                     variant="primary"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={(currentPage + 1) * limit >= totalDocuments}
+                    onClick={() => handlePageChange(pageNo + 1)}
+                    disabled={pageNo === totalPages}
                     className="btn-page"
                   >
                     Next
