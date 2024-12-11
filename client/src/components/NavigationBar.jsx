@@ -8,6 +8,20 @@ export function NavigationBar(props) {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
 
+  const handleLoginClick = () => {
+    if (location.pathname !== "/") {
+      navigate("/"); // Redirige solo se non sei già sulla home
+    }
+    props.toggleLoginPane(); // Apre la sliding pane
+  };
+
+  const handleNewUserClick = () => {
+    if (location.pathname !== "/") {
+      navigate("/"); // Redirige solo se non sei già sulla home
+    }
+    props.toggleAddUserPane(); // Apre la sliding pane
+  };
+
   const handleScroll = () => {
     if (window.scrollY > 50) {
       setScrolled(true);
@@ -27,6 +41,7 @@ export function NavigationBar(props) {
 
   const handleLogout = () => {
     props.handleLogout();
+    props.closeAddUserPane();
     navigate("/");
   };
 
@@ -40,13 +55,13 @@ export function NavigationBar(props) {
         <Nav className="ms-auto">
           {props.loggedIn ? (
             <>
-              <Nav.Link
+              {/* <Nav.Link
                 as={Link}
                 to="/"
                 className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
               >
                 Home
-              </Nav.Link>
+              </Nav.Link> */}
               <Nav.Link
                 as={Link}
                 to="/map"
@@ -59,29 +74,35 @@ export function NavigationBar(props) {
                 to="/graph"
                 className={`nav-link ${location.pathname === "/graph" ? "active" : ""}`}
               >
-                Graph
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/documents"
-                className={`nav-link ${location.pathname === "/documents" ? "active" : ""}`}
-              >
-                Add Document
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/documents/links"
-                className={`nav-link ${location.pathname === "/documents/links" ? "active" : ""}`}
-              >
-                Add Link
+                Diagram
               </Nav.Link>
               <Nav.Link
                 as={Link}
                 to="/documents/all"
                 className={`nav-link ${location.pathname === "/documents/all" ? "active" : ""}`}
               >
-                All Documents
+                Documents List
               </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/documents"
+                className={`nav-link ${location.pathname === "/documents" ? "active" : ""}`}
+              >
+                New Document
+              </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/documents/links"
+                className={`nav-link ${location.pathname === "/documents/links" ? "active" : ""}`}
+              >
+                New Connection
+              </Nav.Link>
+              {/* RICORDATI DI CAMBIARE !== CON === */}
+              {props.role !== "admin" && (
+                <Nav.Link onClick={handleNewUserClick} className="nav-link">
+                  New User
+                </Nav.Link>
+              )}
               <Nav.Link onClick={handleLogout} className="nav-link">
                 Logout
               </Nav.Link>
@@ -102,17 +123,7 @@ export function NavigationBar(props) {
               >
                 Map
               </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/graph"
-                className={`nav-link ${location.pathname === "/graph" ? "active" : ""}`}
-              >
-                Graph
-              </Nav.Link>
-              <Nav.Link
-                onClick={props.toggleLoginPane}
-                className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
-              >
+              <Nav.Link onClick={handleLoginClick} className="nav-link">
                 Login
               </Nav.Link>
             </>
