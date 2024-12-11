@@ -55,13 +55,13 @@ export function NavigationBar(props) {
         <Nav className="ms-auto">
           {props.loggedIn ? (
             <>
-              <Nav.Link
+              {/* <Nav.Link
                 as={Link}
                 to="/"
                 className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
               >
                 Home
-              </Nav.Link>
+              </Nav.Link> */}
               <Nav.Link
                 as={Link}
                 to="/map"
@@ -74,33 +74,33 @@ export function NavigationBar(props) {
                 to="/graph"
                 className={`nav-link ${location.pathname === "/graph" ? "active" : ""}`}
               >
-                Graph
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/documents"
-                className={`nav-link ${location.pathname === "/documents" ? "active" : ""}`}
-              >
-                Add Document
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/documents/links"
-                className={`nav-link ${location.pathname === "/documents/links" ? "active" : ""}`}
-              >
-                Add Link
+                Diagram
               </Nav.Link>
               <Nav.Link
                 as={Link}
                 to="/documents/all"
                 className={`nav-link ${location.pathname === "/documents/all" ? "active" : ""}`}
               >
-                All Documents
+                Documents List
+              </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/documents"
+                className={`nav-link ${location.pathname === "/documents" ? "active" : ""}`}
+              >
+                New Document
+              </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/documents/links"
+                className={`nav-link ${location.pathname === "/documents/links" ? "active" : ""}`}
+              >
+                New Connection
               </Nav.Link>
               {/* RICORDATI DI CAMBIARE !== CON === */}
               {props.role !== "admin" && (
                 <Nav.Link onClick={handleNewUserClick} className="nav-link">
-                  Add User
+                  New User
                 </Nav.Link>
               )}
               <Nav.Link onClick={handleLogout} className="nav-link">
