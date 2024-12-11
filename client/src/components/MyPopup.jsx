@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Tooltip, OverlayTrigger, Button, Dropdown } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import API from '../../API';
 
+
+import API from '../../API';
 
 
 function MyPopup(props) {
@@ -86,15 +87,7 @@ function MyPopup(props) {
   };
 
   const navigate = useNavigate();
-  const computePages = (pageFrom, pageTo) => {
-    if (pageFrom && pageTo) {
-      return Number(pageTo) - Number(pageFrom) + 1;
-    }
-    return '-';
-  };
-  const handleNavigation = (id) => {
-    navigate(`/document/${id}`);
-  };
+  
   
   const handleClick = () => {
     if (props.doc && props.doc.id && props.doc.id > 0) {
@@ -114,9 +107,9 @@ function MyPopup(props) {
     return stakeholderList;
   }
   // Helper function to display "-" if value is null
-  const displayValue = (value) => (value !== null ? value : '-');
+  const displayValue = (value) => ((value !== null && value !== undefined) ? value : '-');
   const listOfStakeholders = stakeholderList(props.doc.stakeholders);
-
+  
   return (
     <Row className="p-3 border rounded shadow-sm popupProp" style={{ backgroundColor: '#f9f9f9' }}>
       {/* Icon Column */}
@@ -212,12 +205,7 @@ function MyPopup(props) {
         )}
         <p className='text-muted small m-0'>
           <strong className="text-dark">Language:</strong> {props.doc.language} <br />
-          <strong className="text-dark">Number of pages:</strong> {props.doc.pages ? displayValue(props.doc.pages) : computePages(props.doc.pageFrom,props.doc.pageTo)} <br />
-          <strong className="text-dark">Pages:</strong>{' '}
-          {props.doc.pageFrom && props.doc.pageTo
-            ? `${props.doc.pageFrom}-${props.doc.pageTo}`
-            : `-`}
-          <br />
+          <strong className="text-dark">Pages:</strong> {displayValue(props.doc.pages)} <br />
           <strong className="text-dark">Position:</strong>{' '}
           {props.doc.area? 'Area' : props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'  }
         </p>
