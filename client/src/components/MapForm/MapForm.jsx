@@ -14,6 +14,7 @@ import LoadGeoJson from "../MapUtils/LoadGeoJson";
 import MapControlPanel from "./SideBarMenu";
 import RecenterButton from '../MapUtils/RecenterButton';
 
+
 /**
  * Button component to resize the map
  * @param {*} isFullScreen boolean to tell is the map occupies the whole screen or the container size
@@ -63,6 +64,7 @@ const MapForm = (props) => {
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [selectedDoc, setSelectedDoc] = useState(null); 
   const KirunaCenter = [67.85, 20.217];
+
 
   //validate coordinates: verify they're in the Kiruna Municipality
   const validateCoordinates = (lat, long) => {
