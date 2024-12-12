@@ -208,6 +208,7 @@ function Links(props) {
                       onChange={(e) => handleLinkTypeChange(e.target.value)}
                       isInvalid={!!errors.linkType}
                       disabled={!linkData.document1}
+                      className="input-multi"
                     >
                       <option value="">Select a type of connection</option>
                       {typeLink.map((type, index) => (
@@ -236,12 +237,12 @@ function Links(props) {
                           ? `${linkData.document2.length} Documents Selected`
                           : "Select Documents"}
                       </Dropdown.Toggle>
-                      <Dropdown.Menu as={CustomMenu}>
+                      <Dropdown.Menu className="dropdown-force-down" as={CustomMenu}>
                         {documents
                           .filter(
                             (doc) =>
                               !linkedDocuments.includes(doc.id) && doc.id !== linkData.document1
-                          ) // Filtro per rimuovere anche linkData.document1
+                          )
                           .map((doc) => (
                             <Dropdown.Item
                               key={doc.id}
@@ -253,6 +254,7 @@ function Links(props) {
                           ))}
                       </Dropdown.Menu>
                     </Dropdown>
+
                     {errors.document2 && (
                       <div className="invalid-feedback d-block">{errors.document2}</div>
                     )}

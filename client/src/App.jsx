@@ -18,7 +18,6 @@ import { SingleDocument } from "./components/SingleDocument.jsx";
 import DocumentChartStatic from "./components/Graph/Graph.jsx";
 
 function App() {
-  //const [currentUser, setCurrentUser] = useState(""); //BOH
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -51,20 +50,14 @@ function App() {
   const handleLogin = async (credentials) => {
     try {
       const response = await API.logIn(credentials);
-
       if (!response.ok) {
         throw new Error("Login failed. Please check your credentials.");
       }
-
       const user = await API.getUserInfo();
-      //setCurrentUser(user);
       setLoggedIn(true);
       setRole(user.role);
-      setIsLoginOpen(false); // Chiude la finestra di login
+      setIsLoginOpen(false);
       setloggedinError(null);
-
-      // Redirect to home and close the login pane
-      // navigate("/", { state: { openLogin: false } });
     } catch (error) {
       setloggedinError("Login failed. Please check your credentials.");
     }
@@ -77,7 +70,6 @@ function App() {
         // Check if the user is already logged in
         const user = await API.getUserInfo();
         setUsername(user.username);
-        //setCurrentUser(user);
         setLoggedIn(true);
         setRole(user.role);
       } catch (error) {
@@ -94,7 +86,6 @@ function App() {
     await API.logOut();
     setLoggedIn(false);
     setUsername("");
-    //setCurrentUser("");
     navigate("/");
     setRole("");
   };

@@ -37,7 +37,7 @@ const Step2 = ({ document, errors, handleChange, handleAddNew, scales, types }) 
               onChange={handleChange}
               isInvalid={!!errors.nValue}
               placeholder="Enter n"
-              className={`input ${document.scale === "1:n" ? "" : "disabled-field"}`}
+              className={`input-multi ${document.scale === "1:n" ? "" : "disabled-field"}`}
               disabled={document.scale !== "1:n"}
             />
             <Form.Control.Feedback type="invalid">{errors.nValue}</Form.Control.Feedback>
@@ -78,7 +78,7 @@ const Step2 = ({ document, errors, handleChange, handleAddNew, scales, types }) 
               onChange={handleChange}
               isInvalid={!!errors.newType}
               placeholder="Enter new type"
-              className={`input ${document.type === "add_new_type" ? "" : "disabled-field"}`}
+              className={`input-multi ${document.type === "add_new_type" ? "" : "disabled-field"}`}
               disabled={document.type !== "add_new_type"}
             />
             <Form.Control.Feedback type="invalid">{errors.newType}</Form.Control.Feedback>
@@ -124,7 +124,7 @@ const Step2 = ({ document, errors, handleChange, handleAddNew, scales, types }) 
               value={document.pages || ""}
               onChange={handleChange}
               placeholder="e.g., 35 or 35-45"
-              className="input"
+              className="input-multi"
               isInvalid={!!errors.pages}
             />
             <Form.Control.Feedback type="invalid">{errors.pages}</Form.Control.Feedback>

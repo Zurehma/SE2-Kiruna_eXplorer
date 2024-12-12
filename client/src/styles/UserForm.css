@@ -1,16 +1,23 @@
 .add-user-form {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* Cambia per allineare il contenuto all'inizio */
   align-items: center;
   gap: 15px;
   height: 100%;
+  padding: 30px;
+  overflow-y: auto; /* Abilita lo scroll verticale se il contenuto supera l'altezza */
+  max-height: 100vh; /* Assicura che il form non superi l'altezza della finestra */
+  box-sizing: border-box; /* Assicurati che padding e border siano inclusi nella dimensione */
 }
+
+/* Mantieni il resto del tuo CSS invariato */
 
 .add-user-title {
   text-align: center;
   font-size: 1.8rem;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  color: #006d77;
 }
 
 .form-group {
@@ -28,14 +35,20 @@
 }
 
 .add-user-button {
-  padding: 10px 15px;
-  background-color: #4caf50;
+  padding: 12px 20px;
+  background-color: #006d77;
   color: white;
+  font-size: 16px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .add-user-button:hover {
-  background-color: #45a049;
+  background-color: #004f55;
+  transform: translateY(-2px);
 }

@@ -23,7 +23,7 @@ const Step1 = ({
             value={document.title}
             onChange={handleChange}
             placeholder="Enter document title"
-            className="input"
+            className="input-multi"
             isInvalid={!!errors.title}
           />
           <Form.Control.Feedback type="invalid">{errors.title}</Form.Control.Feedback>
@@ -44,7 +44,15 @@ const Step1 = ({
                 onCreateOption={handleCreate}
                 placeholder="Select or add stakeholders..."
                 formatCreateLabel={(inputValue) => `Add "${inputValue}"`}
-                classNamePrefix="react-select"
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    border: "1px solid #006d77", // Bordo coerente con il campo Title
+                    borderRadius: "5px", // Angoli arrotondati
+                    fontSize: "16px", // Dimensione del testo
+                    padding: "0.5rem", // Rimuove padding extra
+                  }),
+                }}
               />
             </div>
             {errors.stakeholders && (
