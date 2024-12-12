@@ -63,13 +63,6 @@ const DocumentChartStatic = (props) => {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-    API.getDocuments(filters, true)
-      .then((docs) => {
-        setChartData(docs);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
   }, [selectedType]);
 
   useEffect(() => {
