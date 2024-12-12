@@ -147,9 +147,12 @@ const getAttachments = async (docID) => {
 const downloadAttachment = async (docID, attachmentID) => {
   try {
     // EFetch request to the server
-    const response = await fetch(`${SERVER_URL}/api/documents/${docID}/attachments/${attachmentID}/download`, {
-      method: "GET",
-    });
+    const response = await fetch(
+      `${SERVER_URL}/api/documents/${docID}/attachments/${attachmentID}/download`,
+      {
+        method: "GET",
+      }
+    );
 
     // 200 if the response is correct
     if (!response.ok) {
@@ -185,6 +188,28 @@ const setLink = async (linkData) => {
     return handleInvalidResponse(response).json();
   } catch (error) {
     console.error("Error setting link:", error);
+    throw error;
+  }
+};
+
+/**
+ * This function sign in a user given the information.
+ */
+const signIn = async (newUser) => {
+  try {
+    console.log("newUser", newUser);
+    const response = await fetch(SERVER_URL + "/api/sessions/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // Invia i cookie, incluso quello di sessione
+      body: JSON.stringify(newUser), // Invia i dati del nuovo utente
+    });
+
+    return handleInvalidResponse(response);
+  } catch (error) {
+    console.error("Error registering user:", error);
     throw error;
   }
 };
@@ -371,6 +396,7 @@ const API = {
   updateDocument,
   allExistingLinks,
   deleteDocument,
+  signIn,
 };
 
 export default API;
