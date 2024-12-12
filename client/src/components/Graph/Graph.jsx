@@ -13,6 +13,7 @@ import useWebSocket from "../../hooks/useWebSocket";
 
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
+  const docCoordsRef = useRef({}); // Initialize useRef for docCoords
   const [documentTypes, setDocumentTypes] = useState([]);
   const [stakeholders, setStakeholders] = useState([]);
   const [chartData, setChartData] = useState([]);
@@ -26,10 +27,6 @@ const DocumentChartStatic = (props) => {
   // States for handling deletion modal
   const [deleteLink, setDeleteLink] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  // We'll store current document coordinates in this dictionary:
-  // { docId: { x: number, y: number } }
-  let docCoords = {};
 
   const fetchData = async () => {
     try {
@@ -186,23 +183,30 @@ const DocumentChartStatic = (props) => {
       };
     }
 
-    // Initialize docCoords
+    // Initialize docCoordsRef.current
+    docCoordsRef.current = {}; // Reset before setting
     chartData.forEach((doc) => {
       const { cellX, cellY } = getCellCoords(doc);
 
       if (cellX != null && cellY != null) {
-        docCoords[doc.id] = {
+        docCoordsRef.current[doc.id] = {
           x: cellWidth / 2,
           y: cellHeight / 2,
         };
       }
     });
 
+    // Update docCoordsRef.current with messageReceived
     Object.keys(messageReceived).forEach((docId) => {
-      const dx = messageReceived[docId].x;
-      const dy = messageReceived[docId].y;
-      docCoords[docId].x = cellWidth / 2 + dx * cellWidth;
-      docCoords[docId].y = cellHeight / 2 + dy * cellHeight;
+      if (docCoordsRef.current[docId]) { // Check if docCoordsRef.current[docId] exists
+        const dx = messageReceived[docId].x;
+        const dy = messageReceived[docId].y;
+        docCoordsRef.current[docId].x = cellWidth / 2 + dx * cellWidth;
+        docCoordsRef.current[docId].y = cellHeight / 2 + dy * cellHeight;
+      } else {
+        console.warn(`Received message for unknown docId: ${docId}`);
+        // Optionally, initialize it or handle accordingly
+      }
     });
 
     const tooltip = d3
@@ -293,8 +297,8 @@ const DocumentChartStatic = (props) => {
         const { cellX: cellX2, cellY: cellY2 } = getCellCoords(doc2);
         if (cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null) return;
 
-        const pos1 = docCoords[doc1.id];
-        const pos2 = docCoords[doc2.id];
+        const pos1 = docCoordsRef.current[doc1.id];
+        const pos2 = docCoordsRef.current[doc2.id];
         if (!pos1 || !pos2) return;
 
         const startX = cellX1 + pos1.x;
@@ -363,8 +367,8 @@ const DocumentChartStatic = (props) => {
       const { cellX: cellX2, cellY: cellY2 } = getCellCoords(doc2);
       if (cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null) return null;
 
-      const pos1 = docCoords[doc1.id];
-      const pos2 = docCoords[doc2.id];
+      const pos1 = docCoordsRef.current[doc1.id];
+      const pos2 = docCoordsRef.current[doc2.id];
       if (!pos1 || !pos2) return null;
 
       const startX = cellX1 + pos1.x + margin.left;
@@ -436,7 +440,7 @@ const DocumentChartStatic = (props) => {
         const cellHeight = yScale.bandwidth();
         const halfSize = 12;
 
-        const oldPos = docCoords[docId];
+        const oldPos = docCoordsRef.current[docId];
         if (!oldPos) return;
 
         let newX = oldPos.x + event.dx;
@@ -447,7 +451,7 @@ const DocumentChartStatic = (props) => {
         if (newY < halfSize) newY = halfSize;
         if (newY > cellHeight - halfSize) newY = cellHeight - halfSize;
 
-        docCoords[docId] = { x: newX, y: newY };
+        docCoordsRef.current[docId] = { x: newX, y: newY };
 
         d3.select(this)
           .attr("transform", `translate(${cellX + newX},${cellY + newY})`);
@@ -456,8 +460,8 @@ const DocumentChartStatic = (props) => {
       })
       .on("end", (event, d) => {
         const docId = d.id;
-        const x = (docCoords[docId].x - cellWidth / 2) / cellWidth;
-        const y = (docCoords[docId].y - cellHeight / 2) / cellHeight;
+        const x = (docCoordsRef.current[docId].x - cellWidth / 2) / cellWidth;
+        const y = (docCoordsRef.current[docId].y - cellHeight / 2) / cellHeight;
         sendMessage({ docId, x, y });
       });
 
@@ -469,7 +473,7 @@ const DocumentChartStatic = (props) => {
       .attr("class", "doc")
       .attr("transform", (d) => {
         const { cellX, cellY } = getCellCoords(d);
-        const pos = docCoords[d.id];
+        const pos = docCoordsRef.current[d.id];
         return `translate(${cellX + pos.x},${cellY + pos.y})`;
       });
 
@@ -480,7 +484,7 @@ const DocumentChartStatic = (props) => {
     function getDocPosition(d) {
       const { cellX, cellY } = getCellCoords(d);
       if (cellX == null || cellY == null) return null;
-      const pos = docCoords[d.id];
+      const pos = docCoordsRef.current[d.id];
       return {
         x: cellX + pos.x + margin.left,
         y: cellY + pos.y + margin.top,
@@ -529,7 +533,7 @@ const DocumentChartStatic = (props) => {
         hideTooltip();
         d3.select(this).select("foreignObject div").transition().duration(200).style("transform", "scale(1)").style("box-shadow", "none");
       });
-  }, [chartData, links, stakeholders, props.role]);
+  }, [chartData, links, stakeholders, props.role, messageReceived, isOpen]); // Updated dependencies
 
   const handleDocumentClick = (doc) => {
     navigate(`/document/${doc.id}`);
