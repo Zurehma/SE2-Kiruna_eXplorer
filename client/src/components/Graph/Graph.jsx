@@ -41,7 +41,7 @@ const DocumentChartStatic = (props) => {
 
       setDocumentTypes(documentType);
       setStakeholders(stakeholdersWithColors);
-      setLinks(linksData); 
+      setLinks(links); 
       
     } catch (error) {
       console.error("Error fetching data:", error);
