@@ -6,7 +6,7 @@ import { Form, Button } from "react-bootstrap";
 import API from "../../API.js";
 
 const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
-  const roles = ["Urban Planners", "Residents", "Urban Developers", "Admin"];
+  const roles = ["Urban Planners", "Residents", "Urban Developers"];
   const [repPassword, setRepPassword] = useState("");
   const [newUser, setNewUser] = useState({
     name: "",
