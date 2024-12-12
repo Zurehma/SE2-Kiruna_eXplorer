@@ -265,6 +265,19 @@ const deleteAttachment = async (docID, attachmentID) => {
   }
 };
 
+// Function to delete a document
+const deleteDocument = async (docID) => {
+  try {
+    await fetch(`${SERVER_URL}/api/documents/${docID}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+  } catch (error) {
+    console.error("Error deleting document:", error);
+    throw error;
+  }
+};
+
 const saveDocument = async (doc) => {
   const filteredDoc = Object.fromEntries(
     Object.entries({
@@ -357,6 +370,7 @@ const API = {
   getDocumentById,
   updateDocument,
   allExistingLinks,
+  deleteDocument,
 };
 
 export default API;

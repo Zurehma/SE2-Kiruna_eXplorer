@@ -7,7 +7,7 @@ function MyFilterDropdown(props){ //loggedIn,set
         <>
             {/* Filter dropdown on the top-right corner */}
             {props.loggedIn && (
-                <Dropdown drop='down-centered' onSelect={(eventKey) => {props.setSelectedType(eventKey); props.setSelectedDoc(null);}} className='myDropdownFilter'>
+                <Dropdown drop='down-centered' onSelect={(eventKey) => {props.setSelectedType(eventKey);}} className='myDropdownFilter'>
                     <Dropdown.Toggle drop='down-centered' variant="light" id="dropdown-filter-button" className='myFilterMenu'>
                         <i className="bi bi-filter me-1" style={{ fontSize: '18px' }}></i>
                         Filter

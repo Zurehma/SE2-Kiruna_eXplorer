@@ -5,16 +5,20 @@ import { Col, Row } from "react-bootstrap";
 import { useLocation } from "react-router";
 import { useState, useEffect } from "react";
 import Login from "./Login";
+import UserForm from "./UserForm";
 
 const Home = ({
   username,
   password,
+  role,
   setUsername,
   setPassword,
   handleLogin,
   toggleLoginPane,
   isLoginOpen,
   closeLoginPane,
+  isAddUserOpen,
+  closeAddUserPane,
 }) => {
   const navigate = useNavigate();
   const scrollToContent = () => {
@@ -34,16 +38,25 @@ const Home = ({
         <Row className="button-row">
           <Col md={6} className="button-col">
             <button onClick={() => navigate("/map")} className="styled-button">
-              Relocation of Kiruna
+              Relocation Map
               <span className="button-icon">
                 <i className="bi bi-geo-alt"></i>{" "}
               </span>
             </button>
           </Col>
           <Col md={6} className="button-col">
-            <button onClick={scrollToContent} className="styled-button">
-              About us
+            <button onClick={() => navigate("/graph")} className="styled-button">
+              View Diagram
               <span className="button-icon">
+                <i class="bi bi-bezier"></i>{" "}
+              </span>
+            </button>
+          </Col>
+        </Row>
+        <Row className="arrow-row">
+          <Col md={6} className="arrow-col">
+            <button onClick={scrollToContent} className="styled-arrow">
+              <span className="arrow-icon">
                 <i className="bi bi-arrow-down"></i>
               </span>
             </button>
@@ -63,8 +76,16 @@ const Home = ({
         closeLoginPane={closeLoginPane}
       />
 
+      {/* Registrazione  RICORDATI DI CAMBIARE !== CON ===*/}
+      {role !== "admin" && (
+        <UserForm
+          toggleLoginPane={toggleLoginPane}
+          isAddUserOpen={isAddUserOpen}
+          closeAddUserPane={closeAddUserPane}
+        />
+      )}
+
       {/* Altre informazioni */}
-      {/* Aggiungi una nuova sezione centrale con immagini e testo diviso in tre parti */}
       <div id="content-section" className="image-text-section">
         <div className="info-block">
           <img src="/cause.png" alt="Mining operations" className="info-image" />
@@ -97,6 +118,8 @@ const Home = ({
           </div>
         </div>
       </div>
+
+      {/* Footer */}
       <footer className="footer">
         <div className="footer-content">
           <h5>Kiruna eXplorer</h5>
