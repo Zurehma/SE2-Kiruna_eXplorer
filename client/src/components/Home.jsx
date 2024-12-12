@@ -17,6 +17,8 @@ const Home = ({
   toggleLoginPane,
   isLoginOpen,
   closeLoginPane,
+  loggedinError,
+  setloggedinError,
   isAddUserOpen,
   closeAddUserPane,
 }) => {
@@ -74,6 +76,8 @@ const Home = ({
         toggleLoginPane={toggleLoginPane}
         isLoginOpen={isLoginOpen}
         closeLoginPane={closeLoginPane}
+        loggedinError={loggedinError}
+        setloggedinError={setloggedinError}
       />
 
       {/* Registrazione  RICORDATI DI CAMBIARE !== CON ===*/}

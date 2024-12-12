@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import * as d3 from "d3";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -7,8 +7,8 @@ import API from "../../../API";
 import "../../styles/DocumentChartStatic.css";
 import Legend from "./Legend";
 import GraphUtils from "./GraphUtils/GraphUtils";
-import useWebSocket from "../../hooks/useWebSocket";
 import MyFilterDropdown from "../MapNavigation/MyFilterDropdown";
+import { Modal, Button } from "react-bootstrap"; // Import Modal and Button from react-bootstrap
 
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
@@ -21,6 +21,10 @@ const DocumentChartStatic = (props) => {
   const { isOpen, messageReceived, sendMessage } = useWebSocket();
 
   const navigate = useNavigate();
+
+  // States for handling deletion modal
+  const [deleteLink, setDeleteLink] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // We'll store current document coordinates in this dictionary:
   // { docId: { x: number, y: number } }
@@ -70,6 +74,37 @@ const DocumentChartStatic = (props) => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Define openDeleteModal using useCallback to ensure stability
+  const openDeleteModal = useCallback((link) => {
+    setDeleteLink(link);
+    setShowDeleteModal(true);
+  }, []);
+
+  const confirmDeleteLink = async () => {
+    if (!deleteLink) return;
+    try {
+      await API.deleteLink(deleteLink.linkID);
+      setShowDeleteModal(false);
+      setDeleteLink(null);
+      fetchData(); // Refresh the data to update the graph immediately
+    } catch (error) {
+      console.error("Failed to delete the link:", error);
+      setShowDeleteModal(false);
+      setDeleteLink(null);
+      // Optionally, handle error display here (e.g., another modal or toast)
+    }
+  };
+
+  const cancelDeleteLink = () => {
+    setShowDeleteModal(false);
+    setDeleteLink(null);
+  };
+
+  const getDocumentTitle = (docID) => {
+    const doc = chartData.find((d) => d.id === docID);
+    return doc ? doc.title : 'Unknown';
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -384,20 +419,12 @@ const DocumentChartStatic = (props) => {
         showTooltip(html, midpoint.x, midpoint.y);
 
         if (props.role === "Urban Planner") {
-          // Add click event handler for the delete button
+          // Add click event handler for the delete button to open the confirmation modal
           d3.select(tooltip.node())
             .select(".delete-link-btn")
-            .on("click", async () => {
-              const confirmDelete = window.confirm("Are you sure you want to delete this link?");
-              if (!confirmDelete) return;
-
-              try {
-                await API.deleteLink(d.linkID); // Pass the linkID to the API
-                hideTooltip();
-                fetchData(); // Refresh the data to update the graph
-              } catch (error) {
-                alert("Failed to delete the link. Please try again.");
-              }
+            .on("click", () => {
+              setShowDeleteModal(false); // Hide the tooltip
+              openDeleteModal(d); // Open the confirmation modal with the link data
             });
         }
       })
@@ -508,7 +535,7 @@ const DocumentChartStatic = (props) => {
         hideTooltip();
         d3.select(this).select("foreignObject div").transition().duration(200).style("transform", "scale(1)").style("box-shadow", "none");
       });
-  }, [chartData, links, stakeholders, props.role, messageReceived]);
+  }, [chartData, links, stakeholders, props.role]);
 
   const handleDocumentClick = (doc) => {
     navigate(`/document/${doc.id}`);
@@ -525,6 +552,40 @@ const DocumentChartStatic = (props) => {
           <svg ref={svgRef} style={{ width: "100%", height: "100%" }}></svg>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={cancelDeleteLink} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {deleteLink ? (
+            <>
+              <p>Are you sure you want to delete this link?</p>
+              <p><strong>Link Type:</strong> {deleteLink.type}</p>
+              <p>
+                <strong>Between:</strong><br />
+                {getDocumentTitle(deleteLink.DocID1)} and {getDocumentTitle(deleteLink.DocID2)}
+              </p>
+              {/* Updated Section: Adding Warning Icon */}
+              <p style={{ color: "red", display: "flex", alignItems: "center" }}>
+                <i className="bi bi-exclamation-triangle-fill" style={{ color: "orange", marginRight: "8px" }}></i>
+                This action cannot be undone.
+              </p>
+            </>
+          ) : (
+            <p>Are you sure you want to delete this link?</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={cancelDeleteLink}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDeleteLink}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
