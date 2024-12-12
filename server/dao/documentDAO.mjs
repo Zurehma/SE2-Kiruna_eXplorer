@@ -21,7 +21,7 @@ const mapRowsToDocument = (documentRows, stakeholderRows) => {
 };
 
 const getPagination = (pageNo, totalElements) => {
-  const PAGE_SIZE = 2;
+  const PAGE_SIZE = 5;
   const totalPages = Math.ceil(totalElements / PAGE_SIZE);
   const limit = PAGE_SIZE;
   const offset = pageNo >= totalPages ? PAGE_SIZE * (totalPages - 1) : PAGE_SIZE * (pageNo - 1);
