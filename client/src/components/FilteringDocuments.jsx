@@ -14,12 +14,13 @@ const FilteringDocuments = (props) => {
   const limit = 3;
   const [currentPage, setCurrentPage] = useState(0);
   const [totalDocuments, setTotalDocuments] = useState(0);
-
+  
   const handleSearch = (e) => setSearchQuery(e.target.value);
 
   const filteredDocs = documents.filter((doc) =>
     doc.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  const executeSearch = () => {};
 
   const handlePageChange = (newPage) => {
     const actualnum = newPage * limit;
@@ -84,20 +85,19 @@ const FilteringDocuments = (props) => {
 
         {/* Results Section */}
         <Col xs={12} md={9} className="filtered-result">
-          <div className="search-section-modern">
+          <div className='mt-3'>
             <InputGroup className="mb-3">
               <Form.Control
                 placeholder="Search by title..."
                 value={searchQuery}
                 onChange={handleSearch}
-                className="search-input-modern"
+                className='searchbar'
               />
-              <div className="icons-container">
-                <i className="bi bi-x-lg clear-icon" onClick={() => setSearchQuery("")}></i>
-              </div>
+              <Button onClick={executeSearch} className="search-btn">
+                <i className="bi bi-search"></i>
+              </Button>
             </InputGroup>
           </div>
-
           <div className="documents-list mt-2">
             <h4 className="text-center">PAGE {currentPage + 1}</h4>
             {loading ? (

@@ -162,7 +162,7 @@ function MapNavigation(props) {
                 <MapClickHandler onMapClick={() => setSelectedDoc(null)} />
                 
                 {/* Dropdown to filter documents by type */}
-                <MyFilterDropdown loggedIn={props.loggedIn} typeDoc={typeDoc} selectedType={selectedType} setSelectedType={setSelectedType} setSelectedDoc={setSelectedDoc} />
+                <MyFilterDropdown loggedIn={props.loggedIn} typeDoc={typeDoc} selectedType={selectedType} setSelectedType={setSelectedType}  />
                 
                 {/* Show documents without coordinates with a button that opens a modal */}
                 <MyModal noCoordDocuments={noCoordDocuments} setSelectedDoc={setSelectedDoc} setRenderNumeber={setRenderNumeber} classNameEntireMunicipality={classNameEntireMunicipality} iconMap={iconMap} renderNumber={renderNumber}/>
