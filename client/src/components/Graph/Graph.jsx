@@ -6,8 +6,8 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import API from "../../../API";
 import "../../styles/DocumentChartStatic.css";
 import Legend from "./Legend";
-import GraphConfig from "./GraphUtils/GraphConfig";
 import GraphUtils from "./GraphUtils/GraphUtils";
+import useWebSocket from "../../hooks/useWebSocket";
 
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
@@ -16,12 +16,13 @@ const DocumentChartStatic = (props) => {
   const [chartData, setChartData] = useState([]);
   const [links, setLinks] = useState([]);
   const [showLegendModal, setShowLegendModal] = useState(false);
+  const { isOpen, messageReceived, sendMessage } = useWebSocket();
 
   const navigate = useNavigate();
 
   // We'll store current document coordinates in this dictionary:
   // { docId: { x: number, y: number } }
-  const docCoords = {};
+  let docCoords = {};
 
   const fetchData = async () => {
     try {
@@ -51,6 +52,8 @@ const DocumentChartStatic = (props) => {
   }, []);
 
   useEffect(() => {
+    if (!isOpen) return;
+
     if (chartData.length === 0) return;
 
     const svg = d3.select(svgRef.current);
@@ -120,17 +123,23 @@ const DocumentChartStatic = (props) => {
       };
     }
 
-    const config = GraphConfig.loadConfig();
-
     // Initialize docCoords
     chartData.forEach((doc) => {
       const { cellX, cellY } = getCellCoords(doc);
+
       if (cellX != null && cellY != null) {
         docCoords[doc.id] = {
-          x: config && config[doc.id] ? config[doc.id].x : xScale.bandwidth() / 2,
-          y: config && config[doc.id] ? config[doc.id].y : yScale.bandwidth() / 2,
+          x: cellWidth / 2,
+          y: cellHeight / 2,
         };
       }
+    });
+
+    Object.keys(messageReceived).forEach((docId) => {
+      const dx = messageReceived[docId].x;
+      const dy = messageReceived[docId].y;
+      docCoords[docId].x = cellWidth / 2 + dx * cellWidth;
+      docCoords[docId].y = cellHeight / 2 + dy * cellHeight;
     });
 
     // Function to update link paths
@@ -239,7 +248,10 @@ const DocumentChartStatic = (props) => {
         g.selectAll(".link").call(updateLinkPath);
       })
       .on("end", (event, d) => {
-        GraphConfig.updateConfig(d.id, docCoords[d.id].x, docCoords[d.id].y);
+        const docId = d.id;
+        const x = (docCoords[docId].x - cellWidth / 2) / cellWidth;
+        const y = (docCoords[docId].y - cellHeight / 2) / cellHeight;
+        sendMessage({ docId, x, y });
       });
 
     // Draw documents
@@ -281,7 +293,7 @@ const DocumentChartStatic = (props) => {
         )
         .on("click", () => handleDocumentClick(d));
     });
-  }, [chartData, links, stakeholders, props.role]);
+  }, [chartData, links, stakeholders, props.role, messageReceived]);
 
   const handleDocumentClick = (doc) => {
     navigate(`/document/${doc.id}`);
