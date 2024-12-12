@@ -28,11 +28,11 @@ class DocumentController {
     });
   };
 
-  getDocuments = (pageNo, title, description, type, stakeholder, issuanceDateFrom, issuanceDateTo) => {
+  getDocuments = (pageNo, subtext, type, stakeholder, issuanceDateFrom, issuanceDateTo) => {
     return new Promise((resolve, reject) => {
       const fetchDocuments = async () => {
         try {
-          let queryParameters = { title, description, type, stakeholder, issuanceDateFrom, issuanceDateTo };
+          let queryParameters = { subtext, type, stakeholder, issuanceDateFrom, issuanceDateTo };
           const documents = await this.documentDAO.getDocuments(pageNo ? Number(pageNo) : 1, queryParameters);
           resolve(documents);
         } catch (err) {
@@ -189,7 +189,7 @@ class DocumentController {
       };
       deleteDocument();
     });
-  }
+  };
 
   /**
    * Get the list of already available document types
@@ -306,7 +306,7 @@ class DocumentController {
       };
       deleteLink();
     });
-  }
+  };
 }
 
 export default DocumentController;
