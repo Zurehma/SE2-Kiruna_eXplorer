@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SlidingPane from "react-sliding-pane";
 import "react-sliding-pane/dist/react-sliding-pane.css";
 import "../styles/UserForm.css";
@@ -7,7 +7,9 @@ import API from "../../API.js";
 
 const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
   const roles = ["Urban Planners", "Residents", "Urban Developers"];
+  const [signinError, setsigninError] = useState(null);
   const [repPassword, setRepPassword] = useState("");
+  const errorRef = useRef(null);
   const [newUser, setNewUser] = useState({
     name: "",
     surname: "",
@@ -23,6 +25,7 @@ const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
     password: "",
     repPassword: "",
   });
+
   const handleSubmitUser = async (e) => {
     e.preventDefault();
     if (validateStep()) {
@@ -34,10 +37,23 @@ const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
         console.log("User created successfully", response);
         closeAddUserPane();
       } catch (error) {
-        console.log("Login failed. Please check your credentials.");
+        setsigninError("Sign in failed. Please check your info.");
       }
     }
   };
+
+  useEffect(() => {
+    if (signinError) {
+      errorRef.current.scrollIntoView({
+        behavior: "smooth", // Scorrimento fluido
+        block: "center", // Posiziona la sezione al centro della finestra
+      });
+      const timer = setTimeout(() => {
+        setsigninError(null); // Clear the error after 5 seconds
+      }, 5000);
+      return () => clearTimeout(timer); // Cleanup timer on component unmount
+    }
+  }, [signinError, setsigninError]);
 
   const validateStep = () => {
     const newErrors = {};
@@ -152,6 +168,18 @@ const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
         <Button className="add-user-button" type="submit">
           Add User
         </Button>
+        {signinError && (
+          <div
+            ref={errorRef}
+            className="error-message d-flex align-items-center mb-3 p-2 bg-danger bg-opacity-10 border border-danger rounded"
+          >
+            <i
+              className="bi bi-exclamation-triangle-fill text-danger me-2"
+              style={{ fontSize: "1.5rem" }}
+            ></i>
+            <span className="text-danger">{signinError}</span>
+          </div>
+        )}
       </Form>
     </SlidingPane>
   );
