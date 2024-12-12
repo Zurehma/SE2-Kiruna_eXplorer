@@ -6,9 +6,8 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import API from "../../../API";
 import "../../styles/DocumentChartStatic.css";
 import Legend from "./Legend";
-import GraphConfig from "./GraphUtils/GraphConfig";
 import GraphUtils from "./GraphUtils/GraphUtils";
-import '../../styles/DocumentChartStatic.css'
+import useWebSocket from "../../hooks/useWebSocket";
 import MyFilterDropdown from "../MapNavigation/MyFilterDropdown";
 
 const DocumentChartStatic = (props) => {
@@ -19,20 +18,17 @@ const DocumentChartStatic = (props) => {
   const [links, setLinks] = useState([]);
   const [showLegendModal, setShowLegendModal] = useState(false);
   const [selectedType, setSelectedType] = useState("All");
+  const { isOpen, messageReceived, sendMessage } = useWebSocket();
 
   const navigate = useNavigate();
 
   // We'll store current document coordinates in this dictionary:
   // { docId: { x: number, y: number } }
-  const docCoords = {};
+  let docCoords = {};
 
   const fetchData = async () => {
     try {
-      const [documentType, stakeholder, links] = await Promise.all([
-        API.getDocumentTypes(),
-        API.getStakeholders(),
-        API.allExistingLinks(),
-      ]);
+      const [documentType, stakeholder, links] = await Promise.all([API.getDocumentTypes(), API.getStakeholders(), API.allExistingLinks()]);
 
       const stakeholdersWithColors = stakeholder.map((s) => ({
         ...s,
@@ -50,11 +46,13 @@ const DocumentChartStatic = (props) => {
   //Separated useEffect to handle the change of the selectedType
   useEffect(() => {
     const filters = selectedType === "All" ? {} : { type: selectedType };
-    API.getDocuments(filters, true).then((docs) => {
-      setChartData(docs);
-    }).catch((error) => {
-      console.error("Error fetching data:", error);
-    });
+    API.getDocuments(filters, true)
+      .then((docs) => {
+        setChartData(docs);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
   }, [selectedType]);
 
   useEffect(() => {
@@ -62,6 +60,8 @@ const DocumentChartStatic = (props) => {
   }, []);
 
   useEffect(() => {
+    if (!isOpen) return;
+
     if (chartData.length === 0) return;
 
     const svg = d3.select(svgRef.current);
@@ -80,8 +80,7 @@ const DocumentChartStatic = (props) => {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    d3.select(svgRef.current)
-      .style("background", "linear-gradient(to bottom, #fafafa, #f0f0f0)");
+    d3.select(svgRef.current).style("background", "linear-gradient(to bottom, #fafafa, #f0f0f0)");
 
     const years = Array.from(new Set(chartData.map((d) => new Date(d.issuanceDate).getFullYear()))).sort((a, b) => a - b);
     const scales = Array.from(new Set(["Text", ...chartData.map((d) => d.scale).filter((v, i, a) => a.indexOf(v) === i)]));
@@ -101,10 +100,7 @@ const DocumentChartStatic = (props) => {
     g.append("g").attr("transform", `translate(0, ${height})`).call(xAxis);
     g.append("g").call(yAxis);
 
-    g.selectAll("text")
-      .style("font-family", "'Inter', sans-serif")
-      .style("font-size", "14px")
-      .style("fill", "#000"); // Changed text color to black
+    g.selectAll("text").style("font-family", "'Inter', sans-serif").style("font-size", "14px").style("fill", "#000"); // Changed text color to black
 
     const stakeholderColorMap = stakeholders.reduce((acc, stakeholder) => {
       acc[stakeholder.name] = stakeholder.color;
@@ -149,16 +145,23 @@ const DocumentChartStatic = (props) => {
       };
     }
 
-    const config = GraphConfig.loadConfig();
-
+    // Initialize docCoords
     chartData.forEach((doc) => {
       const { cellX, cellY } = getCellCoords(doc);
+
       if (cellX != null && cellY != null) {
         docCoords[doc.id] = {
-          x: config && config[doc.id] ? config[doc.id].x : xScale.bandwidth() / 2,
-          y: config && config[doc.id] ? config[doc.id].y : yScale.bandwidth() / 2,
+          x: cellWidth / 2,
+          y: cellHeight / 2,
         };
       }
+    });
+
+    Object.keys(messageReceived).forEach((docId) => {
+      const dx = messageReceived[docId].x;
+      const dy = messageReceived[docId].y;
+      docCoords[docId].x = cellWidth / 2 + dx * cellWidth;
+      docCoords[docId].y = cellHeight / 2 + dy * cellHeight;
     });
 
     const tooltip = d3
@@ -225,9 +228,7 @@ const DocumentChartStatic = (props) => {
       if (left + rect.width > container.offsetWidth) left = container.offsetWidth - rect.width;
       if (top + rect.height > container.offsetHeight) top = container.offsetHeight - rect.height;
 
-      tooltip
-        .style("left", `${left}px`)
-        .style("top", `${top}px`);
+      tooltip.style("left", `${left}px`).style("top", `${top}px`);
 
       tooltip.select(".tooltip-arrow").style("top", `${rect.height}px`);
     }
@@ -340,8 +341,9 @@ const DocumentChartStatic = (props) => {
         if (!midpoint) return;
 
         // Conditionally include Delete Button and Info Icon based on role
-        const actionButtons = props.role === "Urban Planner"
-          ? `
+        const actionButtons =
+          props.role === "Urban Planner"
+            ? `
             <div style="display:flex;align-items:center; margin-top:8px;">
               <button class="delete-link-btn btn btn-sm btn-danger me-2">
                 Delete Link
@@ -351,7 +353,7 @@ const DocumentChartStatic = (props) => {
               </span>
             </div>
           `
-          : "";
+            : "";
 
         const html = `
           <div style="position:relative; color:#000;">
@@ -410,7 +412,10 @@ const DocumentChartStatic = (props) => {
         g.selectAll(".link").call(updateLinkPath);
       })
       .on("end", (event, d) => {
-        GraphConfig.updateConfig(d.id, docCoords[d.id].x, docCoords[d.id].y);
+        const docId = d.id;
+        const x = (docCoords[docId].x - cellWidth / 2) / cellWidth;
+        const y = (docCoords[docId].y - cellHeight / 2) / cellHeight;
+        sendMessage({ docId, x, y });
       });
 
     const docSelection = g
@@ -470,19 +475,18 @@ const DocumentChartStatic = (props) => {
           showTooltip(html, docPos.x, docPos.y - 10);
         }
 
-        d3.select(this).select("foreignObject div")
-          .transition().duration(200)
+        d3.select(this)
+          .select("foreignObject div")
+          .transition()
+          .duration(200)
           .style("transform", "scale(1.1)")
           .style("box-shadow", "0 4px 10px rgba(0,0,0,0.15)");
       })
       .on("mouseout", function () {
         hideTooltip();
-        d3.select(this).select("foreignObject div")
-          .transition().duration(200)
-          .style("transform", "scale(1)")
-          .style("box-shadow", "none");
+        d3.select(this).select("foreignObject div").transition().duration(200).style("transform", "scale(1)").style("box-shadow", "none");
       });
-  }, [chartData, links, stakeholders, props.role]);
+  }, [chartData, links, stakeholders, props.role, messageReceived]);
 
   const handleDocumentClick = (doc) => {
     navigate(`/document/${doc.id}`);
@@ -490,15 +494,10 @@ const DocumentChartStatic = (props) => {
 
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
-      <MyFilterDropdown loggedIn={props.loggedIn} typeDoc={documentTypes} selectedType={selectedType} setSelectedType={setSelectedType}/>
+      <MyFilterDropdown loggedIn={props.loggedIn} typeDoc={documentTypes} selectedType={selectedType} setSelectedType={setSelectedType} />
       <div className="graph-inner-wrapper">
-        <div style={{ marginLeft: '25px' }}>
-          <Legend
-            documentTypes={documentTypes}
-            stakeholders={stakeholders}
-            showLegendModal={showLegendModal}
-            setShowLegendModal={setShowLegendModal}
-          />
+        <div style={{ marginLeft: "25px" }}>
+          <Legend documentTypes={documentTypes} stakeholders={stakeholders} showLegendModal={showLegendModal} setShowLegendModal={setShowLegendModal} />
         </div>
         <div id="image" style={{ width: "100%", height: "100%", position: "relative" }}>
           <svg ref={svgRef} style={{ width: "100%", height: "100%" }}></svg>
