@@ -367,39 +367,13 @@ class DocumentDAO {
     });
   };
 
-  /*getAllLinks = () => {
-    return new Promise((resolve, reject) => {
-      const query = `
-        SELECT 
-          d1.id AS documentID,
-          d1.title AS documentTitle,
-          l.docID1,
-          l.docID2,
-          d2.id AS linkedDocID,
-          d2.title AS linkedTitle,
-          l.type
-        FROM LINK l
-        JOIN DOCUMENT d1 ON l.docID1 = d1.id
-        JOIN DOCUMENT d2 ON l.docID2 = d2.id
-        ORDER BY documentID, linkedDocID ASC`;
-  
-      db.all(query, [], (err, rows) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rows);
-        }
-      });
-    });
-  };*/
-
   getAllLinks = () => {
     return new Promise((resolve, reject) => {
       const query = `
       SELECT 
       CASE WHEN DocID1 < DocID2 THEN DocID1 ELSE DocID2 END AS DocID1,
       CASE WHEN DocID1 < DocID2 THEN DocID2 ELSE DocID1 END AS DocID2,
-      type
+      type, linkID
       FROM LINK
       ORDER BY DocID1 ASC, DocID2 ASC;
     `;

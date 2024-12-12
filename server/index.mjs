@@ -7,12 +7,15 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import bodyParser from "body-parser";
+import WebSocketInterface from "./ws/websocket.mjs";
 import Utility from "./utils/utility.mjs";
 import DocumentRoutes from "./routes/documentRoutes.mjs";
 import AttachmentRoutes from "./routes/attachmentRoutes.mjs";
 import AuthRoutes from "./routes/authRoutes.mjs";
 
 const app = express();
+const httpServer = createServer(app);
+WebSocketInterface.initWebSocket(httpServer);
 const { PORT = 3001 } = process.env;
 const baseURL = "/api";
 const allowedOrigins = ["http://localhost:3000", "http://localhost:5173", "http://frontend:3000", "http://backend:3001"];
@@ -43,8 +46,6 @@ app.use(baseURL + "/documents", attachmentRoutes.getRouter());
 app.use(baseURL + "/sessions", authRoutes.getRouter());
 
 app.use(Utility.errorHandler);
-
-const httpServer = createServer(app);
 
 httpServer.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
 
