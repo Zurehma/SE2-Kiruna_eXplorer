@@ -29,7 +29,7 @@ const FilteringDocuments = (props) => {
   };
 
   return (
-    <Container fluid className="mt-4" style={{ height: "100vh" }}>
+    <Container fluid className="mt-4" >
       <Row style={{ height: "100%" }}>
         {/* Responsive Filters Toggle */}
         <Col xs={12} className="d-md-none text-end mb-3">
@@ -105,7 +105,7 @@ const FilteringDocuments = (props) => {
               </div>
             ) : documents?.length > 0 ? (
               documents.map((doc, index) => (
-                <div className='popupFiltering'>
+                <div key={index} className='popupFiltering'>
                   <MyPopup key={index} doc={doc} loggedIn={props.loggedIn} reload={reload} setReload={setReload} />
                 </div>
               ))
