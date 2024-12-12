@@ -17,6 +17,23 @@ body {
   min-height: 100vh;
 }
 
+.alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 1050; /* Assicura che sia sopra tutto il resto */
+  pointer-events: none; /* Evita di interferire con i click sugli elementi sottostanti */
+}
+
+.fixed-success-alert {
+  margin-top: 70px; /* Distanza dalla cima della finestra */
+  width: fit-content;
+  pointer-events: auto; /* Permette di interagire con l'Alert */
+}
+
 /* Sezione superiore con immagine di sfondo */
 .background-section {
   position: relative;
