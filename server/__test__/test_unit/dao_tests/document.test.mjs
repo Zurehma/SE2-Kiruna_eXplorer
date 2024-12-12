@@ -299,6 +299,38 @@ describe("DocumentDAO", () => {
     });
   });
 
+  describe('deleteDocument', () => {
+    beforeEach(() => {
+      documentDAO = new DocumentDAO();
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
+
+    test("deleteDocument successful", async () => {
+      
+      const mockDBAll = jest.spyOn(db, 'run').mockImplementation((sql, params, callback) => {
+        callback.call({ changes: 1 }, null);
+      });
+
+      const result = await documentDAO.deleteDocument(1);
+      expect(result).toStrictEqual(1);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test("error on DB", async () => {
+      const error = new Error("");
+      const mockDBAll = jest.spyOn(db, 'run').mockImplementation((sql, params, callback) => {
+        callback(error);
+      });
+
+      const result = documentDAO.deleteDocument();
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+  });
+
   describe("addLink", () => {
     beforeEach(() => {
       documentDAO = new DocumentDAO();
@@ -535,5 +567,35 @@ describe("DocumentDAO", () => {
     });
   });
 
+  describe('deleteLink', () => {
+    beforeEach(() => {
+      documentDAO = new DocumentDAO();
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
 
+    test("deleteLink successful", async () => {
+      
+      const mockDBAll = jest.spyOn(db, 'run').mockImplementation((sql, params, callback) => {
+        callback.call({ changes: 1 }, null);
+      });
+
+      const result = await documentDAO.deleteLink(1);
+      expect(result).toStrictEqual(1);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test("error on DB", async () => {
+      const error = new Error("");
+      const mockDBAll = jest.spyOn(db, 'run').mockImplementation((sql, params, callback) => {
+        callback(error);
+      });
+
+      const result = documentDAO.deleteLink();
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+  });  
 });

@@ -446,6 +446,34 @@ describe("DocumentController", () => {
     });
   });
 
+  describe("deleteDocument", () => {
+    afterEach(()=>{
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    })
+
+    test("Document deleted successfully", async () => {
+      const documentDAO = new DocumentDAO();
+      documentDAO.deleteDocument = jest.fn().mockResolvedValue({ changes: 1 });
+
+      const documentController = new DocumentController();
+      documentController.documentDAO = documentDAO;
+      const result = await documentController.deleteDocument(1);
+
+      expect(documentDAO.deleteDocument).toHaveBeenCalled();
+      expect(result).toEqual(null);
+    });
+
+    test("Document not found", async () => {
+      const documentDAO = new DocumentDAO();
+      documentDAO.deleteDocument = jest.fn().mockResolvedValue(0);
+
+      const documentController = new DocumentController();
+      documentController.documentDAO = documentDAO;
+      await expect(documentController.deleteDocument(1)).rejects.toEqual({ errCode: 404, errMessage: "Document not found!" });
+    });
+  });
+
   describe("getLinks", () => {
     afterEach(() => {
       jest.clearAllMocks();
@@ -639,4 +667,31 @@ describe("DocumentController", () => {
     });
   });
   
+  describe("deleteLink", () => {
+    afterEach(()=>{
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    })
+
+    test("Link deleted successfully", async () => {
+      const documentDAO = new DocumentDAO();
+      documentDAO.deleteLink = jest.fn().mockResolvedValue({ changes: 1 });
+
+      const documentController = new DocumentController();
+      documentController.documentDAO = documentDAO;
+      const result = await documentController.deleteLink(1);
+
+      expect(documentDAO.deleteLink).toHaveBeenCalled();
+      expect(result).toEqual(null);
+    });
+
+    test("Link not found", async () => {
+      const documentDAO = new DocumentDAO();
+      documentDAO.deleteLink = jest.fn().mockResolvedValue(0);
+
+      const documentController = new DocumentController();
+      documentController.documentDAO = documentDAO;
+      await expect(documentController.deleteLink(1)).rejects.toEqual({ errCode: 404, errMessage: "Link not found!" });
+    });
+  });
 });
