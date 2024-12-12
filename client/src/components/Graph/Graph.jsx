@@ -508,10 +508,7 @@ const DocumentChartStatic = (props) => {
           })
       );
 
-    // Ensure control points are on top
     g.selectAll(".control-point").raise();
-
-    // === UPDATED SECTION END ===
 
     const drag = d3
       .drag()
