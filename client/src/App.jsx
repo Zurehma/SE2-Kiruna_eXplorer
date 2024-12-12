@@ -61,11 +61,12 @@ function App() {
       setLoggedIn(true);
       setRole(user.role);
       setIsLoginOpen(false); // Chiude la finestra di login
+      setloggedinError(null);
 
       // Redirect to home and close the login pane
       // navigate("/", { state: { openLogin: false } });
     } catch (error) {
-      setloggedinError(error.message || "Login failed. Please check your credentials.");
+      setloggedinError("Login failed. Please check your credentials.");
     }
   };
 
@@ -100,7 +101,7 @@ function App() {
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
-        setloggedinError(null); // Clear the error after 5 seconds
+        setError(null); // Clear the error after 5 seconds
       }, 3000);
       return () => clearTimeout(timer); // Cleanup timer on component unmount
     }
@@ -129,7 +130,7 @@ function App() {
             dismissible
             onClose={() => setError(null)}
           >
-            <p>{error.message}</p>
+            <p>{error}</p>
           </Alert>
         )}
         <Routes>
