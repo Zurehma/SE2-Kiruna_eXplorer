@@ -19,6 +19,7 @@ import MapForm from "./components/MapForm/MapForm.jsx";
 import DocumentChartStatic from "./components/Graph/Graph.jsx";
 
 function App() {
+  //const [currentUser, setCurrentUser] = useState(""); //BOH
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -26,10 +27,11 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [role, setRole] = useState("");
   const [newDoc, setNewDoc] = useState("");
-  const [hideDocBar, sethideDocBar] = useState(false);
+  //const [editDoc, setEditDoc] = useState(""); //BOH
   const navigate = useNavigate();
   const [logging, setLogging] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
 
   const toggleLoginPane = () => {
     setIsLoginOpen((prev) => !prev);
@@ -37,6 +39,14 @@ function App() {
 
   const closeLoginPane = () => {
     setIsLoginOpen(false);
+  };
+
+  const toggleAddUserPane = () => {
+    setIsAddUserOpen((prev) => !prev);
+  };
+
+  const closeAddUserPane = () => {
+    setIsAddUserOpen(false);
   };
 
   const handleLogin = async (credentials) => {
@@ -48,15 +58,13 @@ function App() {
       }
 
       const user = await API.getUserInfo();
+      //setCurrentUser(user);
       setLoggedIn(true);
       setRole(user.role);
-
       setIsLoginOpen(false); // Chiude la finestra di login
 
       // Redirect to home and close the login pane
       // navigate("/", { state: { openLogin: false } });
-
-      console.log("Login successfullll");
     } catch (error) {
       setloggedinError(error.message || "Login failed. Please check your credentials.");
     }
@@ -69,7 +77,7 @@ function App() {
         // Check if the user is already logged in
         const user = await API.getUserInfo();
         setUsername(user.username);
-        setCurrentUser(user);
+        //setCurrentUser(user);
         setLoggedIn(true);
         setRole(user.role);
       } catch (error) {
@@ -86,7 +94,7 @@ function App() {
     await API.logOut();
     setLoggedIn(false);
     setUsername("");
-    setCurrentUser("");
+    //setCurrentUser("");
     navigate("/");
     setRole("");
   };
@@ -106,15 +114,22 @@ function App() {
         username={username}
         handleLogout={handleLogout}
         role={role}
-        sethideDocBar={sethideDocBar}
-        hideDocBar={sethideDocBar}
         toggleLoginPane={toggleLoginPane}
         isLoginOpen={isLoginOpen}
         closeLoginPane={closeLoginPane}
+        toggleAddUserPane={toggleAddUserPane}
+        isAddUserOpen={isAddUserOpen}
+        closeAddUserPane={closeAddUserPane}
       />
       <Container fluid className="flex-grow-1 d-flex flex-column px-0">
         {error && (
-          <Alert variant="danger" className="fixed-top mt-3" style={{ zIndex: 150000000000 }} dismissible onClose={() => setError(null)}>
+          <Alert
+            variant="danger"
+            className="fixed-top mt-3"
+            style={{ zIndex: 150000000000 }}
+            dismissible
+            onClose={() => setError(null)}
+          >
             <p>{error.message}</p>
           </Alert>
         )}
@@ -128,25 +143,68 @@ function App() {
                 password={password}
                 setUsername={setUsername}
                 setPassword={setPassword}
+                role={role}
+                setRole={setRole}
+                loggedinError={loggedinError}
+                setloggedinError={setloggedinError}
                 handleLogin={handleLogin}
                 toggleLoginPane={toggleLoginPane}
                 isLoginOpen={isLoginOpen}
                 closeLoginPane={closeLoginPane}
-                setRole={setRole}
-                loggedinError={loggedinError}
-                setloggedinError={setloggedinError}
+                toggleAddUserPane={toggleAddUserPane}
+                isAddUserOpen={isAddUserOpen}
+                closeAddUserPane={closeAddUserPane}
               />
             }
           />
 
           <Route path="/map" element={<MapNavigation setError={setError} loggedIn={loggedIn} />} />
-          <Route path="/documents" element={loggedIn ? <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} /> : <AccessDenied />} />
-          <Route path="/document/:id" element={<SingleDocument setError={setError} loggedIn={loggedIn} />} />
-          <Route path="/documents/links" element={loggedIn ? <Links newDoc={newDoc} setNewDoc={setNewDoc} /> : <AccessDenied />} />
+          <Route
+            path="/documents"
+            element={
+              loggedIn ? (
+                <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
+              ) : (
+                <AccessDenied toggleLoginPane={toggleLoginPane} />
+              )
+            }
+          />
+          <Route
+            path="/document/:id"
+            element={<SingleDocument setError={setError} loggedIn={loggedIn} />}
+          />
+          <Route
+            path="/documents/links"
+            element={
+              loggedIn ? (
+                <Links newDoc={newDoc} setNewDoc={setNewDoc} />
+              ) : (
+                <AccessDenied toggleLoginPane={toggleLoginPane} />
+              )
+            }
+          />
 
-          <Route path="/documents/all" element={loggedIn ? <FilteringDocuments loggedIn={loggedIn} /> : <AccessDenied />} />
+          <Route
+            path="/documents/all"
+            element={
+              loggedIn ? (
+                <FilteringDocuments loggedIn={loggedIn} />
+              ) : (
+                <AccessDenied toggleLoginPane={toggleLoginPane} />
+              )
+            }
+          />
 
-          <Route path="/documents/:id" element={loggedIn ? <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} /> : <AccessDenied />} />
+          <Route
+            path="/documents/:id"
+            element={
+              loggedIn ? (
+                <Documents newDoc={newDoc} setNewDoc={setNewDoc} setError={setError} />
+              ) : (
+                <AccessDenied toggleLoginPane={toggleLoginPane} />
+              )
+            }
+          />
           <Route path="*" element={<NotFound />} />
           <Route path="graph" element={<DocumentChartStatic role={role} />} />
         </Routes>

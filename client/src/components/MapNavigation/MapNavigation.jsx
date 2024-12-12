@@ -72,6 +72,7 @@ function MapNavigation(props) {
     const [selectedType, setSelectedType] = useState('All'); // New state for selected type
     const [geoJsonData, setGeoJsonData] = useState(null);
     const [highestPoint, setHighestPoint] = useState(null);
+    const [reload,setReload] = useState(false);
     //states to handle KX11
     const [selectedAreas, setSelectedAreas] = useState([]);
     //Add a new area when a marker is clicked, if it exists
@@ -138,7 +139,7 @@ function MapNavigation(props) {
         setLoading(true);
         setSelectedDoc(null); // Clear the selected document whenever the filter changes
         fetchData(selectedType,setData,props.setError,setLoading);
-    }, [selectedType]); // Fetch documents when selectedType changes
+    }, [selectedType,reload]); // Fetch documents when selectedType changes
     // Filter documents without coordinates
     const noCoordDocuments = data.filter(doc => doc.lat == null && doc.long == null);
     // Filter documents with coordinates
@@ -202,7 +203,7 @@ function MapNavigation(props) {
                         return (
                             <Popup position={pos} maxWidth={800} key={myKey}  closeButton={true} autoClose={false}>
                                  <PopupCloseHandler onClose={() => setSelectedDoc(null)} />
-                                <MyPopup doc={selectedDoc} setError={props.setError} loggedIn={props.loggedIn} className='popupProp' />
+                                <MyPopup doc={selectedDoc} setError={props.setError} loggedIn={props.loggedIn} className='popupProp' reload={reload} setReload={setReload}/>
                             </Popup>
                         );
                     })()

@@ -278,7 +278,7 @@ Returns the list of all specific link types.
 
 - Request Parameters: _None_
 - Request Body Content: _None_
-- Response Body Content: The response is a an array of links. Each link has a DocID1, DocID2 and the type of the link.
+- Response Body Content: The response is a an array of links. Each link has a DocID1, DocID2,the type of the link and the linkID.
 - Example:
 
 ```json
@@ -286,12 +286,14 @@ Returns the list of all specific link types.
   {
     "DocID1": 1,
     "DocID2": 2,
-    "type": "Direct"
+    "type": "Direct",
+    "linkID": 1
   },
   {
     "DocID1": 1,
     "DocID2": 3,
-    "type": "Projection"
+    "type": "Projection",
+    "linkID": 2
   }
 ]
 ```
