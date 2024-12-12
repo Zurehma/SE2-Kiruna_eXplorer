@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import SlidingPane from "react-sliding-pane";
 import "react-sliding-pane/dist/react-sliding-pane.css";
 import "../styles/UserForm.css";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Alert } from "react-bootstrap";
 import API from "../../API.js";
 
-const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
+const UserForm = ({ isAddUserOpen, closeAddUserPane, onUserCreated }) => {
   const roles = ["Urban Planners", "Residents", "Urban Developers"];
   const [signinError, setsigninError] = useState(null);
   const [repPassword, setRepPassword] = useState("");
@@ -34,24 +34,44 @@ const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
         if (!response.ok) {
           throw new Error("SignIn failed. Please check your information.");
         }
-        console.log("User created successfully", response);
-        closeAddUserPane();
+        onUserCreated();
+        resetForm(); // Resetta il form
+        closeAddUserPane(); // Chiude il pannello dopo aver registrato l'utente
       } catch (error) {
         setsigninError("Sign in failed. Please check your info.");
       }
     }
   };
 
+  const resetForm = () => {
+    setNewUser({
+      name: "",
+      surname: "",
+      role: "",
+      username: "",
+      password: "",
+    });
+    setRepPassword("");
+    setErrors({
+      name: "",
+      surname: "",
+      role: "",
+      username: "",
+      password: "",
+      repPassword: "",
+    });
+  };
+
   useEffect(() => {
     if (signinError) {
       errorRef.current.scrollIntoView({
-        behavior: "smooth", // Scorrimento fluido
-        block: "center", // Posiziona la sezione al centro della finestra
+        behavior: "smooth",
+        block: "center",
       });
       const timer = setTimeout(() => {
-        setsigninError(null); // Clear the error after 5 seconds
+        setsigninError(null);
       }, 5000);
-      return () => clearTimeout(timer); // Cleanup timer on component unmount
+      return () => clearTimeout(timer);
     }
   }, [signinError, setsigninError]);
 
@@ -101,6 +121,7 @@ const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
           />
           <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
         </Form.Group>
+
         <Form.Group className="form-group" controlId="surname">
           <Form.Label>Surname</Form.Label>
           <Form.Control
@@ -112,17 +133,14 @@ const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
           />
           <Form.Control.Feedback type="invalid">{errors.surname}</Form.Control.Feedback>
         </Form.Group>
+
         <Form.Group className="form-group" controlId="role">
           <Form.Label>Role</Form.Label>
           <Form.Select
-            type="text"
             value={newUser.role}
-            className="input-multi"
-            placeholder="Enter the role (e.g., user, admin)"
             onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
             isInvalid={!!errors.role}
           >
-            {" "}
             <option value="">Select a role</option>
             {roles.map((role, index) => (
               <option key={index} value={role}>
@@ -132,6 +150,7 @@ const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
           </Form.Select>
           <Form.Control.Feedback type="invalid">{errors.role}</Form.Control.Feedback>
         </Form.Group>
+
         <Form.Group className="form-group" controlId="username">
           <Form.Label>Username</Form.Label>
           <Form.Control
@@ -143,6 +162,7 @@ const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
           />
           <Form.Control.Feedback type="invalid">{errors.username}</Form.Control.Feedback>
         </Form.Group>
+
         <Form.Group className="form-group" controlId="password">
           <Form.Label>Password</Form.Label>
           <Form.Control
@@ -154,7 +174,8 @@ const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
           />
           <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
         </Form.Group>
-        <Form.Group className="form-group" controlId="password">
+
+        <Form.Group className="form-group" controlId="repPassword">
           <Form.Label>Repeat Password</Form.Label>
           <Form.Control
             type="password"
@@ -165,9 +186,11 @@ const UserForm = ({ isAddUserOpen, closeAddUserPane }) => {
           />
           <Form.Control.Feedback type="invalid">{errors.repPassword}</Form.Control.Feedback>
         </Form.Group>
+
         <Button className="add-user-button" type="submit">
           Add User
         </Button>
+
         {signinError && (
           <div
             ref={errorRef}
