@@ -51,19 +51,13 @@ function App() {
   const handleLogin = async (credentials) => {
     try {
       const response = await API.logIn(credentials);
-
       if (!response.ok) {
         throw new Error("Login failed. Please check your credentials.");
       }
-
       const user = await API.getUserInfo();
-      //setCurrentUser(user);
       setLoggedIn(true);
       setRole(user.role);
-      setIsLoginOpen(false); // Chiude la finestra di login
-
-      // Redirect to home and close the login pane
-      // navigate("/", { state: { openLogin: false } });
+      setIsLoginOpen(false);
     } catch (error) {
       setloggedinError(error.message || "Login failed. Please check your credentials.");
     }
