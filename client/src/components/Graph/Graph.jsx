@@ -9,6 +9,7 @@ import Legend from "./Legend";
 import GraphUtils from "./GraphUtils/GraphUtils";
 import MyFilterDropdown from "../MapNavigation/MyFilterDropdown";
 import { Modal, Button } from "react-bootstrap"; // Import Modal and Button from react-bootstrap
+import useWebSocket from "../../hooks/useWebSocket";
 
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
