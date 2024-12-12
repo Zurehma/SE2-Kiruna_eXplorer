@@ -312,6 +312,25 @@ body {
   margin-bottom: 10px;
 }
 
+.popupFiltering {
+  border: 2px solid #006d77; /* Colore e spessore del bordo per tutti i dispositivi */
+  border-radius: 15px;;
+  margin-bottom: 5px;
+  max-width: 100%;
+  overflow-x: hidden; /* Nasconde l'overflow di default */
+}
+
+.myPageColor{
+  color: #006d77;
+}
+
+/* Media query per dispositivi con larghezza massima di 768px (ad esempio tablet e dispositivi mobili) */
+@media (max-width: 768px) {
+  .popupFiltering {
+    overflow-x: auto; /* Abilita l'overflow solo su schermi piccoli */
+  }
+}
+
 .btn-page:hover, .btn-page:focus {
   background-color: #0056b3;
   transform: translateY(-2px); 

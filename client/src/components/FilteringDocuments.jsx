@@ -98,14 +98,16 @@ const FilteringDocuments = (props) => {
             </InputGroup>
           </div>
           <div className="documents-list mt-2">
-            <h4 className="text-center">PAGE {currentPage + 1}</h4>
+            <h4 className="text-center myPageColor">PAGE {currentPage + 1}</h4>
             {loading ? (
               <div className="text-center">
                 <Spinner animation="border" variant="primary" />
               </div>
             ) : documents?.length > 0 ? (
               documents.map((doc, index) => (
-                <MyPopup key={index} doc={doc} loggedIn={props.loggedIn} reload={reload} setReload={setReload} />
+                <div className='popupFiltering'>
+                  <MyPopup key={index} doc={doc} loggedIn={props.loggedIn} reload={reload} setReload={setReload} />
+                </div>
               ))
             ) : (
               <p>No documents found</p>
@@ -125,7 +127,7 @@ const FilteringDocuments = (props) => {
                   >
                     Previous
                   </Button>
-                  <span>Page {currentPage + 1}</span>
+                  <span className="myPageColor">Page {currentPage + 1}</span>
                   <Button
                     variant="primary"
                     onClick={() => handlePageChange(currentPage + 1)}
