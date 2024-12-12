@@ -6,25 +6,24 @@ import Filters from "./Filters/Filters.jsx"; // Import the new Filters component
 
 const FilteringDocuments = (props) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [sentSearchQuery, setSentSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [reload,setReload] = useState(false);
 
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const limit = 3;
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalDocuments, setTotalDocuments] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   
   const handleSearch = (e) => setSearchQuery(e.target.value);
 
-  const filteredDocs = documents.filter((doc) =>
-    doc.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const executeSearch = () => {};
+  const executeSearch = () => {
+    setSentSearchQuery(searchQuery);
+  };
 
   const handlePageChange = (newPage) => {
-    const actualnum = newPage * limit;
-    if (newPage >= 0 && actualnum < totalDocuments) {
+    if(newPage >=0 && newPage < totalPages){
       setCurrentPage(newPage);
     }
   };
@@ -45,13 +44,13 @@ const FilteringDocuments = (props) => {
             </Offcanvas.Header>
             <Offcanvas.Body>
               <Filters
-                limit={limit}
+                setDocuments={setDocuments}
+                onSetLoading={setLoading}
                 currentPage={currentPage}
-                onLoadingChange={setLoading}
-                onDocumentsUpdate={(newDocs, total) => {
-                  setDocuments(newDocs);
-                  setTotalDocuments(total);
-                }}
+                setCurrentPage={setCurrentPage}
+                setTotalPages={setTotalPages}
+                searchQuery={sentSearchQuery}
+                reload = {reload}
               />
               <Button
                 id="close-button-resp"
@@ -71,13 +70,13 @@ const FilteringDocuments = (props) => {
             <Card.Body>
               <h5 className="filter-title">Filter Documents</h5>
               <Filters
-                limit={limit}
+                setDocuments={setDocuments}
+                onSetLoading={setLoading}
                 currentPage={currentPage}
-                onLoadingChange={setLoading}
-                onDocumentsUpdate={(newDocs, total) => {
-                  setDocuments(newDocs);
-                  setTotalDocuments(total);
-                }}
+                setCurrentPage={setCurrentPage}
+                setTotalPages={setTotalPages}
+                searchQuery={sentSearchQuery}
+                reload = {reload}
               />
             </Card.Body>
           </Card>
@@ -104,9 +103,9 @@ const FilteringDocuments = (props) => {
               <div className="text-center">
                 <Spinner animation="border" variant="primary" />
               </div>
-            ) : filteredDocs.length > 0 ? (
-              filteredDocs.map((doc, index) => (
-                <MyPopup key={index} doc={doc} loggedIn={props.loggedIn} />
+            ) : documents?.length > 0 ? (
+              documents.map((doc, index) => (
+                <MyPopup key={index} doc={doc} loggedIn={props.loggedIn} reload={reload} setReload={setReload} />
               ))
             ) : (
               <p>No documents found</p>
@@ -114,15 +113,15 @@ const FilteringDocuments = (props) => {
           </div>
 
           {/* Pagination */}
-          {totalDocuments > 0 && (
-            <div className="pagination-controls text-center mt-3">
-              <Row className="mt-3">
+          {documents?.length > 0 && (
+            <div className="pagination-controls text-center mt-3 mb-3">
+              <Row className="mt-3 mb-3">
                 <Col className="text-center">
                   <Button
                     variant="primary"
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 0}
-                    className="btn-page"
+                    className="btn-page me-2"
                   >
                     Previous
                   </Button>
@@ -130,8 +129,8 @@ const FilteringDocuments = (props) => {
                   <Button
                     variant="primary"
                     onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={(currentPage + 1) * limit >= totalDocuments}
-                    className="btn-page"
+                    disabled={(currentPage + 1) >= totalPages}
+                    className="btn-page ms-2"
                   >
                     Next
                   </Button>

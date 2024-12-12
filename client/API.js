@@ -21,13 +21,16 @@ const getDocuments = async (filters = undefined, all = false) => {
 
   if (filters) {
     const queryParams = new URLSearchParams();
-
     if (filters.type) queryParams.append("type", filters.type);
     if (filters.stakeholder) queryParams.append("stakeholder", filters.stakeholder);
     if (filters.issuanceDateFrom) queryParams.append("issuanceDateFrom", filters.issuanceDateFrom);
     if (filters.issuanceDateTo) queryParams.append("issuanceDateTo", filters.issuanceDateTo);
     if (filters.pageNo) queryParams.append("pageNo", filters.pageNo);
-
+    //Add the filtering by title and description
+    if (filters.searchQuery){
+      queryParams.append("title", filters.searchQuery);
+      queryParams.append("description", filters.searchQuery);
+    }  
     const queryString = queryParams.toString();
     nextURI += `?${queryString}`;
   }
@@ -350,7 +353,6 @@ const allExistingLinks = async () => {
 };
 
 const deleteLink = async (linkID) => {
-  console.log(linkID);
   
   try {
     const response = await fetch(`${SERVER_URL}/api/documents/link/${linkID}`, {
