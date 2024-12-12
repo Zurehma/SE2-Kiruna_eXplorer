@@ -28,7 +28,7 @@ const DocumentChartStatic = (props) => {
 
   const fetchData = async () => {
     try {
-      const [documentType, stakeholder, links] = await Promise.all([
+      const [documentType, stakeholder, linksData] = await Promise.all([
         API.getDocumentTypes(),
         API.getStakeholders(),
         API.allExistingLinks(),
@@ -41,20 +41,23 @@ const DocumentChartStatic = (props) => {
 
       setDocumentTypes(documentType);
       setStakeholders(stakeholdersWithColors);
-      setLinks(links);
+      setLinks(linksData); 
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  //Separated useEffect to handle the change of the selectedType
+  // Separated useEffect to handle the change of the selectedType
   useEffect(() => {
     const filters = selectedType === "All" ? {} : { type: selectedType };
-    API.getDocuments(filters, true).then((docs) => {
-      setChartData(docs);
-    }).catch((error) => {
-      console.error("Error fetching data:", error);
-    });
+    API.getDocuments(filters, true)
+      .then((docs) => {
+        setChartData(docs);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
   }, [selectedType]);
 
   useEffect(() => {
@@ -301,9 +304,11 @@ const DocumentChartStatic = (props) => {
       });
     }
 
+    // === UPDATED SECTION START ===
+    // Bind data to link elements using linkID as the key
     const linkSelection = g
       .selectAll(".link")
-      .data(links, (d) => d.DocID1 + "-" + d.DocID2)
+      .data(links, (d) => d.linkID) // Changed from d.DocID1 + "-" + d.DocID2 to d.linkID
       .enter()
       .append("path")
       .attr("class", "link");
@@ -368,17 +373,25 @@ const DocumentChartStatic = (props) => {
         showTooltip(html, midpoint.x, midpoint.y);
 
         if (props.role === "Urban Planner") {
+          // Add click event handler for the delete button
           d3.select(tooltip.node())
             .select(".delete-link-btn")
-            .on("click", () => {
-              console.log("Delete link clicked:", d);
-              // Implement link deletion logic here
-              // For example:
-              // API.deleteLink(d.id).then(() => fetchData());
+            .on("click", async () => {
+              const confirmDelete = window.confirm("Are you sure you want to delete this link?");
+              if (!confirmDelete) return;
+
+              try {
+                await API.deleteLink(d.linkID); // Pass the linkID to the API
+                hideTooltip();
+                fetchData(); // Refresh the data to update the graph
+              } catch (error) {
+                alert("Failed to delete the link. Please try again.");
+              }
             });
         }
       })
       .on("mouseout", hideTooltip);
+    // === UPDATED SECTION END ===
 
     const drag = d3
       .drag()
@@ -490,7 +503,12 @@ const DocumentChartStatic = (props) => {
 
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
-      <MyFilterDropdown loggedIn={props.loggedIn} typeDoc={documentTypes} selectedType={selectedType} setSelectedType={setSelectedType}/>
+      <MyFilterDropdown
+        loggedIn={props.loggedIn}
+        typeDoc={documentTypes}
+        selectedType={selectedType}
+        setSelectedType={setSelectedType}
+      />
       <div className="graph-inner-wrapper">
         <div style={{ marginLeft: '25px' }}>
           <Legend
