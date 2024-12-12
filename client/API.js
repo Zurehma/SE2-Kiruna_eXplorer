@@ -349,6 +349,27 @@ const allExistingLinks = async () => {
     .then((response) => response.json());
 };
 
+const deleteLink = async (linkID) => {
+  console.log(linkID);
+  
+  try {
+    const response = await fetch(`${SERVER_URL}/api/documents/link/${linkID}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to delete the link.");
+    }
+
+    return;
+  } catch (error) {
+    console.error("Error deleting link:", error);
+    throw error;
+  }
+};
+
 //Export API methods
 const API = {
   getStakeholders,
@@ -371,6 +392,7 @@ const API = {
   updateDocument,
   allExistingLinks,
   deleteDocument,
+  deleteLink
 };
 
 export default API;
