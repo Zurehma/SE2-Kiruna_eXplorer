@@ -15,6 +15,12 @@ html {
   padding: 0;
   overflow-y: auto;
 }
+.dropdown-force-down {
+  transform: none !important;
+  top: 100% !important;
+  bottom: auto !important;
+  will-change: auto !important;
+}
 
 .links-card-title {
   font-size: 1.8rem;
@@ -84,6 +90,20 @@ html {
 
 .links-container .form-select::after {
   display: none !important; /* Rimuove la freccia del dropdown */
+}
+
+.input-multi {
+  border-radius: 5px;
+  border: 1px solid #006d77;
+  padding: 0.75rem;
+  transition: all 0.2s ease-in-out;
+  font-size: 1rem; /* Assicura una buona leggibilità */
+}
+
+.input:focus,
+select:focus {
+  border-color: #006d77;
+  box-shadow: 0 0 5px rgba(0, 109, 119, 0.5);
 }
 
 /* stile per icona */
