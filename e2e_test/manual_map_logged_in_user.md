@@ -251,3 +251,20 @@ Steps:
 
 #### Test 12: Try to open a document linked to the one currently open when not logged in
 
+#### Test 13: See the cumulative area, KX11
+Steps:
+1. Login using credentials.
+2. Navigate to the map by either:
+   - Selecting "Relocation of Kiruna" from the home page.
+   - Using the dropdown menu in the menu bar and selecting "Map."
+3. Resize the browser window to different dimensions (e.g., mobile, tablet, desktop).
+4. Try to click on all the document
+**Expected Results:**
+- At the end, the cumulative area of the documents with an associated area can be seen.
+
+#### Test 14: Close areas
+Steps:
+1. Repeat all the steps of test 13
+2. Try to close areas with the dedicated button shown in the lowest point of the area.
+**Expected Results:**
+- At the end, the cumulative area of the documents should not be visible anymore once all have been closed.
