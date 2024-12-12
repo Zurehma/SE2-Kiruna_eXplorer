@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Card, Form } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import API from "../../../API";
 
-function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
+function Filters(props) {
   const [stakeholder, setStakeholder] = useState("");
   const [documentType, setDocumentType] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
@@ -16,9 +16,6 @@ function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
   // Lists fetched from the backend
   const [stakeholdersList, setStakeholdersList] = useState([]);
   const [documentTypesList, setDocumentTypesList] = useState([]);
-
-  const [totalDocuments, setTotalDocuments] = useState(0);
-
   const formatDate = (date) => (date ? format(date, "yyyy-MM-dd") : null);
 
   const fetchDefaultLists = async () => {
@@ -35,12 +32,14 @@ function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
   };
 
   const fetchFilteredDocuments = async () => {
-    onLoadingChange(true);
+    const searchQuery = (props.searchQuery && props.searchQuery !== "") ? props.searchQuery : null;
+    props.onSetLoading(true);
     const filters = {
       type: documentType || undefined,
       stakeholder: stakeholder || undefined,
       issuanceDateFrom: isSingleDate ? formatDate(selectedDate) : formatDate(startDate),
       issuanceDateTo: isSingleDate ? formatDate(selectedDate) : formatDate(endDate),
+      searchQuery: searchQuery,
     };
 
     const filteredParams = Object.fromEntries(
@@ -48,20 +47,22 @@ function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
     );
 
     try {
-      // First fetch all docs to get total count
-      const allDocs = await API.filterDocuments(filteredParams);
-      setTotalDocuments(allDocs.length);
-
-      // Then fetch only the requested page
-      const paginatedFilters = { ...filteredParams, limit, offset: currentPage * limit };
-      const response = await API.filterDocuments(paginatedFilters);
-
-      onDocumentsUpdate(response, allDocs.length);
+      //if limit and current page are passed as props, use them, otherwise no
+      const currentPage = props.currentPage || undefined;
+      const all = props.currentPage!==null? false : true;
+      const paginatedFilters = { ...filteredParams, pageNo: currentPage };
+      let response = await API.getDocuments(paginatedFilters,all);
+    
+      if(response.totalPages <currentPage+1){ //reset to page zero if you exceeded
+        props.setCurrentPage(0);
+      }
+      props.setDocuments(response.elements);
+      props.setTotalPages(response.totalPages);
     } catch (error) {
       console.error("Error fetching filtered documents:", error);
-      onDocumentsUpdate([], 0);
-    } finally {
-      onLoadingChange(false);
+      props.setDocuments([]);
+    }finally{
+      props.onSetLoading(false);
     }
   };
 
@@ -71,7 +72,7 @@ function Filters({ limit, currentPage, onDocumentsUpdate, onLoadingChange }) {
 
   useEffect(() => {
     fetchFilteredDocuments();
-  }, [stakeholder, documentType, selectedDate, startDate, endDate, isSingleDate, currentPage]);
+  }, [stakeholder, documentType, selectedDate, startDate, endDate, isSingleDate, props.currentPage,props.searchQuery,props.reload]);
 
   const handleSingleDateChange = (date) => {
     setSelectedDate(date);

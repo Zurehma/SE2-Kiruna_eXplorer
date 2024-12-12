@@ -293,11 +293,53 @@ body {
   color: #006d77;
 }
 
-/* css fro the pagination */
+/* css fro the pagination 
 .btn-page {
   background-color: #006d77 !important;
   border: none;
   padding: 0.4rem 1.5rem;
-  margin: 1.5rem; /* Spazio attorno al pulsante */
+  margin: 1.5rem; 
   transition: background-color 0.3s ease;
+}*/
+.btn-page {
+  background-color: #007bff; 
+  color: white; 
+  border: none; 
+  padding: 8px 16px; 
+  transition: background-color 0.3s, transform 0.3s; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  border-radius: 5px; 
+  margin-bottom: 10px;
+}
+
+.popupFiltering {
+  border: 2px solid #006d77; /* Colore e spessore del bordo per tutti i dispositivi */
+  border-radius: 15px;;
+  margin-bottom: 5px;
+  max-width: 100%;
+  overflow-x: hidden; /* Nasconde l'overflow di default */
+}
+
+.myPageColor{
+  color: #006d77;
+}
+
+/* Media query per dispositivi con larghezza massima di 768px (ad esempio tablet e dispositivi mobili) */
+@media (max-width: 768px) {
+  .popupFiltering {
+    overflow-x: auto; /* Abilita l'overflow solo su schermi piccoli */
+  }
+}
+
+.btn-page:hover, .btn-page:focus {
+  background-color: #0056b3;
+  transform: translateY(-2px); 
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+}
+
+.btn-page:disabled {
+  background-color: #cccccc; 
+  color: #666666; 
+  cursor: not-allowed; 
+  box-shadow: none; 
 }

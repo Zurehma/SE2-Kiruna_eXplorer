@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import * as d3 from "d3";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -7,8 +7,9 @@ import API from "../../../API";
 import "../../styles/DocumentChartStatic.css";
 import Legend from "./Legend";
 import GraphUtils from "./GraphUtils/GraphUtils";
-import useWebSocket from "../../hooks/useWebSocket";
 import MyFilterDropdown from "../MapNavigation/MyFilterDropdown";
+import { Modal, Button } from "react-bootstrap"; // Import Modal and Button from react-bootstrap
+import useWebSocket from "../../hooks/useWebSocket";
 
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
@@ -22,13 +23,21 @@ const DocumentChartStatic = (props) => {
 
   const navigate = useNavigate();
 
+  // States for handling deletion modal
+  const [deleteLink, setDeleteLink] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   // We'll store current document coordinates in this dictionary:
   // { docId: { x: number, y: number } }
   let docCoords = {};
 
   const fetchData = async () => {
     try {
-      const [documentType, stakeholder, links] = await Promise.all([API.getDocumentTypes(), API.getStakeholders(), API.allExistingLinks()]);
+      const [documentType, stakeholder, links] = await Promise.all([
+        API.getDocumentTypes(),
+        API.getStakeholders(),
+        API.allExistingLinks(),
+      ]);
 
       const stakeholdersWithColors = stakeholder.map((s) => ({
         ...s,
@@ -37,15 +46,23 @@ const DocumentChartStatic = (props) => {
 
       setDocumentTypes(documentType);
       setStakeholders(stakeholdersWithColors);
-      setLinks(links);
+      setLinks(links); 
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  //Separated useEffect to handle the change of the selectedType
+  // Separated useEffect to handle the change of the selectedType
   useEffect(() => {
     const filters = selectedType === "All" ? {} : { type: selectedType };
+    API.getDocuments(filters, true)
+      .then((docs) => {
+        setChartData(docs);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
     API.getDocuments(filters, true)
       .then((docs) => {
         setChartData(docs);
@@ -58,6 +75,37 @@ const DocumentChartStatic = (props) => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Define openDeleteModal using useCallback to ensure stability
+  const openDeleteModal = useCallback((link) => {
+    setDeleteLink(link);
+    setShowDeleteModal(true);
+  }, []);
+
+  const confirmDeleteLink = async () => {
+    if (!deleteLink) return;
+    try {
+      await API.deleteLink(deleteLink.linkID);
+      setShowDeleteModal(false);
+      setDeleteLink(null);
+      fetchData(); // Refresh the data to update the graph immediately
+    } catch (error) {
+      console.error("Failed to delete the link:", error);
+      setShowDeleteModal(false);
+      setDeleteLink(null);
+      // Optionally, handle error display here (e.g., another modal or toast)
+    }
+  };
+
+  const cancelDeleteLink = () => {
+    setShowDeleteModal(false);
+    setDeleteLink(null);
+  };
+
+  const getDocumentTitle = (docID) => {
+    const doc = chartData.find((d) => d.id === docID);
+    return doc ? doc.title : 'Unknown';
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -302,9 +350,11 @@ const DocumentChartStatic = (props) => {
       });
     }
 
+    // === UPDATED SECTION START ===
+    // Bind data to link elements using linkID as the key
     const linkSelection = g
       .selectAll(".link")
-      .data(links, (d) => d.DocID1 + "-" + d.DocID2)
+      .data(links, (d) => d.linkID) // Changed from d.DocID1 + "-" + d.DocID2 to d.linkID
       .enter()
       .append("path")
       .attr("class", "link");
@@ -370,17 +420,17 @@ const DocumentChartStatic = (props) => {
         showTooltip(html, midpoint.x, midpoint.y);
 
         if (props.role === "Urban Planner") {
+          // Add click event handler for the delete button to open the confirmation modal
           d3.select(tooltip.node())
             .select(".delete-link-btn")
             .on("click", () => {
-              console.log("Delete link clicked:", d);
-              // Implement link deletion logic here
-              // For example:
-              // API.deleteLink(d.id).then(() => fetchData());
+              setShowDeleteModal(false); // Hide the tooltip
+              openDeleteModal(d); // Open the confirmation modal with the link data
             });
         }
       })
       .on("mouseout", hideTooltip);
+    // === UPDATED SECTION END ===
 
     const drag = d3
       .drag()
@@ -406,7 +456,8 @@ const DocumentChartStatic = (props) => {
 
         docCoords[docId] = { x: newX, y: newY };
 
-        d3.select(this).attr("transform", `translate(${cellX + newX},${cellY + newY})`);
+        d3.select(this)
+          .attr("transform", `translate(${cellX + newX},${cellY + newY})`);
 
         g.selectAll(".link").call(updateLinkPath);
       })
@@ -485,7 +536,7 @@ const DocumentChartStatic = (props) => {
         hideTooltip();
         d3.select(this).select("foreignObject div").transition().duration(200).style("transform", "scale(1)").style("box-shadow", "none");
       });
-  }, [chartData, links, stakeholders, props.role, messageReceived]);
+  }, [chartData, links, stakeholders, props.role]);
 
   const handleDocumentClick = (doc) => {
     navigate(`/document/${doc.id}`);
@@ -493,7 +544,7 @@ const DocumentChartStatic = (props) => {
 
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
-      <MyFilterDropdown loggedIn={props.loggedIn} typeDoc={documentTypes} selectedType={selectedType} setSelectedType={setSelectedType} />
+      <MyFilterDropdown loggedIn={props.loggedIn} typeDoc={documentTypes} selectedType={selectedType} setSelectedType={setSelectedType}/>
       <div className="graph-inner-wrapper">
         <div style={{ marginLeft: "25px" }}>
           <Legend documentTypes={documentTypes} stakeholders={stakeholders} showLegendModal={showLegendModal} setShowLegendModal={setShowLegendModal} />
@@ -502,6 +553,40 @@ const DocumentChartStatic = (props) => {
           <svg ref={svgRef} style={{ width: "100%", height: "100%" }}></svg>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={cancelDeleteLink} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {deleteLink ? (
+            <>
+              <p>Are you sure you want to delete this link?</p>
+              <p><strong>Link Type:</strong> {deleteLink.type}</p>
+              <p>
+                <strong>Between:</strong><br />
+                {getDocumentTitle(deleteLink.DocID1)} and {getDocumentTitle(deleteLink.DocID2)}
+              </p>
+              {/* Updated Section: Adding Warning Icon */}
+              <p style={{ color: "red", display: "flex", alignItems: "center" }}>
+                <i className="bi bi-exclamation-triangle-fill" style={{ color: "orange", marginRight: "8px" }}></i>
+                This action cannot be undone.
+              </p>
+            </>
+          ) : (
+            <p>Are you sure you want to delete this link?</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={cancelDeleteLink}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDeleteLink}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

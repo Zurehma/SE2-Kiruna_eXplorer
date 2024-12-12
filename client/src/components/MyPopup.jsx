@@ -212,7 +212,7 @@ function MyPopup(props) {
       {/* Edit Button Column */}
       {props.loggedIn && (
       <Col xs={12} md={remainingWidth} className="d-flex align-items-start justify-content-center">
-        <Row className='me-1'>
+        <Row>
           <Col xs={6} className="d-flex justify-content-center">
             <Button
               name="edit-button" variant="outline-primary" className="action-button shadow-sm" aria-label="edit"
