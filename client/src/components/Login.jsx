@@ -14,12 +14,14 @@ const Login = ({
   handleLogin,
   loggedinError,
   setloggedinError,
+  onSuccess,
 }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const credentials = { username, password };
     await handleLogin(credentials);
-    // closeLoginPane();
+    onSuccess();
+    closeLoginPane();
   };
   useEffect(() => {
     if (loggedinError) {
