@@ -139,4 +139,4 @@ server/db/db.db
 *.http
 
 # loadGraphConfiguration
-loadGraphConfiguration.json
+server/ws/GraphConfig.json
