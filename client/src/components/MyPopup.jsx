@@ -129,6 +129,11 @@ function MyPopup(props) {
   // Helper function to display "-" if value is null
   const displayValue = (value) => ((value !== null && value !== undefined) ? value : '-');
   const listOfStakeholders = stakeholderList(props.doc.stakeholders);
+
+  // Function to navigate to diagram page
+  const handleShowOnDiagram = () => {
+    navigate(`/graph/?id=${props.doc.id}`);
+  };
   
   return (
     <Row className="p-3 border rounded shadow-sm popupProp popupBackStyle">
@@ -231,6 +236,12 @@ function MyPopup(props) {
           </Col>
         </Row>
       </Col>)}
+              {/* Add Show on Diagram Button */}
+              <Col xs={12} className="mt-3 d-flex">
+          <Button variant="secondary" className="shadow-sm" onClick={handleShowOnDiagram}>
+            Show on Diagram
+          </Button>
+        </Col>
     </Row>
   );
 }

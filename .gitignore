@@ -137,3 +137,6 @@ server/db/db.db
 
 # HTTP test files
 *.http
+
+# loadGraphConfiguration
+loadGraphConfiguration.json
