@@ -27,10 +27,7 @@ const getDocuments = async (filters = undefined, all = false) => {
     if (filters.issuanceDateTo) queryParams.append("issuanceDateTo", filters.issuanceDateTo);
     if (filters.pageNo) queryParams.append("pageNo", filters.pageNo);
     //Add the filtering by title and description
-    if (filters.searchQuery) {
-      queryParams.append("title", filters.searchQuery);
-      queryParams.append("description", filters.searchQuery);
-    }
+    if (filters.searchQuery) queryParams.append("subtext", filters.searchQuery);
     const queryString = queryParams.toString();
     nextURI += `?${queryString}`;
   }
