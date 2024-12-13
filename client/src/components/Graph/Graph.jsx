@@ -5,135 +5,53 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import API from "../../../API";
 import "../../styles/DocumentChartStatic.css";
-import Legend from "./Legend"; 
-import GraphUtils from "./GraphUtils/GraphUtils";
-// import MyFilterDropdown from "../MapNavigation/MyFilterDropdown";
-import { Modal, Button, Offcanvas, Accordion } from "react-bootstrap"; 
+import GraphUtils from "./utils/graphUtils";
 import useWebSocket from "../../hooks/useWebSocket";
-import Filters from "../Filters/Filters";
 
+import FilterAndLegendSidebar from "./FilterAndLegendSidebar";
+import DeleteLinkModal from "./deleteLinkModal";
 
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
   const docCoordsRef = useRef({});
   const controlPointsRef = useRef({});
-  const [documentTypes, setDocumentTypes] = useState([]);
-  const [stakeholders, setStakeholders] = useState([]);
-  const [chartData, setChartData] = useState([]);
-  const [links, setLinks] = useState([]);
-  const [showLegendModal, setShowLegendModal] = useState(false);
-  const [selectedType, setSelectedType] = useState("All");
+
   const { isOpen, messageReceived, sendMessage } = useWebSocket();
 
   const navigate = useNavigate();
+
+  const [documentTypes, setDocumentTypes] = useState([]);
+  const [stakeholders, setStakeholders] = useState([]);
+  const [links, setLinks] = useState([]);
+  const [chartData, setChartData] = useState([]);
+
+  useEffect(() => {
+    Promise.all([API.getDocumentTypes(), API.getStakeholders(), API.allExistingLinks()])
+      .then(([documentTypes, stakeholders, links]) => {
+        setDocumentTypes(documentTypes);
+        setStakeholders(stakeholders);
+        setLinks(links);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
+  useEffect(() => {
+    API.getDocuments(undefined, true)
+      .then((documents) => setChartData(documents))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   // States for handling deletion modal
   const [deleteLink, setDeleteLink] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // State for sidebar visibility
-  const [showSidebar, setShowSidebar] = useState(false);
-
-  // State for advanced filters
-  const [advancedFilters, setAdvancedFilters] = useState({
-    startDate: "",
-    endDate: "",
-    stakeholderGovernment: false,
-    stakeholderPrivate: false,
-    stakeholderCommunity: false,
-    // Add more fields as per your advanced filters
-  });
-
-  const handleSidebarClose = () => setShowSidebar(false);
-  const handleSidebarShow = () => setShowSidebar(true);
-
-  const fetchData = async () => {
-    try {
-      const [documentType, stakeholder, links] = await Promise.all([
-        API.getDocumentTypes(),
-        API.getStakeholders(),
-        API.allExistingLinks(),
-      ]);
-
-      const stakeholdersWithColors = stakeholder.map((s) => ({
-        ...s,
-        color: GraphUtils.colorNameToHex(s.name),
-      }));
-
-      setDocumentTypes(documentType);
-      setStakeholders(stakeholdersWithColors);
-      setLinks(links);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  // Handle filtering based on selectedType and advancedFilters
-  useEffect(() => {
-    const fetchFilteredDocuments = async () => {
-      const filters = {
-        type: selectedType !== "All" ? selectedType : undefined,
-        // Advanced Filters
-        startDate: advancedFilters.startDate || undefined,
-        endDate: advancedFilters.endDate || undefined,
-        stakeholderTypes: [
-          ...(advancedFilters.stakeholderGovernment ? ["Government"] : []),
-          ...(advancedFilters.stakeholderPrivate ? ["Private Sector"] : []),
-          ...(advancedFilters.stakeholderCommunity ? ["Community"] : []),
-        ],
-        // Add more advanced filter parameters as needed
-      };
-
-      try {
-        const docs = await API.getDocuments(filters, true);
-        setChartData(docs);
-      } catch (error) {
-        console.error("Error fetching filtered documents:", error);
-      }
-    };
-
-    fetchFilteredDocuments();
-  }, [selectedType, advancedFilters]);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  // Define openDeleteModal using useCallback to ensure stability
-  const openDeleteModal = useCallback((link) => {
+  const openDeleteModal = (link) => {
     setDeleteLink(link);
     setShowDeleteModal(true);
-  }, []);
-
-  const confirmDeleteLink = async () => {
-    if (!deleteLink) return;
-    try {
-      await API.deleteLink(deleteLink.linkID);
-      setShowDeleteModal(false);
-      setDeleteLink(null);
-      fetchData(); // Refresh the data to update the graph immediately
-    } catch (error) {
-      console.error("Failed to delete the link:", error);
-      setShowDeleteModal(false);
-      setDeleteLink(null);
-      // Optionally, handle error display here (e.g., another modal or toast)
-    }
-  };
-
-  const cancelDeleteLink = () => {
-    setShowDeleteModal(false);
-    setDeleteLink(null);
-  };
-
-  const getDocumentTitle = (docID) => {
-    const doc = chartData.find((d) => d.id === docID);
-    return doc ? doc.title : "Unknown";
   };
 
   useEffect(() => {
-    if (!isOpen) return;
-
-    if (chartData.length === 0) return;
+    if (!isOpen || chartData.length === 0) return;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
@@ -151,55 +69,27 @@ const DocumentChartStatic = (props) => {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    d3.select(svgRef.current).style(
-      "background",
-      "linear-gradient(to bottom, #fafafa, #f0f0f0)"
-    );
+    d3.select(svgRef.current).style("background", "linear-gradient(to bottom, #fafafa, #f0f0f0)");
 
-    const years = Array.from(
-      new Set(chartData.map((d) => new Date(d.issuanceDate).getFullYear()))
-    ).sort((a, b) => a - b);
-    const scales = Array.from(
-      new Set([
-        "Text",
-        ...chartData
-          .map((d) => d.scale)
-          .filter((v, i, a) => a.indexOf(v) === i),
-      ])
-    );
+    const years = Array.from(new Set(chartData.map((d) => new Date(d.issuanceDate).getFullYear()))).sort((a, b) => a - b);
+    const scales = Array.from(new Set(["Text", ...chartData.map((d) => d.scale).filter((v, i, a) => a.indexOf(v) === i)]));
 
-    const yScales = scales.includes("Blueprint")
-      ? scales
-      : [...scales, "Blueprint"];
+    const yScales = scales.includes("Blueprint") ? scales : [...scales, "Blueprint"];
     yScales.pop();
 
     const xScale = d3.scaleBand().domain(years).range([0, width]).padding(0.1);
-    const yScale = d3
-      .scaleBand()
-      .domain(yScales)
-      .range([0, height])
-      .padding(0.2);
+    const yScale = d3.scaleBand().domain(yScales).range([0, height]).padding(0.2);
 
     const xAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
     const yAxis = d3
       .axisLeft(yScale)
-      .tickFormat((d) =>
-        d !== "Blueprint" && d !== "Text" ? `1:${d}` : d
-      )
+      .tickFormat((d) => (d !== "Blueprint" && d !== "Text" ? `1:${d}` : d))
       .tickSize(0);
 
     g.append("g").attr("transform", `translate(0, ${height})`).call(xAxis);
     g.append("g").call(yAxis);
 
-    g.selectAll("text")
-      .style("font-family", "'Inter', sans-serif")
-      .style("font-size", "14px")
-      .style("fill", "#000"); // Changed text color to black
-
-    const stakeholderColorMap = stakeholders.reduce((acc, stakeholder) => {
-      acc[stakeholder.name] = stakeholder.color;
-      return acc;
-    }, {});
+    g.selectAll("text").style("font-family", "'Inter', sans-serif").style("font-size", "14px").style("fill", "#000"); // Changed text color to black
 
     // Grid lines
     const cellWidth = xScale.bandwidth();
@@ -300,7 +190,7 @@ const DocumentChartStatic = (props) => {
 
     // Tooltip setup
     const tooltip = d3
-      .select(svgRef.current.parentElement)
+      .select(container)
       .append("div")
       .attr("class", "tooltip")
       .style("position", "absolute")
@@ -360,10 +250,8 @@ const DocumentChartStatic = (props) => {
 
       if (left < 0) left = 0;
       if (top < 0) top = 0;
-      if (left + rect.width > container.offsetWidth)
-        left = container.offsetWidth - rect.width;
-      if (top + rect.height > container.offsetHeight)
-        top = container.offsetHeight - rect.height;
+      if (left + rect.width > container.offsetWidth) left = container.offsetWidth - rect.width;
+      if (top + rect.height > container.offsetHeight) top = container.offsetHeight - rect.height;
 
       tooltip.style("left", `${left}px`).style("top", `${top}px`);
 
@@ -376,9 +264,7 @@ const DocumentChartStatic = (props) => {
       }, 300);
     }
 
-    tooltip
-      .on("mouseover", () => clearTimeout(hideTooltipTimeout))
-      .on("mouseout", hideTooltip);
+    tooltip.on("mouseover", () => clearTimeout(hideTooltipTimeout)).on("mouseout", hideTooltip);
 
     function updateLinkPath(selection) {
       selection.each(function (d) {
@@ -389,8 +275,7 @@ const DocumentChartStatic = (props) => {
 
         const { cellX: cellX1, cellY: cellY1 } = getCellCoords(doc1);
         const { cellX: cellX2, cellY: cellY2 } = getCellCoords(doc2);
-        if (cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null)
-          return;
+        if (cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null) return;
 
         const pos1 = docCoordsRef.current[doc1.id];
         const pos2 = docCoordsRef.current[doc2.id];
@@ -469,17 +354,11 @@ const DocumentChartStatic = (props) => {
 
       const { cellX: cellX1, cellY: cellY1 } = getCellCoords(doc1);
       const { cellX: cellX2, cellY: cellY2 } = getCellCoords(doc2);
-      if (cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null)
-        return null;
+      if (cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null) return null;
 
       const pos1 = docCoordsRef.current[doc1.id];
       const pos2 = docCoordsRef.current[doc2.id];
       if (!pos1 || !pos2) return null;
-
-      const startX = cellX1 + pos1.x;
-      const startY = cellY1 + pos1.y;
-      const endX = cellX2 + pos2.x;
-      const endY = cellY2 + pos2.y;
 
       const control = controlPointsRef.current[d.linkID];
       const cx = control.x;
@@ -665,10 +544,7 @@ const DocumentChartStatic = (props) => {
 
     docSelection.each(function (d) {
       const iconClass = GraphUtils.iconMap[d.type] || "bi-file-earmark";
-      const stakeholderColor = d.stakeholders
-        ? d.stakeholders.map((s) => stakeholderColorMap[s] || "black")
-        : ["black"];
-      const iconColor = stakeholderColor.join(", ") || "black";
+      const iconColor = d.stakeholders.map((stakeholder) => GraphUtils.colorNameToHex(stakeholder)).join(", ") || "black";
 
       d3.select(this)
         .append("foreignObject")
@@ -705,12 +581,7 @@ const DocumentChartStatic = (props) => {
       })
       .on("mouseout", function () {
         hideTooltip();
-        d3.select(this)
-          .select("foreignObject div")
-          .transition()
-          .duration(200)
-          .style("transform", "scale(1)")
-          .style("box-shadow", "none");
+        d3.select(this).select("foreignObject div").transition().duration(200).style("transform", "scale(1)").style("box-shadow", "none");
       });
   }, [chartData, links, stakeholders, props.role, messageReceived, isOpen]);
 
@@ -720,46 +591,11 @@ const DocumentChartStatic = (props) => {
 
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
-      {/* Sidebar Toggle Button */}
-      <div className="sidebar-toggle-btn">
-        <Button variant="primary" onClick={handleSidebarShow}>
-          <i className="bi bi-funnel"></i> Filters & Legend
-        </Button>
-      </div>
+      {/* Sidebar component for th legend and the filters */}
+      <FilterAndLegendSidebar documentTypes={documentTypes} stakeholders={stakeholders} />
 
-      {/* Offcanvas Sidebar */}
-      <Offcanvas show={showSidebar} onHide={handleSidebarClose} placement="start">
-        <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Filters & Legend</Offcanvas.Title>
-        </Offcanvas.Header>
-        <Offcanvas.Body>
-          <hr />
-
-          {/* Advanced Filters Accordion */}
-          <Accordion>
-            <Accordion.Item eventKey="0">
-              <Accordion.Header>Advanced Filters</Accordion.Header>
-              <Accordion.Body>
-              < Filters
-            loggedIn={props.loggedIn}
-            typeDoc={documentTypes}
-            selectedType={selectedType}
-            setSelectedType={setSelectedType}
-          />
-              </Accordion.Body>
-            </Accordion.Item>
-          </Accordion>
-
-          <hr />
-
-          {/* Legend */}
-          <Legend
-            documentTypes={documentTypes}
-            stakeholders={stakeholders}
-            mode="sidebar"
-          />
-        </Offcanvas.Body>
-      </Offcanvas>
+      {/* Modal component to confirm the deletion of a link  */}
+      <DeleteLinkModal deleteLink={deleteLink} showDeleteModal={showDeleteModal} setDeleteLink={setDeleteLink} setShowDeleteModal={setShowDeleteModal} />
 
       {/* Existing Graph Components */}
       <div className="graph-inner-wrapper">
@@ -767,46 +603,6 @@ const DocumentChartStatic = (props) => {
           <svg ref={svgRef} style={{ width: "100%", height: "100%" }}></svg>
         </div>
       </div>
-
-      {/* Existing Modals */}
-      <Modal show={showDeleteModal} onHide={cancelDeleteLink} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {deleteLink ? (
-            <>
-              <p>Are you sure you want to delete this link?</p>
-              <p>
-                <strong>Link Type:</strong> {deleteLink.type}
-              </p>
-              <p>
-                <strong>Between:</strong>
-                <br />
-                {getDocumentTitle(deleteLink.DocID1)} and {getDocumentTitle(deleteLink.DocID2)}
-              </p>
-              <p style={{ color: "red", display: "flex", alignItems: "center" }}>
-                <i
-                  className="bi bi-exclamation-triangle-fill"
-                  style={{ color: "orange", marginRight: "8px" }}
-                ></i>
-                This action cannot be undone.
-              </p>
-            </>
-          ) : (
-            <p>Are you sure you want to delete this link?</p>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={cancelDeleteLink}>
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={confirmDeleteLink}>
-            Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
     </div>
   );
 };
