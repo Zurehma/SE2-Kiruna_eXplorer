@@ -5,16 +5,18 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import API from "../../../API";
 import "../../styles/DocumentChartStatic.css";
-import Legend from "./Legend";
+import Legend from "./Legend"; 
 import GraphUtils from "./GraphUtils/GraphUtils";
-import MyFilterDropdown from "../MapNavigation/MyFilterDropdown";
-import { Modal, Button } from "react-bootstrap"; // Import Modal and Button from react-bootstrap
+// import MyFilterDropdown from "../MapNavigation/MyFilterDropdown";
+import { Modal, Button, Offcanvas, Accordion } from "react-bootstrap"; 
 import useWebSocket from "../../hooks/useWebSocket";
+import Filters from "../Filters/Filters";
+
 
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
-  const docCoordsRef = useRef({}); // Initialize useRef for docCoords
-  const controlPointsRef = useRef({}); // Initialize useRef for control points
+  const docCoordsRef = useRef({});
+  const controlPointsRef = useRef({});
   const [documentTypes, setDocumentTypes] = useState([]);
   const [stakeholders, setStakeholders] = useState([]);
   const [chartData, setChartData] = useState([]);
@@ -28,6 +30,22 @@ const DocumentChartStatic = (props) => {
   // States for handling deletion modal
   const [deleteLink, setDeleteLink] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // State for sidebar visibility
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  // State for advanced filters
+  const [advancedFilters, setAdvancedFilters] = useState({
+    startDate: "",
+    endDate: "",
+    stakeholderGovernment: false,
+    stakeholderPrivate: false,
+    stakeholderCommunity: false,
+    // Add more fields as per your advanced filters
+  });
+
+  const handleSidebarClose = () => setShowSidebar(false);
+  const handleSidebarShow = () => setShowSidebar(true);
 
   const fetchData = async () => {
     try {
@@ -44,24 +62,38 @@ const DocumentChartStatic = (props) => {
 
       setDocumentTypes(documentType);
       setStakeholders(stakeholdersWithColors);
-      setLinks(links); 
-      
+      setLinks(links);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  // Separated useEffect to handle the change of the selectedType
+  // Handle filtering based on selectedType and advancedFilters
   useEffect(() => {
-    const filters = selectedType === "All" ? {} : { type: selectedType };
-    API.getDocuments(filters, true)
-      .then((docs) => {
+    const fetchFilteredDocuments = async () => {
+      const filters = {
+        type: selectedType !== "All" ? selectedType : undefined,
+        // Advanced Filters
+        startDate: advancedFilters.startDate || undefined,
+        endDate: advancedFilters.endDate || undefined,
+        stakeholderTypes: [
+          ...(advancedFilters.stakeholderGovernment ? ["Government"] : []),
+          ...(advancedFilters.stakeholderPrivate ? ["Private Sector"] : []),
+          ...(advancedFilters.stakeholderCommunity ? ["Community"] : []),
+        ],
+        // Add more advanced filter parameters as needed
+      };
+
+      try {
+        const docs = await API.getDocuments(filters, true);
         setChartData(docs);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, [selectedType]);
+      } catch (error) {
+        console.error("Error fetching filtered documents:", error);
+      }
+    };
+
+    fetchFilteredDocuments();
+  }, [selectedType, advancedFilters]);
 
   useEffect(() => {
     fetchData();
@@ -95,7 +127,7 @@ const DocumentChartStatic = (props) => {
 
   const getDocumentTitle = (docID) => {
     const doc = chartData.find((d) => d.id === docID);
-    return doc ? doc.title : 'Unknown';
+    return doc ? doc.title : "Unknown";
   };
 
   useEffect(() => {
@@ -119,27 +151,50 @@ const DocumentChartStatic = (props) => {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    d3.select(svgRef.current).style("background", "linear-gradient(to bottom, #fafafa, #f0f0f0)");
+    d3.select(svgRef.current).style(
+      "background",
+      "linear-gradient(to bottom, #fafafa, #f0f0f0)"
+    );
 
-    const years = Array.from(new Set(chartData.map((d) => new Date(d.issuanceDate).getFullYear()))).sort((a, b) => a - b);
-    const scales = Array.from(new Set(["Text", ...chartData.map((d) => d.scale).filter((v, i, a) => a.indexOf(v) === i)]));
+    const years = Array.from(
+      new Set(chartData.map((d) => new Date(d.issuanceDate).getFullYear()))
+    ).sort((a, b) => a - b);
+    const scales = Array.from(
+      new Set([
+        "Text",
+        ...chartData
+          .map((d) => d.scale)
+          .filter((v, i, a) => a.indexOf(v) === i),
+      ])
+    );
 
-    const yScales = scales.includes("Blueprint") ? scales : [...scales, "Blueprint"];
+    const yScales = scales.includes("Blueprint")
+      ? scales
+      : [...scales, "Blueprint"];
     yScales.pop();
 
     const xScale = d3.scaleBand().domain(years).range([0, width]).padding(0.1);
-    const yScale = d3.scaleBand().domain(yScales).range([0, height]).padding(0.2);
+    const yScale = d3
+      .scaleBand()
+      .domain(yScales)
+      .range([0, height])
+      .padding(0.2);
 
     const xAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
     const yAxis = d3
       .axisLeft(yScale)
-      .tickFormat((d) => (d !== "Blueprint" && d !== "Text" ? `1:${d}` : d))
+      .tickFormat((d) =>
+        d !== "Blueprint" && d !== "Text" ? `1:${d}` : d
+      )
       .tickSize(0);
 
     g.append("g").attr("transform", `translate(0, ${height})`).call(xAxis);
     g.append("g").call(yAxis);
 
-    g.selectAll("text").style("font-family", "'Inter', sans-serif").style("font-size", "14px").style("fill", "#000"); // Changed text color to black
+    g.selectAll("text")
+      .style("font-family", "'Inter', sans-serif")
+      .style("font-size", "14px")
+      .style("fill", "#000"); // Changed text color to black
 
     const stakeholderColorMap = stakeholders.reduce((acc, stakeholder) => {
       acc[stakeholder.name] = stakeholder.color;
@@ -231,7 +286,8 @@ const DocumentChartStatic = (props) => {
 
     // Update docCoordsRef.current with messageReceived
     Object.keys(messageReceived).forEach((docId) => {
-      if (docCoordsRef.current[docId]) { // Check if docCoordsRef.current[docId] exists
+      if (docCoordsRef.current[docId]) {
+        // Check if docCoordsRef.current[docId] exists
         const dx = messageReceived[docId].x;
         const dy = messageReceived[docId].y;
         docCoordsRef.current[docId].x = cellWidth / 2 + dx * cellWidth;
@@ -242,6 +298,7 @@ const DocumentChartStatic = (props) => {
       }
     });
 
+    // Tooltip setup
     const tooltip = d3
       .select(svgRef.current.parentElement)
       .append("div")
@@ -303,8 +360,10 @@ const DocumentChartStatic = (props) => {
 
       if (left < 0) left = 0;
       if (top < 0) top = 0;
-      if (left + rect.width > container.offsetWidth) left = container.offsetWidth - rect.width;
-      if (top + rect.height > container.offsetHeight) top = container.offsetHeight - rect.height;
+      if (left + rect.width > container.offsetWidth)
+        left = container.offsetWidth - rect.width;
+      if (top + rect.height > container.offsetHeight)
+        top = container.offsetHeight - rect.height;
 
       tooltip.style("left", `${left}px`).style("top", `${top}px`);
 
@@ -317,7 +376,9 @@ const DocumentChartStatic = (props) => {
       }, 300);
     }
 
-    tooltip.on("mouseover", () => clearTimeout(hideTooltipTimeout)).on("mouseout", hideTooltip);
+    tooltip
+      .on("mouseover", () => clearTimeout(hideTooltipTimeout))
+      .on("mouseout", hideTooltip);
 
     function updateLinkPath(selection) {
       selection.each(function (d) {
@@ -328,7 +389,8 @@ const DocumentChartStatic = (props) => {
 
         const { cellX: cellX1, cellY: cellY1 } = getCellCoords(doc1);
         const { cellX: cellX2, cellY: cellY2 } = getCellCoords(doc2);
-        if (cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null) return;
+        if (cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null)
+          return;
 
         const pos1 = docCoordsRef.current[doc1.id];
         const pos2 = docCoordsRef.current[doc2.id];
@@ -407,7 +469,8 @@ const DocumentChartStatic = (props) => {
 
       const { cellX: cellX1, cellY: cellY1 } = getCellCoords(doc1);
       const { cellX: cellX2, cellY: cellY2 } = getCellCoords(doc2);
-      if (cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null) return null;
+      if (cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null)
+        return null;
 
       const pos1 = docCoordsRef.current[doc1.id];
       const pos2 = docCoordsRef.current[doc2.id];
@@ -437,15 +500,15 @@ const DocumentChartStatic = (props) => {
         const actionButtons =
           props.role === "Urban Planner"
             ? `
-            <div style="display:flex;align-items:center; margin-top:8px;">
-              <button class="delete-link-btn btn btn-sm btn-danger me-2">
-                Delete Link
-              </button>
-              <span class="info-icon" title="This action cannot be undone and will permanently remove the link.">
-                <i class="bi bi-info-circle"></i>
-              </span>
-            </div>
-          `
+              <div style="display:flex;align-items:center; margin-top:8px;">
+                <button class="delete-link-btn btn btn-sm btn-danger me-2">
+                  Delete Link
+                </button>
+                <span class="info-icon" title="This action cannot be undone and will permanently remove the link.">
+                  <i class="bi bi-info-circle"></i>
+                </span>
+              </div>
+            `
             : "";
 
         const html = `
@@ -490,7 +553,8 @@ const DocumentChartStatic = (props) => {
       .attr("cx", (d) => controlPointsRef.current[d.linkID].x)
       .attr("cy", (d) => controlPointsRef.current[d.linkID].y)
       .call(
-        d3.drag()
+        d3
+          .drag()
           .on("drag", function (event, d) {
             // Update control point position
             controlPointsRef.current[d.linkID].x = event.x;
@@ -500,12 +564,9 @@ const DocumentChartStatic = (props) => {
             updateLinkPath(g.selectAll(".link"));
 
             // Update the position of the control point itself
-            d3.select(this)
-              .attr("cx", event.x)
-              .attr("cy", event.y);
+            d3.select(this).attr("cx", event.x).attr("cy", event.y);
           })
-          .on("end", (event, d) => {
-          })
+          .on("end", (event, d) => {})
       );
 
     g.selectAll(".control-point").raise();
@@ -534,8 +595,7 @@ const DocumentChartStatic = (props) => {
 
         docCoordsRef.current[docId] = { x: newX, y: newY };
 
-        d3.select(this)
-          .attr("transform", `translate(${cellX + newX},${cellY + newY})`);
+        d3.select(this).attr("transform", `translate(${cellX + newX},${cellY + newY})`);
 
         // Update the links connected to this document
         g.selectAll(".link").call(updateLinkPath);
@@ -550,7 +610,6 @@ const DocumentChartStatic = (props) => {
               const pos2 = docCoordsRef.current[link.DocID2];
               const { x: startX, y: startY } = pos1;
               const { x: endX, y: endY } = pos2;
-
 
               const midX = (startX + endX) / 2;
               const midY = (startY + endY) / 2;
@@ -570,7 +629,6 @@ const DocumentChartStatic = (props) => {
         g.selectAll(".control-point")
           .attr("cx", (d) => controlPointsRef.current[d.linkID].x)
           .attr("cy", (d) => controlPointsRef.current[d.linkID].y);
-
       })
       .on("end", (event, d) => {
         const docId = d.id;
@@ -607,7 +665,9 @@ const DocumentChartStatic = (props) => {
 
     docSelection.each(function (d) {
       const iconClass = GraphUtils.iconMap[d.type] || "bi-file-earmark";
-      const stakeholderColor = d.stakeholders ? d.stakeholders.map((s) => stakeholderColorMap[s] || "black") : ["black"];
+      const stakeholderColor = d.stakeholders
+        ? d.stakeholders.map((s) => stakeholderColorMap[s] || "black")
+        : ["black"];
       const iconColor = stakeholderColor.join(", ") || "black";
 
       d3.select(this)
@@ -645,9 +705,14 @@ const DocumentChartStatic = (props) => {
       })
       .on("mouseout", function () {
         hideTooltip();
-        d3.select(this).select("foreignObject div").transition().duration(200).style("transform", "scale(1)").style("box-shadow", "none");
+        d3.select(this)
+          .select("foreignObject div")
+          .transition()
+          .duration(200)
+          .style("transform", "scale(1)")
+          .style("box-shadow", "none");
       });
-  }, [chartData, links, stakeholders, props.role, messageReceived, isOpen]); 
+  }, [chartData, links, stakeholders, props.role, messageReceived, isOpen]);
 
   const handleDocumentClick = (doc) => {
     navigate(`/document/${doc.id}`);
@@ -655,16 +720,55 @@ const DocumentChartStatic = (props) => {
 
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
-      <MyFilterDropdown loggedIn={props.loggedIn} typeDoc={documentTypes} selectedType={selectedType} setSelectedType={setSelectedType}/>
+      {/* Sidebar Toggle Button */}
+      <div className="sidebar-toggle-btn">
+        <Button variant="primary" onClick={handleSidebarShow}>
+          <i className="bi bi-funnel"></i> Filters & Legend
+        </Button>
+      </div>
+
+      {/* Offcanvas Sidebar */}
+      <Offcanvas show={showSidebar} onHide={handleSidebarClose} placement="start">
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Filters & Legend</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <hr />
+
+          {/* Advanced Filters Accordion */}
+          <Accordion>
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Advanced Filters</Accordion.Header>
+              <Accordion.Body>
+              < Filters
+            loggedIn={props.loggedIn}
+            typeDoc={documentTypes}
+            selectedType={selectedType}
+            setSelectedType={setSelectedType}
+          />
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+
+          <hr />
+
+          {/* Legend */}
+          <Legend
+            documentTypes={documentTypes}
+            stakeholders={stakeholders}
+            mode="sidebar"
+          />
+        </Offcanvas.Body>
+      </Offcanvas>
+
+      {/* Existing Graph Components */}
       <div className="graph-inner-wrapper">
-        <div style={{ marginLeft: "25px" }}>
-          <Legend documentTypes={documentTypes} stakeholders={stakeholders} showLegendModal={showLegendModal} setShowLegendModal={setShowLegendModal} />
-        </div>
         <div id="image" style={{ width: "100%", height: "100%", position: "relative" }}>
           <svg ref={svgRef} style={{ width: "100%", height: "100%" }}></svg>
         </div>
       </div>
 
+      {/* Existing Modals */}
       <Modal show={showDeleteModal} onHide={cancelDeleteLink} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
@@ -673,13 +777,19 @@ const DocumentChartStatic = (props) => {
           {deleteLink ? (
             <>
               <p>Are you sure you want to delete this link?</p>
-              <p><strong>Link Type:</strong> {deleteLink.type}</p>
               <p>
-                <strong>Between:</strong><br />
+                <strong>Link Type:</strong> {deleteLink.type}
+              </p>
+              <p>
+                <strong>Between:</strong>
+                <br />
                 {getDocumentTitle(deleteLink.DocID1)} and {getDocumentTitle(deleteLink.DocID2)}
               </p>
               <p style={{ color: "red", display: "flex", alignItems: "center" }}>
-                <i className="bi bi-exclamation-triangle-fill" style={{ color: "orange", marginRight: "8px" }}></i>
+                <i
+                  className="bi bi-exclamation-triangle-fill"
+                  style={{ color: "orange", marginRight: "8px" }}
+                ></i>
                 This action cannot be undone.
               </p>
             </>
@@ -696,6 +806,7 @@ const DocumentChartStatic = (props) => {
           </Button>
         </Modal.Footer>
       </Modal>
+
     </div>
   );
 };

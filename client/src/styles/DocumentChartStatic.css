@@ -99,3 +99,37 @@
     font-size: 13px;
   }
 }
+/* DocumentChartStatic.css */
+
+.sidebar-toggle-btn {
+  position:fixed;
+  bottom: 0%;
+  margin-top: 1cm;
+  left: 10px;
+  z-index: 111; /* Ensure it's above other elements */
+}
+
+/* Adjust Offcanvas width for better visibility */
+.offcanvas-start {
+  width: 300px; /* Adjust as needed */
+}
+
+/* Optional: Style the Advanced Filters accordion header */
+.offcanvas-body .accordion-button {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+/* Optional: Add spacing within the Advanced Filters */
+.offcanvas-body .form-group {
+  margin-bottom: 1rem;
+}
+
+/* Tooltip styling adjustments if needed */
+.tooltip {
+  /* Existing styles */
+}
+
+.legend-modal-overlay {
+  /* Existing styles */
+}
