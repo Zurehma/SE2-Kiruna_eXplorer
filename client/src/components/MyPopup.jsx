@@ -215,18 +215,24 @@ function MyPopup(props) {
         <Row>
           <Col xs={6} className="d-flex justify-content-center">
             <Button
-              name="edit-button" variant="outline-primary" className="action-button shadow-sm" aria-label="edit"
+              name="edit-button"
+              variant="link" 
+              className="icon-button" 
+              aria-label="edit"
               onClick={handleEditClick}
             >
-              <i className="bi bi-pencil-square action-icon"></i>
+              <i className="bi bi-pencil-square"></i>
             </Button>
           </Col>
           <Col xs={6} className="d-flex justify-content-center">
             <Button
-              name="delete-button" variant="outline-danger" className="action-button shadow-sm" aria-label="delete"
+              name="delete-button"
+              variant="link" 
+              className="icon-button" 
+              aria-label="delete"
               onClick={handleDeleteClick}
             >
-              <i className="bi bi-trash action-icon"></i>
+              <i className="bi bi-trash"></i> 
             </Button>
           </Col>
         </Row>
