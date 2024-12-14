@@ -109,12 +109,19 @@ export function NavigationBar(props) {
             </>
           ) : (
             <>
-              <Nav.Link
+              {/* <Nav.Link
                 as={Link}
                 to="/"
                 className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
               >
                 Home
+              </Nav.Link> */}
+              <Nav.Link
+                as={Link}
+                to="/map"
+                className={`nav-link ${location.pathname === "/map" ? "active" : ""}`}
+              >
+                Map
               </Nav.Link>
               <Nav.Link
                 as={Link}
@@ -122,13 +129,6 @@ export function NavigationBar(props) {
                 className={`nav-link ${location.pathname === "/graph" ? "active" : ""}`}
               >
                 Diagram
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/map"
-                className={`nav-link ${location.pathname === "/map" ? "active" : ""}`}
-              >
-                Map
               </Nav.Link>
               <Nav.Link onClick={handleLoginClick} className="nav-link">
                 Login
