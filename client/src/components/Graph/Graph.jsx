@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import API from "../../../API";
 import "../../styles/DocumentChartStatic.css";
-import GraphUtils from '../../utils/graphUtils'
+import GraphUtils from '../../utils/graphUtils';
 import useWebSocket from "../../hooks/useWebSocket";
 import FilterAndLegendSidebar from "./FilterAndLegendSidebar";
 import DeleteLinkModal from "./deleteLinkModal";
@@ -72,7 +72,6 @@ const DocumentChartStatic = (props) => {
 
     const years = Array.from(new Set(chartData.map((d) => new Date(d.issuanceDate).getFullYear()))).sort((a, b) => a - b);
     const scales = Array.from(new Set(["Text", ...chartData.map((d) => d.scale).filter((v, i, a) => a.indexOf(v) === i)]));
-
     const yScales = scales.includes("Blueprint") ? scales : [...scales, "Blueprint"];
     yScales.pop();
 
@@ -88,7 +87,7 @@ const DocumentChartStatic = (props) => {
     g.append("g").attr("transform", `translate(0, ${height})`).call(xAxis);
     g.append("g").call(yAxis);
 
-    g.selectAll("text").style("font-family", "'Inter', sans-serif").style("font-size", "14px").style("fill", "#000"); // Changed text color to black
+    g.selectAll("text").style("font-family", "'Inter', sans-serif").style("font-size", "14px").style("fill", "#000");
 
     // Grid lines
     const cellWidth = xScale.bandwidth();
@@ -142,8 +141,9 @@ const DocumentChartStatic = (props) => {
     });
 
     // Initialize controlPointsRef.current with dynamic positioning
-    if (Object.keys(controlPointsRef.current).length === 0) {
-      links.forEach((link) => {
+    if (Object.keys(controlPointsRef.current).length !== links.length) {
+      controlPointsRef.current = {}; // Reset before setting
+      links.forEach((link, index) => {
         const doc1 = chartData.find((d) => d.id === link.DocID1);
         const doc2 = chartData.find((d) => d.id === link.DocID2);
         if (doc1 && doc2) {
@@ -159,18 +159,25 @@ const DocumentChartStatic = (props) => {
           // Calculate angle of the link
           const angle = Math.atan2(endY - startY, endX - startX);
 
-          // Calculate perpendicular offset (smaller value for closer positioning)
-          const offsetMagnitude = 20; // Adjust this value as needed
-          const offsetX = -Math.sin(angle) * offsetMagnitude;
-          const offsetY = Math.cos(angle) * offsetMagnitude;
+          // Alternate offset direction based on link index to spread control points
+          const alternate = index % 2 === 0 ? 1 : -1;
 
-          // Set control point position closer to the link
+          // Reduce offset magnitude to keep control points closer
+          const baseOffset = 10; // Reduced from 20 to 10
+          // Removed variation for simplicity
+          const offsetMagnitude = baseOffset;
+
+          const offsetX = -Math.sin(angle) * offsetMagnitude * alternate;
+          const offsetY = Math.cos(angle) * offsetMagnitude * alternate;
+
+          // Set control point position
           controlPointsRef.current[link.linkID] = {
             x: midX + offsetX,
             y: midY + offsetY,
           };
         }
       });
+      console.log("Control Points Initialized:", controlPointsRef.current);
     }
 
     // Update docCoordsRef.current with messageReceived
@@ -193,7 +200,7 @@ const DocumentChartStatic = (props) => {
       .append("div")
       .attr("class", "tooltip")
       .style("position", "absolute")
-      .style("background", "#fff") // Fixed missing '#' for white background
+      .style("background", "#fff")
       .style("padding", "12px 16px")
       .style("border", "1px solid #ddd")
       .style("border-radius", "8px")
@@ -201,7 +208,7 @@ const DocumentChartStatic = (props) => {
       .style("font-size", "14px")
       .style("line-height", "1.4")
       .style("font-family", "'Inter', sans-serif")
-      .style("color", "#000") // Changed tooltip text color to black
+      .style("color", "#000")
       .style("pointer-events", "none")
       .style("opacity", 0)
       .style("z-index", 9999)
@@ -286,26 +293,28 @@ const DocumentChartStatic = (props) => {
         const endY = cellY2 + pos2.y;
 
         // Retrieve control point for this link
-        const control = controlPointsRef.current[d.linkID];
+        let control = controlPointsRef.current[d.linkID];
         if (!control) {
           // If no control point, set to midpoint with dynamic offset
           const midX = (startX + endX) / 2;
           const midY = (startY + endY) / 2;
 
           const angle = Math.atan2(endY - startY, endX - startX);
-          const offsetMagnitude = 20; // Adjust as needed
-          const offsetX = -Math.sin(angle) * offsetMagnitude;
-          const offsetY = Math.cos(angle) * offsetMagnitude;
+          const offsetMagnitude = 10; // Adjusted to match control points
+          const alternate = links.indexOf(d) % 2 === 0 ? 1 : -1;
+
+          const offsetX = -Math.sin(angle) * offsetMagnitude * alternate;
+          const offsetY = Math.cos(angle) * offsetMagnitude * alternate;
 
           controlPointsRef.current[d.linkID] = {
             x: midX + offsetX,
             y: midY + offsetY,
           };
+          control = controlPointsRef.current[d.linkID];
         }
 
-        const controlPoint = controlPointsRef.current[d.linkID];
-        const cx = controlPoint.x;
-        const cy = controlPoint.y;
+        const cx = control.x;
+        const cy = control.y;
 
         let strokeStyle = "4,4";
         switch (d.type) {
@@ -335,8 +344,7 @@ const DocumentChartStatic = (props) => {
       });
     }
 
-    // === UPDATED SECTION START ===
-    // Bind data to link elements using linkID as the key
+    // === Bind data to link elements using linkID as the key ===
     const linkSelection = g
       .selectAll(".link")
       .data(links, (d) => d.linkID) // Changed from d.DocID1 + "-" + d.DocID2 to d.linkID
@@ -360,6 +368,8 @@ const DocumentChartStatic = (props) => {
       if (!pos1 || !pos2) return null;
 
       const control = controlPointsRef.current[d.linkID];
+      if (!control) return null;
+
       const cx = control.x;
       const cy = control.y;
 
@@ -371,9 +381,10 @@ const DocumentChartStatic = (props) => {
         clearTimeout(hideTooltipTimeout);
         const doc1 = chartData.find((doc) => doc.id === d.DocID1);
         const doc2 = chartData.find((doc) => doc.id === d.DocID2);
-        const midpoint = getLinkMidpoint(d);
-        if (!midpoint) return;
-
+        
+        // Get mouse position relative to the container
+        const [mouseX, mouseY] = d3.pointer(event, container);
+        
         // Conditionally include Delete Button and Info Icon based on role
         const actionButtons =
           props.role === "Urban Planner"
@@ -388,7 +399,7 @@ const DocumentChartStatic = (props) => {
               </div>
             `
             : "";
-
+        
         const html = `
           <div style="position:relative; color:#000;">
             <div style="margin-bottom:4px;font-weight:bold;">Link Type: ${d.type}</div>
@@ -400,9 +411,10 @@ const DocumentChartStatic = (props) => {
             ${actionButtons}
           </div>
         `;
-
-        showTooltip(html, midpoint.x + margin.left, midpoint.y + margin.top);
-
+        
+        // Show tooltip near the mouse cursor
+        showTooltip(html, mouseX + margin.left, mouseY + margin.top);
+        
         if (props.role === "Urban Planner") {
           // Add click event handler for the delete button to open the confirmation modal
           d3.select(tooltip.node())
@@ -417,7 +429,9 @@ const DocumentChartStatic = (props) => {
 
     // === ADDING CONTROL POINTS ===
     // Append control points as draggable circles
-    const controlPointSelection = g
+    const controlPointsGroup = g.append("g").attr("class", "control-points");
+
+    const controlPointSelection = controlPointsGroup
       .selectAll(".control-point")
       .data(links, (d) => d.linkID)
       .enter()
@@ -444,10 +458,23 @@ const DocumentChartStatic = (props) => {
             // Update the position of the control point itself
             d3.select(this).attr("cx", event.x).attr("cy", event.y);
           })
-          .on("end", (event, d) => {})
+          .on("end", (event, d) => {
+            // Optionally, persist the new control point position to a backend or state
+            // Example:
+            // API.updateControlPoint(d.linkID, controlPointsRef.current[d.linkID])
+            //   .then(response => { /* handle success */ })
+            //   .catch(error => { /* handle error */ });
+          })
       );
 
-    g.selectAll(".control-point").raise();
+    controlPointSelection.raise();
+
+    // Optionally, you can style control points more distinctively
+    controlPointSelection
+      .attr("fill", "orange")
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 2)
+      .attr("r", 6);
 
     const drag = d3
       .drag()
@@ -489,12 +516,17 @@ const DocumentChartStatic = (props) => {
               const { x: startX, y: startY } = pos1;
               const { x: endX, y: endY } = pos2;
 
+              // Recalculate control point based on updated positions
               const midX = (startX + endX) / 2;
               const midY = (startY + endY) / 2;
               const angle = Math.atan2(endY - startY, endX - startX);
-              const offsetMagnitude = 20; // Adjust as needed
-              const offsetX = -Math.sin(angle) * offsetMagnitude;
-              const offsetY = Math.cos(angle) * offsetMagnitude;
+              const alternate = links.indexOf(link) % 2 === 0 ? 1 : -1;
+              const baseOffset = 10; // Adjusted to match control points
+              // Removed variation for simplicity
+              const offsetMagnitude = baseOffset;
+
+              const offsetX = -Math.sin(angle) * offsetMagnitude * alternate;
+              const offsetY = Math.cos(angle) * offsetMagnitude * alternate;
 
               controlPointsRef.current[link.linkID] = {
                 x: midX + offsetX,
@@ -555,8 +587,8 @@ const DocumentChartStatic = (props) => {
         .html(
           `<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;pointer-events:all;transition:transform 0.2s, box-shadow 0.2s;">
             <i class="bi ${iconClass}" style="font-size: 20px; color: ${iconColor}; cursor: ${
-            props.role === "Urban Planner" ? "move" : "default"
-          }; pointer-events:all;"></i>
+          props.role === "Urban Planner" ? "move" : "default"
+        }; pointer-events:all;"></i>
           </div>`
         )
         .on("click", () => handleDocumentClick(d));
@@ -590,10 +622,10 @@ const DocumentChartStatic = (props) => {
 
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
-      {/* Sidebar component for th legend and the filters */}
+      {/* Sidebar component for the legend and the filters */}
       <FilterAndLegendSidebar documentTypes={documentTypes} stakeholders={stakeholders} />
 
-      {/* Modal component to confirm the deletion of a link  */}
+      {/* Modal component to confirm the deletion of a link */}
       <DeleteLinkModal deleteLink={deleteLink} showDeleteModal={showDeleteModal} setDeleteLink={setDeleteLink} setShowDeleteModal={setShowDeleteModal} />
 
       {/* Existing Graph Components */}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Modal, Button, Offcanvas, Accordion } from "react-bootstrap";
 import Legend from "./Legend";
+import Filters from "../Filters/Filters";
 
 const FilterAndLegendSidebar = ({ documentTypes, stakeholders }) => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -27,9 +28,9 @@ const FilterAndLegendSidebar = ({ documentTypes, stakeholders }) => {
           {/* Advanced Filters Accordion */}
           <Accordion>
             <Accordion.Item eventKey="0">
-              <Accordion.Header>Filters</Accordion.Header>
+              <Accordion.Header>Advanced filters</Accordion.Header>
               <Accordion.Body>
-                {/* The filter component that already exist not usable here because is specifically designed to work with the list of document */}
+                <Filters/>
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>
@@ -38,6 +39,8 @@ const FilterAndLegendSidebar = ({ documentTypes, stakeholders }) => {
 
           {/* Legend */}
           <Legend documentTypes={documentTypes} stakeholders={stakeholders} />
+          <Button onClick={()=>setShowSidebar(false)}>Close Filter&Legend</Button>
+
         </Offcanvas.Body>
       </Offcanvas>
     </>
