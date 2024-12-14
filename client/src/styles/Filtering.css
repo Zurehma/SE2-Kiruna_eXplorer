@@ -4,23 +4,35 @@ html,
 body {
   margin: 0;
   height: 100%;
-  overflow: hidden; /* Evita il doppio scroll */
+  overflow-y: auto; /* Abilita lo scroll globale */
 }
+
 .viewall-background {
   background: linear-gradient(to right, #006d77, #83c5be);
   font-family: "Roboto", sans-serif;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh; /* Prendi l'altezza completa della finestra */
-  overflow: hidden; /* Impedisce il doppio scroll */
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  min-height: 100vh; /* Usa `min-height` invece di `height` */
+  overflow-y: auto; /* Abilita lo scroll verticale se necessario */
 }
 
 .filtered-result {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
   background-color: transparent !important;
-  max-height: calc(100vh - 30px); /* Assicurati che questo valore sia sufficiente */
-  overflow-y: auto;
-  padding-bottom: 100px; /* Aggiungi spazio alla fine per evitare che i bottoni siano nascosti */
+  height: 100%; /* Usa altezza completa del contenitore */
+  max-height: none; /* Rimuovi qualsiasi limite massimo di altezza */
+  overflow-y: auto; /* Consenti lo scroll verticale */
+  padding-bottom: 20px; /* Spazio extra per evitare che i bottoni siano nascosti */
+}
+
+.documents-list {
+  min-height: 100%;
+  padding: 15px;
 }
 
 @media (min-width: 768px) {
@@ -99,10 +111,44 @@ body {
   justify-content: center;
   margin-top: 10px;
 }
+/* Stile base della checkbox */
+.custom-checkbox input[type="checkbox"] {
+  accent-color: #006d77; /* Cambia colore della spunta */
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+/* Personalizzazione avanzata per browser che non supportano accent-color */
+.custom-checkbox input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border: 2px solid #006d77;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Stile per la checkbox selezionata */
+.custom-checkbox input[type="checkbox"]:checked {
+  background-color: #006d77;
+}
+
+/* Aggiungere un'icona di spunta personalizzata */
+.custom-checkbox input[type="checkbox"]:checked::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 16px;
+}
 
 .custom-toggle {
   padding: 8px 15px;
-  background: #2d5dbd; /* Light gray */
+  background: #d4d4d4; /* Light gray */
   border: 1px solid #d1d5db;
   border-radius: 20px; /* Makes the toggle button more rounded */
   cursor: pointer;
@@ -130,7 +176,7 @@ body {
 }
 
 .custom-toggle.active:hover {
-  background-color: #006d99;
+  background-color: #006d77;
 }
 
 .toggle-label {
@@ -167,11 +213,11 @@ body {
   width: 8px;
 }
 .filter-input::-webkit-scrollbar-thumb {
-  background: #3b82f6; /* Blue scrollbar thumb */
+  background: #a9a9a9; /* Blue scrollbar thumb */
   border-radius: 8px;
 }
 .filter-input::-webkit-scrollbar-thumb:hover {
-  background: #1e40af; /* Darker blue on hover */
+  background-color: #006d77; /* Darker blue on hover */
 }
 
 .filter-input:focus {
@@ -194,9 +240,9 @@ body {
 }
 
 /* Document Cards */
-/* .documents-list {
-  background-color: #000000;
-} */
+.documents-list {
+  padding: 15px;
+}
 
 /* Button & Spinner Styling */
 /* .spinner-border {
