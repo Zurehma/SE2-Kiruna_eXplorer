@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -48,6 +48,7 @@ const DocumentChartStatic = (props) => {
     setDeleteLink(link);
     setShowDeleteModal(true);
   };
+
   const handleLinkDeleted = (deletedLinkID) => {
     setLinks((prevLinks) => prevLinks.filter(link => link.linkID !== deletedLinkID));
   };
@@ -431,53 +432,53 @@ const DocumentChartStatic = (props) => {
       .on("mouseout", hideTooltip);
 
     // === ADDING CONTROL POINTS ===
-    // Append control points as draggable circles
-    const controlPointsGroup = g.append("g").attr("class", "control-points");
+    if (props.role === "Urban Planner") { // Only render control points for authorized users
+      const controlPointsGroup = g.append("g").attr("class", "control-points");
 
-    const controlPointSelection = controlPointsGroup
-      .selectAll(".control-point")
-      .data(links, (d) => d.linkID)
-      .enter()
-      .append("circle")
-      .attr("class", "control-point")
-      .attr("r", 6)
-      .attr("fill", "orange")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 2)
-      .attr("cursor", "pointer")
-      .attr("cx", (d) => controlPointsRef.current[d.linkID].x)
-      .attr("cy", (d) => controlPointsRef.current[d.linkID].y)
-      .call(
-        d3
-          .drag()
-          .on("drag", function (event, d) {
-            // Update control point position
-            controlPointsRef.current[d.linkID].x = event.x;
-            controlPointsRef.current[d.linkID].y = event.y;
+      const controlPointSelection = controlPointsGroup
+        .selectAll(".control-point")
+        .data(links, (d) => d.linkID)
+        .enter()
+        .append("circle")
+        .attr("class", "control-point")
+        .attr("r", 6)
+        .attr("fill", "orange")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 2)
+        .attr("cursor", "pointer")
+        .attr("cx", (d) => controlPointsRef.current[d.linkID].x)
+        .attr("cy", (d) => controlPointsRef.current[d.linkID].y)
+        .call(
+          d3.drag()
+            .on("drag", function (event, d) {
+              // Update control point position
+              controlPointsRef.current[d.linkID].x = event.x;
+              controlPointsRef.current[d.linkID].y = event.y;
 
-            // Update the link path
-            updateLinkPath(g.selectAll(".link"));
+              // Update the link path
+              updateLinkPath(g.selectAll(".link"));
 
-            // Update the position of the control point itself
-            d3.select(this).attr("cx", event.x).attr("cy", event.y);
-          })
-          .on("end", (event, d) => {
-            // Optionally, persist the new control point position to a backend or state
-            // Example:
-            // API.updateControlPoint(d.linkID, controlPointsRef.current[d.linkID])
-            //   .then(response => { /* handle success */ })
-            //   .catch(error => { /* handle error */ });
-          })
-      );
+              // Update the position of the control point itself
+              d3.select(this).attr("cx", event.x).attr("cy", event.y);
+            })
+            .on("end", (event, d) => {
+              // Optionally, persist the new control point position to a backend or state
+              // Example:
+              // API.updateControlPoint(d.linkID, controlPointsRef.current[d.linkID])
+              //   .then(response => { /* handle success */ })
+              //   .catch(error => { /* handle error */ });
+            })
+        );
 
-    controlPointSelection.raise();
+      controlPointSelection.raise();
 
-    // Optionally, you can style control points more distinctively
-    controlPointSelection
-      .attr("fill", "orange")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 2)
-      .attr("r", 6);
+      // Optionally, you can style control points more distinctively
+      controlPointSelection
+        .attr("fill", "orange")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 2)
+        .attr("r", 6);
+    }
 
     const drag = d3
       .drag()
@@ -539,9 +540,11 @@ const DocumentChartStatic = (props) => {
           }
         });
 
-        g.selectAll(".control-point")
-          .attr("cx", (d) => controlPointsRef.current[d.linkID].x)
-          .attr("cy", (d) => controlPointsRef.current[d.linkID].y);
+        if (props.role === "Urban Planner") {
+          g.selectAll(".control-point")
+            .attr("cx", (d) => controlPointsRef.current[d.linkID].x)
+            .attr("cy", (d) => controlPointsRef.current[d.linkID].y);
+        }
       })
       .on("end", (event, d) => {
         const docId = d.id;
@@ -590,8 +593,8 @@ const DocumentChartStatic = (props) => {
         .html(
           `<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;pointer-events:all;transition:transform 0.2s, box-shadow 0.2s;">
             <i class="bi ${iconClass}" style="font-size: 20px; color: ${iconColor}; cursor: ${
-          props.role === "Urban Planner" ? "move" : "default"
-        }; pointer-events:all;"></i>
+            props.role === "Urban Planner" ? "move" : "default"
+          }; pointer-events:all;"></i>
           </div>`
         )
         .on("click", () => handleDocumentClick(d));
@@ -626,10 +629,17 @@ const DocumentChartStatic = (props) => {
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
       {/* Sidebar component for the legend and the filters */}
-      <FilterAndLegendSidebar documentTypes={documentTypes} stakeholders={stakeholders} />
+      {props.role == 'Urban Planner' && (      <FilterAndLegendSidebar documentTypes={documentTypes} stakeholders={stakeholders} />)}
 
       {/* Modal component to confirm the deletion of a link */}
-      <DeleteLinkModal deleteLink={deleteLink} showDeleteModal={showDeleteModal} setDeleteLink={setDeleteLink} setShowDeleteModal={setShowDeleteModal} chartData={chartData} onLinkDeleted={handleLinkDeleted} />
+      <DeleteLinkModal
+        deleteLink={deleteLink}
+        showDeleteModal={showDeleteModal}
+        setDeleteLink={setDeleteLink}
+        setShowDeleteModal={setShowDeleteModal}
+        chartData={chartData}
+        onLinkDeleted={handleLinkDeleted} // Pass the callback here
+      />
 
       {/* Existing Graph Components */}
       <div className="graph-inner-wrapper">
