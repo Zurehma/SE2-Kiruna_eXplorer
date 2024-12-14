@@ -5,9 +5,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import API from "../../../API";
 import "../../styles/DocumentChartStatic.css";
-import GraphUtils from "./utils/graphUtils";
+import GraphUtils from '../../utils/graphUtils'
 import useWebSocket from "../../hooks/useWebSocket";
-
 import FilterAndLegendSidebar from "./FilterAndLegendSidebar";
 import DeleteLinkModal from "./deleteLinkModal";
 

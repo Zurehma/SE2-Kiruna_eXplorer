@@ -1,6 +1,6 @@
 // Legend.js
 import React from "react";
-import GraphUtils from "./utils/graphUtils";
+import GraphUtils from '../../utils/graphUtils'
 
 const Legend = ({ documentTypes, stakeholders }) => {
   const iconMap = {
