@@ -54,6 +54,7 @@ const FilteringDocuments = (props) => {
               />
               <Button
                 id="close-button-resp"
+                type="button"
                 onClick={() => {
                   setShowFilters(false);
                 }}

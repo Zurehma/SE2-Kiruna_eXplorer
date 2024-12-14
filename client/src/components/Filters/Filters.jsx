@@ -56,6 +56,8 @@ function Filters(props) {
       if(response.totalPages <currentPage+1){ //reset to page zero if you exceeded
         props.setCurrentPage(0);
       }
+      console.log(response.elements);
+      
       props.setDocuments(response.elements);
       props.setTotalPages(response.totalPages);
     } catch (error) {

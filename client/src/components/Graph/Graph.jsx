@@ -23,6 +23,14 @@ const DocumentChartStatic = (props) => {
   const [stakeholders, setStakeholders] = useState([]);
   const [links, setLinks] = useState([]);
   const [chartData, setChartData] = useState([]);
+  const [reload,setReload] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sentSearchQuery, setSentSearchQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);    
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  
 
   useEffect(() => {
     Promise.all([API.getDocumentTypes(), API.getStakeholders(), API.allExistingLinks()])
@@ -33,6 +41,7 @@ const DocumentChartStatic = (props) => {
       })
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
+
 
   useEffect(() => {
     API.getDocuments(undefined, true)
@@ -635,8 +644,20 @@ const DocumentChartStatic = (props) => {
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
       {/* Sidebar component for the legend and the filters */}
-      {props.role == 'Urban Planner' && (      <FilterAndLegendSidebar documentTypes={documentTypes} stakeholders={stakeholders} />)}
-
+      {props.role == 'Urban Planner' && (      
+                      <FilterAndLegendSidebar
+                      documentTypes={documentTypes}
+                      stakeholders={stakeholders}
+                      setDocuments={setChartData}
+                      onSetLoading={setLoading}
+                      currentPage={currentPage}
+                      setCurrentPage={setCurrentPage}
+                      setTotalPages={setTotalPages}
+                      searchQuery={sentSearchQuery}
+                      reload = {reload}
+                    />
+      )}                
+                
       {/* Modal component to confirm the deletion of a link */}
       <DeleteLinkModal
         deleteLink={deleteLink}
