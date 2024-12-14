@@ -29,14 +29,14 @@ const colorNameToHex = (colorName) => {
   return color;
 };
 
-function getCellPosition(document) {
+const getCellPosition = (document) => {
   const year = new Date(document.issuanceDate).getFullYear();
 
   return {
     cellX: xScale(year),
     cellY: yScale(doc.scale),
   };
-}
+};
 
 const GraphUtils = { iconMap, colorNameToHex, getCellPosition };
 
