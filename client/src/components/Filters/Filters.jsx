@@ -106,8 +106,8 @@ function Filters(props) {
       {/* Stakeholder Dropdown */}
       <Form.Group controlId="sidebarFilterStakeholder" className="mt-3">
         <Form.Label className="filter-label">Stakeholder</Form.Label>
-        <Form.Control
-          as="select"
+        <Form.Select
+          name="stakeholder"
           value={stakeholder}
           onChange={(e) => setStakeholder(e.target.value)}
           className="filter-input"
@@ -118,14 +118,14 @@ function Filters(props) {
               {stakeholderItem.name}
             </option>
           ))}
-        </Form.Control>
+        </Form.Select>
       </Form.Group>
 
       {/* Document Type Dropdown */}
       <Form.Group controlId="sidebarFilterDocumentType" className="mt-3">
         <Form.Label className="filter-label">Document Type</Form.Label>
-        <Form.Control
-          as="select"
+        <Form.Select
+          name="documentType"
           value={documentType}
           onChange={(e) => setDocumentType(e.target.value)}
           className="filter-input"
@@ -136,7 +136,7 @@ function Filters(props) {
               {typeItem.name}
             </option>
           ))}
-        </Form.Control>
+        </Form.Select>
       </Form.Group>
 
       {/* Date Selection Checkbox */}
