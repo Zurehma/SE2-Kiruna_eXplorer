@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal, Button, Offcanvas, Accordion } from "react-bootstrap";
 import Legend from "./Legend";
 import Filters from "../Filters/Filters";
+import '../../styles/FilterAndSidebar.css'
 
 const FilterAndLegendSidebar = ({ documentTypes, stakeholders }) => {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -12,7 +13,7 @@ const FilterAndLegendSidebar = ({ documentTypes, stakeholders }) => {
   return (
     <>
       <div className="sidebar-toggle-btn">
-        <Button variant="primary" onClick={handleSidebarShow}>
+        <Button className='button' onClick={handleSidebarShow}>
           <i className="bi bi-funnel"></i> Filters & Legend
         </Button>
       </div>
@@ -39,7 +40,7 @@ const FilterAndLegendSidebar = ({ documentTypes, stakeholders }) => {
 
           {/* Legend */}
           <Legend documentTypes={documentTypes} stakeholders={stakeholders} />
-          <Button onClick={()=>setShowSidebar(false)}>Close Filter&Legend</Button>
+          <Button className='button' onClick={()=>setShowSidebar(false)}>Close Filter&Legend</Button>
 
         </Offcanvas.Body>
       </Offcanvas>

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
+import API from "../../../API";
 
-const DeleteLinkModal = ({ deleteLink, showDeleteModal, setDeleteLink, setShowDeleteModal }) => {
+const DeleteLinkModal = ({ deleteLink, showDeleteModal, setDeleteLink, setShowDeleteModal, chartData,onLinkDeleted }) => {
   const getDocumentTitle = (docID) => {
     const doc = chartData.find((d) => d.id === docID);
     return doc ? doc.title : "Unknown";
@@ -9,11 +10,13 @@ const DeleteLinkModal = ({ deleteLink, showDeleteModal, setDeleteLink, setShowDe
 
   const confirmDeleteLink = async () => {
     if (!deleteLink) return;
-
+      console.log(deleteLink.linkID);
+      
     try {
       await API.deleteLink(deleteLink.linkID);
       setShowDeleteModal(false);
       setDeleteLink(null);
+      onLinkDeleted(deleteLink.linkID);
       fetchData();
     } catch (error) {
       console.error("Failed to delete the link:", error);

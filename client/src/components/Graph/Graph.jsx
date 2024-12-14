@@ -48,6 +48,9 @@ const DocumentChartStatic = (props) => {
     setDeleteLink(link);
     setShowDeleteModal(true);
   };
+  const handleLinkDeleted = (deletedLinkID) => {
+    setLinks((prevLinks) => prevLinks.filter(link => link.linkID !== deletedLinkID));
+  };
 
   useEffect(() => {
     if (!isOpen || chartData.length === 0) return;
@@ -626,7 +629,7 @@ const DocumentChartStatic = (props) => {
       <FilterAndLegendSidebar documentTypes={documentTypes} stakeholders={stakeholders} />
 
       {/* Modal component to confirm the deletion of a link */}
-      <DeleteLinkModal deleteLink={deleteLink} showDeleteModal={showDeleteModal} setDeleteLink={setDeleteLink} setShowDeleteModal={setShowDeleteModal} />
+      <DeleteLinkModal deleteLink={deleteLink} showDeleteModal={showDeleteModal} setDeleteLink={setDeleteLink} setShowDeleteModal={setShowDeleteModal} chartData={chartData} onLinkDeleted={handleLinkDeleted} />
 
       {/* Existing Graph Components */}
       <div className="graph-inner-wrapper">
