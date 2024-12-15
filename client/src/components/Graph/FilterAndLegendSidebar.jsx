@@ -10,6 +10,8 @@ const FilterAndLegendSidebar = ({ documentTypes, stakeholders,setDocuments,onSet
 
   const handleSidebarClose = () => setShowSidebar(false);
   const handleSidebarShow = () => setShowSidebar(true);
+  const [stakeholder, setStakeholder] = useState("");
+  const [documentType, setDocumentType] = useState("");
 
   return (
     <>
@@ -32,7 +34,7 @@ const FilterAndLegendSidebar = ({ documentTypes, stakeholders,setDocuments,onSet
             <Accordion.Item eventKey="0">
               <Accordion.Header>Advanced filters</Accordion.Header>
               <Accordion.Body>
-                <Filters setDocuments={setDocuments} onSetLoading={onSetLoading}/>
+                <Filters setDocuments={setDocuments} onSetLoading={onSetLoading} stakeholder={stakeholder} setStakeholder = {setStakeholder} documentType={documentType} setDocumentType={setDocumentType}  />
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>

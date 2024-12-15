@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Card, Form } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { format, set } from "date-fns";
+import { format } from "date-fns";
 import API from "../../../API";
 
 function Filters(props) {
-  const [stakeholder, setStakeholder] = useState("");
-  const [documentType, setDocumentType] = useState("");
+  const [stakeholder, setStakeholder] = useState(props.stakeholder!==null && props.stakeholder!==undefined? props.stakeholder : "");
+  const [documentType, setDocumentType] = useState(props.documentType!==null && props.documentType!==undefined? props.documentType : "");
   const [selectedDate, setSelectedDate] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -105,7 +105,7 @@ function Filters(props) {
           <Form.Control
             as="select"
             value={stakeholder}
-            onChange={(e) => setStakeholder(e.target.value)}
+            onChange={(e) => {setStakeholder(e.target.value); if(props.setStakeholder!==null && props.setStakeholder!==undefined){props.setStakeholder(e.target.value);}}}
             className="filter-input"
           >
             <option value="">All Stakeholders</option>
@@ -123,7 +123,7 @@ function Filters(props) {
           <Form.Control
             as="select"
             value={documentType}
-            onChange={(e) => setDocumentType(e.target.value)}
+            onChange={(e) => {setDocumentType(e.target.value); if(props.setDocumentType!==null && props.setDocumentType!==undefined){props.setDocumentType(e.target.value);}}}
             className="filter-input"
           >
             <option value="">All Document Types</option>
