@@ -24,7 +24,6 @@ const DocumentChartStatic = (props) => {
   const [links, setLinks] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showFilters, setShowFilters] = useState(false);
 
 
 
@@ -40,7 +39,7 @@ const DocumentChartStatic = (props) => {
 
   useEffect(() => {
     API.getDocuments(undefined, true)
-      .then((documents) => {setChartData(documents); console.log('entered here');})
+      .then((documents) =>setChartData(documents))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
@@ -145,13 +144,28 @@ const DocumentChartStatic = (props) => {
           x: cellWidth / 2,
           y: cellHeight / 2,
         };
+      } else {
+        console.warn(`Document with id ${doc.id} has invalid issuanceDate or scale.`);
       }
     });
 
-    // Initialize controlPointsRef.current with dynamic positioning
-    if (Object.keys(controlPointsRef.current).length !== links.length) {
-      controlPointsRef.current = {}; // Reset before setting
-      links.forEach((link, index) => {
+    // === PRUNE CONTROL POINTS TO MATCH CURRENT LINKS ===
+    // This ensures that controlPointsRef only contains control points for existing links
+    const currentLinkIDs = new Set(links.map(link => link.linkID));
+    Object.keys(controlPointsRef.current).forEach(linkID => {
+      if (!currentLinkIDs.has(linkID)) {
+        delete controlPointsRef.current[linkID];
+      }
+    });
+    console.log("After pruning, controlPointsRef.current:", controlPointsRef.current);
+
+    // Initialize controlPointsRef.current for new links
+    const linkPairCount = {}; // To track the number of links between the same pair
+
+    links.forEach((link, index) => {
+      const pairKey = [link.DocID1, link.DocID2].sort().join('-'); // Unique key for a pair
+
+      if (!controlPointsRef.current[link.linkID]) {
         const doc1 = chartData.find((d) => d.id === link.DocID1);
         const doc2 = chartData.find((d) => d.id === link.DocID2);
         if (doc1 && doc2) {
@@ -167,13 +181,17 @@ const DocumentChartStatic = (props) => {
           // Calculate angle of the link
           const angle = Math.atan2(endY - startY, endX - startX);
 
-          // Alternate offset direction based on link index to spread control points
-          const alternate = index % 2 === 0 ? 1 : -1;
+          // Initialize count for the pair if not present
+          if (!linkPairCount[pairKey]) {
+            linkPairCount[pairKey] = 0;
+          }
 
-          // Reduce offset magnitude to keep control points closer
-          const baseOffset = 10; // Reduced from 20 to 10
-          // Removed variation for simplicity
-          const offsetMagnitude = baseOffset;
+          // Assign unique offset based on the number of existing links between the pair
+          const offsetMultiplier = linkPairCount[pairKey] + 1; // Start from 1
+          const offsetMagnitude = 10 * offsetMultiplier; // Increase magnitude for each additional link
+
+          // Alternate offset direction
+          const alternate = linkPairCount[pairKey] % 2 === 0 ? 1 : -1;
 
           const offsetX = -Math.sin(angle) * offsetMagnitude * alternate;
           const offsetY = Math.cos(angle) * offsetMagnitude * alternate;
@@ -183,15 +201,19 @@ const DocumentChartStatic = (props) => {
             x: midX + offsetX,
             y: midY + offsetY,
           };
+
+          // Increment the count for the pair
+          linkPairCount[pairKey]++;
+        } else {
+          console.warn(`Link with linkID ${link.linkID} has invalid DocID1 or DocID2.`);
         }
-      });
-      console.log("Control Points Initialized:", controlPointsRef.current);
-    }
+      }
+    });
+    console.log("After initialization, controlPointsRef.current:", controlPointsRef.current);
 
     // Update docCoordsRef.current with messageReceived
     Object.keys(messageReceived).forEach((docId) => {
       if (docCoordsRef.current[docId]) {
-        // Check if docCoordsRef.current[docId] exists
         const dx = messageReceived[docId].x;
         const dy = messageReceived[docId].y;
         docCoordsRef.current[docId].x = cellWidth / 2 + dx * cellWidth;
@@ -240,21 +262,6 @@ const DocumentChartStatic = (props) => {
     function showTooltip(html, x, y) {
       clearTimeout(hideTooltipTimeout);
       tooltip.html(html);
-
-      const arrow = tooltip.select(".tooltip-arrow");
-      if (arrow.empty()) {
-        tooltip
-          .append("div")
-          .attr("class", "tooltip-arrow")
-          .style("position", "absolute")
-          .style("width", "0")
-          .style("height", "0")
-          .style("border-left", `${arrowSize}px solid transparent`)
-          .style("border-right", `${arrowSize}px solid transparent`)
-          .style("border-bottom", `${arrowSize}px solid #ddd`)
-          .style("left", "50%")
-          .style("transform", "translateX(-50%)");
-      }
 
       tooltip.style("opacity", 1).style("pointer-events", "all");
       const rect = tooltip.node().getBoundingClientRect();
@@ -413,8 +420,8 @@ const DocumentChartStatic = (props) => {
             <div style="margin-bottom:4px;font-weight:bold;">Link Type: ${d.type}</div>
             <div style="margin-bottom:8px;">
               <b>Documents:</b><br/>
-              ${doc1.title}<br/>
-              ${doc2.title}
+              ${doc1 ? doc1.title : "Unknown"}<br/>
+              ${doc2 ? doc2.title : "Unknown"}
             </div>
             ${actionButtons}
           </div>
@@ -450,8 +457,21 @@ const DocumentChartStatic = (props) => {
         .attr("stroke", "#fff")
         .attr("stroke-width", 2)
         .attr("cursor", "pointer")
-        .attr("cx", (d) => controlPointsRef.current[d.linkID].x)
-        .attr("cy", (d) => controlPointsRef.current[d.linkID].y)
+        .attr("cx", (d) => {
+          if (!controlPointsRef.current[d.linkID]) {
+            console.warn(`Control point missing for linkID: ${d.linkID}`);
+            return 0; // or another default value or handling
+          }
+          return controlPointsRef.current[d.linkID].x;
+        })
+        .attr("cy", (d) => {
+          if (!controlPointsRef.current[d.linkID]) {
+            console.warn(`Control point missing for linkID: ${d.linkID}`);
+            return 0; // or another default value or handling
+          }
+          return controlPointsRef.current[d.linkID].y;
+        })
+        .style("display", (d) => controlPointsRef.current[d.linkID] ? "block" : "none")
         .on("click", (event, d) => {
           // Prevent event propagation to avoid triggering other handlers
           event.stopPropagation();
@@ -467,6 +487,10 @@ const DocumentChartStatic = (props) => {
             })
             .on("drag", function (event, d) {
               // Update control point position
+              if (!controlPointsRef.current[d.linkID]) {
+                console.warn(`Cannot drag undefined control point for linkID: ${d.linkID}`);
+                return;
+              }
               controlPointsRef.current[d.linkID].x = event.x;
               controlPointsRef.current[d.linkID].y = event.y;
 
@@ -488,6 +512,31 @@ const DocumentChartStatic = (props) => {
               //   .catch(error => { /* handle error */ });
             })
         );
+
+      // Add hover effects to control points
+      controlPointSelection
+        .on("mouseover", function(event, d) {
+          d3.select(this)
+            .transition()
+            .duration(200)
+            .attr("fill", "red"); // Change to desired hover color
+
+          // Highlight the corresponding link
+          g.selectAll(".link")
+            .filter((linkData) => linkData.linkID === d.linkID)
+            .attr("stroke", "red"); // Change to desired highlight color
+        })
+        .on("mouseout", function(event, d) {
+          d3.select(this)
+            .transition()
+            .duration(200)
+            .attr("fill", "orange"); // Revert to original color
+
+          // Remove highlight from the corresponding link
+          g.selectAll(".link")
+            .filter((linkData) => linkData.linkID === d.linkID)
+            .attr("stroke", "gray"); // Revert to original stroke color
+        });
 
       controlPointSelection.raise();
 
@@ -560,8 +609,8 @@ const DocumentChartStatic = (props) => {
 
         if (props.role === "Urban Planner") {
           g.selectAll(".control-point")
-            .attr("cx", (d) => controlPointsRef.current[d.linkID].x)
-            .attr("cy", (d) => controlPointsRef.current[d.linkID].y);
+            .attr("cx", (d) => controlPointsRef.current[d.linkID]?.x || 0)
+            .attr("cy", (d) => controlPointsRef.current[d.linkID]?.y || 0);
         }
       })
       .on("end", (event, d) => {
@@ -611,8 +660,8 @@ const DocumentChartStatic = (props) => {
         .html(
           `<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;pointer-events:all;transition:transform 0.2s, box-shadow 0.2s;">
             <i class="bi ${iconClass}" style="font-size: 20px; color: ${iconColor}; cursor: ${
-            props.role === "Urban Planner" ? "move" : "default"
-          }; pointer-events:all;"></i>
+          props.role === "Urban Planner" ? "move" : "default"
+        }; pointer-events:all;"></i>
           </div>`
         )
         .on("click", () => handleDocumentClick(d));
