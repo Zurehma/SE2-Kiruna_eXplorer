@@ -50,29 +50,21 @@ function Filters(props) {
       //if limit and current page are passed as props, use them, otherwise no
       const currentPage = (props.currentPage!== null && props.currentPage!==undefined)? props.currentPage : undefined;
       const all = (props.currentPage!== null && props.currentPage!==undefined)? false : true;
-      // console.log(all);
       
       const paginatedFilters = { ...filteredParams, pageNo: currentPage +1};
       let response = await API.getDocuments(paginatedFilters,all);
-      console.log(response);
-      
-      if(currentPage){
+    
+      if(currentPage!==null){
         if(response.totalPages <currentPage+1){ //reset to page zero if you exceeded
           props.setCurrentPage(0);
         }
-      }
-      if(currentPage){
+        props.setTotalPages(response.totalPages)
         props.setDocuments(response.elements)
       }
       else{
         props.setDocuments(response)
       }
-      if(currentPage){
-        props.setTotalPages(response.totalPages)
-      }
-      
-      // props.setDocuments(response.elements);
-      // props.setTotalPages(response.totalPages);
+    
     } catch (error) {
       console.error("Error fetching filtered documents:", error);
       props.setDocuments([]);
@@ -88,10 +80,6 @@ function Filters(props) {
   useEffect(() => {
     fetchFilteredDocuments();
   }, [stakeholder, documentType, selectedDate, startDate, endDate, isSingleDate, props.currentPage,props.searchQuery,props.reload]);
-
-  console.log(props.currentPage);
-  console.log(props.searchQuery);
-  console.log(props.reload);
   
   const handleSingleDateChange = (date) => {
     setSelectedDate(date);
