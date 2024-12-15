@@ -39,7 +39,7 @@ const handleMessage = async (message) => {
   await editGraphConfiguration(elementType, data.id, content);
 
   const graphConfiguration = await loadGraphConfiguration();
-  broadcastMessage(graphConfiguration);
+  broadcastMessage({ messageType: MESSAGE_TYPES.updateConfiguration, ...graphConfiguration });
 };
 
 const initWebSocket = (httpServer) => {
@@ -51,7 +51,7 @@ const initWebSocket = (httpServer) => {
     if (ws.readyState === WebSocket.OPEN) {
       (async () => {
         const graphConfiguration = await loadGraphConfiguration();
-        ws.send(JSON.stringify(graphConfiguration));
+        ws.send(JSON.stringify({ messageType: MESSAGE_TYPES.updateConfiguration, ...graphConfiguration }));
       })();
     }
 

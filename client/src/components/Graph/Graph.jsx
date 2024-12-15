@@ -209,28 +209,26 @@ const DocumentChartStatic = (props) => {
     });
     console.log("After initialization, controlPointsRef.current:", controlPointsRef.current);
 
-    // Update docCoordsRef.current with messageReceived
-    Object.keys(messageReceived["nodes"]).forEach((docId) => {
-      if (docCoordsRef.current[docId]) {
-        const dx = messageReceived["nodes"][docId].x;
-        const dy = messageReceived["nodes"][docId].y;
-        docCoordsRef.current[docId].x = cellWidth / 2 + dx * cellWidth;
-        docCoordsRef.current[docId].y = cellHeight / 2 + dy * cellHeight;
-      } else {
-        console.warn(`Received message for unknown docId: ${docId}`);
-        // Optionally, initialize it or handle accordingly
-      }
-    });
+    console.log(messageReceived);
 
-    Object.keys(messageReceived["connections"]).forEach((linkId) => {
-      if (controlPointsRef.current[linkId]) {
-        const dx = messageReceived["connections"][linkId].x;
-        const dy = messageReceived["connections"][linkId].y;
-        console.log(dx, dy);
-        controlPointsRef.current[linkId].x = width * dx;
-        controlPointsRef.current[linkId].y = height * dy;
-      }
-    });
+    // Update docCoordsRef.current with messageReceived
+    if (messageReceived.messageType === "update-configuration") {
+      const nodes = messageReceived["nodes"];
+      const connections = messageReceived["connections"];
+
+      console.log("nodes: ", nodes);
+      console.log("connections: ", connections);
+
+      Object.entries(nodes).forEach(([nodeId, node]) => {
+        docCoordsRef.current[nodeId].x = cellWidth / 2 + node.x * cellWidth;
+        docCoordsRef.current[nodeId].y = cellHeight / 2 + node.y * cellHeight;
+      });
+
+      Object.entries(connections).forEach(([connectionId, connection]) => {
+        controlPointsRef.current[connectionId].x = connection.x * width;
+        controlPointsRef.current[connectionId].y = connection.y * height;
+      });
+    }
 
     // Tooltip setup
     const tooltip = d3
