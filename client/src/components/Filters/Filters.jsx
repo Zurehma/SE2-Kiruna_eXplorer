@@ -6,12 +6,14 @@ import { format } from "date-fns";
 import API from "../../../API";
 
 function Filters(props) {
+  const { showDateFilters = true } = props;
   const [stakeholder, setStakeholder] = useState(props.stakeholder!==null && props.stakeholder!==undefined? props.stakeholder : "");
   const [documentType, setDocumentType] = useState(props.documentType!==null && props.documentType!==undefined? props.documentType : "");
   const [selectedDate, setSelectedDate] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [isSingleDate, setIsSingleDate] = useState(true);
+
 
   // Lists fetched from the backend
   const [stakeholdersList, setStakeholdersList] = useState([]);
@@ -135,78 +137,104 @@ function Filters(props) {
           </Form.Control>
         </Form.Group>
 
-        {/* Date Selection Toggle */}
-        <Form.Group controlId="sidebarFilterDateType" className="mt-3">
-          <Form.Label className="filter-label">Select Date Type</Form.Label>
-          <div className="custom-toggle-container">
-            <div
-              className={`custom-toggle ${isSingleDate ? "active" : ""}`}
-              onClick={() => setIsSingleDate(true)}
-            >
-              <div className={`toggle-button ${isSingleDate ? "active" : ""}`}></div>
-              <span className="toggle-label">Single Date</span>
-            </div>
-            <div
-              className={`custom-toggle ${!isSingleDate ? "active" : ""}`}
-              onClick={() => setIsSingleDate(false)}
-            >
-              <div className={`toggle-button ${!isSingleDate ? "active" : ""}`}></div>
-              <span className="toggle-label">Date Range</span>
-            </div>
-          </div>
-        </Form.Group>
+
 
         {/* Date Picker with Reset Icon */}
-        <Form.Group controlId="sidebarFilterDate" className="mt-3 position-relative">
-          <Form.Label>{isSingleDate ? "Select Date" : "Select Date Range"}</Form.Label>
-          {isSingleDate ? (
-            <div className="d-flex align-items-center position-relative" style={{ gap: "5px" }}>
-              <DatePicker
-                selected={selectedDate}
-                onChange={handleSingleDateChange}
-                dateFormat="yyyy-MM-dd"
-                className="form-control date-picker-input"
-                placeholderText="Select Date"
-                calendarClassName="custom-calendar"
-                showYearDropdown
-                yearDropdownItemNumber={15}
-                scrollableYearDropdown
-              />
-              {selectedDate && (
-                <i
-                  className="bi bi-x-lg"
-                  style={{ cursor: "pointer" }}
-                  onClick={handleResetDate}
-                ></i>
+        {showDateFilters && (
+          <>
+            {/* Date Selection Toggle */}
+            <Form.Group controlId="sidebarFilterDateType" className="mt-3">
+              <Form.Label className="filter-label">Select Date Type</Form.Label>
+              <div className="custom-toggle-container">
+                <div
+                  className={`custom-toggle ${isSingleDate ? "active" : ""}`}
+                  onClick={() => setIsSingleDate(true)}
+                >
+                  <div
+                    className={`toggle-button ${
+                      isSingleDate ? "active" : ""
+                    }`}
+                  ></div>
+                  <span className="toggle-label">Single Date</span>
+                </div>
+                <div
+                  className={`custom-toggle ${!isSingleDate ? "active" : ""}`}
+                  onClick={() => setIsSingleDate(false)}
+                >
+                  <div
+                    className={`toggle-button ${
+                      !isSingleDate ? "active" : ""
+                    }`}
+                  ></div>
+                  <span className="toggle-label">Date Range</span>
+                </div>
+              </div>
+            </Form.Group>
+
+            {/* Date Picker with Reset Icon */}
+            <Form.Group
+              controlId="sidebarFilterDate"
+              className="mt-3 position-relative"
+            >
+              <Form.Label>
+                {isSingleDate ? "Select Date" : "Select Date Range"}
+              </Form.Label>
+              {isSingleDate ? (
+                <div
+                  className="d-flex align-items-center position-relative"
+                  style={{ gap: "5px" }}
+                >
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={handleSingleDateChange}
+                    dateFormat="yyyy-MM-dd"
+                    className="form-control date-picker-input"
+                    placeholderText="Select Date"
+                    calendarClassName="custom-calendar"
+                    showYearDropdown
+                    yearDropdownItemNumber={15}
+                    scrollableYearDropdown
+                  />
+                  {selectedDate && (
+                    <i
+                      className="bi bi-x-lg"
+                      style={{ cursor: "pointer" }}
+                      onClick={handleResetDate}
+                    ></i>
+                  )}
+                </div>
+              ) : (
+                <div
+                  className="d-flex align-items-center position-relative"
+                  style={{ gap: "5px" }}
+                >
+                  <DatePicker
+                    selected={startDate}
+                    onChange={handleDateRangeChange}
+                    startDate={startDate}
+                    endDate={endDate}
+                    selectsRange
+                    isClearable
+                    dateFormat="yyyy-MM-dd"
+                    className="form-control date-picker-input"
+                    placeholderText="Select Date Range"
+                    calendarClassName="custom-calendar-range"
+                    showYearDropdown
+                    yearDropdownItemNumber={15}
+                    scrollableYearDropdown
+                  />
+                  {(startDate || endDate) && (
+                    <i
+                      className="bi bi-x-lg"
+                      style={{ cursor: "pointer" }}
+                      onClick={handleResetDate}
+                    ></i>
+                  )}
+                </div>
               )}
-            </div>
-          ) : (
-            <div className="d-flex align-items-center position-relative" style={{ gap: "5px" }}>
-              <DatePicker
-                selected={startDate}
-                onChange={handleDateRangeChange}
-                startDate={startDate}
-                endDate={endDate}
-                selectsRange
-                isClearable
-                dateFormat="yyyy-MM-dd"
-                className="form-control date-picker-input"
-                placeholderText="Select Date Range"
-                calendarClassName="custom-calendar-range"
-                showYearDropdown
-                yearDropdownItemNumber={15}
-                scrollableYearDropdown
-              />
-              {(startDate || endDate) && (
-                <i
-                  className="bi bi-x-lg"
-                  style={{ cursor: "pointer" }}
-                  onClick={handleResetDate}
-                ></i>
-              )}
-            </div>
-          )}
-        </Form.Group>
+            </Form.Group>
+          </>
+        )}
       </Card.Body>
     </Card>
   );

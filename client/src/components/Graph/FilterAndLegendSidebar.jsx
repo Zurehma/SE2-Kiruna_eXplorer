@@ -34,8 +34,8 @@ const FilterAndLegendSidebar = ({ documentTypes, stakeholders,setDocuments,onSet
             <Accordion.Item eventKey="0">
               <Accordion.Header>Advanced filters</Accordion.Header>
               <Accordion.Body>
-                <Filters setDocuments={setDocuments} onSetLoading={onSetLoading} stakeholder={stakeholder} setStakeholder = {setStakeholder} documentType={documentType} setDocumentType={setDocumentType}  />
-              </Accordion.Body>
+                <Filters setDocuments={setDocuments} onSetLoading={onSetLoading} stakeholder={stakeholder} setStakeholder = {setStakeholder} documentType={documentType} setDocumentType={setDocumentType} showDateFilters={false} />
+              </Accordion.Body> 
             </Accordion.Item>
           </Accordion>
 
