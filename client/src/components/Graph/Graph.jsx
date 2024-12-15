@@ -164,7 +164,11 @@ const DocumentChartStatic = (props) => {
     console.log("After pruning, controlPointsRef.current:", controlPointsRef.current);
 
     // Initialize controlPointsRef.current for new links
+    const linkPairCount = {}; // To track the number of links between the same pair
+
     links.forEach((link, index) => {
+      const pairKey = [link.DocID1, link.DocID2].sort().join('-'); // Unique key for a pair
+
       if (!controlPointsRef.current[link.linkID]) {
         const doc1 = chartData.find((d) => d.id === link.DocID1);
         const doc2 = chartData.find((d) => d.id === link.DocID2);
@@ -181,12 +185,17 @@ const DocumentChartStatic = (props) => {
           // Calculate angle of the link
           const angle = Math.atan2(endY - startY, endX - startX);
 
-          // Alternate offset direction based on link index to spread control points
-          const alternate = index % 2 === 0 ? 1 : -1;
+          // Initialize count for the pair if not present
+          if (!linkPairCount[pairKey]) {
+            linkPairCount[pairKey] = 0;
+          }
 
-          // Reduce offset magnitude to keep control points closer
-          const baseOffset = 10; // Reduced from 20 to 10
-          const offsetMagnitude = baseOffset;
+          // Assign unique offset based on the number of existing links between the pair
+          const offsetMultiplier = linkPairCount[pairKey] + 1; // Start from 1
+          const offsetMagnitude = 10 * offsetMultiplier; // Increase magnitude for each additional link
+
+          // Alternate offset direction
+          const alternate = linkPairCount[pairKey] % 2 === 0 ? 1 : -1;
 
           const offsetX = -Math.sin(angle) * offsetMagnitude * alternate;
           const offsetY = Math.cos(angle) * offsetMagnitude * alternate;
@@ -196,6 +205,9 @@ const DocumentChartStatic = (props) => {
             x: midX + offsetX,
             y: midY + offsetY,
           };
+
+          // Increment the count for the pair
+          linkPairCount[pairKey]++;
         } else {
           console.warn(`Link with linkID ${link.linkID} has invalid DocID1 or DocID2.`);
         }
@@ -505,6 +517,31 @@ const DocumentChartStatic = (props) => {
             })
         );
 
+      // Add hover effects to control points
+      controlPointSelection
+        .on("mouseover", function(event, d) {
+          d3.select(this)
+            .transition()
+            .duration(200)
+            .attr("fill", "red"); // Change to desired hover color
+
+          // Highlight the corresponding link
+          g.selectAll(".link")
+            .filter((linkData) => linkData.linkID === d.linkID)
+            .attr("stroke", "red"); // Change to desired highlight color
+        })
+        .on("mouseout", function(event, d) {
+          d3.select(this)
+            .transition()
+            .duration(200)
+            .attr("fill", "orange"); // Revert to original color
+
+          // Remove highlight from the corresponding link
+          g.selectAll(".link")
+            .filter((linkData) => linkData.linkID === d.linkID)
+            .attr("stroke", "gray"); // Revert to original stroke color
+        });
+
       controlPointSelection.raise();
 
       // Optionally, you can style control points more distinctively
@@ -627,8 +664,8 @@ const DocumentChartStatic = (props) => {
         .html(
           `<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;pointer-events:all;transition:transform 0.2s, box-shadow 0.2s;">
             <i class="bi ${iconClass}" style="font-size: 20px; color: ${iconColor}; cursor: ${
-            props.role === "Urban Planner" ? "move" : "default"
-          }; pointer-events:all;"></i>
+          props.role === "Urban Planner" ? "move" : "default"
+        }; pointer-events:all;"></i>
           </div>`
         )
         .on("click", () => handleDocumentClick(d));

@@ -126,7 +126,18 @@
 }
 
 .active-link {
-  stroke: #8f2e11 !important; /* Choose a distinct color */
-  stroke-width: 1.5 !important; /* Optionally increase stroke width */
-  stroke-dasharray: 0 !important; /* Remove dash pattern if any */
+  stroke: #8f2e11 ; /* Choose a distinct color */
+  stroke-width: 1.5 ; /* Optionally increase stroke width */
+  stroke-dasharray: 0 ; /* Remove dash pattern if any */
+}
+
+/* Control Point Hover */
+.control-point.hovered {
+  fill: red; /* Hover color */
+}
+
+/* Link Hover */
+.link.hovered {
+  stroke: #8f2e11; /* Highlight color */
+  stroke-width: 2px; /* Optional: make the link more prominent */
 }
