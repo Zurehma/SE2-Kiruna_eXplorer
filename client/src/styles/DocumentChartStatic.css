@@ -125,11 +125,8 @@
   margin-bottom: 1rem;
 }
 
-/* Tooltip styling adjustments if needed */
-.tooltip {
-  /* Existing styles */
-}
-
-.legend-modal-overlay {
-  /* Existing styles */
+.active-link {
+  stroke: #8f2e11 !important; /* Choose a distinct color */
+  stroke-width: 1.5 !important; /* Optionally increase stroke width */
+  stroke-dasharray: 0 !important; /* Remove dash pattern if any */
 }

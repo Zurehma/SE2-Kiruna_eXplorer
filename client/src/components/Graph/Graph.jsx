@@ -23,14 +23,13 @@ const DocumentChartStatic = (props) => {
   const [stakeholders, setStakeholders] = useState([]);
   const [links, setLinks] = useState([]);
   const [chartData, setChartData] = useState([]);
-  const [reload,setReload] = useState(false);
+  const [reload, setReload] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [sentSearchQuery, setSentSearchQuery] = useState("");
-  const [showFilters, setShowFilters] = useState(false);    
+  const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  
 
   useEffect(() => {
     Promise.all([API.getDocumentTypes(), API.getStakeholders(), API.allExistingLinks()])
@@ -41,7 +40,6 @@ const DocumentChartStatic = (props) => {
       })
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
-
 
   useEffect(() => {
     API.getDocuments(undefined, true)
@@ -291,50 +289,43 @@ const DocumentChartStatic = (props) => {
         const doc1 = chartData.find((doc) => doc.id === d.DocID1);
         const doc2 = chartData.find((doc) => doc.id === d.DocID2);
         if (!doc1 || !doc2) return;
-    
+
         const { cellX: cellX1, cellY: cellY1 } = getCellCoords(doc1);
         const { cellX: cellX2, cellY: cellY2 } = getCellCoords(doc2);
         if (cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null) return;
-    
+
         const pos1 = docCoordsRef.current[doc1.id];
         const pos2 = docCoordsRef.current[doc2.id];
         if (!pos1 || !pos2) return;
-    
+
         const startX = cellX1 + pos1.x;
         const startY = cellY1 + pos1.y;
         const endX = cellX2 + pos2.x;
         const endY = cellY2 + pos2.y;
-    
+
         // Use existing control points if they exist
         let control = controlPointsRef.current[d.linkID];
         if (!control) {
           // If no control point exists, initialize it
           const midX = (startX + endX) / 2;
           const midY = (startY + endY) / 2;
-    
+
           const angle = Math.atan2(endY - startY, endX - startX);
           const offsetMagnitude = 10;
           const alternate = links.indexOf(d) % 2 === 0 ? 1 : -1;
-    
+
           const offsetX = -Math.sin(angle) * offsetMagnitude * alternate;
           const offsetY = Math.cos(angle) * offsetMagnitude * alternate;
-    
+
           controlPointsRef.current[d.linkID] = {
             x: midX + offsetX,
             y: midY + offsetY,
           };
           control = controlPointsRef.current[d.linkID];
         }
-    
+
         const cx = control.x;
         const cy = control.y;
-    
-        path
-          .attr("fill", "none")
-          .attr("stroke", "gray")
-          .attr("stroke-width", 1.5)
-          .attr("stroke-dasharray", "4,4")
-          .attr("d", `M${startX},${startY} Q${cx},${cy} ${endX},${endY}`); 
 
         let strokeStyle = "4,4";
         switch (d.type) {
@@ -401,10 +392,10 @@ const DocumentChartStatic = (props) => {
         clearTimeout(hideTooltipTimeout);
         const doc1 = chartData.find((doc) => doc.id === d.DocID1);
         const doc2 = chartData.find((doc) => doc.id === d.DocID2);
-        
+
         // Get mouse position relative to the container
         const [mouseX, mouseY] = d3.pointer(event, container);
-        
+
         // Conditionally include Delete Button and Info Icon based on role
         const actionButtons =
           props.role === "Urban Planner"
@@ -419,7 +410,7 @@ const DocumentChartStatic = (props) => {
               </div>
             `
             : "";
-        
+
         const html = `
           <div style="position:relative; color:#000;">
             <div style="margin-bottom:4px;font-weight:bold;">Link Type: ${d.type}</div>
@@ -431,10 +422,10 @@ const DocumentChartStatic = (props) => {
             ${actionButtons}
           </div>
         `;
-        
+
         // Show tooltip near the mouse cursor
         showTooltip(html, mouseX + margin.left, mouseY + margin.top);
-        
+
         if (props.role === "Urban Planner") {
           // Add click event handler for the delete button to open the confirmation modal
           d3.select(tooltip.node())
@@ -464,27 +455,42 @@ const DocumentChartStatic = (props) => {
         .attr("cursor", "pointer")
         .attr("cx", (d) => controlPointsRef.current[d.linkID].x)
         .attr("cy", (d) => controlPointsRef.current[d.linkID].y)
+        .on("click", (event, d) => {
+          // Prevent event propagation to avoid triggering other handlers
+          event.stopPropagation();
+          // Additional click logic if needed
+        })
         .call(
           d3.drag()
+            .on("start", function (event, d) {
+              // Highlight the corresponding link
+              g.selectAll(".link")
+                .filter((linkData) => linkData.linkID === d.linkID)
+                .classed("active-link", true);
+            })
             .on("drag", function (event, d) {
               // Update control point position
               controlPointsRef.current[d.linkID].x = event.x;
               controlPointsRef.current[d.linkID].y = event.y;
-        
+
               // Update the link path
               updateLinkPath(g.selectAll(".link"));
-        
+
               // Update the position of the control point itself
               d3.select(this).attr("cx", event.x).attr("cy", event.y);
             })
             .on("end", (event, d) => {
+              // Remove the highlight from the link
+              g.selectAll(".link")
+                .filter((linkData) => linkData.linkID === d.linkID)
+                .classed("active-link", false);
+
               // Optionally persist the new position to a backend or state
               // API.updateControlPoint(d.linkID, controlPointsRef.current[d.linkID])
               //   .then(response => { /* handle success */ })
               //   .catch(error => { /* handle error */ });
             })
         );
-        
 
       controlPointSelection.raise();
 
@@ -502,29 +508,29 @@ const DocumentChartStatic = (props) => {
         const docId = d.id;
         const { cellX, cellY } = getCellCoords(d);
         if (cellX == null || cellY == null) return;
-      
+
         const cellWidth = xScale.bandwidth();
         const cellHeight = yScale.bandwidth();
         const halfSize = 12;
-      
+
         const oldPos = docCoordsRef.current[docId];
         if (!oldPos) return;
-      
+
         let newX = oldPos.x + event.dx;
         let newY = oldPos.y + event.dy;
-      
+
         if (newX < halfSize) newX = halfSize;
         if (newX > cellWidth - halfSize) newX = cellWidth - halfSize;
         if (newY < halfSize) newY = halfSize;
         if (newY > cellHeight - halfSize) newY = cellHeight - halfSize;
-      
+
         docCoordsRef.current[docId] = { x: newX, y: newY };
-      
+
         d3.select(this).attr("transform", `translate(${cellX + newX},${cellY + newY})`);
-      
+
         // Update links connected to this document
         g.selectAll(".link").call(updateLinkPath);
-      
+
         // Reuse manually adjusted control points if available
         links.forEach((link) => {
           if (link.DocID1 === docId || link.DocID2 === docId) {
@@ -533,19 +539,19 @@ const DocumentChartStatic = (props) => {
             if (otherDoc) {
               const pos1 = docCoordsRef.current[link.DocID1];
               const pos2 = docCoordsRef.current[link.DocID2];
-      
+
               // Check if a manual adjustment exists
               if (!controlPointsRef.current[link.linkID]) {
                 const midX = (pos1.x + pos2.x) / 2;
                 const midY = (pos1.y + pos2.y) / 2;
-      
+
                 const angle = Math.atan2(pos2.y - pos1.y, pos2.x - pos1.x);
                 const alternate = links.indexOf(link) % 2 === 0 ? 1 : -1;
                 const offsetMagnitude = 10;
-      
+
                 const offsetX = -Math.sin(angle) * offsetMagnitude * alternate;
                 const offsetY = Math.cos(angle) * offsetMagnitude * alternate;
-      
+
                 controlPointsRef.current[link.linkID] = {
                   x: midX + offsetX,
                   y: midY + offsetY,
@@ -554,13 +560,13 @@ const DocumentChartStatic = (props) => {
             }
           }
         });
-      
+
         if (props.role === "Urban Planner") {
           g.selectAll(".control-point")
             .attr("cx", (d) => controlPointsRef.current[d.linkID].x)
             .attr("cy", (d) => controlPointsRef.current[d.linkID].y);
         }
-      })      
+      })
       .on("end", (event, d) => {
         const docId = d.id;
         const x = (docCoordsRef.current[docId].x - cellWidth / 2) / cellWidth;
@@ -644,20 +650,20 @@ const DocumentChartStatic = (props) => {
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
       {/* Sidebar component for the legend and the filters */}
-      {props.role == 'Urban Planner' && (      
-                      <FilterAndLegendSidebar
-                      documentTypes={documentTypes}
-                      stakeholders={stakeholders}
-                      setDocuments={setChartData}
-                      onSetLoading={setLoading}
-                      currentPage={currentPage}
-                      setCurrentPage={setCurrentPage}
-                      setTotalPages={setTotalPages}
-                      searchQuery={sentSearchQuery}
-                      reload = {reload}
-                    />
+      {props.role === 'Urban Planner' && (      
+        <FilterAndLegendSidebar
+          documentTypes={documentTypes}
+          stakeholders={stakeholders}
+          setDocuments={setChartData}
+          onSetLoading={setLoading}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          setTotalPages={setTotalPages}
+          searchQuery={sentSearchQuery}
+          reload={reload}
+        />
       )}                
-                
+
       {/* Modal component to confirm the deletion of a link */}
       <DeleteLinkModal
         deleteLink={deleteLink}
