@@ -14,7 +14,6 @@ const Login = ({
   handleLogin,
   loggedinError,
   setloggedinError,
-  onSuccess,
 }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();

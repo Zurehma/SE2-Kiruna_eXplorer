@@ -21,10 +21,10 @@ const Home = ({
   setloggedinError,
   isAddUserOpen,
   closeAddUserPane,
+  showLoginMessage,
 }) => {
   const navigate = useNavigate();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [showLoginMessage, setShowLoginMessage] = useState(false);
 
   const scrollToContent = () => {
     const section = document.getElementById("content-section");
@@ -43,12 +43,6 @@ const Home = ({
     }, 5000);
   };
 
-  const handleLoginSuccess = () => {
-    setShowLoginMessage(true);
-    setTimeout(() => {
-      setShowLoginMessage(false);
-    }, 5000);
-  };
 
   return (
     <div className="homepage">
@@ -108,7 +102,7 @@ const Home = ({
         closeLoginPane={closeLoginPane}
         loggedinError={loggedinError}
         setloggedinError={setloggedinError}
-        onSuccess={handleLoginSuccess}
+        
       />
       {/* Registrazione  RICORDATI DI CAMBIARE !== CON ===*/}
       {role !== "admin" && (

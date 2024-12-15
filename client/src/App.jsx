@@ -30,6 +30,15 @@ function App() {
   const [logging, setLogging] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
+
+
+  const handleLoginSuccess = () => {
+    setShowLoginMessage(true);
+    setTimeout(() => {
+      setShowLoginMessage(false);
+    }, 5000);
+  };
 
   const toggleLoginPane = () => {
     setIsLoginOpen((prev) => !prev);
@@ -56,6 +65,7 @@ function App() {
       const user = await API.getUserInfo();
       setLoggedIn(true);
       setRole(user.role);
+      handleLoginSuccess();
       setIsLoginOpen(false);
       setloggedinError(null);
     } catch (error) {
@@ -145,6 +155,9 @@ function App() {
                 toggleAddUserPane={toggleAddUserPane}
                 isAddUserOpen={isAddUserOpen}
                 closeAddUserPane={closeAddUserPane}
+                setShowLoginMessage={setShowLoginMessage}
+                showLoginMessage={showLoginMessage}
+                handleLoginSuccess={handleLoginSuccess}
               />
             }
           />
