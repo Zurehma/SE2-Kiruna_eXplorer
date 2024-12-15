@@ -4,14 +4,13 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow-x: hidden;
+  overflow-y: auto;
   font-family: Arial, sans-serif;
 }
 
 .homepage {
   height: 165vh; /* Pagina più lunga per permettere lo scrolling */
   width: 100%;
-  overflow: hidden; /* Rimuove spazi extra */
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -145,6 +144,9 @@ body {
 
 .styled-arrow:hover {
   transform: scale(1.1); /* Effetto zoom */
+}
+#content-section {
+  scroll-margin-top: 100px; /* Aggiusta questo valore per compensare header fissi */
 }
 
 /* Media query per schermi piccoli */
