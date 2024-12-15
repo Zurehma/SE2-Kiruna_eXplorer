@@ -50,11 +50,11 @@ function Filters(props) {
       //if limit and current page are passed as props, use them, otherwise no
       const currentPage = (props.currentPage!== null && props.currentPage!==undefined)? props.currentPage : undefined;
       const all = (props.currentPage!== null && props.currentPage!==undefined)? false : true;
-      
+      console.log("Current Page: ",currentPage);
       const paginatedFilters = { ...filteredParams, pageNo: currentPage +1};
       let response = await API.getDocuments(paginatedFilters,all);
     
-      if(currentPage!==null){
+      if(currentPage!==null && currentPage!==undefined){
         if(response.totalPages <currentPage+1){ //reset to page zero if you exceeded
           props.setCurrentPage(0);
         }

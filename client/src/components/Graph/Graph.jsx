@@ -43,7 +43,7 @@ const DocumentChartStatic = (props) => {
 
   useEffect(() => {
     API.getDocuments(undefined, true)
-      .then((documents) => setChartData(documents))
+      .then((documents) => {setChartData(documents); console.log('entered here');})
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 

@@ -81,7 +81,7 @@ const Home = ({
             <button onClick={() => navigate("/graph")} className="styled-button">
               View Diagram
               <span className="button-icon">
-                <i class="bi bi-bezier"></i>{" "}
+                <i className="bi bi-bezier"></i>{" "}
               </span>
             </button>
           </Col>
