@@ -4,7 +4,7 @@ import Legend from "./Legend";
 import Filters from "../Filters/Filters";
 import '../../styles/FilterAndSidebar.css'
 
-const FilterAndLegendSidebar = ({ documentTypes, stakeholders,setDocuments,reload,setReload,onSetLoading,searchQuery,setTotalPages,setCurrentPage, currentPage}) => {
+const FilterAndLegendSidebar = ({ documentTypes, stakeholders,setDocuments,onSetLoading}) => {
     
   const [showSidebar, setShowSidebar] = useState(false);
 
@@ -32,7 +32,7 @@ const FilterAndLegendSidebar = ({ documentTypes, stakeholders,setDocuments,reloa
             <Accordion.Item eventKey="0">
               <Accordion.Header>Advanced filters</Accordion.Header>
               <Accordion.Body>
-                <Filters setDocuments={setDocuments} reload={reload} setReload={setReload} onSetLoading={onSetLoading} searchQuery ={searchQuery} setTotalPages ={setTotalPages} setCurrentPage={setCurrentPage} currentPage={currentPage}/>
+                <Filters setDocuments={setDocuments} onSetLoading={onSetLoading}/>
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>

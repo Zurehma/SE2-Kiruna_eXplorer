@@ -658,9 +658,9 @@ const DocumentChartStatic = (props) => {
           onSetLoading={setLoading}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          setTotalPages={setTotalPages}
-          searchQuery={sentSearchQuery}
-          reload={reload}
+          // setTotalPages={setTotalPages}
+          // searchQuery={sentSearchQuery}
+          // reload={reload}
         />
       )}                
 
