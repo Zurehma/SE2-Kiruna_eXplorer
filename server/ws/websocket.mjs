@@ -2,23 +2,44 @@ import { WebSocket, WebSocketServer } from "ws";
 import fs from "fs";
 
 const clients = new Set();
-
 const graphConfigFilePath = "./ws/GraphConfig.json";
+const MESSAGE_TYPES = { updateNode: "update-node", updateConnection: "update-connection", updateConfiguration: "update-configuration" };
+const ELEMENT_TYPES = { nodes: "nodes", connections: "connections" };
 
 const loadGraphConfiguration = async () => {
   if (!fs.existsSync(graphConfigFilePath)) {
-    await fs.promises.writeFile(graphConfigFilePath, JSON.stringify({}), "utf8");
+    const baseSetup = {};
+    Object.values(ELEMENT_TYPES).forEach((element) => (baseSetup[element] = {}));
+    console.log(baseSetup);
+    await fs.promises.writeFile(graphConfigFilePath, JSON.stringify(baseSetup), "utf8");
   }
 
   const graphConfig = await fs.promises.readFile(graphConfigFilePath, "utf8");
   return JSON.parse(graphConfig);
 };
 
-const editGraphConfiguration = async (docId, x, y) => {
+const editGraphConfiguration = async (type, id, content) => {
   const graphConfig = await loadGraphConfiguration();
 
-  graphConfig[docId] = { x, y };
+  graphConfig[type][id] = content;
   await fs.promises.writeFile(graphConfigFilePath, JSON.stringify(graphConfig), "utf8");
+};
+
+const handleMessage = async (message) => {
+  const data = JSON.parse(message);
+  let elementType;
+
+  if (data.messageType === MESSAGE_TYPES.updateConnection) {
+    elementType = ELEMENT_TYPES.connections;
+  } else if (data.messageType === MESSAGE_TYPES.updateNode) {
+    elementType = ELEMENT_TYPES.nodes;
+  }
+
+  const content = { x: data.x, y: data.y };
+  await editGraphConfiguration(elementType, data.id, content);
+
+  const graphConfiguration = await loadGraphConfiguration();
+  broadcastMessage(graphConfiguration);
 };
 
 const initWebSocket = (httpServer) => {
@@ -34,14 +55,8 @@ const initWebSocket = (httpServer) => {
       })();
     }
 
-    ws.on("message", (data) => {
-      const { docId, x, y } = JSON.parse(data);
-
-      (async () => {
-        await editGraphConfiguration(docId, x, y);
-        const graphConfiguration = await loadGraphConfiguration();
-        broadcastMessage(graphConfiguration);
-      })();
+    ws.on("message", (message) => {
+      handleMessage(message);
     });
 
     ws.on("close", () => {

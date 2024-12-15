@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import API from "../../../API";
 import "../../styles/DocumentChartStatic.css";
-import GraphUtils from '../../utils/graphUtils';
+import GraphUtils from "../../utils/graphUtils";
 import useWebSocket from "../../hooks/useWebSocket";
 import FilterAndLegendSidebar from "./FilterAndLegendSidebar";
 import DeleteLinkModal from "./deleteLinkModal";
@@ -25,8 +25,6 @@ const DocumentChartStatic = (props) => {
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-
-
   useEffect(() => {
     Promise.all([API.getDocumentTypes(), API.getStakeholders(), API.allExistingLinks()])
       .then(([documentTypes, stakeholders, links]) => {
@@ -39,7 +37,7 @@ const DocumentChartStatic = (props) => {
 
   useEffect(() => {
     API.getDocuments(undefined, true)
-      .then((documents) =>  setChartData(documents))
+      .then((documents) => setChartData(documents))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
@@ -53,7 +51,7 @@ const DocumentChartStatic = (props) => {
   };
 
   const handleLinkDeleted = (deletedLinkID) => {
-    setLinks((prevLinks) => prevLinks.filter(link => link.linkID !== deletedLinkID));
+    setLinks((prevLinks) => prevLinks.filter((link) => link.linkID !== deletedLinkID));
   };
 
   useEffect(() => {
@@ -151,8 +149,8 @@ const DocumentChartStatic = (props) => {
 
     // === PRUNE CONTROL POINTS TO MATCH CURRENT LINKS ===
     // This ensures that controlPointsRef only contains control points for existing links
-    const currentLinkIDs = new Set(links.map(link => link.linkID));
-    Object.keys(controlPointsRef.current).forEach(linkID => {
+    const currentLinkIDs = new Set(links.map((link) => link.linkID));
+    Object.keys(controlPointsRef.current).forEach((linkID) => {
       if (!currentLinkIDs.has(linkID)) {
         delete controlPointsRef.current[linkID];
       }
@@ -163,7 +161,7 @@ const DocumentChartStatic = (props) => {
     const linkPairCount = {}; // To track the number of links between the same pair
 
     links.forEach((link, index) => {
-      const pairKey = [link.DocID1, link.DocID2].sort().join('-'); // Unique key for a pair
+      const pairKey = [link.DocID1, link.DocID2].sort().join("-"); // Unique key for a pair
 
       if (!controlPointsRef.current[link.linkID]) {
         const doc1 = chartData.find((d) => d.id === link.DocID1);
@@ -212,15 +210,25 @@ const DocumentChartStatic = (props) => {
     console.log("After initialization, controlPointsRef.current:", controlPointsRef.current);
 
     // Update docCoordsRef.current with messageReceived
-    Object.keys(messageReceived).forEach((docId) => {
+    Object.keys(messageReceived["nodes"]).forEach((docId) => {
       if (docCoordsRef.current[docId]) {
-        const dx = messageReceived[docId].x;
-        const dy = messageReceived[docId].y;
+        const dx = messageReceived["nodes"][docId].x;
+        const dy = messageReceived["nodes"][docId].y;
         docCoordsRef.current[docId].x = cellWidth / 2 + dx * cellWidth;
         docCoordsRef.current[docId].y = cellHeight / 2 + dy * cellHeight;
       } else {
         console.warn(`Received message for unknown docId: ${docId}`);
         // Optionally, initialize it or handle accordingly
+      }
+    });
+
+    Object.keys(messageReceived["connections"]).forEach((linkId) => {
+      if (controlPointsRef.current[linkId]) {
+        const dx = messageReceived["connections"][linkId].x;
+        const dy = messageReceived["connections"][linkId].y;
+        console.log(dx, dy);
+        controlPointsRef.current[linkId].x = width * dx;
+        controlPointsRef.current[linkId].y = height * dy;
       }
     });
 
@@ -443,7 +451,8 @@ const DocumentChartStatic = (props) => {
       .on("mouseout", hideTooltip);
 
     // === ADDING CONTROL POINTS ===
-    if (props.role === "Urban Planner") { // Only render control points for authorized users
+    if (props.role === "Urban Planner") {
+      // Only render control points for authorized users
       const controlPointsGroup = g.append("g").attr("class", "control-points");
 
       const controlPointSelection = controlPointsGroup
@@ -471,14 +480,15 @@ const DocumentChartStatic = (props) => {
           }
           return controlPointsRef.current[d.linkID].y;
         })
-        .style("display", (d) => controlPointsRef.current[d.linkID] ? "block" : "none")
+        .style("display", (d) => (controlPointsRef.current[d.linkID] ? "block" : "none"))
         .on("click", (event, d) => {
           // Prevent event propagation to avoid triggering other handlers
           event.stopPropagation();
           // Additional click logic if needed
         })
         .call(
-          d3.drag()
+          d3
+            .drag()
             .on("start", function (event, d) {
               // Highlight the corresponding link
               g.selectAll(".link")
@@ -506,31 +516,27 @@ const DocumentChartStatic = (props) => {
                 .filter((linkData) => linkData.linkID === d.linkID)
                 .classed("active-link", false);
 
-              // Optionally persist the new position to a backend or state
-              // API.updateControlPoint(d.linkID, controlPointsRef.current[d.linkID])
-              //   .then(response => { /* handle success */ })
-              //   .catch(error => { /* handle error */ });
+              sendMessage({
+                messageType: "update-connection",
+                id: d.linkID,
+                x: controlPointsRef.current[d.linkID].x / width,
+                y: controlPointsRef.current[d.linkID].y / height,
+              });
             })
         );
 
       // Add hover effects to control points
       controlPointSelection
-        .on("mouseover", function(event, d) {
-          d3.select(this)
-            .transition()
-            .duration(200)
-            .attr("fill", "red"); // Change to desired hover color
+        .on("mouseover", function (event, d) {
+          d3.select(this).transition().duration(200).attr("fill", "red"); // Change to desired hover color
 
           // Highlight the corresponding link
           g.selectAll(".link")
             .filter((linkData) => linkData.linkID === d.linkID)
             .attr("stroke", "red"); // Change to desired highlight color
         })
-        .on("mouseout", function(event, d) {
-          d3.select(this)
-            .transition()
-            .duration(200)
-            .attr("fill", "orange"); // Revert to original color
+        .on("mouseout", function (event, d) {
+          d3.select(this).transition().duration(200).attr("fill", "orange"); // Revert to original color
 
           // Remove highlight from the corresponding link
           g.selectAll(".link")
@@ -541,11 +547,7 @@ const DocumentChartStatic = (props) => {
       controlPointSelection.raise();
 
       // Optionally, you can style control points more distinctively
-      controlPointSelection
-        .attr("fill", "orange")
-        .attr("stroke", "#fff")
-        .attr("stroke-width", 2)
-        .attr("r", 6);
+      controlPointSelection.attr("fill", "orange").attr("stroke", "#fff").attr("stroke-width", 2).attr("r", 6);
     }
 
     const drag = d3
@@ -617,7 +619,7 @@ const DocumentChartStatic = (props) => {
         const docId = d.id;
         const x = (docCoordsRef.current[docId].x - cellWidth / 2) / cellWidth;
         const y = (docCoordsRef.current[docId].y - cellHeight / 2) / cellHeight;
-        sendMessage({ docId, x, y });
+        sendMessage({ messageType: "update-node", id: docId, x, y });
       });
 
     const docSelection = g
@@ -660,8 +662,8 @@ const DocumentChartStatic = (props) => {
         .html(
           `<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;pointer-events:all;transition:transform 0.2s, box-shadow 0.2s;">
             <i class="bi ${iconClass}" style="font-size: 20px; color: ${iconColor}; cursor: ${
-          props.role === "Urban Planner" ? "move" : "default"
-        }; pointer-events:all;"></i>
+            props.role === "Urban Planner" ? "move" : "default"
+          }; pointer-events:all;"></i>
           </div>`
         )
         .on("click", () => handleDocumentClick(d));
@@ -695,13 +697,8 @@ const DocumentChartStatic = (props) => {
 
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
-      {/* Sidebar component for the legend and the filters */}     
-      <FilterAndLegendSidebar
-          documentTypes={documentTypes}
-          stakeholders={stakeholders}
-          setDocuments={setChartData}
-          onSetLoading={setLoading}
-        />               
+      {/* Sidebar component for the legend and the filters */}
+      <FilterAndLegendSidebar documentTypes={documentTypes} stakeholders={stakeholders} setDocuments={setChartData} onSetLoading={setLoading} />
 
       {/* Modal component to confirm the deletion of a link */}
       <DeleteLinkModal
