@@ -89,9 +89,6 @@ body {
   overflow-y: auto; /* Per gestire il contenuto scrollabile */
 }
 
-.filter-card {
-}
-
 .filter-title {
   font-size: 1.5rem;
   font-weight: bold;
