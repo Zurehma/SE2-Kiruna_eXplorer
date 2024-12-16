@@ -12,7 +12,7 @@ export function NavigationBar(props) {
 
   const handleLoginClick = () => {
     if (location.pathname !== "/") {
-      navigate("/"); 
+      navigate("/");
     }
     props.toggleLoginPane();
     setExpanded(false); // Close the navbar if open
@@ -23,7 +23,7 @@ export function NavigationBar(props) {
       navigate("/");
     }
     props.toggleAddUserPane();
-    setExpanded(false); 
+    setExpanded(false);
   };
 
   const handleScroll = () => {
@@ -125,7 +125,7 @@ export function NavigationBar(props) {
               >
                 New Connection
               </Nav.Link>
-              {props.role !== "admin" && (
+              {props.role === "admin" && (
                 <Nav.Link onClick={handleNewUserClick} className="nav-link">
                   New User
                 </Nav.Link>

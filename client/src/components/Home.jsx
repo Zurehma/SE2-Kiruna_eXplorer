@@ -43,7 +43,6 @@ const Home = ({
     }, 5000);
   };
 
-
   return (
     <div className="homepage">
       {showSuccessMessage && (
@@ -102,10 +101,8 @@ const Home = ({
         closeLoginPane={closeLoginPane}
         loggedinError={loggedinError}
         setloggedinError={setloggedinError}
-        
       />
-      {/* Registrazione  RICORDATI DI CAMBIARE !== CON ===*/}
-      {role !== "admin" && (
+      {role === "admin" && (
         <UserForm
           toggleLoginPane={toggleLoginPane}
           isAddUserOpen={isAddUserOpen}
