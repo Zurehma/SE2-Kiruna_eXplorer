@@ -90,9 +90,6 @@ body {
 }
 
 .filter-card {
-  border-radius: 10px; /* Makes the entire card rounded */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adds a soft shadow for more depth */
-  border: 1px solid #1f9775; /* Optional: a subtle border to give a defined look */
 }
 
 .filter-title {
@@ -100,7 +97,6 @@ body {
   font-weight: bold;
   color: #006d77;
   text-align: center;
-  margin-bottom: 5px;
 }
 
 /* Custom Toggle for Single Date / Date Range */
