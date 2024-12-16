@@ -61,6 +61,23 @@ html {
     font-size: 1.5rem;
   }
 }
+
+@media (max-width: 576px) {
+  .links-background {
+    padding: 1rem; /* Riduce il padding per schermi molto piccoli */
+  }
+  .cd-body {
+    margin: auto 1rem; /* Riduce il margine per schermi molto piccoli */
+  }
+  .form-select {
+    display: inline-block;
+    max-width: 100%; /* Assicura che non superi il contenitore */
+    overflow: hidden; /* Nasconde il testo che supera il limite */
+    text-overflow: ellipsis; /* Aggiunge i puntini di sospensione */
+    white-space: nowrap; /* Impedisce al testo di andare a capo */
+  }
+}
+
 /* Applica gli stili SOLO all'interno del container con classe "links-container" */
 .links-container .dropdown-toggle {
   background-color: #ffffff !important;
@@ -72,9 +89,14 @@ html {
 
 .links-container .dropdown-menu {
   width: 100% !important; /* La larghezza del menu sarà uguale al contenitore */
+  max-width: 100%; /* Impedisce al menu di uscire dal contenitore */
+  white-space: normal; /* Permette al testo di andare a capo */
+  overflow-wrap: break-word;
   background-color: #f0f0f0 !important;
   border-radius: 5px !important;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra per maggiore contrasto */
+  max-height: 250px; /* Limita l'altezza del dropdown */
+  overflow-y: auto; /* Abilita lo scroll verticale se necessario */
 }
 
 .links-container .dropdown-item {

@@ -184,12 +184,17 @@ select:focus {
 }
 
 @media (max-width: 768px) {
-  .card {
-    padding: 1rem;
-  }
-
   .card-title {
     font-size: 1.5rem;
+  }
+
+  .step-line {
+    width: 100%; /* Assicura che la barra sia larga quanto il contenitore */
+    gap: 10px; /* Distanza uniforme tra gli elementi */
+  }
+  .step-label {
+    font-size: 0.8rem;
+    font-weight: 500;
   }
 
   .button-group {
