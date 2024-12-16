@@ -155,33 +155,6 @@ const FilteringDocuments = (props) => {
                 <p>No documents found</p>
               )}
             </div>
-
-            {/* Bottom Pagination */}
-            {documents?.length > 0 && (
-              <div className="pagination-controls text-center mt-3 mb-3">
-                <Row className="mt-3 mb-3">
-                  <Col className="text-center">
-                    <Button
-                      variant="primary"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 0}
-                      className="btn-page me-2"
-                    >
-                      Previous
-                    </Button>
-                    <span className="myPageColor">Page {currentPage + 1}</span>
-                    <Button
-                      variant="primary"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage + 1 >= totalPages}
-                      className="btn-page ms-2"
-                    >
-                      Next
-                    </Button>
-                  </Col>
-                </Row>
-              </div>
-            )}
           </Col>
         </Row>
       </Container>
