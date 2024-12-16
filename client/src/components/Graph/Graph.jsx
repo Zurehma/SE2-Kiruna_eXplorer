@@ -9,6 +9,9 @@ import GraphUtils from "../../utils/graphUtils";
 import useWebSocket from "../../hooks/useWebSocket";
 import FilterAndLegendSidebar from "./FilterAndLegendSidebar";
 import DeleteLinkModal from "./deleteLinkModal";
+import Filters from "../Filters/Filters";
+import { useLocation } from "react-router-dom";
+
 
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
@@ -16,7 +19,9 @@ const DocumentChartStatic = (props) => {
   const controlPointsRef = useRef({});
 
   const { isOpen, messageReceived, sendMessage } = useWebSocket();
+  const [selectedDoc, setSelectedDoc] = useState(null);
 
+  const location = useLocation();
   const navigate = useNavigate();
 
   const [documentTypes, setDocumentTypes] = useState([]);
@@ -692,6 +697,35 @@ const DocumentChartStatic = (props) => {
   const handleDocumentClick = (doc) => {
     navigate(`/document/${doc.id}`);
   };
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const docId = parseInt(searchParams.get("id"));
+
+    if (docId) {
+      setSelectedDoc(docId);
+    }
+  });
+
+  //if selected document then highlight the document
+  useEffect(() => {
+    if (selectedDoc) {
+      const doc = chartData.find((d) => d.id === selectedDoc);
+      if (doc) {
+        //fill the shape as blue and zoom in and out
+        const svg = d3.select(svgRef.current);
+        const docSelection = svg.selectAll(".doc");
+        const selectedDoc = docSelection.filter((d) => d.id === doc.id);
+        if (selectedDoc) {
+          selectedDoc.select("foreignObject div")
+            .style("background", "#006d77")
+            .transition().duration(200)
+            .style("transform", "scale(1.5)")
+            .style("box-shadow", "0 4px 10px rgba(0,0,0,0.15)");
+        }
+      }
+    }
+  });
 
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
