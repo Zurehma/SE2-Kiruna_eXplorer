@@ -364,3 +364,11 @@ button.myDropdownDocuments:focus {
 button.myDropdownDocuments {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
+
+.showDiagram{
+    margin-left: 12px;
+}
+
+.showMap{
+    margin-left: 9px;
+}

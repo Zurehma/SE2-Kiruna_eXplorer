@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Tooltip, OverlayTrigger, Button, Dropdown } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-
+import '../styles/MapNavigation.css';
 
 import API from '../../API';
 
@@ -257,16 +257,16 @@ function MyPopup(props) {
           {/* Add Show on Diagram Button */}
           <Col xs={12} className="mt-1 d-flex">
             {isOnMap ? (
-              <Button variant="secondary" className="shadow-sm" onClick={handleShowOnDiagram}>
+              <Button size="sm" variant="secondary" className="shadow-sm showDiagram" onClick={handleShowOnDiagram}>
               Show on Diagram
             </Button>
             ) : (
               <>
-              <Button variant="secondary" className="shadow-sm" onClick={handleShowOnDiagram}>
+              <Button size="sm" variant="secondary" className="shadow-sm" onClick={handleShowOnDiagram}>
                 Show on Diagram
               </Button>
               {/* Add show on map button */}
-              <Button variant="secondary" className="shadow-sm ms-3" onClick={handleShowOnMap}>
+              <Button size="sm" variant="secondary" className="shadow-sm showMap" onClick={handleShowOnMap}>
                 Show on Map
               </Button>
               </>
