@@ -166,7 +166,7 @@ function Filters(props) {
             {/* Date Selection Checkbox */}
             <Form.Group controlId="sidebarFilterDateType" className="mt-3">
               <Form.Label className="filter-label">Select Date</Form.Label>
-              <div className="d-flex align-items-center" style={{ gap: "15px" }}>
+              <div className="d-flex align-items-center flex-wrap" style={{ gap: "15px" }}>
                 <Form.Check
                   type="checkbox"
                   label="Date"
