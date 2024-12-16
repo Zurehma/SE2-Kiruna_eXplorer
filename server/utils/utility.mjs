@@ -38,6 +38,21 @@ const isLoggedIn = (req, res, next) => {
 };
 
 /**
+ * Middleware to check if a user is an admin
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns
+ */ 
+const isAdmin = (req, res, next) => {
+  if (req?.user?.role === "admin") {
+    return next();
+  }
+
+  return res.status(401).json({ error: "Not authorized", status: 401 });
+};
+
+/**
  * Middleware to check if a string matches the date format YYYY-MM or YYYY
  * @param {String} value
  * @returns
@@ -160,6 +175,7 @@ const errorHandler = (err, req, res, next) => {
 const Utility = {
   isValidKirunaCoordinates,
   isLoggedIn,
+  isAdmin,
   isValidYearMonthOrYear,
   isValidCoordinatesObject,
   isValidPages,

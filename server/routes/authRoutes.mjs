@@ -55,6 +55,7 @@ function AuthRoutes(app) {
     this.router.post(
       "/register/urbanplanner",
       Utility.isLoggedIn,
+      Utility.isAdmin,  
       body("name").isString().notEmpty(),
       body("surname").isString().notEmpty(),
       body("username").isString().notEmpty(),
