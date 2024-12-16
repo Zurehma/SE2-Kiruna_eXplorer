@@ -18,7 +18,6 @@ import API from '../../../API';
 import LoadGeoJson from '../MapUtils/LoadGeoJson';
 import {createCustomIcon,iconMap} from '../MapUtils/CustomIcon';
 import fetchData from '../MapUtils/DataFetching';
-import { useLocation } from 'react-router-dom';
 
 const closeIcon = L.divIcon({
     className: 'custom-close-icon', // Classe personalizzata per evitare gli stili di default di Leaflet
@@ -63,7 +62,6 @@ const MapClickHandler = ({ onMapClick }) => {
 
 function MapNavigation(props) {
     const initialPosition = [67.850, 20.217];
-    const location = useLocation();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [positionActual, setPositionActual] = useState(initialPosition);
@@ -90,14 +88,6 @@ function MapNavigation(props) {
     const handleCloseClick = (docId) => {
         setSelectedAreas(selectedAreas.filter(area => area.docId !== docId));
     };
-
-    useEffect(() => {
-        const searchParams = new URLSearchParams(location.search);
-        const docId = parseInt(searchParams.get('id'));
-        if (docId) {
-            setSelectedDoc(data.find(doc => doc.id === docId));
-        }
-    },[location.search,data]);
 
 
     //Handle views in the map

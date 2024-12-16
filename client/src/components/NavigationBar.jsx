@@ -42,18 +42,12 @@ export function NavigationBar(props) {
   const handleLogout = () => {
     props.handleLogout();
     props.closeAddUserPane();
-    props.closeLoginPane(); // Chiude il login pane quando viene effettuata una navigazione
     navigate("/");
-  };
-
-  const handleCloseSliding = () => {
-    props.closeAddUserPane(); // Chiude il login pane quando viene effettuata una navigazione
-    props.closeLoginPane(); // Chiude il login pane quando viene effettuata una navigazione
   };
 
   return (
     <Navbar expand="lg" className={`custom-navbar ${scrolled ? "scrolled" : ""}`}>
-      <Navbar.Brand as={Link} onClick={handleCloseSliding} to="/" className="navbar-brand">
+      <Navbar.Brand as={Link} to="/" className="navbar-brand">
         Kiruna eXplorer
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -61,9 +55,15 @@ export function NavigationBar(props) {
         <Nav className="ms-auto">
           {props.loggedIn ? (
             <>
+              {/* <Nav.Link
+                as={Link}
+                to="/"
+                className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
+              >
+                Home
+              </Nav.Link> */}
               <Nav.Link
                 as={Link}
-                onClick={handleCloseSliding}
                 to="/map"
                 className={`nav-link ${location.pathname === "/map" ? "active" : ""}`}
               >
@@ -71,7 +71,6 @@ export function NavigationBar(props) {
               </Nav.Link>
               <Nav.Link
                 as={Link}
-                onClick={handleCloseSliding}
                 to="/graph"
                 className={`nav-link ${location.pathname === "/graph" ? "active" : ""}`}
               >
@@ -79,7 +78,6 @@ export function NavigationBar(props) {
               </Nav.Link>
               <Nav.Link
                 as={Link}
-                onClick={handleCloseSliding}
                 to="/documents/all"
                 className={`nav-link ${location.pathname === "/documents/all" ? "active" : ""}`}
               >
@@ -87,7 +85,6 @@ export function NavigationBar(props) {
               </Nav.Link>
               <Nav.Link
                 as={Link}
-                onClick={handleCloseSliding}
                 to="/documents"
                 className={`nav-link ${location.pathname === "/documents" ? "active" : ""}`}
               >
@@ -95,7 +92,6 @@ export function NavigationBar(props) {
               </Nav.Link>
               <Nav.Link
                 as={Link}
-                onClick={handleCloseSliding}
                 to="/documents/links"
                 className={`nav-link ${location.pathname === "/documents/links" ? "active" : ""}`}
               >
@@ -115,19 +111,24 @@ export function NavigationBar(props) {
             <>
               <Nav.Link
                 as={Link}
-                to="/map"
-                onClick={handleCloseSliding}
-                className={`nav-link ${location.pathname === "/map" ? "active" : ""}`}
+                to="/"
+                className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
               >
-                Map
+                Home
               </Nav.Link>
               <Nav.Link
                 as={Link}
-                onClick={handleCloseSliding}
                 to="/graph"
                 className={`nav-link ${location.pathname === "/graph" ? "active" : ""}`}
               >
                 Diagram
+              </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/map"
+                className={`nav-link ${location.pathname === "/map" ? "active" : ""}`}
+              >
+                Map
               </Nav.Link>
               <Nav.Link onClick={handleLoginClick} className="nav-link">
                 Login

@@ -1,98 +1,107 @@
 /* Filtering.css */
-/* General Styling Improvements */
-html,
-body {
-  margin: 0;
-  height: 100%;
-  overflow-y: auto; /* Abilita lo scroll globale */
-}
 
-.viewall-background {
-  background: linear-gradient(to right, #006d77, #83c5be);
-  font-family: "Roboto", sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-  min-height: 100vh; /* Usa `min-height` invece di `height` */
-  overflow-y: auto; /* Abilita lo scroll verticale se necessario */
-}
-
-.filtered-result {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-  background-color: transparent !important;
-  height: 100%; /* Usa altezza completa del contenitore */
-  max-height: none; /* Rimuovi qualsiasi limite massimo di altezza */
-  overflow-y: auto; /* Consenti lo scroll verticale */
-  padding-bottom: 20px; /* Spazio extra per evitare che i bottoni siano nascosti */
-}
-
-.documents-list {
-  min-height: 100%;
-  padding: 15px;
+/* General Container Styling */
+.sidebar-section {
+  border-right: 1px solid #ddd;
+  padding-right: 20px;
+  padding-left: 20px;
+  overflow: hidden;
+  position: fixed;
+  top: 2cm;
+  bottom: 0;
+  overflow-y: auto;
+  height: 100vh;
+  background-color: #f3f4f6; /* Slightly warmer grey for a modern look */
 }
 
 @media (min-width: 768px) {
   .filtered-result {
     margin-left: 27%;
     padding-left: 15px;
+    height: 100vh;
     padding-right: 2cm;
     background-color: #ffffff;
   }
 }
 
-/* SEARCH BAR */
+.main-content {
+  padding-left: 20px;
+  background-color: #f7f8fa;
+}
+
+.filter-options {
+  margin-top: 20px;
+}
+
+.content-section {
+  margin-top: 20px;
+}
+
 
 .search-btn {
-  background-color: rgb(255, 255, 255);
-  border: 1px solid #000000;
-  color: #495057;
-  border-color: #006d77;
-  border-width: 1px;
+  background-color: white; 
+  border: 1px solid #000000; 
+  color: #495057; 
 }
 
 .search-btn:hover,
 .search-btn:focus {
-  background-color: #006d77;
-  color: white;
-  border-color: #006d77;
+  background-color: #006d77; 
+  color: white; 
+  border-color: #006d77; 
 }
-
-.searchbar {
+.search-btn{
   border-color: #006d77;
   border-width: 1px;
 }
-
 .searchbar:hover,
-.searchbar:focus {
-  border-color: #006d77;
-  border-width: 1.5px;
-  box-shadow: none;
+.searchbar:focus{
+  border-color: #006d77; 
+  border-width: 3px;
+  box-shadow: none; 
+}
+.searchbar{
+  border-color: #006d77; 
+  border-width: 1px;
 }
 
 .bi-search {
-  font-size: 1.2rem;
+  font-size: 1.2rem; 
 }
 
-/* SIDEBAR FILTERING */
-.sidebar-section {
-  border-right: 1px solid #ddd;
-  padding-right: 35px;
-  padding-left: 35px;
-  position: fixed;
-  top: 108px; /* Posizione fissa a partire da un margine in alto */
-  bottom: 0;
-  height: calc(100vh - 108px); /* Sottrarre l'altezza della barra in alto */
-  overflow-y: auto; /* Per gestire il contenuto scrollabile */
+.search-input-modern:focus {
+  border-color: #006d77;
+  box-shadow: 0 6px 16px rgba(0, 109, 119, 0.4);
 }
 
+.icons-container {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 10px;
+  padding-bottom: 0.3cm;
+}
+
+.clear-icon,
+.search-icon {
+  cursor: pointer;
+  color: #006d77;
+  font-size: 24px;
+  transition: color 0.2s;
+}
+
+.clear-icon:hover,
+.search-icon:hover {
+  color: #b62727;
+}
+
+/* Filter Card Styles */
 .filter-card {
-  border-radius: 10px; /* Makes the entire card rounded */
+  border-radius: 16px; /* Makes the entire card rounded */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adds a soft shadow for more depth */
-  border: 1px solid #1f9775; /* Optional: a subtle border to give a defined look */
+  border: 1px solid #d1d5db; /* Optional: a subtle border to give a defined look */
 }
 
 .filter-title {
@@ -100,7 +109,7 @@ body {
   font-weight: bold;
   color: #006d77;
   text-align: center;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
 }
 
 /* Custom Toggle for Single Date / Date Range */
@@ -111,44 +120,10 @@ body {
   justify-content: center;
   margin-top: 10px;
 }
-/* Stile base della checkbox */
-.custom-checkbox input[type="checkbox"] {
-  accent-color: #006d77; /* Cambia colore della spunta */
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-}
-
-/* Personalizzazione avanzata per browser che non supportano accent-color */
-.custom-checkbox input[type="checkbox"] {
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  background-color: white;
-  border: 2px solid #006d77;
-  border-radius: 4px;
-  cursor: pointer;
-  position: relative;
-}
-
-/* Stile per la checkbox selezionata */
-.custom-checkbox input[type="checkbox"]:checked {
-  background-color: #006d77;
-}
-
-/* Aggiungere un'icona di spunta personalizzata */
-.custom-checkbox input[type="checkbox"]:checked::before {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 16px;
-}
 
 .custom-toggle {
   padding: 8px 15px;
-  background: #d4d4d4; /* Light gray */
+  background: #f3f4f6; /* Light gray */
   border: 1px solid #d1d5db;
   border-radius: 20px; /* Makes the toggle button more rounded */
   cursor: pointer;
@@ -176,7 +151,7 @@ body {
 }
 
 .custom-toggle.active:hover {
-  background-color: #006d77;
+  background-color: #006d99;
 }
 
 .toggle-label {
@@ -185,11 +160,52 @@ body {
   color: #868585;
 }
 
-/* titolo dei fields */
 .filter-label {
   font-weight: bold;
   margin-bottom: 8px;
   color: #006d77;
+}
+
+/* Document Cards */
+.documents-list {
+  margin-top: 20px;
+}
+
+.document-card {
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  cursor: pointer;
+  background-color: #ffffff;
+}
+
+.document-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.document-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.document-meta {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Button & Spinner Styling */
+.spinner-border {
+  color: #006d77;
+}
+
+/* General Styling Improvements */
+body {
+  background-color: #f5f5f5; /* Light grey background to reduce the stark white contrast */
+  font-family: "Roboto", sans-serif; /* Modern font for better readability */
 }
 
 /* Filter Dropdown Input Enhancements */
@@ -204,6 +220,7 @@ body {
   padding: 10px;
   background: #ffffff;
   color: #006d77;
+  transition: background 0.3s;
 }
 .filter-input option:hover {
   background-color: #006d77;
@@ -213,11 +230,11 @@ body {
   width: 8px;
 }
 .filter-input::-webkit-scrollbar-thumb {
-  background: #a9a9a9; /* Blue scrollbar thumb */
+  background: #3b82f6; /* Blue scrollbar thumb */
   border-radius: 8px;
 }
 .filter-input::-webkit-scrollbar-thumb:hover {
-  background-color: #006d77; /* Darker blue on hover */
+  background: #1e40af; /* Darker blue on hover */
 }
 
 .filter-input:focus {
@@ -238,16 +255,6 @@ body {
   border-color: #006d77;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
-
-/* Document Cards */
-.documents-list {
-  padding: 15px;
-}
-
-/* Button & Spinner Styling */
-/* .spinner-border {
-  color: #770014;
-} */
 
 /* Card Styling for Responsiveness */
 @media (max-width: px) {
@@ -286,47 +293,35 @@ body {
   color: #006d77;
 }
 
+/* css fro the pagination 
+.btn-page {
+  background-color: #006d77 !important;
+  border: none;
+  padding: 0.4rem 1.5rem;
+  margin: 1.5rem; 
+  transition: background-color 0.3s ease;
+}*/
+.btn-page {
+  background-color: #007bff; 
+  color: white; 
+  border: none; 
+  padding: 8px 16px; 
+  transition: background-color 0.3s, transform 0.3s; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  border-radius: 5px; 
+  margin-bottom: 10px;
+}
+
 .popupFiltering {
   border: 2px solid #006d77; /* Colore e spessore del bordo per tutti i dispositivi */
-  border-radius: 15px;
+  border-radius: 15px;;
   margin-bottom: 5px;
   max-width: 100%;
+  overflow-x: hidden; /* Nasconde l'overflow di default */
 }
 
-/* PAGINATION */
-.btn-page {
-  background-color: #006d77;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  min-width: 100px;
-  transition: background-color 0.3s, transform 0.3s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  margin: 10px;
-}
-
-.btn-page:hover,
-.btn-page:focus {
-  background-color: #003d42;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.btn-page:disabled {
-  background-color: white; /* Grigio chiaro per il campo */
-  border-color: #dad0ce; /* Bordo grigio */
-  color: rgb(50, 50, 50);
-  cursor: not-allowed;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  filter: brightness(1.5); /* Aumenta la luminosità del pulsante */
-  cursor: not-allowed;
-}
-
-.myPageColor {
-  font-size: 1.2rem;
-  padding: 10px;
-  color: white;
+.myPageColor{
+  color: #006d77;
 }
 
 /* Media query per dispositivi con larghezza massima di 768px (ad esempio tablet e dispositivi mobili) */
@@ -334,4 +329,17 @@ body {
   .popupFiltering {
     overflow-x: auto; /* Abilita l'overflow solo su schermi piccoli */
   }
+}
+
+.btn-page:hover, .btn-page:focus {
+  background-color: #0056b3;
+  transform: translateY(-2px); 
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
+}
+
+.btn-page:disabled {
+  background-color: #cccccc; 
+  color: #666666; 
+  cursor: not-allowed; 
+  box-shadow: none; 
 }
