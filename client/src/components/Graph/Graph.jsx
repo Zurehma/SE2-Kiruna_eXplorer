@@ -717,11 +717,14 @@ const DocumentChartStatic = (props) => {
         const docSelection = svg.selectAll(".doc");
         const selectedDoc = docSelection.filter((d) => d.id === doc.id);
         if (selectedDoc) {
-          selectedDoc.select("foreignObject div")
-            .style("background", "#006d77")
-            .transition().duration(200)
-            .style("transform", "scale(1.5)")
-            .style("box-shadow", "0 4px 10px rgba(0,0,0,0.15)");
+          selectedDoc.select("foreignObject div").classed("highlighted", true);
+            //.style("background", "#006d77")
+        } else{
+          const svg = d3.select(svgRef.current);
+          svg.selectAll(".doc").select("foreignObject div")
+            .style("background", null)
+            .style("transform", "scale(1)")
+            .style("box-shadow", null);
         }
       }
     }

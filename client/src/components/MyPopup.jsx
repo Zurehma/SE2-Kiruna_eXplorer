@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Tooltip, OverlayTrigger, Button, Dropdown } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
@@ -14,6 +14,13 @@ function MyPopup(props) {
   const [showLinks, setShowLinks] = useState(false); // State to control visibility of the dropdown
   const widthLastColumn = props.loggedIn ? 4 : 5;
   const remainingWidth = 12 -3 -4 - widthLastColumn;
+  const location = useLocation(); 
+  const [isOnMap, setIsOnMap] = useState(false);
+
+  // Check if the user is on the map page
+  useEffect(() => {
+    setIsOnMap(location.pathname.includes('map'));
+  }, [location]);
 
   //fetch links and available attachments for the document 
   useEffect(() => { //As soon as the id of the doc changes, fetch its links and attachments
@@ -134,6 +141,11 @@ function MyPopup(props) {
   const handleShowOnDiagram = () => {
     navigate(`/graph/?id=${props.doc.id}`);
   };
+
+  //Function to navigate to map page
+  const handleShowOnMap = () => {
+    navigate(`/map/?id=${props.doc.id}`);
+  };
   
   return (
     <Row className="p-3 border rounded shadow-sm popupProp popupBackStyle">
@@ -242,11 +254,23 @@ function MyPopup(props) {
           </Col>
         </Row>
       </Col>)}
-              {/* Add Show on Diagram Button */}
-              <Col xs={12} className="mt-3 d-flex">
-          <Button variant="secondary" className="shadow-sm" onClick={handleShowOnDiagram}>
-            Show on Diagram
-          </Button>
+          {/* Add Show on Diagram Button */}
+          <Col xs={12} className="mt-1 d-flex">
+            {isOnMap ? (
+              <Button variant="secondary" className="shadow-sm" onClick={handleShowOnDiagram}>
+              Show on Diagram
+            </Button>
+            ) : (
+              <>
+              <Button variant="secondary" className="shadow-sm" onClick={handleShowOnDiagram}>
+                Show on Diagram
+              </Button>
+              {/* Add show on map button */}
+              <Button variant="secondary" className="shadow-sm ms-3" onClick={handleShowOnMap}>
+                Show on Map
+              </Button>
+              </>
+            )}
         </Col>
     </Row>
   );
