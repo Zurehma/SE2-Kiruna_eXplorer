@@ -144,7 +144,7 @@
 
 /* Documented highlighted */
 .highlighted {
-  background: #1ba8b7; /* Highlight color */
+  background: yellow; /* Highlight color */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Add shadow */
   transition: all 0.2s ease-in-out; /* Smooth transition for changes */
 }
