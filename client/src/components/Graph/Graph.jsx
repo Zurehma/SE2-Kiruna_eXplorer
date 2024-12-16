@@ -152,21 +152,18 @@ const DocumentChartStatic = (props) => {
       }
     });
 
-    // === PRUNE CONTROL POINTS TO MATCH CURRENT LINKS ===
-    // This ensures that controlPointsRef only contains control points for existing links
+    // PRUNE CONTROL POINTS TO MATCH CURRENT LINKS
     const currentLinkIDs = new Set(links.map((link) => link.linkID));
     Object.keys(controlPointsRef.current).forEach((linkID) => {
       if (!currentLinkIDs.has(linkID)) {
         delete controlPointsRef.current[linkID];
       }
     });
-    console.log("After pruning, controlPointsRef.current:", controlPointsRef.current);
 
     // Initialize controlPointsRef.current for new links
-    const linkPairCount = {}; // To track the number of links between the same pair
-
+    const linkPairCount = {};
     links.forEach((link, index) => {
-      const pairKey = [link.DocID1, link.DocID2].sort().join("-"); // Unique key for a pair
+      const pairKey = [link.DocID1, link.DocID2].sort().join("-");
 
       if (!controlPointsRef.current[link.linkID]) {
         const doc1 = chartData.find((d) => d.id === link.DocID1);
@@ -174,46 +171,54 @@ const DocumentChartStatic = (props) => {
         if (doc1 && doc2) {
           const pos1 = docCoordsRef.current[doc1.id];
           const pos2 = docCoordsRef.current[doc2.id];
-          const { x: startX, y: startY } = pos1;
-          const { x: endX, y: endY } = pos2;
+          const { cellX: cellX1, cellY: cellY1 } = getCellCoords(doc1);
+          const { cellX: cellX2, cellY: cellY2 } = getCellCoords(doc2);
 
-          // Calculate midpoint
+          if (!pos1 || !pos2 || cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null) {
+            console.warn(`Link with linkID ${link.linkID} has invalid positioning.`);
+            return;
+          }
+
+          const startX = cellX1 + pos1.x;
+          const startY = cellY1 + pos1.y;
+          const endX = cellX2 + pos2.x;
+          const endY = cellY2 + pos2.y;
+
+          // Calculate midpoint of the straight line between docs
           const midX = (startX + endX) / 2;
           const midY = (startY + endY) / 2;
 
-          // Calculate angle of the link
+          // Calculate angle of the line connecting the two docs
           const angle = Math.atan2(endY - startY, endX - startX);
 
-          // Initialize count for the pair if not present
           if (!linkPairCount[pairKey]) {
             linkPairCount[pairKey] = 0;
           }
 
-          // Assign unique offset based on the number of existing links between the pair
-          const offsetMultiplier = linkPairCount[pairKey] + 1; // Start from 1
-          const offsetMagnitude = 10 * offsetMultiplier; // Increase magnitude for each additional link
+          const linkIndexForPair = linkPairCount[pairKey];
+          const offsetBaseMagnitude = 40;
+          const offsetMagnitude = offsetBaseMagnitude * (linkIndexForPair + 1);
 
-          // Alternate offset direction
-          const alternate = linkPairCount[pairKey] % 2 === 0 ? 1 : -1;
+          const rotationAngle = (Math.PI / 6) * linkIndexForPair;
+          const direction = (linkIndexForPair % 2 === 0) ? 1 : -1;
+          const perpendicularAngle = angle + Math.PI / 2 + rotationAngle * direction;
 
-          const offsetX = -Math.sin(angle) * offsetMagnitude * alternate;
-          const offsetY = Math.cos(angle) * offsetMagnitude * alternate;
+          const offsetX = Math.cos(perpendicularAngle) * offsetMagnitude;
+          const offsetY = Math.sin(perpendicularAngle) * offsetMagnitude;
 
-          // Set control point position
           controlPointsRef.current[link.linkID] = {
             x: midX + offsetX,
             y: midY + offsetY,
           };
 
-          // Increment the count for the pair
           linkPairCount[pairKey]++;
         } else {
           console.warn(`Link with linkID ${link.linkID} has invalid DocID1 or DocID2.`);
         }
       }
     });
-    console.log("After initialization, controlPointsRef.current:", controlPointsRef.current);
 
+    console.log("After initialization, controlPointsRef.current:", controlPointsRef.current);
     console.log(messageReceived);
 
     // Update docCoordsRef.current with messageReceived
@@ -298,6 +303,7 @@ const DocumentChartStatic = (props) => {
 
     tooltip.on("mouseover", () => clearTimeout(hideTooltipTimeout)).on("mouseout", hideTooltip);
 
+    // Modified updateLinkPath to use a cubic Bezier that passes through the control point
     function updateLinkPath(selection) {
       selection.each(function (d) {
         const path = d3.select(this);
@@ -321,26 +327,21 @@ const DocumentChartStatic = (props) => {
         // Use existing control points if they exist
         let control = controlPointsRef.current[d.linkID];
         if (!control) {
-          // If no control point exists, initialize it
+          // Initialize if no control point exists
           const midX = (startX + endX) / 2;
           const midY = (startY + endY) / 2;
-
-          const angle = Math.atan2(endY - startY, endX - startX);
-          const offsetMagnitude = 10;
-          const alternate = links.indexOf(d) % 2 === 0 ? 1 : -1;
-
-          const offsetX = -Math.sin(angle) * offsetMagnitude * alternate;
-          const offsetY = Math.cos(angle) * offsetMagnitude * alternate;
-
-          controlPointsRef.current[d.linkID] = {
-            x: midX + offsetX,
-            y: midY + offsetY,
-          };
-          control = controlPointsRef.current[d.linkID];
+          control = { x: midX, y: midY };
+          controlPointsRef.current[d.linkID] = control;
         }
 
         const cx = control.x;
         const cy = control.y;
+
+        // Calculate P1 = P2 so that the curve passes through (cx, cy) at t=0.5
+        // Formula derived:
+        // CP = (S + E)/8 + (3/4)*X  =>  X = [CP - (S+E)/8]*(4/3)
+        const Px = (cx - (startX + endX)/8) * (4/3);
+        const Py = (cy - (startY + endY)/8) * (4/3);
 
         let strokeStyle = "4,4";
         switch (d.type) {
@@ -366,41 +367,19 @@ const DocumentChartStatic = (props) => {
           .attr("stroke", "gray")
           .attr("stroke-width", 1.5)
           .attr("stroke-dasharray", strokeStyle)
-          .attr("d", `M${startX},${startY} Q${cx},${cy} ${endX},${endY}`);
+          .attr("d", `M${startX},${startY} C${Px},${Py} ${Px},${Py} ${endX},${endY}`);
       });
     }
 
     // === Bind data to link elements using linkID as the key ===
     const linkSelection = g
       .selectAll(".link")
-      .data(links, (d) => d.linkID) // Changed from d.DocID1 + "-" + d.DocID2 to d.linkID
+      .data(links, (d) => d.linkID)
       .enter()
       .append("path")
       .attr("class", "link");
 
     updateLinkPath(linkSelection);
-
-    function getLinkMidpoint(d) {
-      const doc1 = chartData.find((doc) => doc.id === d.DocID1);
-      const doc2 = chartData.find((doc) => doc.id === d.DocID2);
-      if (!doc1 || !doc2) return null;
-
-      const { cellX: cellX1, cellY: cellY1 } = getCellCoords(doc1);
-      const { cellX: cellX2, cellY: cellY2 } = getCellCoords(doc2);
-      if (cellX1 == null || cellY1 == null || cellX2 == null || cellY2 == null) return null;
-
-      const pos1 = docCoordsRef.current[doc1.id];
-      const pos2 = docCoordsRef.current[doc2.id];
-      if (!pos1 || !pos2) return null;
-
-      const control = controlPointsRef.current[d.linkID];
-      if (!control) return null;
-
-      const cx = control.x;
-      const cy = control.y;
-
-      return { x: cx, y: cy };
-    }
 
     linkSelection
       .on("mouseover", function (event, d) {
@@ -408,10 +387,8 @@ const DocumentChartStatic = (props) => {
         const doc1 = chartData.find((doc) => doc.id === d.DocID1);
         const doc2 = chartData.find((doc) => doc.id === d.DocID2);
 
-        // Get mouse position relative to the container
         const [mouseX, mouseY] = d3.pointer(event, container);
 
-        // Conditionally include Delete Button and Info Icon based on role
         const actionButtons =
           props.role === "Urban Planner"
             ? `
@@ -438,24 +415,22 @@ const DocumentChartStatic = (props) => {
           </div>
         `;
 
-        // Show tooltip near the mouse cursor
         showTooltip(html, mouseX + margin.left, mouseY + margin.top);
 
         if (props.role === "Urban Planner") {
-          // Add click event handler for the delete button to open the confirmation modal
           d3.select(tooltip.node())
             .select(".delete-link-btn")
             .on("click", () => {
-              setShowDeleteModal(false); // Hide the tooltip
-              openDeleteModal(d); // Open the confirmation modal with the link data
+              setShowDeleteModal(false);
+              openDeleteModal(d);
             });
         }
       })
       .on("mouseout", hideTooltip);
 
-    // === ADDING CONTROL POINTS ===
+
     if (props.role === "Urban Planner") {
-      // Only render control points for authorized users
+      // Render control points
       const controlPointsGroup = g.append("g").attr("class", "control-points");
 
       const controlPointSelection = controlPointsGroup
@@ -472,49 +447,42 @@ const DocumentChartStatic = (props) => {
         .attr("cx", (d) => {
           if (!controlPointsRef.current[d.linkID]) {
             console.warn(`Control point missing for linkID: ${d.linkID}`);
-            return 0; // or another default value or handling
+            return 0;
           }
           return controlPointsRef.current[d.linkID].x;
         })
         .attr("cy", (d) => {
           if (!controlPointsRef.current[d.linkID]) {
             console.warn(`Control point missing for linkID: ${d.linkID}`);
-            return 0; // or another default value or handling
+            return 0;
           }
           return controlPointsRef.current[d.linkID].y;
         })
         .style("display", (d) => (controlPointsRef.current[d.linkID] ? "block" : "none"))
-        .on("click", (event, d) => {
-          // Prevent event propagation to avoid triggering other handlers
-          event.stopPropagation();
-          // Additional click logic if needed
-        })
         .call(
-          d3
-            .drag()
-            .on("start", function (event, d) {
-              // Highlight the corresponding link
+          d3.drag()
+            .on("start", function(event, d) {
               g.selectAll(".link")
                 .filter((linkData) => linkData.linkID === d.linkID)
                 .classed("active-link", true);
             })
-            .on("drag", function (event, d) {
-              // Update control point position
-              if (!controlPointsRef.current[d.linkID]) {
-                console.warn(`Cannot drag undefined control point for linkID: ${d.linkID}`);
-                return;
-              }
-              controlPointsRef.current[d.linkID].x = event.x;
-              controlPointsRef.current[d.linkID].y = event.y;
+            .on("drag", function(event, d) {
+              let [mx, my] = d3.pointer(event, g.node());
 
-              // Update the link path
+              // Clamp the control point within the chart area
+              if (mx < 0) mx = 0;
+              if (mx > width) mx = width;
+              if (my < 0) my = 0;
+              if (my > height) my = height;
+
+              controlPointsRef.current[d.linkID].x = mx;
+              controlPointsRef.current[d.linkID].y = my;
+
+              d3.select(this).attr("cx", mx).attr("cy", my);
+
               updateLinkPath(g.selectAll(".link"));
-
-              // Update the position of the control point itself
-              d3.select(this).attr("cx", event.x).attr("cy", event.y);
             })
-            .on("end", (event, d) => {
-              // Remove the highlight from the link
+            .on("end", function(event, d) {
               g.selectAll(".link")
                 .filter((linkData) => linkData.linkID === d.linkID)
                 .classed("active-link", false);
@@ -523,34 +491,24 @@ const DocumentChartStatic = (props) => {
                 messageType: "update-connection",
                 id: d.linkID,
                 x: controlPointsRef.current[d.linkID].x / width,
-                y: controlPointsRef.current[d.linkID].y / height,
+                y: controlPointsRef.current[d.linkID].y / height
               });
             })
-        );
-
-      // Add hover effects to control points
-      controlPointSelection
+        )
         .on("mouseover", function (event, d) {
-          d3.select(this).transition().duration(200).attr("fill", "red"); // Change to desired hover color
-
-          // Highlight the corresponding link
+          d3.select(this).transition().duration(200).attr("fill", "red");
           g.selectAll(".link")
             .filter((linkData) => linkData.linkID === d.linkID)
-            .attr("stroke", "red"); // Change to desired highlight color
+            .attr("stroke", "red");
         })
         .on("mouseout", function (event, d) {
-          d3.select(this).transition().duration(200).attr("fill", "orange"); // Revert to original color
-
-          // Remove highlight from the corresponding link
+          d3.select(this).transition().duration(200).attr("fill", "orange");
           g.selectAll(".link")
             .filter((linkData) => linkData.linkID === d.linkID)
-            .attr("stroke", "gray"); // Revert to original stroke color
+            .attr("stroke", "gray");
         });
 
       controlPointSelection.raise();
-
-      // Optionally, you can style control points more distinctively
-      controlPointSelection.attr("fill", "orange").attr("stroke", "#fff").attr("stroke-width", 2).attr("r", 6);
     }
 
     const drag = d3
@@ -560,15 +518,13 @@ const DocumentChartStatic = (props) => {
         const { cellX, cellY } = getCellCoords(d);
         if (cellX == null || cellY == null) return;
 
-        const cellWidth = xScale.bandwidth();
-        const cellHeight = yScale.bandwidth();
-        const halfSize = 12;
-
         const oldPos = docCoordsRef.current[docId];
         if (!oldPos) return;
 
         let newX = oldPos.x + event.dx;
         let newY = oldPos.y + event.dy;
+
+        const halfSize = 12;
 
         if (newX < halfSize) newX = halfSize;
         if (newX > cellWidth - halfSize) newX = cellWidth - halfSize;
@@ -579,38 +535,7 @@ const DocumentChartStatic = (props) => {
 
         d3.select(this).attr("transform", `translate(${cellX + newX},${cellY + newY})`);
 
-        // Update links connected to this document
         g.selectAll(".link").call(updateLinkPath);
-
-        // Reuse manually adjusted control points if available
-        links.forEach((link) => {
-          if (link.DocID1 === docId || link.DocID2 === docId) {
-            const otherDocId = link.DocID1 === docId ? link.DocID2 : link.DocID1;
-            const otherDoc = chartData.find((doc) => doc.id === otherDocId);
-            if (otherDoc) {
-              const pos1 = docCoordsRef.current[link.DocID1];
-              const pos2 = docCoordsRef.current[link.DocID2];
-
-              // Check if a manual adjustment exists
-              if (!controlPointsRef.current[link.linkID]) {
-                const midX = (pos1.x + pos2.x) / 2;
-                const midY = (pos1.y + pos2.y) / 2;
-
-                const angle = Math.atan2(pos2.y - pos1.y, pos2.x - pos1.x);
-                const alternate = links.indexOf(link) % 2 === 0 ? 1 : -1;
-                const offsetMagnitude = 10;
-
-                const offsetX = -Math.sin(angle) * offsetMagnitude * alternate;
-                const offsetY = Math.cos(angle) * offsetMagnitude * alternate;
-
-                controlPointsRef.current[link.linkID] = {
-                  x: midX + offsetX,
-                  y: midY + offsetY,
-                };
-              }
-            }
-          }
-        });
 
         if (props.role === "Urban Planner") {
           g.selectAll(".control-point")
@@ -712,15 +637,12 @@ const DocumentChartStatic = (props) => {
     if (selectedDoc) {
       const doc = chartData.find((d) => d.id === selectedDoc);
       if (doc) {
-        //fill the shape as blue and zoom in and out
         const svg = d3.select(svgRef.current);
         const docSelection = svg.selectAll(".doc");
-        const selectedDoc = docSelection.filter((d) => d.id === doc.id);
-        if (selectedDoc) {
-          selectedDoc.select("foreignObject div").classed("highlighted", true);
-            //.style("background", "#006d77")
-        } else{
-          const svg = d3.select(svgRef.current);
+        const selectedDocEl = docSelection.filter((d) => d.id === doc.id);
+        if (!selectedDocEl.empty()) {
+          selectedDocEl.select("foreignObject div").classed("highlighted", true);
+        } else {
           svg.selectAll(".doc").select("foreignObject div")
             .style("background", null)
             .style("transform", "scale(1)")
@@ -742,10 +664,9 @@ const DocumentChartStatic = (props) => {
         setDeleteLink={setDeleteLink}
         setShowDeleteModal={setShowDeleteModal}
         chartData={chartData}
-        onLinkDeleted={handleLinkDeleted} // Pass the callback here
+        onLinkDeleted={handleLinkDeleted}
       />
 
-      {/* Existing Graph Components */}
       <div className="graph-inner-wrapper">
         <div id="image" style={{ width: "100%", height: "100%", position: "relative" }}>
           <svg ref={svgRef} style={{ width: "100%", height: "100%" }}></svg>
