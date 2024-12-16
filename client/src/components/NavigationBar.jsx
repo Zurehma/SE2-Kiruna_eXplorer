@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Navbar, Nav } from "react-bootstrap";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../styles/Navbar.css";
@@ -7,33 +7,31 @@ export function NavigationBar(props) {
   const location = useLocation();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
+  const [expanded, setExpanded] = useState(false); // Track navbar expansion state
+  const navRef = useRef(null);
 
   const handleLoginClick = () => {
     if (location.pathname !== "/") {
-      navigate("/"); // Redirige solo se non sei già sulla home
+      navigate("/"); 
     }
-    props.toggleLoginPane(); // Apre la sliding pane
+    props.toggleLoginPane();
+    setExpanded(false); // Close the navbar if open
   };
 
   const handleNewUserClick = () => {
     if (location.pathname !== "/") {
-      navigate("/"); // Redirige solo se non sei già sulla home
+      navigate("/");
     }
-    props.toggleAddUserPane(); // Apre la sliding pane
+    props.toggleAddUserPane();
+    setExpanded(false); 
   };
 
   const handleScroll = () => {
-    if (window.scrollY > 50) {
-      setScrolled(true);
-    } else {
-      setScrolled(false);
-    }
+    setScrolled(window.scrollY > 50);
   };
 
   useEffect(() => {
-    // Aggiungi l'ascoltatore dello scroll
     window.addEventListener("scroll", handleScroll);
-    // Rimuovi l'ascoltatore quando il componente viene smontato
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -42,21 +40,47 @@ export function NavigationBar(props) {
   const handleLogout = () => {
     props.handleLogout();
     props.closeAddUserPane();
-    props.closeLoginPane(); // Chiude il login pane quando viene effettuata una navigazione
+    props.closeLoginPane();
     navigate("/");
+    setExpanded(false);
   };
 
   const handleCloseSliding = () => {
-    props.closeAddUserPane(); // Chiude il login pane quando viene effettuata una navigazione
-    props.closeLoginPane(); // Chiude il login pane quando viene effettuata una navigazione
+    props.closeAddUserPane();
+    props.closeLoginPane();
+    setExpanded(false);
   };
 
+  // Handle clicks outside of the Navbar to close it when expanded
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (expanded && navRef.current && !navRef.current.contains(event.target)) {
+        setExpanded(false);
+      }
+    };
+
+    if (expanded) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [expanded]);
+
   return (
-    <Navbar expand="lg" className={`custom-navbar ${scrolled ? "scrolled" : ""}`}>
+    <Navbar
+      expand="lg"
+      className={`custom-navbar ${scrolled ? "scrolled" : ""}`}
+      expanded={expanded}
+      ref={navRef}
+    >
       <Navbar.Brand as={Link} onClick={handleCloseSliding} to="/" className="navbar-brand">
         Kiruna eXplorer
       </Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Toggle aria-controls="basic-navbar-nav" onClick={() => setExpanded(!expanded)} />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="ms-auto">
           {props.loggedIn ? (
@@ -101,7 +125,6 @@ export function NavigationBar(props) {
               >
                 New Connection
               </Nav.Link>
-              {/* RICORDATI DI CAMBIARE !== CON === */}
               {props.role !== "admin" && (
                 <Nav.Link onClick={handleNewUserClick} className="nav-link">
                   New User
