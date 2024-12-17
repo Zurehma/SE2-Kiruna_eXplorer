@@ -19,7 +19,6 @@ const Login = ({
     e.preventDefault();
     const credentials = { username, password };
     await handleLogin(credentials);
-    onSuccess();
     closeLoginPane();
   };
   useEffect(() => {
