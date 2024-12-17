@@ -33,6 +33,8 @@ function Links(props) {
   const [saveStatus, setSaveStatus] = useState("");
   const [linkedDocuments, setLinkedDocuments] = useState([]);
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
+
   const [linkData, setLinkData] = useState({
     document1: "",
     document2: [],
@@ -55,6 +57,7 @@ function Links(props) {
         setTypeLink(response2);
       } catch (error) {
         console.error("Error fetching documents:", error);
+        setError("Error fetching documents.");
       }
     };
     fetchDocuments();
@@ -83,6 +86,7 @@ function Links(props) {
           setLinkedDocuments(filteredLinkedDocs);
         } catch (error) {
           console.error("Error fetching connected documents:", error);
+          setError("Error fetching connected documents.");
         }
       };
 
@@ -159,6 +163,17 @@ function Links(props) {
   return (
     <div className="links-background">
       <Container className="links-container d-flex align-items-top justify-content-center min-vh-100">
+        {error && (
+          <Alert
+            variant="danger"
+            className="fixed-top mt-3"
+            style={{ zIndex: 150000000000 }}
+            dismissible
+            onClose={() => setError(null)}
+          >
+            <p>{error}</p>
+          </Alert>
+        )}
         <Card
           className="p-4 shadow-lg w-100"
           style={{ maxWidth: "700px", maxHeight: "650px", marginTop: "50px" }}
