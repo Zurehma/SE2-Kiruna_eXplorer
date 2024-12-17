@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import API from "../../../API";
-import "../../styles/DocumentChartStatic.css";
+import "../../styles/DocumentChartStatic.css"; // Ensure this path is correct
 import GraphUtils from "../../utils/graphUtils";
 import useWebSocket from "../../hooks/useWebSocket";
 import FilterAndLegendSidebar from "./FilterAndLegendSidebar";
 import DeleteLinkModal from "./deleteLinkModal";
-import { useLocation } from "react-router-dom";
+import Filters from "../Filters/Filters";
 
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
@@ -28,37 +28,25 @@ const DocumentChartStatic = (props) => {
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetch Document Types, Stakeholders, and Links
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [documentTypes, stakeholders, linksData, documents] = await Promise.all([
-          API.getDocumentTypes(),
-          API.getStakeholders(),
-          API.allExistingLinks(),
-          API.getDocuments(undefined, true),
-        ]);
-  
+    Promise.all([API.getDocumentTypes(), API.getStakeholders(), API.allExistingLinks()])
+      .then(([documentTypes, stakeholders, links]) => {
         setDocumentTypes(documentTypes);
         setStakeholders(stakeholders);
-  
-        // Convert all document IDs to strings for consistency
-        const validDocumentIds = new Set(documents.map(doc => String(doc.id)));
-  
-        const validLinks = linksData.filter(link => 
-          validDocumentIds.has(String(link.DocID1)) && validDocumentIds.has(String(link.DocID2))
-        );
-  
-        setLinks(validLinks);
-        setChartData(documents);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-  
-    fetchData();
+        setLinks(links);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
   }, []);
-  
-  
+
+  // Fetch Documents
+  useEffect(() => {
+    API.getDocuments(undefined, true)
+      .then((documents) => setChartData(documents))
+      .catch((error) => console.error("Error fetching data:", error))
+      .finally(() => setLoading(false));
+  }, []);
+  console.log(chartData);
 
   // States for handling deletion modal
   const [deleteLink, setDeleteLink] = useState(null);
@@ -176,7 +164,7 @@ const DocumentChartStatic = (props) => {
 
     // Initialize controlPointsRef.current for new links
     const linkPairCount = {};
-    links.forEach((link) => {
+    links.forEach((link, index) => {
       const pairKey = [link.DocID1, link.DocID2].sort().join("-");
 
       if (!controlPointsRef.current[link.linkID]) {
@@ -232,7 +220,7 @@ const DocumentChartStatic = (props) => {
       }
     });
 
-    // console.log("After initialization, controlPointsRef.current:", controlPointsRef.current);
+    console.log("After initialization, controlPointsRef.current:", controlPointsRef.current);
 
     // Update docCoordsRef.current with messageReceived
     if (messageReceived.messageType === "update-configuration") {
@@ -243,8 +231,8 @@ const DocumentChartStatic = (props) => {
         const nodes = messageReceived["nodes"];
         const connections = messageReceived["connections"];
 
-        // console.log("nodes: ", nodes);
-        // console.log("connections: ", connections);
+        console.log("nodes: ", nodes);
+        console.log("connections: ", connections);
 
         Object.entries(nodes).forEach(([nodeId, node]) => {
           if (docCoordsRef.current.hasOwnProperty(nodeId)) {
@@ -652,9 +640,9 @@ const DocumentChartStatic = (props) => {
     if (docId) {
       setSelectedDoc(docId);
     }
-  });
+  }, [location.search]); // Added dependency to avoid missing dependencies warning
 
-  //if selected document then highlight the document
+  // Highlight Selected Document
   useEffect(() => {
     if (selectedDoc) {
       const doc = chartData.find((d) => d.id === selectedDoc);
@@ -676,12 +664,17 @@ const DocumentChartStatic = (props) => {
         }
       }
     }
-  });
+  }, [selectedDoc, chartData]);
 
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
       {/* Sidebar component for the legend and the filters */}
-      <FilterAndLegendSidebar documentTypes={documentTypes} stakeholders={stakeholders} setDocuments={setChartData} onSetLoading={setLoading} />
+      <FilterAndLegendSidebar
+        documentTypes={documentTypes}
+        stakeholders={stakeholders}
+        setDocuments={setChartData}
+        onSetLoading={setLoading}
+      />
 
       {/* Modal component to confirm the deletion of a link */}
       <DeleteLinkModal
@@ -694,9 +687,25 @@ const DocumentChartStatic = (props) => {
       />
 
       <div className="graph-inner-wrapper">
-        <div id="image" style={{ width: "100%", height: "100%", position: "relative" }}>
-          <svg ref={svgRef} style={{ width: "100%", height: "100%" }}></svg>
-        </div>
+        {loading ? (
+          // Loading Spinner
+          <div className="d-flex align-items-center justify-content-center" style={{ height: "100%" }}>
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        ) : chartData.length === 0 ? (
+          // No Data Message
+          <div className="no-data-container d-flex flex-column align-items-center justify-content-center" style={{ height: "100%" }}>
+            <h3 className="text-muted">No Documents Available</h3>
+            <p className="text-muted">Please add some documents to see the chart.</p>
+          </div>
+        ) : (
+          // SVG Chart
+          <div id="image" style={{ width: "100%", height: "100%", position: "relative" }}>
+            <svg ref={svgRef} style={{ width: "100%", height: "100%" }}></svg>
+          </div>
+        )}
       </div>
     </div>
   );
