@@ -9,7 +9,6 @@ import GraphUtils from "../../utils/graphUtils";
 import useWebSocket from "../../hooks/useWebSocket";
 import FilterAndLegendSidebar from "./FilterAndLegendSidebar";
 import DeleteLinkModal from "./deleteLinkModal";
-import Filters from "../Filters/Filters";
 import { useLocation } from "react-router-dom";
 
 const DocumentChartStatic = (props) => {
@@ -30,20 +29,36 @@ const DocumentChartStatic = (props) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([API.getDocumentTypes(), API.getStakeholders(), API.allExistingLinks()])
-      .then(([documentTypes, stakeholders, links]) => {
+    const fetchData = async () => {
+      try {
+        const [documentTypes, stakeholders, linksData, documents] = await Promise.all([
+          API.getDocumentTypes(),
+          API.getStakeholders(),
+          API.allExistingLinks(),
+          API.getDocuments(undefined, true),
+        ]);
+  
         setDocumentTypes(documentTypes);
         setStakeholders(stakeholders);
-        setLinks(links);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
+  
+        // Convert all document IDs to strings for consistency
+        const validDocumentIds = new Set(documents.map(doc => String(doc.id)));
+  
+        const validLinks = linksData.filter(link => 
+          validDocumentIds.has(String(link.DocID1)) && validDocumentIds.has(String(link.DocID2))
+        );
+  
+        setLinks(validLinks);
+        setChartData(documents);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
   }, []);
-
-  useEffect(() => {
-    API.getDocuments(undefined, true)
-      .then((documents) => setChartData(documents))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+  
+  
 
   // States for handling deletion modal
   const [deleteLink, setDeleteLink] = useState(null);
@@ -161,7 +176,7 @@ const DocumentChartStatic = (props) => {
 
     // Initialize controlPointsRef.current for new links
     const linkPairCount = {};
-    links.forEach((link, index) => {
+    links.forEach((link) => {
       const pairKey = [link.DocID1, link.DocID2].sort().join("-");
 
       if (!controlPointsRef.current[link.linkID]) {
@@ -217,7 +232,7 @@ const DocumentChartStatic = (props) => {
       }
     });
 
-    console.log("After initialization, controlPointsRef.current:", controlPointsRef.current);
+    // console.log("After initialization, controlPointsRef.current:", controlPointsRef.current);
 
     // Update docCoordsRef.current with messageReceived
     if (messageReceived.messageType === "update-configuration") {
@@ -228,8 +243,8 @@ const DocumentChartStatic = (props) => {
         const nodes = messageReceived["nodes"];
         const connections = messageReceived["connections"];
 
-        console.log("nodes: ", nodes);
-        console.log("connections: ", connections);
+        // console.log("nodes: ", nodes);
+        // console.log("connections: ", connections);
 
         Object.entries(nodes).forEach(([nodeId, node]) => {
           if (docCoordsRef.current.hasOwnProperty(nodeId)) {
