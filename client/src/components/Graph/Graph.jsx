@@ -649,6 +649,13 @@ const DocumentChartStatic = (props) => {
         const selectedDocEl = docSelection.filter((d) => d.id === doc.id);
         if (!selectedDocEl.empty()) {
           selectedDocEl.select("foreignObject div").classed("highlighted", true);
+          // Remove highlight after 10 seconds
+          const timeout = setTimeout(() => {
+            selectedDocEl.select("foreignObject div").classed("highlighted", false);
+          }, 10000); // 10 seconds
+
+          // Clean up timeout on unmount or when `selectedDoc` changes
+          return () => clearTimeout(timeout);
         } else {
           svg.selectAll(".doc").select("foreignObject div").style("background", null).style("transform", "scale(1)").style("box-shadow", null);
         }
