@@ -12,7 +12,6 @@ import DeleteLinkModal from "./deleteLinkModal";
 import Filters from "../Filters/Filters";
 import { useLocation } from "react-router-dom";
 
-
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
   const docCoordsRef = useRef({});
@@ -200,7 +199,7 @@ const DocumentChartStatic = (props) => {
           const offsetMagnitude = offsetBaseMagnitude * (linkIndexForPair + 1);
 
           const rotationAngle = (Math.PI / 6) * linkIndexForPair;
-          const direction = (linkIndexForPair % 2 === 0) ? 1 : -1;
+          const direction = linkIndexForPair % 2 === 0 ? 1 : -1;
           const perpendicularAngle = angle + Math.PI / 2 + rotationAngle * direction;
 
           const offsetX = Math.cos(perpendicularAngle) * offsetMagnitude;
@@ -219,25 +218,33 @@ const DocumentChartStatic = (props) => {
     });
 
     console.log("After initialization, controlPointsRef.current:", controlPointsRef.current);
-    console.log(messageReceived);
 
     // Update docCoordsRef.current with messageReceived
     if (messageReceived.messageType === "update-configuration") {
       const nodes = messageReceived["nodes"];
       const connections = messageReceived["connections"];
 
-      console.log("nodes: ", nodes);
-      console.log("connections: ", connections);
+      if (messageReceived.messageType === "update-configuration") {
+        const nodes = messageReceived["nodes"];
+        const connections = messageReceived["connections"];
 
-      Object.entries(nodes).forEach(([nodeId, node]) => {
-        docCoordsRef.current[nodeId].x = cellWidth / 2 + node.x * cellWidth;
-        docCoordsRef.current[nodeId].y = cellHeight / 2 + node.y * cellHeight;
-      });
+        console.log("nodes: ", nodes);
+        console.log("connections: ", connections);
 
-      Object.entries(connections).forEach(([connectionId, connection]) => {
-        controlPointsRef.current[connectionId].x = connection.x * width;
-        controlPointsRef.current[connectionId].y = connection.y * height;
-      });
+        Object.entries(nodes).forEach(([nodeId, node]) => {
+          if (docCoordsRef.current.hasOwnProperty(nodeId)) {
+            docCoordsRef.current[nodeId].x = cellWidth / 2 + node.x * cellWidth;
+            docCoordsRef.current[nodeId].y = cellHeight / 2 + node.y * cellHeight;
+          }
+        });
+
+        Object.entries(connections).forEach(([connectionId, connection]) => {
+          if (controlPointsRef.current.hasOwnProperty(connectionId)) {
+            controlPointsRef.current[connectionId].x = connection.x * width;
+            controlPointsRef.current[connectionId].y = connection.y * height;
+          }
+        });
+      }
     }
 
     // Tooltip setup
@@ -340,8 +347,8 @@ const DocumentChartStatic = (props) => {
         // Calculate P1 = P2 so that the curve passes through (cx, cy) at t=0.5
         // Formula derived:
         // CP = (S + E)/8 + (3/4)*X  =>  X = [CP - (S+E)/8]*(4/3)
-        const Px = (cx - (startX + endX)/8) * (4/3);
-        const Py = (cy - (startY + endY)/8) * (4/3);
+        const Px = (cx - (startX + endX) / 8) * (4 / 3);
+        const Py = (cy - (startY + endY) / 8) * (4 / 3);
 
         let strokeStyle = "4,4";
         switch (d.type) {
@@ -428,7 +435,6 @@ const DocumentChartStatic = (props) => {
       })
       .on("mouseout", hideTooltip);
 
-
     if (props.role === "Urban Planner") {
       // Render control points
       const controlPointsGroup = g.append("g").attr("class", "control-points");
@@ -460,13 +466,14 @@ const DocumentChartStatic = (props) => {
         })
         .style("display", (d) => (controlPointsRef.current[d.linkID] ? "block" : "none"))
         .call(
-          d3.drag()
-            .on("start", function(event, d) {
+          d3
+            .drag()
+            .on("start", function (event, d) {
               g.selectAll(".link")
                 .filter((linkData) => linkData.linkID === d.linkID)
                 .classed("active-link", true);
             })
-            .on("drag", function(event, d) {
+            .on("drag", function (event, d) {
               let [mx, my] = d3.pointer(event, g.node());
 
               // Clamp the control point within the chart area
@@ -482,7 +489,7 @@ const DocumentChartStatic = (props) => {
 
               updateLinkPath(g.selectAll(".link"));
             })
-            .on("end", function(event, d) {
+            .on("end", function (event, d) {
               g.selectAll(".link")
                 .filter((linkData) => linkData.linkID === d.linkID)
                 .classed("active-link", false);
@@ -491,7 +498,7 @@ const DocumentChartStatic = (props) => {
                 messageType: "update-connection",
                 id: d.linkID,
                 x: controlPointsRef.current[d.linkID].x / width,
-                y: controlPointsRef.current[d.linkID].y / height
+                y: controlPointsRef.current[d.linkID].y / height,
               });
             })
         )
@@ -643,10 +650,7 @@ const DocumentChartStatic = (props) => {
         if (!selectedDocEl.empty()) {
           selectedDocEl.select("foreignObject div").classed("highlighted", true);
         } else {
-          svg.selectAll(".doc").select("foreignObject div")
-            .style("background", null)
-            .style("transform", "scale(1)")
-            .style("box-shadow", null);
+          svg.selectAll(".doc").select("foreignObject div").style("background", null).style("transform", "scale(1)").style("box-shadow", null);
         }
       }
     }

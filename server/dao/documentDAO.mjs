@@ -343,7 +343,7 @@ class DocumentDAO {
           WHEN docID1 = ? THEN docID2 
           ELSE docID1 
         END AS linkedDocID, 
-        title, l.type 
+        l.linkID, title, l.type 
       FROM LINK l
       JOIN DOCUMENT ON linkedDocID = id
       WHERE docID1 = ? OR docID2 = ?
@@ -354,6 +354,7 @@ class DocumentDAO {
         } else {
           const linkIDs = rows.map((row) => ({
             linkedDocID: row.linkedDocID,
+            linkID: row.linkID,
             title: row.title,
             type: row.type,
           }));
