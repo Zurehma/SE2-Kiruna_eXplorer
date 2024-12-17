@@ -19,8 +19,8 @@ const Login = ({
     e.preventDefault();
     const credentials = { username, password };
     await handleLogin(credentials);
-    closeLoginPane();
   };
+
   useEffect(() => {
     if (loggedinError) {
       const timer = setTimeout(() => {
