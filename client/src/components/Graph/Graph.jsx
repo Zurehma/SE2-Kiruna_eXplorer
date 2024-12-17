@@ -82,13 +82,51 @@ const DocumentChartStatic = (props) => {
 
     d3.select(svgRef.current).style("background", "linear-gradient(to bottom, #fafafa, #f0f0f0)");
 
-    const years = Array.from(new Set(chartData.map((d) => new Date(d.issuanceDate).getFullYear()))).sort((a, b) => a - b);
-    const scales = Array.from(new Set(["Text", ...chartData.map((d) => d.scale).filter((v, i, a) => a.indexOf(v) === i)]));
-    const yScales = scales.includes("Blueprint") ? scales : [...scales, "Blueprint"];
-    yScales.pop();
+    // === Updated Scales Setup ===
+
+    // 1. Normalize scale values: Map any scale containing "Blueprint" to "Blueprint"
+    const normalizeScale = (scale) => {
+      if (typeof scale === "string") {
+        if (scale.toLowerCase().includes("blueprint")) {
+          return "Blueprint";
+        }
+        return scale;
+      }
+      return scale; // Keep numeric scales as is
+    };
+
+    const normalizedScales = chartData.map((d) => normalizeScale(d.scale));
+
+    // 2. Create a Set to ensure unique scales, including "Text"
+    const scalesSet = new Set(["Text", ...normalizedScales]);
+    let scales = Array.from(scalesSet);
+
+    // 3. Ensure "Blueprint" is always the last element
+    if (scales.includes("Blueprint")) {
+      scales = scales.filter((scale) => scale !== "Blueprint");
+    }
+    scales.push("Blueprint");
+
+    const yScales = scales;
+
+    // 4. Define the yScale with the updated yScales array
+    const yScale = d3.scaleBand().domain(yScales).range([0, height]).padding(0.2);
+
+    // === End of Updated Scales Setup ===
+
+    // Prepare xScale based on unique years
+    const years = Array.from(
+      new Set(chartData.map((d) => {
+        const date = new Date(d.issuanceDate);
+        if (isNaN(date)) {
+          console.warn(`Invalid issuanceDate for document ID ${d.id}: ${d.issuanceDate}`);
+          return null; // Exclude invalid dates
+        }
+        return date.getFullYear();
+      }))
+    ).filter(year => year !== null).sort((a, b) => a - b);
 
     const xScale = d3.scaleBand().domain(years).range([0, width]).padding(0.1);
-    const yScale = d3.scaleBand().domain(yScales).range([0, height]).padding(0.2);
 
     const xAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
     const yAxis = d3
@@ -99,7 +137,10 @@ const DocumentChartStatic = (props) => {
     g.append("g").attr("transform", `translate(0, ${height})`).call(xAxis);
     g.append("g").call(yAxis);
 
-    g.selectAll("text").style("font-family", "'Inter', sans-serif").style("font-size", "14px").style("fill", "#000");
+    g.selectAll("text")
+      .style("font-family", "'Inter', sans-serif")
+      .style("font-size", "14px")
+      .style("fill", "#000");
 
     // Grid lines
     const cellWidth = xScale.bandwidth();
@@ -132,10 +173,16 @@ const DocumentChartStatic = (props) => {
     });
 
     function getCellCoords(doc) {
-      const year = new Date(doc.issuanceDate).getFullYear();
+      const date = new Date(doc.issuanceDate);
+      const year = date.getFullYear();
+      if (isNaN(year)) {
+        console.warn(`Invalid issuanceDate for document ID ${doc.id}: ${doc.issuanceDate}`);
+        return { cellX: null, cellY: null };
+      }
+      const normalizedScale = normalizeScale(doc.scale);
       return {
         cellX: xScale(year),
-        cellY: yScale(doc.scale),
+        cellY: yScale(normalizedScale),
       };
     }
 
@@ -588,7 +635,10 @@ const DocumentChartStatic = (props) => {
 
     docSelection.each(function (d) {
       const iconClass = GraphUtils.iconMap[d.type] || "bi-file-earmark";
-      const iconColor = d.stakeholders.map((stakeholder) => GraphUtils.colorNameToHex(stakeholder)).join(", ") || "black";
+      const iconColor =
+        d.stakeholders
+          .map((stakeholder) => GraphUtils.colorNameToHex(stakeholder))
+          .join(", ") || "black";
 
       d3.select(this)
         .append("foreignObject")
@@ -625,7 +675,12 @@ const DocumentChartStatic = (props) => {
       })
       .on("mouseout", function () {
         hideTooltip();
-        d3.select(this).select("foreignObject div").transition().duration(200).style("transform", "scale(1)").style("box-shadow", "none");
+        d3.select(this)
+          .select("foreignObject div")
+          .transition()
+          .duration(200)
+          .style("transform", "scale(1)")
+          .style("box-shadow", "none");
       });
   }, [chartData, links, stakeholders, props.role, messageReceived, isOpen]);
 
@@ -660,7 +715,12 @@ const DocumentChartStatic = (props) => {
           // Clean up timeout on unmount or when `selectedDoc` changes
           return () => clearTimeout(timeout);
         } else {
-          svg.selectAll(".doc").select("foreignObject div").style("background", null).style("transform", "scale(1)").style("box-shadow", null);
+          svg
+            .selectAll(".doc")
+            .select("foreignObject div")
+            .style("background", null)
+            .style("transform", "scale(1)")
+            .style("box-shadow", null);
         }
       }
     }
@@ -696,7 +756,10 @@ const DocumentChartStatic = (props) => {
           </div>
         ) : chartData.length === 0 ? (
           // No Data Message
-          <div className="no-data-container d-flex flex-column align-items-center justify-content-center" style={{ height: "100%" }}>
+          <div
+            className="no-data-container d-flex flex-column align-items-center justify-content-center"
+            style={{ height: "100%" }}
+          >
             <h3 className="text-muted">No Documents Available</h3>
             <p className="text-muted">Please add some documents to see the chart.</p>
           </div>
