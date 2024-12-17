@@ -166,7 +166,7 @@ function Links(props) {
           <Card.Body>
             <Card.Title className="links-card-title">ADD NEW CONNECTION</Card.Title>
             <div className="step-button">
-              <i class="bi bi-share-fill"></i>
+              <i className="bi bi-share-fill"></i>
               CONNECTION STEP
             </div>
 
