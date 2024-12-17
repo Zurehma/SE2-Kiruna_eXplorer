@@ -41,7 +41,6 @@ function MyPopup(props) {
     fetchData();
   }, [props.doc.id]);
 
-
   //Handle download of attachment
   const handleDownload = async (docID, attachmentID) => {
     try {

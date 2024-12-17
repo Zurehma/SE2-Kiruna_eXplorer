@@ -6,7 +6,7 @@ import { Button } from 'react-bootstrap';
 
 import API from '../../API';
 import { MyPopup } from './MyPopup.jsx'; 
-
+import updateDocument from './Filters/UpdateDocument.js';
 
 function SingleDocument(props) {
     const { id } = useParams();
@@ -18,7 +18,8 @@ function SingleDocument(props) {
         const getDocument = async () => {
             try{
                 const response = await API.getDocumentById(id);
-                setDocument(response);
+                const updated = updateDocument(response);
+                setDocument(updated);
             } catch (error) {
                props.setError(error);
             }finally{

@@ -9,7 +9,7 @@ import GraphUtils from "../../utils/graphUtils";
 import useWebSocket from "../../hooks/useWebSocket";
 import FilterAndLegendSidebar from "./FilterAndLegendSidebar";
 import DeleteLinkModal from "./deleteLinkModal";
-import Filters from "../Filters/Filters";
+import updateDocument from "../Filters/UpdateDocument";
 
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
@@ -42,11 +42,14 @@ const DocumentChartStatic = (props) => {
   // Fetch Documents
   useEffect(() => {
     API.getDocuments(undefined, true)
-      .then((documents) => setChartData(documents))
+      .then((documents) => {
+        const doc = documents.map(updateDocument);
+        setChartData(doc);
+      })
       .catch((error) => console.error("Error fetching data:", error))
       .finally(() => setLoading(false));
   }, []);
-  console.log(chartData);
+  
 
   // States for handling deletion modal
   const [deleteLink, setDeleteLink] = useState(null);
@@ -267,8 +270,6 @@ const DocumentChartStatic = (props) => {
       }
     });
 
-    console.log("After initialization, controlPointsRef.current:", controlPointsRef.current);
-
     // Update docCoordsRef.current with messageReceived
     if (messageReceived.messageType === "update-configuration") {
       const nodes = messageReceived["nodes"];
@@ -277,9 +278,6 @@ const DocumentChartStatic = (props) => {
       if (messageReceived.messageType === "update-configuration") {
         const nodes = messageReceived["nodes"];
         const connections = messageReceived["connections"];
-
-        console.log("nodes: ", nodes);
-        console.log("connections: ", connections);
 
         Object.entries(nodes).forEach(([nodeId, node]) => {
           if (docCoordsRef.current.hasOwnProperty(nodeId)) {
