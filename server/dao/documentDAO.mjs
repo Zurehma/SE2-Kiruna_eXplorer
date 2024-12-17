@@ -21,7 +21,7 @@ const mapRowsToDocument = (documentRows, stakeholderRows) => {
 };
 
 const getPagination = (pageNo, totalElements) => {
-  const PAGE_SIZE = 2;
+  const PAGE_SIZE = 5;
   const totalPages = Math.ceil(totalElements / PAGE_SIZE);
   const limit = PAGE_SIZE;
   const offset = pageNo >= totalPages ? PAGE_SIZE * (totalPages - 1) : PAGE_SIZE * (pageNo - 1);
@@ -71,30 +71,21 @@ class DocumentDAO {
     return new Promise((resolve, reject) => {
       (async () => {
         try {
-          const { title, description, type, stakeholder, issuanceDateFrom, issuanceDateTo } = queryParameters || {};
+          const { subtext, type, stakeholder, issuanceDateFrom, issuanceDateTo } = queryParameters || {};
           let query1 = "SELECT DISTINCT DOCUMENT.* FROM DOCUMENT";
           let query2 = "SELECT COUNT(DISTINCT DOCUMENT.id) AS total FROM DOCUMENT";
           let params = [];
           let conditions = [];
 
-          if (title) {
-            params.push(`%${title}%`);
-            conditions.push("DOCUMENT.title LIKE ?");
-          }
-
-          if (description) {
-            params.push(`%${description}%`);
-            conditions.push("DOCUMENT.description LIKE ?");
+          if (subtext) {
+            params.push(`%${subtext}%`);
+            params.push(`%${subtext}%`);
+            conditions.push("(DOCUMENT.title LIKE ? OR DOCUMENT.description LIKE ?)");
           }
 
           if (type) {
             params.push(type);
             conditions.push("DOCUMENT.type = ?");
-          }
-
-          if (stakeholder) {
-            params.push(stakeholder);
-            conditions.push("DOCUMENT_STAKEHOLDER.stakeholder = ?");
           }
 
           if (issuanceDateFrom) {
@@ -107,10 +98,15 @@ class DocumentDAO {
             conditions.push("DOCUMENT.issuanceDate <= ?");
           }
 
-          if (conditions.length > 0) {
+          if (stakeholder) {
+            params.push(stakeholder);
+            conditions.push("DOCUMENT_STAKEHOLDER.stakeholder = ?");
             query1 += " JOIN DOCUMENT_STAKEHOLDER ON DOCUMENT.id = DOCUMENT_STAKEHOLDER.docID";
-            query1 += " WHERE " + conditions.join(" AND ");
             query2 += " JOIN DOCUMENT_STAKEHOLDER ON DOCUMENT.id = DOCUMENT_STAKEHOLDER.docID";
+          }
+
+          if (conditions.length > 0) {
+            query1 += " WHERE " + conditions.join(" AND ");
             query2 += " WHERE " + conditions.join(" AND ");
           }
 
@@ -293,7 +289,7 @@ class DocumentDAO {
         }
       });
     });
-  }
+  };
 
   /**
    * Add a new stakeholder for an existing document
@@ -347,7 +343,7 @@ class DocumentDAO {
           WHEN docID1 = ? THEN docID2 
           ELSE docID1 
         END AS linkedDocID, 
-        title, l.type 
+        l.linkID, title, l.type 
       FROM LINK l
       JOIN DOCUMENT ON linkedDocID = id
       WHERE docID1 = ? OR docID2 = ?
@@ -358,6 +354,7 @@ class DocumentDAO {
         } else {
           const linkIDs = rows.map((row) => ({
             linkedDocID: row.linkedDocID,
+            linkID: row.linkID,
             title: row.title,
             type: row.type,
           }));
@@ -429,7 +426,7 @@ class DocumentDAO {
         }
       });
     });
-  }
+  };
 }
 
 export default DocumentDAO;

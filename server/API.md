@@ -66,8 +66,7 @@ Returns the list of all documents (if filters applied it returns the list of all
 
 - Request Parameters (optional):
 
-  - `title`: a substring that match the title.
-  - `description`: a substring that match the description.
+  - `subtext`: a substring that matches the title or the description.
   - `type`: a string that represent the type of the document.
   - `stakeholder`: a string that represent the stakeholder of the document.
   - `issuanceDateFrom`: a date that represent the starting date of the filtered document.

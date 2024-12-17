@@ -254,23 +254,16 @@ function Documents(props) {
 
   const handlePreviousStep = () => setStep((prev) => prev - 1);
 
-  // cambia in modo da poter avere o 1 o 1-34 o 1-34-45
   const validatePages = (value) => {
     if (!value) {
-      // Campo vuoto è accettato
       return true;
     }
-
-    // Espressione regolare per accettare un singolo numero o più numeri separati da trattini
-    const pagesRegex = /^(\d+)(\s*-\s*\d+)*$/;
-
+    // Espressione regolare per accettare un singolo numero o più numeri separati da trattini senza spazi
+    const pagesRegex = /^(\d+)(-\d+)*$/;
     if (pagesRegex.test(value)) {
-      // Input valido
       document.pages = value;
       return true;
     }
-
-    // Input non valido
     return false;
   };
 
@@ -352,7 +345,12 @@ function Documents(props) {
     // Rimuove solo quelli creati manualmente
     const removedNewOptions = removedOptions.filter((opt) => opt.isNew);
     if (removedNewOptions.length > 0) {
-      setStakeholdersList((prev) => prev.filter((stakeholders) => !removedNewOptions.some((removed) => removed.value === stakeholders.value)));
+      setStakeholdersList((prev) =>
+        prev.filter(
+          (stakeholders) =>
+            !removedNewOptions.some((removed) => removed.value === stakeholders.value)
+        )
+      );
     }
     // Aggiorna le opzioni selezionate
     setSelectedStakeholders(selectedOptions || []);

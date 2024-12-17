@@ -85,3 +85,19 @@ body {
 .nav-link:last-child {
   margin-right: 0;
 }
+
+.nav-link {
+  color: #006d77 !important; /* Colore verde */
+}
+
+.nav-link:hover {
+  color: #004f55 !important; /* Colore scuro quando hover */
+}
+
+.nav-link.active {
+  color: #006d77 !important; /* Colore verde per il link attivo */
+}
+
+.nav-link:focus {
+  color: #006d77 !important; /* Colore verde quando in focus */
+}

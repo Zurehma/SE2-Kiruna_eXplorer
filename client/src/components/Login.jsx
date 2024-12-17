@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SlidingPane from "react-sliding-pane";
 import "react-sliding-pane/dist/react-sliding-pane.css";
 import "../styles/Login.css";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Alert } from "react-bootstrap";
 
 const Login = ({
   isLoginOpen,
@@ -12,13 +12,24 @@ const Login = ({
   setUsername,
   setPassword,
   handleLogin,
+  loggedinError,
+  setloggedinError,
 }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const credentials = { username, password };
     await handleLogin(credentials);
+    onSuccess();
     closeLoginPane();
   };
+  useEffect(() => {
+    if (loggedinError) {
+      const timer = setTimeout(() => {
+        setloggedinError(null); // Clear the error after 5 seconds
+      }, 5000);
+      return () => clearTimeout(timer); // Cleanup timer on component unmount
+    }
+  }, [loggedinError, setloggedinError]);
 
   return (
     <SlidingPane
@@ -56,6 +67,15 @@ const Login = ({
         <Button className="login-button" type="submit">
           Login
         </Button>
+        {loggedinError && (
+          <div className="error-message d-flex align-items-center mb-3 p-2 bg-danger bg-opacity-10 border border-danger rounded">
+            <i
+              className="bi bi-exclamation-triangle-fill text-danger me-2"
+              style={{ fontSize: "1.5rem" }}
+            ></i>
+            <span className="text-danger">{loggedinError}</span>
+          </div>
+        )}
       </Form>
     </SlidingPane>
   );

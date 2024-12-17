@@ -99,3 +99,52 @@
     font-size: 13px;
   }
 }
+/* DocumentChartStatic.css */
+
+.sidebar-toggle-btn {
+  position:fixed;
+  bottom: 0%;
+  margin-top: 1cm;
+  left: 10px;
+  z-index: 111; /* Ensure it's above other elements */
+}
+
+/* Adjust Offcanvas width for better visibility */
+.offcanvas-start {
+  width: 300px; /* Adjust as needed */
+}
+
+/* Optional: Style the Advanced Filters accordion header */
+.offcanvas-body .accordion-button {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+/* Optional: Add spacing within the Advanced Filters */
+.offcanvas-body .form-group {
+  margin-bottom: 1rem;
+}
+
+.active-link {
+  stroke: #8f2e11 ; /* Choose a distinct color */
+  stroke-width: 1.5 ; /* Optionally increase stroke width */
+  stroke-dasharray: 0 ; /* Remove dash pattern if any */
+}
+
+/* Control Point Hover */
+.control-point.hovered {
+  fill: red; /* Hover color */
+}
+
+/* Link Hover */
+.link.hovered {
+  stroke: #8f2e11; /* Highlight color */
+  stroke-width: 2px; /* Optional: make the link more prominent */
+}
+
+/* Documented highlighted */
+.highlighted {
+  background: yellow; /* Highlight color */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Add shadow */
+  transition: all 0.2s ease-in-out; /* Smooth transition for changes */
+}

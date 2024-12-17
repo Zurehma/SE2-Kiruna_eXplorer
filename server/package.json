@@ -4,7 +4,7 @@
   "description": "projectSEII",
   "main": "index.js",
   "scripts": {
-    "start": "set NODE_ENV=development && nodemon index.mjs",
+    "start": "set NODE_ENV=development && nodemon --ignore 'ws/GraphConfig.json' --ignore 'uploads/' index.mjs",
     "test": "set NODE_ENV=test && node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage  --detectOpenHandles --forceExit",
     "test_unit": "set NODE_ENV=test && node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage  --detectOpenHandles --forceExit testPathPattern=test_unit",
     "test_integration": "set NODE_ENV=test && node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage  --detectOpenHandles --forceExit testPathPattern=test_integration"
@@ -26,7 +26,8 @@
     "officemanagement": "file:",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",

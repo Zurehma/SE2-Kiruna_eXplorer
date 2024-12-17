@@ -15,6 +15,12 @@ html {
   padding: 0;
   overflow-y: auto;
 }
+.dropdown-force-down {
+  transform: none !important;
+  top: 100% !important;
+  bottom: auto !important;
+  will-change: auto !important;
+}
 
 .links-card-title {
   font-size: 1.8rem;
@@ -55,6 +61,23 @@ html {
     font-size: 1.5rem;
   }
 }
+
+@media (max-width: 576px) {
+  .links-background {
+    padding: 1rem; /* Riduce il padding per schermi molto piccoli */
+  }
+  .cd-body {
+    margin: auto 1rem; /* Riduce il margine per schermi molto piccoli */
+  }
+  .form-select {
+    display: inline-block;
+    max-width: 100%; /* Assicura che non superi il contenitore */
+    overflow: hidden; /* Nasconde il testo che supera il limite */
+    text-overflow: ellipsis; /* Aggiunge i puntini di sospensione */
+    white-space: nowrap; /* Impedisce al testo di andare a capo */
+  }
+}
+
 /* Applica gli stili SOLO all'interno del container con classe "links-container" */
 .links-container .dropdown-toggle {
   background-color: #ffffff !important;
@@ -66,9 +89,14 @@ html {
 
 .links-container .dropdown-menu {
   width: 100% !important; /* La larghezza del menu sarà uguale al contenitore */
+  max-width: 100%; /* Impedisce al menu di uscire dal contenitore */
+  white-space: normal; /* Permette al testo di andare a capo */
+  overflow-wrap: break-word;
   background-color: #f0f0f0 !important;
   border-radius: 5px !important;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra per maggiore contrasto */
+  max-height: 250px; /* Limita l'altezza del dropdown */
+  overflow-y: auto; /* Abilita lo scroll verticale se necessario */
 }
 
 .links-container .dropdown-item {
@@ -84,6 +112,20 @@ html {
 
 .links-container .form-select::after {
   display: none !important; /* Rimuove la freccia del dropdown */
+}
+
+.input-multi {
+  border-radius: 5px;
+  border: 1px solid #006d77;
+  padding: 0.75rem;
+  transition: all 0.2s ease-in-out;
+  font-size: 1rem; /* Assicura una buona leggibilità */
+}
+
+.input:focus,
+select:focus {
+  border-color: #006d77;
+  box-shadow: 0 0 5px rgba(0, 109, 119, 0.5);
 }
 
 /* stile per icona */

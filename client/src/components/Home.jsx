@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/Home.css";
 import { useNavigate } from "react-router-dom";
-import { Col, Row } from "react-bootstrap";
+import { Col, Row, Alert } from "react-bootstrap";
 import { useLocation } from "react-router";
 import { useState, useEffect } from "react";
 import Login from "./Login";
@@ -17,10 +17,15 @@ const Home = ({
   toggleLoginPane,
   isLoginOpen,
   closeLoginPane,
+  loggedinError,
+  setloggedinError,
   isAddUserOpen,
   closeAddUserPane,
+  showLoginMessage,
 }) => {
   const navigate = useNavigate();
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
   const scrollToContent = () => {
     const section = document.getElementById("content-section");
     if (section) {
@@ -31,8 +36,29 @@ const Home = ({
     }
   };
 
+  const handleUserCreated = () => {
+    setShowSuccessMessage(true);
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 5000);
+  };
+
   return (
     <div className="homepage">
+      {showSuccessMessage && (
+        <div className="alert-overlay">
+          <Alert variant="success" className="fixed-success-alert">
+            User created successfully!
+          </Alert>
+        </div>
+      )}
+      {showLoginMessage && (
+        <div className="alert-overlay">
+          <Alert variant="success" className="fixed-success-alert">
+            Login successfully!
+          </Alert>
+        </div>
+      )}
       {/* Parte superiore con immagine di sfondo */}
       <div className="background-section">
         <Row className="button-row">
@@ -48,7 +74,7 @@ const Home = ({
             <button onClick={() => navigate("/graph")} className="styled-button">
               View Diagram
               <span className="button-icon">
-                <i class="bi bi-bezier"></i>{" "}
+                <i className="bi bi-bezier"></i>{" "}
               </span>
             </button>
           </Col>
@@ -63,7 +89,6 @@ const Home = ({
           </Col>
         </Row>
       </div>
-
       {/* Login */}
       <Login
         username={username}
@@ -74,17 +99,17 @@ const Home = ({
         toggleLoginPane={toggleLoginPane}
         isLoginOpen={isLoginOpen}
         closeLoginPane={closeLoginPane}
+        loggedinError={loggedinError}
+        setloggedinError={setloggedinError}
       />
-
-      {/* Registrazione  RICORDATI DI CAMBIARE !== CON ===*/}
-      {role !== "admin" && (
+      {role === "admin" && (
         <UserForm
           toggleLoginPane={toggleLoginPane}
           isAddUserOpen={isAddUserOpen}
           closeAddUserPane={closeAddUserPane}
+          onUserCreated={handleUserCreated}
         />
       )}
-
       {/* Altre informazioni */}
       <div id="content-section" className="image-text-section">
         <div className="info-block">
@@ -118,7 +143,6 @@ const Home = ({
           </div>
         </div>
       </div>
-
       {/* Footer */}
       <footer className="footer">
         <div className="footer-content">

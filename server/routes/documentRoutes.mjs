@@ -26,8 +26,7 @@ class DocumentRoutes {
     this.router.get(
       "/",
       query("pageNo").optional().isInt({ gt: 0 }),
-      query("title").optional().isString().withMessage("Type must be a string"),
-      query("description").optional().isString().withMessage("Type must be a string"),
+      query("subtext").optional().isString().withMessage("Type must be a string"),
       query("type").optional().isString().withMessage("Type must be a string"),
       query("stakeholder").optional().isString().withMessage("Stakeholder must be a string"),
       query("issuanceDateFrom").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
@@ -35,15 +34,7 @@ class DocumentRoutes {
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
-          .getDocuments(
-            req.query.pageNo,
-            req.query.title,
-            req.query.description,
-            req.query.type,
-            req.query.stakeholder,
-            req.query.issuanceDateFrom,
-            req.query.issuanceDateTo
-          )
+          .getDocuments(req.query.pageNo, req.query.subtext, req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo)
           .then((document) => res.status(200).json(document))
           .catch((err) => next(err));
       }
@@ -212,8 +203,7 @@ class DocumentRoutes {
         .deleteLink(Number(req.params.linkID))
         .then(() => res.status(204).end())
         .catch((err) => next(err));
-    }
-  );
+    });
   };
 }
 

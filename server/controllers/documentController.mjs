@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import DocumentDAO from "../dao/documentDAO.mjs";
 import Document from "../models/document.mjs";
 import Utility from "../utils/utility.mjs";
+import GraphConfig from "../ws/graphConfig.mjs";
 
 class DocumentController {
   constructor() {
@@ -28,11 +29,11 @@ class DocumentController {
     });
   };
 
-  getDocuments = (pageNo, title, description, type, stakeholder, issuanceDateFrom, issuanceDateTo) => {
+  getDocuments = (pageNo, subtext, type, stakeholder, issuanceDateFrom, issuanceDateTo) => {
     return new Promise((resolve, reject) => {
       const fetchDocuments = async () => {
         try {
-          let queryParameters = { title, description, type, stakeholder, issuanceDateFrom, issuanceDateTo };
+          let queryParameters = { subtext, type, stakeholder, issuanceDateFrom, issuanceDateTo };
           const documents = await this.documentDAO.getDocuments(pageNo ? Number(pageNo) : 1, queryParameters);
           resolve(documents);
         } catch (err) {
@@ -164,6 +165,10 @@ class DocumentController {
             await this.documentDAO.addStakeholder(id, stakeholder);
           }
 
+          if (oldDocument.scale !== scale || oldDocument.issuanceDate !== issuanceDate) {
+            await GraphConfig.removeGraphConfiguration(GraphConfig.ELEMENT_TYPES.nodes, id);
+          }
+
           resolve(null);
         } catch (err) {
           reject(err);
@@ -177,11 +182,20 @@ class DocumentController {
     return new Promise((resolve, reject) => {
       const deleteDocument = async () => {
         try {
+          const links = await this.documentDAO.getLinks(id);
           let deletedDoc = await this.documentDAO.deleteDocument(id);
+
           if (deletedDoc === 0) {
             const error = { errCode: 404, errMessage: "Document not found!" };
             throw error;
           }
+
+          await GraphConfig.removeGraphConfiguration(GraphConfig.ELEMENT_TYPES.nodes, id);
+
+          for (let link of links) {
+            await GraphConfig.removeGraphConfiguration(GraphConfig.ELEMENT_TYPES.connections, link.linkID);
+          }
+
           resolve(null);
         } catch (err) {
           reject(err);
@@ -189,7 +203,7 @@ class DocumentController {
       };
       deleteDocument();
     });
-  }
+  };
 
   /**
    * Get the list of already available document types
@@ -295,10 +309,14 @@ class DocumentController {
       const deleteLink = async () => {
         try {
           let deletedLink = await this.documentDAO.deleteLink(linkID);
+
           if (deletedLink === 0) {
             const error = { errCode: 404, errMessage: "Link not found!" };
             throw error;
           }
+
+          await GraphConfig.removeGraphConfiguration(GraphConfig.ELEMENT_TYPES.connections, linkID);
+
           resolve(null);
         } catch (err) {
           reject(err);
@@ -306,7 +324,7 @@ class DocumentController {
       };
       deleteLink();
     });
-  }
+  };
 }
 
 export default DocumentController;

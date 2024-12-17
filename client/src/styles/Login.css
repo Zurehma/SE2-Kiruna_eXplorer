@@ -11,11 +11,12 @@
   gap: 30px;
   width: 100%;
   max-width: 400px;
-  padding: 20px;
+  padding: 10px;
   background-color: #ffffff;
+  margin-top: 5%;
+  padding: 20px;
   margin-top: 45%;
   border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Titolo del form */

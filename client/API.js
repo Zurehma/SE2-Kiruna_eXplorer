@@ -21,13 +21,13 @@ const getDocuments = async (filters = undefined, all = false) => {
 
   if (filters) {
     const queryParams = new URLSearchParams();
-
     if (filters.type) queryParams.append("type", filters.type);
     if (filters.stakeholder) queryParams.append("stakeholder", filters.stakeholder);
     if (filters.issuanceDateFrom) queryParams.append("issuanceDateFrom", filters.issuanceDateFrom);
     if (filters.issuanceDateTo) queryParams.append("issuanceDateTo", filters.issuanceDateTo);
     if (filters.pageNo) queryParams.append("pageNo", filters.pageNo);
-
+    //Add the filtering by title and description
+    if (filters.searchQuery) queryParams.append("subtext", filters.searchQuery);
     const queryString = queryParams.toString();
     nextURI += `?${queryString}`;
   }
@@ -147,9 +147,12 @@ const getAttachments = async (docID) => {
 const downloadAttachment = async (docID, attachmentID) => {
   try {
     // EFetch request to the server
-    const response = await fetch(`${SERVER_URL}/api/documents/${docID}/attachments/${attachmentID}/download`, {
-      method: "GET",
-    });
+    const response = await fetch(
+      `${SERVER_URL}/api/documents/${docID}/attachments/${attachmentID}/download`,
+      {
+        method: "GET",
+      }
+    );
 
     // 200 if the response is correct
     if (!response.ok) {
@@ -185,6 +188,28 @@ const setLink = async (linkData) => {
     return handleInvalidResponse(response).json();
   } catch (error) {
     console.error("Error setting link:", error);
+    throw error;
+  }
+};
+
+/**
+ * This function sign in a user given the information.
+ */
+const signIn = async (newUser) => {
+  try {
+    console.log("newUser", newUser);
+    const response = await fetch(SERVER_URL + "/api/sessions/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // Invia i cookie, incluso quello di sessione
+      body: JSON.stringify(newUser), // Invia i dati del nuovo utente
+    });
+
+    return handleInvalidResponse(response);
+  } catch (error) {
+    console.error("Error registering user:", error);
     throw error;
   }
 };
@@ -349,6 +374,25 @@ const allExistingLinks = async () => {
     .then((response) => response.json());
 };
 
+const deleteLink = async (linkID) => {
+  try {
+    const response = await fetch(`${SERVER_URL}/api/documents/link/${linkID}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to delete the link.");
+    }
+
+    return;
+  } catch (error) {
+    console.error("Error deleting link:", error);
+    throw error;
+  }
+};
+
 //Export API methods
 const API = {
   getStakeholders,
@@ -371,6 +415,8 @@ const API = {
   updateDocument,
   allExistingLinks,
   deleteDocument,
+  deleteLink,
+  signIn,
 };
 
 export default API;

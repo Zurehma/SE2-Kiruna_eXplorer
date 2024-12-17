@@ -15,11 +15,9 @@ import FilteringDocuments from "./components/FilteringDocuments.jsx";
 import AccessDenied from "./components/AccessDenied.jsx";
 import NotFound from "./components/NotFound.jsx";
 import { SingleDocument } from "./components/SingleDocument.jsx";
-import MapForm from "./components/MapForm/MapForm.jsx";
 import DocumentChartStatic from "./components/Graph/Graph.jsx";
 
 function App() {
-  //const [currentUser, setCurrentUser] = useState(""); //BOH
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -32,6 +30,15 @@ function App() {
   const [logging, setLogging] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
+
+
+  const handleLoginSuccess = () => {
+    setShowLoginMessage(true);
+    setTimeout(() => {
+      setShowLoginMessage(false);
+    }, 5000);
+  };
 
   const toggleLoginPane = () => {
     setIsLoginOpen((prev) => !prev);
@@ -52,21 +59,17 @@ function App() {
   const handleLogin = async (credentials) => {
     try {
       const response = await API.logIn(credentials);
-
       if (!response.ok) {
         throw new Error("Login failed. Please check your credentials.");
       }
-
       const user = await API.getUserInfo();
-      //setCurrentUser(user);
       setLoggedIn(true);
       setRole(user.role);
-      setIsLoginOpen(false); // Chiude la finestra di login
-
-      // Redirect to home and close the login pane
-      // navigate("/", { state: { openLogin: false } });
+      handleLoginSuccess();
+      setIsLoginOpen(false);
+      setloggedinError(null);
     } catch (error) {
-      setloggedinError(error.message || "Login failed. Please check your credentials.");
+      setloggedinError("Login failed. Please check your credentials.");
     }
   };
 
@@ -77,7 +80,6 @@ function App() {
         // Check if the user is already logged in
         const user = await API.getUserInfo();
         setUsername(user.username);
-        //setCurrentUser(user);
         setLoggedIn(true);
         setRole(user.role);
       } catch (error) {
@@ -94,14 +96,13 @@ function App() {
     await API.logOut();
     setLoggedIn(false);
     setUsername("");
-    //setCurrentUser("");
     navigate("/");
     setRole("");
   };
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
-        setloggedinError(null); // Clear the error after 5 seconds
+        setError(null); // Clear the error after 5 seconds
       }, 3000);
       return () => clearTimeout(timer); // Cleanup timer on component unmount
     }
@@ -130,7 +131,7 @@ function App() {
             dismissible
             onClose={() => setError(null)}
           >
-            <p>{error.message}</p>
+            <p>{error}</p>
           </Alert>
         )}
         <Routes>
@@ -154,6 +155,9 @@ function App() {
                 toggleAddUserPane={toggleAddUserPane}
                 isAddUserOpen={isAddUserOpen}
                 closeAddUserPane={closeAddUserPane}
+                setShowLoginMessage={setShowLoginMessage}
+                showLoginMessage={showLoginMessage}
+                handleLoginSuccess={handleLoginSuccess}
               />
             }
           />
@@ -206,7 +210,7 @@ function App() {
             }
           />
           <Route path="*" element={<NotFound />} />
-          <Route path="graph" element={<DocumentChartStatic role={role} />} />
+          <Route path="graph" element={<DocumentChartStatic role={role} loggedIn={loggedIn} />} />
         </Routes>
       </Container>
     </div>

@@ -10,7 +10,7 @@
 }
 
 .popupProp {
-    min-width: 140vh;
+    min-width: 100vh;
 }
 .dropStyle{
     color:black;
@@ -37,22 +37,20 @@
     width: 100%;
 }
 
-.action-button {
-    border:none;
-    width: 2.5rem;
-    height: 2.5rem;
+.icon-button {
+    border: none;
+    background: none;
+    padding: 0;
+    color: black;
+    font-size: 1rem; 
 }
-  
-.action-icon {
+
+.icon-button:hover, .icon-button:focus {
+    color: #006d77; 
+    outline: none;
     font-size: 1.5rem;
 }
-.action-button:hover {
-    transform: none; 
-    width: 2.5rem; 
-    height: 2.5rem; 
-    background-color:none;
-}
-  
+ 
 
 .leaflet-popup-content-wrapper {
     width: 100%;
@@ -365,4 +363,12 @@ button.myDropdownDocuments:focus {
 
 button.myDropdownDocuments {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.showDiagram{
+    margin-left: 12px;
+}
+
+.showMap{
+    margin-left: 9px;
 }
