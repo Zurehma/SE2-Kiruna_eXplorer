@@ -97,7 +97,11 @@ function MapNavigation(props) {
         const docId = parseInt(searchParams.get('id'));
         if (docId) {
             setSelectedDoc(data.find(doc => doc.id === docId));
-            setSelectedAreas(data.filter(doc => doc.id === docId).map(doc => ({ docId: doc.id, area: doc.area, lowestPoint: doc.area[0] })));
+            const doc = data.find(doc => doc.id === docId);
+            // If the document has an area, add it to selectedAreas
+            if (doc?.area) {
+                handleMarkerClick(doc);
+            }
         }
     },[location.search,data]);
 
