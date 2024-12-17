@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Button, Container, Card, Row, Col } from "react-bootstrap";
+import { Form, Button, Container, Card, Row, Col, Alert } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../../../API.js";
 import "../../styles/Documents.css";
@@ -24,6 +24,7 @@ function Documents(props) {
   const [stakeholdersList, setStakeholdersList] = useState([]);
   const [selectedStakeholders, setSelectedStakeholders] = useState([]);
   const [position, setPosition] = useState({ type: null, coordinates: null, name: null });
+  const [error, setError] = useState(null);
 
   const [document, setDocument] = useState({
     title: "",
@@ -129,7 +130,7 @@ function Documents(props) {
       }
     } catch (error) {
       console.error("Error fetching document:", error);
-      props.setError(error);
+      setError("Error fetching document");
     }
   };
 
@@ -138,7 +139,7 @@ function Documents(props) {
       const attachments = await API.getAttachments(documentId);
       setExistingAttachments(attachments);
     } catch (error) {
-      props.setError(error);
+      setError("Error fetching document");
     }
   };
 
@@ -281,7 +282,7 @@ function Documents(props) {
         try {
           await API.uploadFiles(doc.id, formData);
         } catch (error) {
-          props.setError(error);
+          setError("Error saving document:");
         }
       });
     }
@@ -315,7 +316,7 @@ function Documents(props) {
             await API.deleteAttachment(id, attachmentId);
           } catch (error) {
             console.error("Error deleting attachment:", error);
-            props.setError(error);
+            setError("Error deleting attachment");
           }
         });
         resetState();
@@ -330,7 +331,7 @@ function Documents(props) {
       }
     } catch (error) {
       console.error("Error saving document:", error);
-      props.setError(error);
+      setError("Error saving document:");
     }
   };
 
@@ -380,6 +381,17 @@ function Documents(props) {
   return (
     <div className="documents-background">
       <Container className="d-flex align-items-center justify-content-center min-vh-100">
+        {error && (
+          <Alert
+            variant="danger"
+            className="fixed-top mt-3"
+            style={{ zIndex: 150000000000 }}
+            dismissible
+            onClose={() => setError(null)}
+          >
+            <p>{error}</p>
+          </Alert>
+        )}
         <Card className="p-4 shadow-lg w-100" style={{ maxWidth: "700px" }}>
           <Card.Body>
             <Card.Title className="mb-4 text-center">
