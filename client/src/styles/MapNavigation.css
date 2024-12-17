@@ -365,10 +365,26 @@ button.myDropdownDocuments {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
-.showDiagram{
-    margin-left: 12px;
-}
-
-.showMap{
-    margin-left: 9px;
-}
+.link {
+    text-decoration: none;
+    color: #006d77;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+  .link.showDiagram {
+    margin-left: -10px;
+    color: #006d77;
+  }
+  
+  .link.viewOnMap {
+    margin-left: -5px;
+    color: #006d77;
+  }
+  
+  .link i {
+    color: #006d77;
+    margin-right: 5px; /* Ensures spacing between the icon and text */
+  }
+  

@@ -254,22 +254,51 @@ function MyPopup(props) {
           </Col>
         </Row>
       </Col>)}
+
           {/* Add Show on Diagram Button */}
           <Col xs={12} className="mt-1 d-flex">
             {isOnMap ? (
-              <Button size="sm" variant="secondary" className="shadow-sm showDiagram" onClick={handleShowOnDiagram}>
-              Show on Diagram
-            </Button>
+              <>
+                <a 
+                  href="#" 
+                  className="link me-1" 
+                  onClick={(e) => {
+                    e.preventDefault(); 
+                    handleShowOnDiagram();
+                  }}
+                >
+                  <i className="bi bi-bezier"></i>
+                  View on Diagram
+                </a>
+              </>
             ) : (
               <>
-              <Button size="sm" variant="secondary" className="shadow-sm" onClick={handleShowOnDiagram}>
-                Show on Diagram
-              </Button>
-              {/* Add show on map button */}
-              <Button size="sm" variant="secondary" className="shadow-sm showMap" onClick={handleShowOnMap}>
-                Show on Map
-              </Button>
-              </>
+                {/* Diagram Link with Icon */}
+                <a 
+                  href="#" 
+                  className="link showDiagram me-3" 
+                  onClick={(e) => {
+                    e.preventDefault(); 
+                    handleShowOnDiagram();
+                  }}
+                >
+                  <i className="bi bi-bezier"></i>
+                  View on Diagram
+                </a>
+          
+                {/* Map Link with Icon */}
+                <a 
+                  href="#" 
+                  className="link viewOnMap" 
+                  onClick={(e) => {
+                    e.preventDefault(); 
+                    handleShowOnMap();
+                  }}
+                >
+                  <i className="bi bi-geo-alt"></i>
+                  View on Map
+                </a>
+            </>
             )}
         </Col>
     </Row>
