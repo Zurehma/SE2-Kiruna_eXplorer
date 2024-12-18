@@ -87,8 +87,8 @@ sections:
   - Strategy adopted: 
     - We aimed to fix all issues that were giving a C rating in SonarQube.
     - We added more tasks for code review and code cleanup and allocated individual tasks for technical debt management in the sprint.
-  - Total hours estimated estimated: 2h
-  - Total hours spent: 2h
+  - Total hours estimated estimated: 4h
+  - Total hours spent: 4h
   
 
 
