@@ -149,12 +149,12 @@ describe("DocumentController", () => {
     });
 
     test("Document added successfully", async () => {
-      const exampleAddResult = { lastID: 12, changes: 1 };
+      const exampleAddResult = { changes: 1, lastID: 12 };
       const exampleDocumentData = {
         title: "title",
         stakeholders: ["stakeholder", "stakeholder2"],
         scale: 100,
-        issuanceDate: "2016-02-12",
+        issuanceDate: "2016-06-22",
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
@@ -181,9 +181,11 @@ describe("DocumentController", () => {
       documentDAO.addStakeholder = jest.fn().mockResolvedValueOnce();
       documentDAO.getDocumentByID = jest.fn().mockResolvedValueOnce(exampleDocument);
 
+      console.log(Array.isArray(exampleDocumentData.stakeholders));
+
       const result = await documentController.addDocument(
         exampleDocumentData.title,
-        exampleDocumentData.stakeholders,
+        exampleDocumentData.stakeholders, 
         exampleDocumentData.scale,
         exampleDocumentData.issuanceDate,
         exampleDocumentData.type,

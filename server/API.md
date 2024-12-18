@@ -505,3 +505,7 @@ Start the download of a specific attachment.
 - Urban Planner:
   - Username: johndoe
   - Password: password
+
+- Admin
+  - Username: admin
+  - Password: password
