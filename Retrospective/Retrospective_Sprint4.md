@@ -97,8 +97,10 @@ sections:
 - What lessons did you learn (both positive and negative) in this sprint?
 
 - Which improvement goals set in the previous retrospective were you able to achieve? 
+  - We had aimed to refine the details of our application to improve functionality and make it more aesthetically pleasing. We were able to achieve this goal!
   
 - Which ones you were not able to achieve? Why?
+  - We were able to achieve the goals set out
 
 - Improvement goals for the next sprint and how to achieve them (technical tasks, team coordination, etc.)
 
