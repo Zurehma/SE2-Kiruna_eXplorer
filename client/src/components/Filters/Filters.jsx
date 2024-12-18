@@ -6,8 +6,6 @@ import { format } from "date-fns";
 import API from "../../../API";
 import updateDocument from "./UpdateDocument";
 
-
-
 function Filters(props) {
   const { showDateFilters = true } = props;
   const [stakeholder, setStakeholder] = useState(
@@ -60,7 +58,7 @@ function Filters(props) {
           ? props.currentPage
           : undefined;
       const all = props.currentPage !== null && props.currentPage !== undefined ? false : true;
-      
+
       const paginatedFilters = { ...filteredParams, pageNo: currentPage + 1 };
       let response = await API.getDocuments(paginatedFilters, all);
 
@@ -123,8 +121,7 @@ function Filters(props) {
       <Card.Body>
         <Form.Group controlId="sidebarFilterStakeholder" className="mt-3">
           <Form.Label>Stakeholder</Form.Label>
-          <Form.Control
-            as="select"
+          <Form.Select
             value={stakeholder}
             onChange={(e) => {
               setStakeholder(e.target.value);
@@ -140,14 +137,13 @@ function Filters(props) {
                 {stakeholderItem.name}
               </option>
             ))}
-          </Form.Control>
+          </Form.Select>
         </Form.Group>
 
         {/* Document Type Dropdown */}
         <Form.Group controlId="sidebarFilterDocumentType" className="mt-3">
           <Form.Label>Document Type</Form.Label>
-          <Form.Control
-            as="select"
+          <Form.Select
             value={documentType}
             onChange={(e) => {
               setDocumentType(e.target.value);
@@ -163,7 +159,7 @@ function Filters(props) {
                 {typeItem.name}
               </option>
             ))}
-          </Form.Control>
+          </Form.Select>
         </Form.Group>
 
         {showDateFilters && (
