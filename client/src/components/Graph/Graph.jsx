@@ -8,7 +8,7 @@ import "../../styles/DocumentChartStatic.css"; // Ensure this path is correct
 import GraphUtils from "../../utils/graphUtils";
 import useWebSocket from "../../hooks/useWebSocket";
 import FilterAndLegendSidebar from "./FilterAndLegendSidebar";
-import DeleteLinkModal from "./deleteLinkModal";
+import DeleteLinkModal from "./DeleteLinkModal";
 import updateDocument from "../Filters/UpdateDocument";
 
 const DocumentChartStatic = (props) => {
@@ -49,7 +49,6 @@ const DocumentChartStatic = (props) => {
       .catch((error) => console.error("Error fetching data:", error))
       .finally(() => setLoading(false));
   }, []);
-  
 
   // States for handling deletion modal
   const [deleteLink, setDeleteLink] = useState(null);
@@ -144,10 +143,7 @@ const DocumentChartStatic = (props) => {
     g.append("g").attr("transform", `translate(0, ${height})`).call(xAxis);
     g.append("g").call(yAxis);
 
-    g.selectAll("text")
-      .style("font-family", "'Inter', sans-serif")
-      .style("font-size", "14px")
-      .style("fill", "#000");
+    g.selectAll("text").style("font-family", "'Inter', sans-serif").style("font-size", "14px").style("fill", "#000");
 
     // Grid lines
     const cellWidth = xScale.bandwidth();
@@ -193,7 +189,6 @@ const DocumentChartStatic = (props) => {
       };
     }
 
-
     // Initialize docCoordsRef.current
     docCoordsRef.current = {}; // Reset before setting
 
@@ -215,7 +210,7 @@ const DocumentChartStatic = (props) => {
 
     // Assign positions with offsets
     Object.entries(positionGroups).forEach(([key, docs]) => {
-      const [cellX, cellY] = key.split('-').map(Number);
+      const [cellX, cellY] = key.split("-").map(Number);
       const count = docs.length;
       if (count === 1) {
         // Single document: center of the cell
@@ -659,10 +654,7 @@ const DocumentChartStatic = (props) => {
 
     docSelection.each(function (d) {
       const iconClass = GraphUtils.iconMap[d.type] || "bi-file-earmark";
-      const iconColor =
-        d.stakeholders
-          .map((stakeholder) => GraphUtils.colorNameToHex(stakeholder))
-          .join(", ") || "black";
+      const iconColor = d.stakeholders.map((stakeholder) => GraphUtils.colorNameToHex(stakeholder)).join(", ") || "black";
 
       d3.select(this)
         .append("foreignObject")
@@ -699,12 +691,7 @@ const DocumentChartStatic = (props) => {
       })
       .on("mouseout", function () {
         hideTooltip();
-        d3.select(this)
-          .select("foreignObject div")
-          .transition()
-          .duration(200)
-          .style("transform", "scale(1)")
-          .style("box-shadow", "none");
+        d3.select(this).select("foreignObject div").transition().duration(200).style("transform", "scale(1)").style("box-shadow", "none");
       });
   }, [chartData, links, stakeholders, props.role, messageReceived, isOpen]);
 
@@ -739,12 +726,7 @@ const DocumentChartStatic = (props) => {
           // Clean up timeout on unmount or when `selectedDoc` changes
           return () => clearTimeout(timeout);
         } else {
-          svg
-            .selectAll(".doc")
-            .select("foreignObject div")
-            .style("background", null)
-            .style("transform", "scale(1)")
-            .style("box-shadow", null);
+          svg.selectAll(".doc").select("foreignObject div").style("background", null).style("transform", "scale(1)").style("box-shadow", null);
         }
       }
     }
@@ -753,12 +735,7 @@ const DocumentChartStatic = (props) => {
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
       {/* Sidebar component for the legend and the filters */}
-      <FilterAndLegendSidebar
-        documentTypes={documentTypes}
-        stakeholders={stakeholders}
-        setDocuments={setChartData}
-        onSetLoading={setLoading}
-      />
+      <FilterAndLegendSidebar documentTypes={documentTypes} stakeholders={stakeholders} setDocuments={setChartData} onSetLoading={setLoading} />
 
       {/* Modal component to confirm the deletion of a link */}
       <DeleteLinkModal
@@ -780,10 +757,7 @@ const DocumentChartStatic = (props) => {
           </div>
         ) : chartData.length === 0 ? (
           // No Data Message
-          <div
-            className="no-data-container d-flex flex-column align-items-center justify-content-center"
-            style={{ height: "100%" }}
-          >
+          <div className="no-data-container d-flex flex-column align-items-center justify-content-center" style={{ height: "100%" }}>
             <h3 className="text-muted">No Documents Available</h3>
             <p className="text-muted">Please add some documents to see the chart.</p>
           </div>
