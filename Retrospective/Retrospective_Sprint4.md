@@ -19,7 +19,7 @@ sections:
     - Committed: 27 (13 points of previous sprint stories)
     - Done: 27
 - Nr of hours planned vs spent (as a team)
-    - Planned: 
+    - Planned: 100h 15m
     - Spent: 
 
 **Remember**  a story is done ONLY if it fits the Definition of Done:
