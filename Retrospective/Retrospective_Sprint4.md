@@ -19,8 +19,8 @@ sections:
     - Committed: 27 (13 points of previous sprint stories)
     - Done: 27
 - Nr of hours planned vs spent (as a team)
-    - Planned: 100h 15m
-    - Spent: 
+    - Planned: 96h 15m
+    - Spent: 96h 35m
 
 **Remember**  a story is done ONLY if it fits the Definition of Done:
  
@@ -35,12 +35,12 @@ sections:
 
 | Story  | # Tasks | Points | Hours est. | Hours actual |
 |--------|---------|--------|------------|--------------|
-| _#0_   |   29    |    -    |   50h 55m  |    50h 40m   |
+| _#0_   |   29    |    -    |   50h 55m  |    51h 10m   |
 | _#KX1_ |    9    |   2     |    5h 20m  |     5h 40m   |
 | _#KX6_ |    4    |   1     |    6h 30m  |      6h 30m  |
 | _#KX9_ |    1    |   3     |    0h 45m  |     1h 00m   |
 | _#KX19_ |  6     |   3     |    4h 45m  |    4h 15m    | 
-| _#KX10_ |   8    |   3     |   8h 00m   |     8h 05m   |
+| _#KX10_ |   8    |   3     |    8h 00m  |     8h 05m   |
 | _#KX11_ |   1    |   1     |    0h 30m  |    0h 30m    |
 | _#KX17_ |  7     |   3     |    4h 25m  |    4h 20m    |
 | _#KX12_ |   5    |   5     |    4h 00m  |    4h 00m    |
@@ -72,21 +72,23 @@ sections:
 ## QUALITY MEASURES 
 
 - Unit Testing:
-  - Total hours estimated
-  - Total hours spent
-  - Nr of automated unit test cases 
+  - Total hours estimated: 3h 30m
+  - Total hours spent: 3h 30m
+  - Nr of automated unit test cases: 
   - Coverage
 - E2E testing:
-  - Total hours estimated
-  - Total hours spent
-  - Nr of test cases
+  - Total hours estimated: 5h
+  - Total hours spent: 5h
+  - Nr of test cases: 
 - Code review 
-  - Total hours estimated 
-  - Total hours spent
+  - Total hours estimated: 2h 30m
+  - Total hours spent: 2h 30m
 - Technical Debt management:
-  - Strategy adopted
-  - Total hours estimated estimated
-  - Total hours spent
+  - Strategy adopted: 
+    - We aimed to fix all issues that were giving a C rating in SonarQube.
+    - We added more tasks for code review and code cleanup and allocated individual tasks for technical debt management in the sprint.
+  - Total hours estimated estimated: 2h
+  - Total hours spent: 2h
   
 
 
