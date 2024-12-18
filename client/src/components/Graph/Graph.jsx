@@ -116,15 +116,19 @@ const DocumentChartStatic = (props) => {
 
     // Prepare xScale based on unique years
     const years = Array.from(
-      new Set(chartData.map((d) => {
-        const date = new Date(d.issuanceDate);
-        if (isNaN(date)) {
-          console.warn(`Invalid issuanceDate for document ID ${d.id}: ${d.issuanceDate}`);
-          return null; // Exclude invalid dates
-        }
-        return date.getFullYear();
-      }))
-    ).filter(year => year !== null).sort((a, b) => a - b);
+      new Set(
+        chartData
+          .map((d) => {
+            const date = new Date(d.issuanceDate);
+            if (isNaN(date)) {
+              console.warn(`Invalid issuanceDate for document ID ${d.id}: ${d.issuanceDate}`);
+              return null; // Exclude invalid dates
+            }
+            return date.getFullYear();
+          })
+          .filter((year) => year !== null)
+      )
+    ).sort((a, b) => a - b);
 
     const xScale = d3.scaleBand().domain(years).range([0, width]).padding(0.1);
 
@@ -186,18 +190,42 @@ const DocumentChartStatic = (props) => {
       };
     }
 
+
     // Initialize docCoordsRef.current
     docCoordsRef.current = {}; // Reset before setting
+
+    // Group documents by their cellX and cellY
+    const positionGroups = {};
+
     chartData.forEach((doc) => {
       const { cellX, cellY } = getCellCoords(doc);
-
-      if (cellX != null && cellY != null) {
-        docCoordsRef.current[doc.id] = {
-          x: cellWidth / 2,
-          y: cellHeight / 2,
-        };
-      } else {
+      if (cellX == null || cellY == null) {
         console.warn(`Document with id ${doc.id} has invalid issuanceDate or scale.`);
+        return;
+      }
+      const key = `${cellX}-${cellY}`;
+      if (!positionGroups[key]) {
+        positionGroups[key] = [];
+      }
+      positionGroups[key].push(doc);
+    });
+
+    // Assign positions with offsets
+    Object.entries(positionGroups).forEach(([key, docs]) => {
+      const [cellX, cellY] = key.split('-').map(Number);
+      const count = docs.length;
+      if (count === 1) {
+        // Single document: center of the cell
+        docCoordsRef.current[docs[0].id] = { x: cellWidth / 2, y: cellHeight / 2 };
+      } else {
+        // Multiple documents: arrange in a circle
+        const radius = Math.min(cellWidth, cellHeight) / 4; // Adjust radius as needed
+        docs.forEach((doc, index) => {
+          const angle = (2 * Math.PI * index) / count;
+          const offsetX = radius * Math.cos(angle);
+          const offsetY = radius * Math.sin(angle);
+          docCoordsRef.current[doc.id] = { x: cellWidth / 2 + offsetX, y: cellHeight / 2 + offsetY };
+        });
       }
     });
 
@@ -274,27 +302,22 @@ const DocumentChartStatic = (props) => {
       const nodes = messageReceived["nodes"];
       const connections = messageReceived["connections"];
 
-      if (messageReceived.messageType === "update-configuration") {
-        const nodes = messageReceived["nodes"];
-        const connections = messageReceived["connections"];
+      console.log("nodes: ", nodes);
+      console.log("connections: ", connections);
 
-        console.log("nodes: ", nodes);
-        console.log("connections: ", connections);
+      Object.entries(nodes).forEach(([nodeId, node]) => {
+        if (docCoordsRef.current.hasOwnProperty(nodeId)) {
+          docCoordsRef.current[nodeId].x = cellWidth / 2 + node.x * cellWidth;
+          docCoordsRef.current[nodeId].y = cellHeight / 2 + node.y * cellHeight;
+        }
+      });
 
-        Object.entries(nodes).forEach(([nodeId, node]) => {
-          if (docCoordsRef.current.hasOwnProperty(nodeId)) {
-            docCoordsRef.current[nodeId].x = cellWidth / 2 + node.x * cellWidth;
-            docCoordsRef.current[nodeId].y = cellHeight / 2 + node.y * cellHeight;
-          }
-        });
-
-        Object.entries(connections).forEach(([connectionId, connection]) => {
-          if (controlPointsRef.current.hasOwnProperty(connectionId)) {
-            controlPointsRef.current[connectionId].x = connection.x * width;
-            controlPointsRef.current[connectionId].y = connection.y * height;
-          }
-        });
-      }
+      Object.entries(connections).forEach(([connectionId, connection]) => {
+        if (controlPointsRef.current.hasOwnProperty(connectionId)) {
+          controlPointsRef.current[connectionId].x = connection.x * width;
+          controlPointsRef.current[connectionId].y = connection.y * height;
+        }
+      });
     }
 
     // Tooltip setup
@@ -394,7 +417,7 @@ const DocumentChartStatic = (props) => {
         const cx = control.x;
         const cy = control.y;
 
-        // Calculate P1 = P2 so that the curve passes through (cx, cy) at t=0.5
+        // Calculate P1 and P2 so that the curve passes through (cx, cy) at t=0.5
         // Formula derived:
         // CP = (S + E)/8 + (3/4)*X  =>  X = [CP - (S+E)/8]*(4/3)
         const Px = (cx - (startX + endX) / 8) * (4 / 3);
