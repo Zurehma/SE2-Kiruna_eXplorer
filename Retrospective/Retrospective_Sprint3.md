@@ -43,11 +43,13 @@ sections:
 | _KX5_   |   1      |  3      |  0h 30m         |  0h 30m      |
 | _KX6_   |   3      |  1      | 3h 30m       |   3h 30m         |
 | _KX9_   |    8     |   3     |    9h 00m    |     8h 00m    |
-| _KX10_  |   16      |   3     |   15h 5m     |   15h 15m   |
-| _KX11_  |    1     |   1     |     1h 00m       |    0h 50m   |
-| _KX14_  |   4      |   1     |    1h 50m   |      1h 40m    |
 | _KX19_  |     6    |   3     |     6h 00m    |      6h 20m     |
+| _KX10_  |   16      |   3     |   15h 5m     |   15h 15m   |
 | _KX20_  |    2     |   1     |    2h 30m        |   1h 55m |
+| _KX14_  |   4      |   1     |    1h 50m   |      1h 40m    |
+| _KX11_  |    1     |   1     |     1h 00m       |    0h 50m   |
+
+
    
 
 > place technical tasks corresponding to story `#0` and leave out story points (not applicable in this case)
