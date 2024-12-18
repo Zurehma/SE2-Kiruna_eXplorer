@@ -74,12 +74,12 @@ sections:
 - Unit Testing:
   - Total hours estimated: 3h 30m
   - Total hours spent: 3h 30m
-  - Nr of automated unit test cases: 
-  - Coverage
+  - Nr of automated unit test cases: 82
+  - Coverage: ![TestCoverage](Sprint4_TestCoverage.png)
 - E2E testing:
   - Total hours estimated: 5h
   - Total hours spent: 5h
-  - Nr of test cases: 
+  - Nr of test cases: 108  (96 manual tests + 12 Cypress tests)
 - Code review 
   - Total hours estimated: 2h 30m
   - Total hours spent: 2h 30m
