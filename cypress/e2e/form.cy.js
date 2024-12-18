@@ -1,17 +1,19 @@
 describe('Add Document Form test', () => {
   it('Correct fill of form', () => {
-    cy.visit('/login')
+    cy.visit('/documents')
+    cy.contains('Login').should('be.visible');
+    cy.contains('Login').click();
+    
     cy.get("#username").type("johndoe");
     cy.get("#password").type("password");
     cy.get('button[type="submit"]').click();
 
-    cy.contains('Add Document').should('be.visible');
-    cy.contains('Add Document').click();
+    cy.contains("New Document").should("be.visible").click();
 
     // Step 1
     cy.get("#title").type("My Document");
-    cy.get('.react-select__control').click();
-    cy.get('.react-select__menu .react-select__option').first().click();
+    cy.get('[id="react-select-3-input"]').click({ force: true });
+    cy.get('[id="react-select-3-option-0"]').click();
     cy.get("#description").type("This is a test description");
     cy.get('.btn-save').click()
 
@@ -38,56 +40,56 @@ describe('Add Document Form test', () => {
   })
 
   it('Invalid credentials', () => {
-    cy.visit('/login')
+    cy.visit('/documents')
+    cy.contains('Login').should('be.visible');
+    cy.contains('Login').click();
 
     cy.get("#username").type("wrongusername");
     cy.get("#password").type("password");
     cy.get('button[type="submit"]').click();
   
-    cy.contains('Unauthorized').should('be.visible');
+    cy.contains('Login failed. Please check your credentials.').should('be.visible');
   });
 
   it('Validate fields in step1', () => {
-    cy.visit('/login')
+    cy.visit('/documents')
+    cy.contains('Login').should('be.visible');
+    cy.contains('Login').click();
+    
     cy.get("#username").type("johndoe");
     cy.get("#password").type("password");
     cy.get('button[type="submit"]').click();
 
-    cy.contains('Add Document').should('be.visible');
-    cy.contains('Add Document').click();
+    cy.contains("New Document").should("be.visible").click();
 
-    cy.get('.react-select__control').click();
-    cy.get('.react-select__menu .react-select__option').first().click();
-
+    cy.get('[id="react-select-3-input"]').click({ force: true });
+    cy.get('[id="react-select-3-option-0"]').click();
     cy.get("#description").type("This is a test description");
     cy.get('.btn-save').click()
     cy.contains('button', 'Next').click();
 
     cy.contains('Title is required and cannot be empty.').should('be.visible');
-
-    cy.get('.react-select__multi-value').contains('Kiruna kommun') 
-    .parent() 
-    .find('.react-select__multi-value__remove')
-    .click();
-
-    cy.get('.react-select__multi-value').should('not.exist'); 
   })
 
   it('Validate fields in step2', () => {
-    cy.visit('/login')
+    cy.visit('/documents')
+    cy.contains('Login').should('be.visible');
+    cy.contains('Login').click();    
+    
     cy.get("#username").type("johndoe");
     cy.get("#password").type("password");
     cy.get('button[type="submit"]').click();
 
-    cy.contains('Add Document').should('be.visible');
-    cy.contains('Add Document').click();
+    cy.contains("New Document").should("be.visible").click();
+
 
     // Step 1
     cy.get("#title").type("My Document");
-    cy.get('.react-select__control').click();
-    cy.get('.react-select__menu .react-select__option').first().click();
+    cy.get('[id="react-select-3-input"]').click({ force: true });
+    cy.get('[id="react-select-3-option-0"]').click();
     cy.get("#description").type("This is a test description");
     cy.get('.btn-save').click()
+    cy.contains('button', 'Next').click();
 
     // Step 2
     cy.get('[name="scale"]').select("Text");

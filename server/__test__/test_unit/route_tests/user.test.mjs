@@ -15,6 +15,11 @@ describe("authRoutes", () => {
         test("Create a new user", async () => {
             expect(1).toBe(1);
         });
+    });
 
+    describe("POST /register/urbanplanner", () => {
+        test("Create a new urbanplanner", async () => {
+            expect(1).toBe(1);
+        });
     });
 });

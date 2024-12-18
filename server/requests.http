@@ -55,8 +55,7 @@ Content-Type: application/json
     "language": "Swedish",
     "description": "This plan, approved in July 2016, is the first detailed plan to be implemented from the new masterplan (Adjusted development plan). The document defines the entire area near the town hall, comprising a total of 9 blocks known for their density. Among these are the 6 buildings that will face the main square. The functions are mixed, both public and private, with residential being prominent, as well as the possibility of incorporating accommodation facilities such as hotels. For all buildings in this plan, the only height limit is imposed by air traffic.",
     "coordinates": {"lat":67.849982,"long":20.217068},
-    "pageFrom": 1,
-    "pageTo": 43
+    "pages": "10"
 }
 
 ### Modify a document
