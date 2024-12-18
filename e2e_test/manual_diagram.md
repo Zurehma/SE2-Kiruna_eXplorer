@@ -29,3 +29,56 @@ Steps:
 
 ### Test 4-n: Repeat Test 3 for all the icons shown in the diagram, ensuring that the document appearing is always different and coherent.
 
+# Tests related to the fourth sprint. Repeat also the previous tests, but the diagram now is in a separated page with respect to the map to improve readability of both
+
+
+# The first tests we are reporting can be executed by both Urban planners and visitors and are related to KX10 and KX15. Follow the procedure of the following test to reach the diagram.
+### Test 5: Filter documents in the diagram
+Steps:
+1. Navigate to the diagram using the appropriate button in the navbar or in the home page;
+2. Click on the button in the bottom-left of the screen ('Legend & Filter').
+
+**Expected Results:**
+- A side bar opens, with the legend and a menu containing advanced filters. In particular, filters allow to filter by stakeholder and document type.
+
+### Test 6: Filter documents in the diagram
+Steps:
+1. Navigate to the diagram using the appropriate button in the navbar or in the home page;
+2. Click on the button in the bottom-left of the screen ('Legend & Filter').
+3. Open the dropdown menu containing filters;
+4. Try different combinations of filters.
+
+**Expected Results:**
+- You should see in the background that the diagram is changing. When there are no documents associated with the filtering combination, a page displaying 'No documents found' appears. Moreover, if u try to close and open again the filtering side bar, the configuration set for filters is kept. With respect to the view all documents page, filtering by date is not allowed because it is already an information shown on the x axis of the diagram, so, filtering by date, the diagram wouldn't lose meaning. 
+
+# The following tests refers to the urban planner only and requires authentication (thus can be performed also by the admin).
+
+### Test 7: Move a document
+Steps:
+1. Navigate to the diagram using the appropriate button in the navbar or in the home page;
+2. Try to move a document;
+
+**Expected Results:**
+- You should be allowed to move a document within its cell and the position in which it is placed is stored. This can be verified by opening two different pages or by changing pages.
+
+### Test 8: Move a link
+Steps:
+1. Navigate to the diagram using the appropriate button in the navbar or in the home page;
+2. Try to move a link by using the control point over the link
+
+**Expected Results:**
+- You should be allowed to move it and everything it has been said as expected result of the previous test is valid also in this context.
+
+### Test 8: Delete a link
+Steps:
+1. Navigate to the diagram using the appropriate button in the navbar or in the home page;
+2. Try to hoover on different link;
+3. Click the 'Delete' button for one or more of them;
+
+**Expected Results:**
+- You should see that, by hoovering on the links and documents, informations about them appears. In particular, regarding links, there's also the possibility to delete them if you are authenticated. By doing it, the diagram is promptly updated and the deleted link is not visible anymore. Obviously, the modification is permanent and this is also made clear through a message in a modal.
+
+
+
+
+

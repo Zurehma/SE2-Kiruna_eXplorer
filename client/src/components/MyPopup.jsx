@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Tooltip, OverlayTrigger, Button, Dropdown } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import API from '../../API';
+import '../styles/MapNavigation.css';
 
+import API from '../../API';
 
 
 function MyPopup(props) {
@@ -13,6 +14,13 @@ function MyPopup(props) {
   const [showLinks, setShowLinks] = useState(false); // State to control visibility of the dropdown
   const widthLastColumn = props.loggedIn ? 4 : 5;
   const remainingWidth = 12 -3 -4 - widthLastColumn;
+  const location = useLocation(); 
+  const [isOnMap, setIsOnMap] = useState(false);
+
+  // Check if the user is on the map page
+  useEffect(() => {
+    setIsOnMap(location.pathname.includes('map'));
+  }, [location]);
 
   //fetch links and available attachments for the document 
   useEffect(() => { //As soon as the id of the doc changes, fetch its links and attachments
@@ -32,7 +40,6 @@ function MyPopup(props) {
     };
     fetchData();
   }, [props.doc.id]);
-
 
   //Handle download of attachment
   const handleDownload = async (docID, attachmentID) => {
@@ -86,20 +93,32 @@ function MyPopup(props) {
   };
 
   const navigate = useNavigate();
-  const computePages = (pageFrom, pageTo) => {
-    if (pageFrom && pageTo) {
-      return Number(pageTo) - Number(pageFrom) + 1;
-    }
-    return '-';
-  };
-  const handleNavigation = (id) => {
-    navigate(`/document/${id}`);
-  };
   
-  const handleClick = () => {
+  
+  const handleEditClick = () => {
     if (props.doc && props.doc.id && props.doc.id > 0) {
       navigate(`/documents/${props.doc.id}`, { state: { docId: props.doc.id } });
     } else {
+      props.setError('Invalid document data');
+    }
+  };
+
+  const handleNavigation = (id) => {
+    navigate(`/document/${id}`);
+  };
+  const handleDeleteClick = () => {
+    if (props.doc && props.doc.id && props.doc.id > 0) {
+      API.deleteDocument(props.doc.id).then(() => {
+        const path = window.location.pathname.split('/');
+        if(path.length === 3 && path[1] === 'document' && !isNaN(parseInt(path[2]))){
+          navigate(-1);}
+        else{
+          props.setReload(!props.reload);
+        }
+      }).catch((error) => {
+        props.setError(error);
+      });  
+    }else{
       props.setError('Invalid document data');
     }
   };
@@ -114,35 +133,32 @@ function MyPopup(props) {
     return stakeholderList;
   }
   // Helper function to display "-" if value is null
-  const displayValue = (value) => (value !== null ? value : '-');
+  const displayValue = (value) => ((value !== null && value !== undefined) ? value : '-');
   const listOfStakeholders = stakeholderList(props.doc.stakeholders);
 
+  // Function to navigate to diagram page
+  const handleShowOnDiagram = () => {
+    navigate(`/graph/?id=${props.doc.id}`);
+  };
+
+  //Function to navigate to map page
+  const handleShowOnMap = () => {
+    navigate(`/map/?id=${props.doc.id}`);
+  };
+  
   return (
-    <Row className="p-3 border rounded shadow-sm popupProp" style={{ backgroundColor: '#f9f9f9' }}>
+    <Row className="p-3 border rounded shadow-sm popupProp popupBackStyle">
       {/* Icon Column */}
-      <Col
-        xs={12}
-        md={3}
-        className="myPopup mt-1"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',  // Disposizione verticale per gli altri elementi
-          alignItems: 'flex-start',  // Allineamento a sinistra per la lista
-          paddingTop: '0.5rem',
-        }}
-      >
-        {/* Icona centrata orizzontalmente */}
-        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+      <Col xs={12} md={3} className="myPopup mt-1 attachmentStyle">
+        <div className='iconPupoupStyle'>
           {renderIcon()}
         </div>
-
         <h6 className="fw-bold text-secondary mb-2 mt-2">Attachments:</h6>
         {attachments.length === 0 && <p className="small text-muted mt-2">No attachments added yet</p>}
         <ul className="list-unstyled">
           {attachments.map((attachment) => (
             <li key={attachment.id} className="mb-2">
-              <a
-                href="#"
+              <a href="#"
                 onClick={(e) => {
                   e.preventDefault();
                   handleDownload(props.doc.id, attachment.id);
@@ -156,9 +172,6 @@ function MyPopup(props) {
           ))}
         </ul>
       </Col>
-
-
-
       {/* Details Column */}
       <Col xs={12} md={4} className="myPopup">
         <h6 className="fw-bold text-secondary mb-2">{props.doc.title}</h6>
@@ -166,12 +179,10 @@ function MyPopup(props) {
           <strong className="text-dark">Stakeholders:</strong> {listOfStakeholders} <br />
           <strong className="text-dark">Scale:</strong>{' '}
           {props.doc.scale &&
-          typeof props.doc.scale === 'string' &&
-          props.doc.scale.toUpperCase() !== 'TEXT' &&
-          props.doc.scale.toUpperCase() !== 'BLUEPRINT/EFFECTS'
-            ? `1:${props.doc.scale}`
-            : props.doc.scale}{' '}
-          <br />
+            typeof props.doc.scale === 'string' &&
+            props.doc.scale.toUpperCase() !== 'TEXT' &&
+            props.doc.scale.toUpperCase() !== 'BLUEPRINT/EFFECTS'
+              ? `1:${props.doc.scale}`: props.doc.scale}{' '}<br />
           <strong className="text-dark">Issuance Date:</strong> {props.doc.issuanceDate} <br />
           <strong className="text-dark">Type:</strong> {props.doc.type} <br />
         </div>
@@ -180,14 +191,9 @@ function MyPopup(props) {
             <strong className="text-dark">Connections:</strong> {props.doc.connections}
             {props.doc.connections > 0 && !loading && (
               <Dropdown className="d-inline ms-2">
-                <Dropdown.Toggle
-                  variant="link"
-                  aria-label="connections"
-                  id="dropdown-toggle-connection"
-                  className="p-0"
+                <Dropdown.Toggle variant="link" aria-label="connections" id="dropdown-toggle-connection" className="p-0 dropStyle"
                   onClick={() => setShowLinks(!showLinks)}
-                  style={{ color: 'black', fontSize: '1rem' }}
-                  data-testid="connections-toggle-button"
+                  data-testid="connections-toggle-button "
                 >
                 </Dropdown.Toggle>
               </Dropdown>
@@ -199,56 +205,101 @@ function MyPopup(props) {
           <ul className="small text-muted ms-3">
             {links.map((link) => (
               <li key={link.linkedDocID}>
-              <span
-                style={{ color: "#007bff", cursor: "pointer", textDecoration: "underline" }}
-                onClick={() => handleNavigation(link.linkedDocID)}
-              >
-                {link.title}
-              </span>{" "}
-              - {link.type}
-            </li>
-            ))}
+                <span className='linkStyle'
+                  onClick={() => handleNavigation(link.linkedDocID)}
+                >{link.title}
+                </span>{" "} - {link.type}
+              </li>))}
           </ul>
         )}
         <p className='text-muted small m-0'>
           <strong className="text-dark">Language:</strong> {props.doc.language} <br />
-          <strong className="text-dark">Number of pages:</strong> {props.doc.pages ? displayValue(props.doc.pages) : computePages(props.doc.pageFrom,props.doc.pageTo)} <br />
-          <strong className="text-dark">Pages:</strong>{' '}
-          {props.doc.pageFrom && props.doc.pageTo
-            ? `${props.doc.pageFrom}-${props.doc.pageTo}`
-            : `-`}
-          <br />
+          <strong className="text-dark">Pages:</strong> {displayValue(props.doc.pages)} <br />
           <strong className="text-dark">Position:</strong>{' '}
           {props.doc.area? 'Area' : props.doc.lat ? `${props.doc.lat} - ${props.doc.long}` : 'entire municipality'  }
         </p>
       </Col>
-
       {/* Description Column */}
       <Col xs={12} md={widthLastColumn} className="position-relative">
         <p className="mt-3 small text-muted">
           <strong className="text-dark">Description:</strong> {props.doc.description}
         </p>
       </Col>
-
       {/* Edit Button Column */}
       {props.loggedIn && (
       <Col xs={12} md={remainingWidth} className="d-flex align-items-start justify-content-center">
-        <Button
-          name="edit-button"
-          variant="outline-primary"
-          className="shadow-sm edit-button" // Added custom class for targeted CSS
-          aria-label="edit" 
-          style={{
-            padding: '0.5rem',
-            borderRadius: '50%',
-            width: '2.5rem',
-            height: '2.5rem',
-          }}
-          onClick={handleClick}
-        >
-          <i className="bi bi-pencil-square edit-icon" style={{ fontSize: '1.25rem' }}></i>
-        </Button>
+        <Row>
+          <Col xs={6} className="d-flex justify-content-center">
+            <Button
+              name="edit-button"
+              variant="link" 
+              className="icon-button" 
+              aria-label="edit"
+              onClick={handleEditClick}
+            >
+              <i className="bi bi-pencil-square"></i>
+            </Button>
+          </Col>
+          <Col xs={6} className="d-flex justify-content-center">
+            <Button
+              name="delete-button"
+              variant="link" 
+              className="icon-button" 
+              aria-label="delete"
+              onClick={handleDeleteClick}
+            >
+              <i className="bi bi-trash"></i> 
+            </Button>
+          </Col>
+        </Row>
       </Col>)}
+
+          {/* Add Show on Diagram Button */}
+          <Col xs={12} className="mt-1 d-flex">
+            {isOnMap ? (
+              <>
+                <a 
+                  href="#" 
+                  className="link me-1" 
+                  onClick={(e) => {
+                    e.preventDefault(); 
+                    handleShowOnDiagram();
+                  }}
+                >
+                  <i className="bi bi-bezier"></i>
+                  View on Diagram
+                </a>
+              </>
+            ) : (
+              <>
+                {/* Diagram Link with Icon */}
+                <a 
+                  href="#" 
+                  className="link showDiagram me-3" 
+                  onClick={(e) => {
+                    e.preventDefault(); 
+                    handleShowOnDiagram();
+                  }}
+                >
+                  <i className="bi bi-bezier"></i>
+                  View on Diagram
+                </a>
+          
+                {/* Map Link with Icon */}
+                <a 
+                  href="#" 
+                  className="link viewOnMap" 
+                  onClick={(e) => {
+                    e.preventDefault(); 
+                    handleShowOnMap();
+                  }}
+                >
+                  <i className="bi bi-geo-alt"></i>
+                  View on Map
+                </a>
+            </>
+            )}
+        </Col>
     </Row>
   );
 }

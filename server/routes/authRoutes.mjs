@@ -51,6 +51,27 @@ function AuthRoutes(app) {
       }
     );
 
+   //Register an urban planner
+    this.router.post(
+      "/register/urbanplanner",
+      Utility.isLoggedIn,
+      Utility.isAdmin,  
+      body("name").isString().notEmpty(),
+      body("surname").isString().notEmpty(),
+      body("username").isString().notEmpty(),
+      body("password").isString().notEmpty(),
+      Utility.validateRequest,
+      (req, res, next) => {
+        this.UserController.registerUser(req.body.name, req.body.surname, 'Urban Planner', req.body.username, req.body.password)
+          .then(() => {
+            res.status(200).json({ message: "Urban planner created successfully" });
+          })
+          .catch((error) => {
+            res.status(500).json({ error: error.message });
+          });
+      }
+    );
+
     //Login
     this.router.post("/login", passport.authenticate("local"), (req, res) => {
       res.status(200).json({ message: "Login successful" });

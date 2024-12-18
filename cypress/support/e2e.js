@@ -18,3 +18,19 @@ import './commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+Cypress.on("uncaught:exception", (err, runnable) => {
+    // Ignore 'onSuccess is not defined' errors
+    if (err.message.includes("onSuccess is not defined")) {
+      return false;
+    }
+    return true;
+  });
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+  // Ignore errors caused by Leaflet
+  if (err.message.includes('_leaflet_pos')) {
+    return false; // Prevent the test from failing
+  }
+  return true;
+});

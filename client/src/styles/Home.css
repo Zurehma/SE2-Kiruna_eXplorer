@@ -4,17 +4,33 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow-x: hidden;
+  overflow-y: auto;
   font-family: Arial, sans-serif;
 }
 
 .homepage {
   height: 165vh; /* Pagina più lunga per permettere lo scrolling */
   width: 100%;
-  overflow: hidden; /* Rimuove spazi extra */
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+.alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 1050; /* Assicura che sia sopra tutto il resto */
+  pointer-events: none; /* Evita di interferire con i click sugli elementi sottostanti */
+}
+
+.fixed-success-alert {
+  margin-top: 70px; /* Distanza dalla cima della finestra */
+  width: fit-content;
+  pointer-events: auto; /* Permette di interagire con l'Alert */
 }
 
 /* Sezione superiore con immagine di sfondo */
@@ -64,7 +80,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 30px;
+  margin-bottom: 20px;
   flex-wrap: nowrap; /* Impedisce l'avvolgimento dei bottoni */
   gap: 10px; /* Spaziatura tra i bottoni */
 }
@@ -93,6 +110,43 @@ body {
 
 .button-icon:hover {
   background-color: #004f55; /* Cambia colore dell'icona su hover */
+}
+
+/* Stile per arrow  */
+.arrow-icon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #006d77; /* Colore dello sfondo dell'icona */
+  color: white; /* Colore del simbolo */
+  border-radius: 50%; /* Forma circolare */
+  font-size: 1.2rem; /* Dimensione del simbolo */
+  width: 50px;
+  height: 50px;
+}
+
+.arrow-icon:hover {
+  background-color: #004f55; /* Cambia colore dell'icona su hover */
+}
+
+.styled-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent; /* Colore opaco del pulsante */
+  box-shadow: none; /* Rimuove completamente l'ombra */
+  border: none;
+  border-radius: 25px;
+  margin: auto 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.styled-arrow:hover {
+  transform: scale(1.1); /* Effetto zoom */
+}
+#content-section {
+  scroll-margin-top: 100px; /* Aggiusta questo valore per compensare header fissi */
 }
 
 /* Media query per schermi piccoli */

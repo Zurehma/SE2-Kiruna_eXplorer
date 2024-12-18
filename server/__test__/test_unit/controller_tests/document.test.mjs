@@ -48,9 +48,7 @@ describe("DocumentController", () => {
           language: "english",
           description: "Desc",
           coordinates: null,
-          pages: null,
-          pageFrom: null,
-          pageTo: null,
+          pages: null
         },
         {
           id: 6,
@@ -62,9 +60,7 @@ describe("DocumentController", () => {
           language: "english",
           description: "Desc",
           coordinates: null,
-          pages: null,
-          pageFrom: null,
-          pageTo: null,
+          pages: null
         },
       ],
     };
@@ -101,7 +97,7 @@ describe("DocumentController", () => {
     let documentController;
     let documentDAO;
 
-    const exampleDocument = new Document(5, "Document 2", "Stakeholder", 100, "2023-01-01", "Design", 5, "english", "Desc", null, null, null, null);
+    const exampleDocument = new Document(5, "Document 2", ["Stakeholder"], 100, "2023-01-01", "Design", 5, "english", "Desc", null, null);
 
     beforeEach(() => {
       documentDAO = new DocumentDAO();
@@ -153,17 +149,17 @@ describe("DocumentController", () => {
     });
 
     test("Document added successfully", async () => {
-      const exampleAddResult = { lastID: 12, changes: 1 };
+      const exampleAddResult = { changes: 1, lastID: 12 };
       const exampleDocumentData = {
         title: "title",
         stakeholders: ["stakeholder", "stakeholder2"],
         scale: 100,
-        issuanceDate: "2016-02-12",
+        issuanceDate: "2016-06-22",
         type: "Informative",
         language: "English",
         description: "Lore ipsum...",
         coordinates: {"lat":67.849982, "long":20.217068},
-        pages: 16,
+        pages: 16
       };
 
       const exampleDocument = new Document(
@@ -177,28 +173,26 @@ describe("DocumentController", () => {
         exampleDocumentData.language,
         exampleDocumentData.description,
         JSON.stringify(exampleDocumentData.coordinates),
-        exampleDocumentData.pages,
-        exampleDocumentData.pageFrom,
-        exampleDocumentData.pageTo
+        exampleDocumentData.pages
       );
 
       Utility.isValidKirunaCoordinates = jest.fn().mockReturnValue(true);
       documentDAO.addDocument = jest.fn().mockResolvedValueOnce(exampleAddResult);
-      documentDAO.addStakeholder = jest.fn().mockResolvedValueOnce( {changes: 1} );
+      documentDAO.addStakeholder = jest.fn().mockResolvedValueOnce();
       documentDAO.getDocumentByID = jest.fn().mockResolvedValueOnce(exampleDocument);
+
+      console.log(Array.isArray(exampleDocumentData.stakeholders));
 
       const result = await documentController.addDocument(
         exampleDocumentData.title,
-        exampleDocumentData.stakeholders,
+        exampleDocumentData.stakeholders, 
         exampleDocumentData.scale,
         exampleDocumentData.issuanceDate,
         exampleDocumentData.type,
-        exampleDocumentData.description,
         exampleDocumentData.language,
+        exampleDocumentData.description,
         exampleDocumentData.coordinates,
-        exampleDocumentData.pages,
-        exampleDocument.pageFrom,
-        exampleDocument.pageTo
+        exampleDocumentData.pages
       );
 
       expect(result).toBeInstanceOf(Document);
@@ -209,12 +203,10 @@ describe("DocumentController", () => {
         exampleDocumentData.scale,
         exampleDocumentData.issuanceDate,
         exampleDocumentData.type,
-        exampleDocumentData.description,
         exampleDocumentData.language,
+        exampleDocumentData.description,
         JSON.stringify(exampleDocumentData.coordinates),
-        exampleDocumentData.pages,
-        exampleDocumentData.pageFrom,
-        exampleDocumentData.pageTo
+        exampleDocumentData.pages
       );
       expect(documentDAO.getDocumentByID).toHaveBeenCalled();
       expect(documentDAO.getDocumentByID).toHaveBeenCalledWith(exampleAddResult.lastID);
@@ -299,7 +291,7 @@ describe("DocumentController", () => {
         language: "English",
         description: "Lorem ipsum...",
         coordinates: { lat: 67.849982, long: 20.217068 },
-        pages: 16,
+        pages: 16
       };
 
       const oldDocument = new Document(
@@ -313,15 +305,13 @@ describe("DocumentController", () => {
         oldDocumentData.language,
         oldDocumentData.description,
         JSON.stringify(oldDocumentData.coordinates),
-        oldDocumentData.pages,
-        oldDocumentData.pageFrom,
-        oldDocumentData.pageTo
+        oldDocumentData.pages
       );
 
       const documentDAO = new DocumentDAO();
-      documentDAO.getDocumentByID = jest.fn().mockResolvedValue(oldDocument);
       Utility.isValidKirunaCoordinates = jest.fn().mockReturnValue(true);
-      documentDAO.updateDocument = jest.fn().mockResolvedValue({ changes: 1 });
+      documentDAO.getDocumentByID = jest.fn().mockResolvedValue(oldDocument);
+      documentDAO.updateDocument = jest.fn().mockResolvedValue({ changes: 1, lastID: 1 });
       documentDAO.deleteStakeholders = jest.fn().mockResolvedValueOnce({ changes: 1 });
       documentDAO.addStakeholder = jest.fn().mockResolvedValueOnce();
 
@@ -338,9 +328,7 @@ describe("DocumentController", () => {
           "Swedish",
           "Loreum ipsum...Updated",
           { lat: 67.849982, long: 20.217068 },
-          true,
-          16,
-          false
+          16
         )
       ).resolves.toBeNull();
 
@@ -356,9 +344,7 @@ describe("DocumentController", () => {
         "Swedish",
         "Loreum ipsum...Updated",
         JSON.stringify({ lat: 67.849982, long: 20.217068 }),
-        true,
-        16,
-        false
+        16
       );
     });
 
@@ -443,6 +429,34 @@ describe("DocumentController", () => {
           false
         )
       ).rejects.toEqual({ errCode: 400, errMessage: "Coordinates error." });
+    });
+  });
+
+  describe("deleteDocument", () => {
+    afterEach(()=>{
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    })
+
+    test("Document deleted successfully", async () => {
+      const documentDAO = new DocumentDAO();
+      documentDAO.deleteDocument = jest.fn().mockResolvedValue({ changes: 1 });
+
+      const documentController = new DocumentController();
+      documentController.documentDAO = documentDAO;
+      const result = await documentController.deleteDocument(1);
+
+      expect(documentDAO.deleteDocument).toHaveBeenCalled();
+      expect(result).toEqual(null);
+    });
+
+    test("Document not found", async () => {
+      const documentDAO = new DocumentDAO();
+      documentDAO.deleteDocument = jest.fn().mockResolvedValue(0);
+
+      const documentController = new DocumentController();
+      documentController.documentDAO = documentDAO;
+      await expect(documentController.deleteDocument(1)).rejects.toEqual({ errCode: 404, errMessage: "Document not found!" });
     });
   });
 
@@ -639,4 +653,31 @@ describe("DocumentController", () => {
     });
   });
   
+  describe("deleteLink", () => {
+    afterEach(()=>{
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    })
+
+    test("Link deleted successfully", async () => {
+      const documentDAO = new DocumentDAO();
+      documentDAO.deleteLink = jest.fn().mockResolvedValue({ changes: 1 });
+
+      const documentController = new DocumentController();
+      documentController.documentDAO = documentDAO;
+      const result = await documentController.deleteLink(1);
+
+      expect(documentDAO.deleteLink).toHaveBeenCalled();
+      expect(result).toEqual(null);
+    });
+
+    test("Link not found", async () => {
+      const documentDAO = new DocumentDAO();
+      documentDAO.deleteLink = jest.fn().mockResolvedValue(0);
+
+      const documentController = new DocumentController();
+      documentController.documentDAO = documentDAO;
+      await expect(documentController.deleteLink(1)).rejects.toEqual({ errCode: 404, errMessage: "Link not found!" });
+    });
+  });
 });

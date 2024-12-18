@@ -35,7 +35,7 @@ Specific error scenarios will have their corresponding error code.
 
 Returns the document with the requested id.
 
-- Request Parameters: 
+- Request Parameters:
   - `id`: a number that represent the id of the document.
 - Additional Constraints: _None_
 - Response Body Content: A **Document** object.
@@ -58,28 +58,31 @@ Returns the document with the requested id.
         "description": "Lore ipsum..."
     },
     ...
+  ```
 
 #### GET `api/documents`
 
 Returns the list of all documents (if filters applied it returns the list of all documents filtered).
 
 - Request Parameters (optional):
+
+  - `subtext`: a substring that matches the title or the description.
   - `type`: a string that represent the type of the document.
-  - Request Parameters:
   - `stakeholder`: a string that represent the stakeholder of the document.
-  - Request Parameters:
   - `issuanceDateFrom`: a date that represent the starting date of the filtered document.
-  - Request Parameters:
   - `issuanceDateTo`: a date that represent the last date in the range.
-  - `limit`: a number that represents the maximum number of documents returned.
-  - `offset`: a number that specifies the number of rows to skip.  
+  - `pageNo`: an integer that represent the page number. If not specified the first page will be retrieved. If the integer specified is bigger than the total number of pages the last page will be retrieved.
+
 - Request Body Content: _None_
-- Response Body Content: An array of **Document** objects.
+- Response Body Content: An object with the list of **Document** objects, the next field is absent if the page retrieved is the last one.
 - Example:
 
   ```json
-  [
-    {
+  {
+    "pageNo": 1,
+    "totalPages": 4,
+    "elements": [
+      {
         "id": 1,
         "title": "example",
         "stakeholder": ["example"],
@@ -87,20 +90,21 @@ Returns the list of all documents (if filters applied it returns the list of all
         "issuanceDate": "2024-10-28",
         "connections": 3,
         "language": "English",
-        "pages": 2,
+        "pages": "1-32",
         "description": "Lore ipsum...",
         "coordinates": {
-         "lat": 67.853058,
-         "long": 20.294995
+          "lat": 67.853058,
+          "long": 20.294995
         },
-    },
-    ...
-  ]
+      },
+      ...
+    ],
+    "next": "api/documents?pageNo=2"
+  }
   ```
 
 - Access Constraints: _None_
-- Additional Constraints: 
-  - It should return a 422 error when `offset` is added without specifying `limit` in the parameter query.
+- Additional Constraints: _None_
 
 #### GET `api/documents/document-types`
 
@@ -112,7 +116,7 @@ Returns the list of already existing document types.
 - Example:
 
 ```json
-["Informative", "Prescriptive", "Material", "Design", "Technical"]
+["Informative", "Prescriptive", "Material effect", "Design", "Technical"]
 ```
 
 - Access Constraints: Can only be called by a logged in user.
@@ -147,10 +151,8 @@ Add a new document with the provided information.
   - `type`: a string that represent the type. Can be a value between: [`Informative`, `Prescriptive`, `Material`, `Design`, `Technical`].
   - `language`: a string that must not be empty.
   - `description`: a string that must not be empty. It represent a brief description of the document.
-  - `coordinates`: an array that contain coordinates that must have only two properties: `lat` and `long` that must be valid latitude and longitude values.
-  - `pages`: an integer that must be greater than 0. If `pageFrom` or `pageTo` are present, this parameter should not be present.
-  - `pageFrom`: an integer that must be greater than 0. It need `pageTo` to be present.
-  - `pageTo`: an integer that must be greater than 0. It need `pageFrom` to be present.
+  - `coordinates`: an optional field that could be an object with the properties `lat` and `long` or an array that contains a list of coordinates in a two values array where the first one is the latitude and the second one is the longitude. All the values must be valid latitude and longitude values.
+  - `pages`: an optional string that must not be empty. This string can must have one or multiple numbers and in that case the numbers must be separated with '-' symbol.
 - Response Body Content: The newly created **Document** object.
 - Example:
 
@@ -166,10 +168,10 @@ Add a new document with the provided information.
     "language": "English",
     "coordinates": [
       {
-        "lat": 67.87318157366065, 
+        "lat": 67.87318157366065,
         "long": 20.20047943270466
-       }
-      ],
+      }
+    ],
     "pages": 20,
     "pageFrom": 12,
     "pageTo": 32,
@@ -195,16 +197,26 @@ Update an existing document by providing a new object.
   - `type`: a string that represent the type. Can be a value between: [`Informative`, `Prescriptive`, `Material`, `Design`, `Technical`].
   - `language`: a string that must not be empty.
   - `description`: a string that must not be empty. It represent a brief description of the document.
-  - `coordinates`: an array that contain coordinates that must have only two properties: `lat` and `long` that must be valid latitude and longitude values.
-  - `pages`: an integer that must be greater than 0. If `pageFrom` or `pageTo` are present, this parameter should not be present.
-  - `pageFrom`: an integer that must be greater than 0. It need `pageTo` to be present.
-  - `pageTo`: an integer that must be greater than 0. It need `pageFrom` to be present.
+  - `coordinates`: an optional field that could be an object with the properties `lat` and `long` or an array that contains a list of coordinates in a two values array where the first one is the latitude and the second one is the longitude. All the values must be valid latitude and longitude values.
+  - `pages`: an optional string that must not be empty. This string can must have one or multiple numbers and in that case the numbers must be separated with '-' symbol.
 - Response Body Content: _None_
 
 - Access Constraints: Can only be called by a logged in user.
 - Additional Constraints:
   - It should return a 400 error when `issuanceDate` is after the current date.
   - It should return a 400 error when `coordinates` are located in a different place than Kiruna.
+
+#### DELETE `api/documents/:docID`
+
+Delete an existing document.
+
+- Request Parameters:
+  - `docID`: a number that represent the ID of the document.
+- Request Body Content: _None_
+- Response Body Content: _None_
+- Access Constraints: Can only be called by a logged in user.
+- Additional Constraints:
+  - It should return a 404 error when the document does not exist.
 
 #### GET `api/documents/link-types`
 
@@ -265,23 +277,26 @@ Returns the list of all specific link types.
 
 - Request Parameters: _None_
 - Request Body Content: _None_
-- Response Body Content: The response is a an array of links. Each link has a DocID1, DocID2 and the type of the link.
+- Response Body Content: The response is a an array of links. Each link has a DocID1, DocID2,the type of the link and the linkID.
 - Example:
 
 ```json
-  [
-    {
+[
+  {
     "DocID1": 1,
     "DocID2": 2,
-    "type": "Direct"
+    "type": "Direct",
+    "linkID": 1
   },
   {
     "DocID1": 1,
     "DocID2": 3,
-    "type": "Projection"
-  },
-  ]
+    "type": "Projection",
+    "linkID": 2
+  }
+]
 ```
+
 - Access Constraints: _None_
 - Additional Constraints: _None_
 
@@ -317,6 +332,18 @@ Returns the list of all specific link types.
   - It should return a `404` error when document ID does not exist
   - It should return a `409` error when the link of the same type already exists between a pair of documents
   - It should return a `422` error if the link type is invalid
+
+#### DELETE `api/documents/link/:linkID`
+
+Delete an existing link.
+
+- Request Parameters:
+  - `linkID`: a number that represent the ID of the link.
+- Request Body Content: _None_
+- Response Body Content: _None_
+- Access Constraints: Can only be called by a logged in user.
+- Additional Constraints:
+  - It should return a 404 error when the link does not exist.
 
 ### Attachment APIs
 
@@ -417,7 +444,7 @@ Start the download of a specific attachment.
 
 - Fields: id-title-scale-issuanceDate-type-connections-language-description-coordinates-pages-pageFrom-pageTo
 - Primary key: id
-- Description: The table stores information on each document. The information is the one from the cards along with an object of coordinates (NULL default means the document covers the whole area).  
+- Description: The table stores information on each document. The information is the one from the cards along with an object of coordinates (NULL default means the document covers the whole area).
   - id: Each documents is uniquely identified through an id
   - title: Title of the document
   - scale: Can be one of "Text", "Blueprints/Effects" or a number representing n in "1:n"
@@ -426,7 +453,7 @@ Start the download of a specific attachment.
   - connections: Represents the number of connections a document has with other documents
   - language: Represents the language of the document
   - description: description of the document
-  - coordinates: 
+  - coordinates:
   - pages: The number of pages in the document. Optional field. If this exists then pageFrom and pageTo should be NULL
   - pageFrom: Starting of range of pages. Optional field but must exist if pageTo exists. If a range exists then pages should be NULL
   - pageTo: Ending of range of pages. Optional field but must exist if pageFrom exists. If a range exists then pages should be NULL
@@ -465,9 +492,9 @@ Start the download of a specific attachment.
 
 ### Table `Attachment`
 
-- Fields:  docID-id-name-path-format
+- Fields: docID-id-name-path-format
 - Primary key: id
-- Description: The table stores information about attachments being added for a document. 
+- Description: The table stores information about attachments being added for a document.
   - docID: document to which the attachment refers to
   - name: name of the document
   - path: path to the document
@@ -479,3 +506,6 @@ Start the download of a specific attachment.
   - Username: johndoe
   - Password: password
 
+- Admin
+  - Username: admin
+  - Password: password

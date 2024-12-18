@@ -5,13 +5,15 @@ import { booleanPointInPolygon, point } from "@turf/turf";
 
 import "../../styles/MapForm.css";
 
-import { Button, Dropdown } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import MapLayoutCustomPoint from "./MapLayoutCustomPoint";
-import MapLayoutPredefinedPoint from "./MapFormLayoutPredefinedPoint";
-import MapLayoutPredefinedArea from "./MapFormLayoutPredefinedArea";
+import MapLayoutPredefinedPosition from "./MapLayoutPredefinedPosition";
 import KirunaMunicipality from "../MapUtils/KirunaMunicipality";
 import MapFormLayoutCustomArea from "./MapFormLayoutCustomArea";
 import LoadGeoJson from "../MapUtils/LoadGeoJson";
+import MapControlPanel from "./SideBarMenu";
+import RecenterButton from '../MapUtils/RecenterButton';
+
 
 /**
  * Button component to resize the map
@@ -24,11 +26,7 @@ const ResizeButton = (props) => {
 
   return (
     <>
-      <Button
-        type="button"
-        variant="light"
-        size="sm"
-        className="resize-button"
+      <Button type="button" variant="light" size="sm" className="resize-button"
         onClick={(e) => {
           e.stopPropagation();
           toggleResize();
@@ -57,32 +55,16 @@ const ClearPositionButton = (props) => {
   );
 };
 
-const DropdownMapMode = (props) => {
-  const { modeList, currentMode, setCurrentMode } = props;
 
-  return (
-    <>
-      <Dropdown drop="up" size="sm" onSelect={(eventKey) => setCurrentMode(eventKey)} className="map-mode-dropdown">
-        <Dropdown.Toggle variant="light" id="dropdown-map-mode-button">
-          {currentMode || "Change mode"}
-        </Dropdown.Toggle>
-        <Dropdown.Menu className="dropdown-menu">
-          {modeList.map((mode) => (
-            <Dropdown.Item key={mode} eventKey={mode} className="dropdown-item">
-              {mode}
-            </Dropdown.Item>
-          ))}
-        </Dropdown.Menu>
-      </Dropdown>
-    </>
-  );
-};
 
 const MapForm = (props) => {
   const [initialPosition, setInitalPosition] = useState([67.85, 20.217]);
   const [initialZoom, setInitalZoom] = useState(7);
   const [mapView, setMapView] = useState("satellite");
   const [geoJsonData, setGeoJsonData] = useState(null);
+  const [selectedDoc, setSelectedDoc] = useState(null); 
+  const KirunaCenter = [67.85, 20.217];
+
 
   //validate coordinates: verify they're in the Kiruna Municipality
   const validateCoordinates = (lat, long) => {
@@ -114,26 +96,23 @@ const MapForm = (props) => {
   const [mapSizeClass, setMapSizeClass] = useState(mapContainerClass);
   const [overlay, setOverlay] = useState("without-overlay");
 
-  const predefinedPoint = "Predefined point";
-  const predefinedArea = "Predefined area";
+  const predefinedPosition = "Existing position";
   const customPoint = "Custom point";
   const customArea = "Custom area";
-  const modeList = [predefinedPoint, predefinedArea, customPoint, customArea];
-  const [currentMode, setCurrentMode] = useState(undefined);
+  const explore = "Explore";
+  const modeList = [explore, predefinedPosition, customPoint, customArea];
+  const [currentMode, setCurrentMode] = useState(explore);
 
   const [position, setPosition] = useState(props.position || { type: null, coordinates: null, name: null });
 
   const handleSetPoint = (lat, long, name = null) => {
     setPosition({ type: "Point", coordinates: { lat: lat, long: long }, name: name });
   };
+
   const handleSetArea = (coordinates, name = null) => {
     setPosition({ type: "Area", coordinates: coordinates, name: name });
   };
-  const clearPosition = () => setPosition({ type: null, coordinates: null, name: null });
-
-  const resetOnChange = () => {
-    clearPosition();
-  };
+  const clearPosition = () => {setPosition({ type: null, coordinates: null, name: null }); setSelectedDoc(null);};
 
   const ResizeMap = () => {
     const map = useMap();
@@ -153,40 +132,24 @@ const MapForm = (props) => {
   }, [position.coordinates, position.type]);
 
   useEffect(() => {
+    setInitalZoom(11);
     if (isFullscreen) {
       setMapSizeClass(mapFullscreenClass);
       setOverlay("overlay");
-      if (currentMode === predefinedArea) {
-        setInitalZoom(9);
-      } else {
-        setInitalZoom(11);
-      }
     } else {
       setMapSizeClass(mapContainerClass);
       setOverlay("without-overlay");
-      setInitalZoom(9);
     }
-  }, [isFullscreen, currentMode]);
+  }, [isFullscreen]);
 
   return (
     <div className={overlay}>
       <div className={mapSizeClass}>
-        <MapContainer key={isFullscreen} center={initialPosition} zoom={initialZoom} style={{ height: "100%", width: "100%" }}>
+        <MapContainer key={isFullscreen} center={initialPosition} zoom={initialZoom} maxZoom={18} style={{ height: "100%", width: "100%" }}>
           <ResizeButton isFullscreen={isFullscreen} toggleResize={() => setIsFullscreen(!isFullscreen)} />
-          {isFullscreen && (
-            <DropdownMapMode
-              modeList={modeList}
-              currentMode={currentMode}
-              setCurrentMode={(mode) => {
-                if (currentMode !== mode) {
-                  resetOnChange();
-                  setCurrentMode(mode);
-                }
-              }}
-            />
-          )}
-          {isFullscreen && currentMode === predefinedPoint && <MapLayoutPredefinedPoint position={position} newPoint={handleSetPoint} />}
-          {isFullscreen && currentMode === predefinedArea && <MapLayoutPredefinedArea position={position} newArea={handleSetArea} />}
+          
+          {isFullscreen && <MapControlPanel modeList={modeList} currentMode={currentMode} setCurrentMode={setCurrentMode} clearPosition={clearPosition} position={position} newPoint={handleSetPoint} validateCoordinates={validateCoordinates}  />}
+          {isFullscreen && currentMode === predefinedPosition && <MapLayoutPredefinedPosition selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} newPoint={handleSetPoint} newArea={handleSetArea} />}
           {isFullscreen && currentMode === customPoint && (
             <MapLayoutCustomPoint position={position} newPoint={handleSetPoint} validateCoordinates={validateCoordinates} />
           )}
@@ -198,19 +161,9 @@ const MapForm = (props) => {
           {geoJsonData && isFullscreen && (currentMode === customArea || currentMode === customPoint) && (
             <KirunaMunicipality  geoJsonData={geoJsonData} />
           )}
-          {position && position.type === "Point" && (
+          {/** Show the marker or area on the map, but if it's a predefined position, show it only if the map is small */}
+          {position && position.type === "Point" && (!isFullscreen || currentMode!==predefinedPosition) &&(
             <Marker position={[position.coordinates.lat, position.coordinates.long]} data-testid="map-marker" zIndexOffset={10}>
-              <Popup>
-                {position.name && (
-                  <>
-                    {`Name: ${position.name}`}
-                    <br />
-                  </>
-                )}
-                Latitude: {position.coordinates.lat}
-                <br />
-                Longitude: {position.coordinates.long}
-              </Popup>
             </Marker>
           )}
           {position && position.type === "Area" && (
@@ -218,8 +171,9 @@ const MapForm = (props) => {
               {position.name && <Popup>Name: {position.name}</Popup>}
             </Polygon>
           )}
-          {position && position.coordinates && <ClearPositionButton clearPosition={clearPosition} />}
+          {position && position.coordinates && !isFullscreen && <ClearPositionButton clearPosition={clearPosition} />}
           <TileLayer url={mapStyles[mapView]} />
+          <RecenterButton initialPosition={KirunaCenter} positionActual={KirunaCenter} setPositionActual={setInitalPosition} zoomLevel={initialZoom} setZoomLevel={setInitalZoom} draw={currentMode === 'Custom area' && isFullscreen} />
           <ResizeMap />
         </MapContainer>
       </div>

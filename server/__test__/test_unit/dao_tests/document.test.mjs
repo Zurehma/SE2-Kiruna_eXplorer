@@ -36,8 +36,6 @@ describe("DocumentDAO", () => {
         "Lore ipsum...",
         null,
         null,
-        null,
-        null,
         null
       );
 
@@ -62,8 +60,6 @@ describe("DocumentDAO", () => {
         "Informative",
         "english",
         "Lore ipsum...",
-        null,
-        null,
         null,
         null,
         null
@@ -100,8 +96,6 @@ describe("DocumentDAO", () => {
         "Lore ipsum...",
         null,
         null,
-        null,
-        null,
         null
       );
 
@@ -127,8 +121,6 @@ describe("DocumentDAO", () => {
         "Informative",
         "english",
         "Lore ipsum...",
-        null,
-        null,
         null,
         null,
         null
@@ -165,7 +157,6 @@ describe("DocumentDAO", () => {
         3,
         "english",
         "Lore ipsum...",
-        null,
         null,
         null
       );
@@ -215,6 +206,7 @@ describe("DocumentDAO", () => {
     const document1 = {
         id: 5,
         title: "Document 1",
+        stakeholder: ["Stakeholder"],
         scale: 100,
         issuanceDate: "2023-01-01",
         type: "Design",
@@ -222,13 +214,12 @@ describe("DocumentDAO", () => {
         language: "english",
         description: "Desc",
         coordinates: null,
-        pages: null,
-        pageFrom: null,
-        pageTo: null
+        pages: null
       }
     const document2 ={
         id: 6,
         title: "Document 2",
+        stakeholder: ["Stakeholder"],
         scale: 100,
         issuanceDate: "2023-01-01",
         type: "Design",
@@ -236,9 +227,7 @@ describe("DocumentDAO", () => {
         language: "english",
         description: "Desc",
         coordinates: null,
-        pages: null,
-        pageFrom: null,
-        pageTo: null
+        pages: null
       }
 
       const documentRows = [document1, document2];
@@ -255,22 +244,22 @@ describe("DocumentDAO", () => {
 
     test("All documents retrieved", async () => {
       const docs = [];
-      const doc1 = new Document(5, "Document 1", ["Stakeholder"], 100, "2023-01-01", "Design", 5, "english", "Desc", null, null, null, null)
-      const doc2 = new Document(6, "Document 2", ["Stakeholder"], 100, "2023-01-01", "Design", 5, "english", "Desc", null, null, null, null)
+      const doc1 = new Document(5, "Document 1", ["Stakeholder"], 100, "2023-01-01", "Design", 5, "english", "Desc", null, null)
+      const doc2 = new Document(6, "Document 2", ["Stakeholder"], 100, "2023-01-01", "Design", 5, "english", "Desc", null, null)
       docs.push(doc1);
       docs.push(doc2);
 
-      const stakeholderRows = [{ docID: 5, stakeholder: "Stakeholder" }, { docID: 6, stakeholder: "Stakeholder" }];
+      // const stakeholderRows = [{ docID: 5, stakeholder: "Stakeholder" }, { docID: 6, stakeholder: "Stakeholder" }];
 
 
       const mockDBAll = jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
     
-        if(sql.includes("SELECT * FROM DOCUMENT_STAKEHOLDER WHERE docID IN")){
-          callback(null, stakeholderRows);
-        } 
-        else if(sql.includes("SELECT * FROM DOCUMENT")){
+        // if(sql.includes("SELECT * FROM DOCUMENT_STAKEHOLDER WHERE docID IN")){
           callback(null, documentRows);
-        }
+        // } 
+        // else if(sql.includes("SELECT * FROM DOCUMENT")){
+        //   callback(null, documentRows);
+        // }
       });
 
       const result = await documentDAO.getDocuments();
@@ -294,6 +283,38 @@ describe("DocumentDAO", () => {
 
       const result = documentDAO.getDocuments();
 
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteDocument', () => {
+    beforeEach(() => {
+      documentDAO = new DocumentDAO();
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
+
+    test("deleteDocument successful", async () => {
+      
+      const mockDBAll = jest.spyOn(db, 'run').mockImplementation((sql, params, callback) => {
+        callback.call({ changes: 1 }, null);
+      });
+
+      const result = await documentDAO.deleteDocument(1);
+      expect(result).toStrictEqual(1);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test("error on DB", async () => {
+      const error = new Error("");
+      const mockDBAll = jest.spyOn(db, 'run').mockImplementation((sql, params, callback) => {
+        callback(error);
+      });
+
+      const result = documentDAO.deleteDocument();
       await expect(result).rejects.toEqual(error);
       expect(mockDBAll).toHaveBeenCalled();
     });
@@ -473,8 +494,8 @@ describe("DocumentDAO", () => {
 
     test("getLinks successful", async () => {
       const links = [
-        { linkedDocID: 2, title: 'Document 2', type: 'Direct' },
-        { linkedDocID: 3, title: 'Document 3', type: 'Projection' }
+        { linkedDocID: 1, linkID: 2, title: "Link1", type: 'Direct' },
+        { linkedDocID: 2, linkID: 3, title: "Link2", type: 'Direct' },
       ];
 
       const mockDBAll = jest.spyOn(db, 'all').mockImplementation((sql, params, callback) => {
@@ -535,5 +556,35 @@ describe("DocumentDAO", () => {
     });
   });
 
+  describe('deleteLink', () => {
+    beforeEach(() => {
+      documentDAO = new DocumentDAO();
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
 
+    test("deleteLink successful", async () => {
+      
+      const mockDBAll = jest.spyOn(db, 'run').mockImplementation((sql, params, callback) => {
+        callback.call({ changes: 1 }, null);
+      });
+
+      const result = await documentDAO.deleteLink(1);
+      expect(result).toStrictEqual(1);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+
+    test("error on DB", async () => {
+      const error = new Error("");
+      const mockDBAll = jest.spyOn(db, 'run').mockImplementation((sql, params, callback) => {
+        callback(error);
+      });
+
+      const result = documentDAO.deleteLink();
+      await expect(result).rejects.toEqual(error);
+      expect(mockDBAll).toHaveBeenCalled();
+    });
+  });  
 });

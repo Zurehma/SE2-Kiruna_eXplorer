@@ -25,33 +25,18 @@ class DocumentRoutes {
 
     this.router.get(
       "/",
-      [
-        query("type").optional().isString().withMessage("Type must be a string"),
-        query("stakeholder").optional().isString().withMessage("Stakeholder must be a string"),
-        query("issuanceDateFrom").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
-        query("issuanceDateTo").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
-        query("limit").optional().isInt({ gt: 0 }).withMessage("Limit must be a positive integer"),
-        query("offset")
-          .optional()
-          .isInt({ min: 0 })
-          .withMessage("Offset must be a non-negative integer")
-          .custom((value, { req }) => {
-            if (!req.query.limit) {
-              throw new Error("Offset is required when limit is specified");
-            }
-            return true;
-          }),
-      ],
+      query("pageNo").optional().isInt({ gt: 0 }),
+      query("subtext").optional().isString().withMessage("Type must be a string"),
+      query("type").optional().isString().withMessage("Type must be a string"),
+      query("stakeholder").optional().isString().withMessage("Stakeholder must be a string"),
+      query("issuanceDateFrom").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
+      query("issuanceDateTo").optional().isISO8601({ strict: true }).withMessage("Issuance date must be a valid ISO8601 date string"),
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
-          .getDocuments(req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo, req.query.limit, req.query.offset)
-          .then((document) => {
-            res.status(200).json(document);
-          })
-          .catch((err) => {
-            next(err);
-          });
+          .getDocuments(req.query.pageNo, req.query.subtext, req.query.type, req.query.stakeholder, req.query.issuanceDateFrom, req.query.issuanceDateTo)
+          .then((document) => res.status(200).json(document))
+          .catch((err) => next(err));
       }
     );
 
@@ -70,9 +55,7 @@ class DocumentRoutes {
         body("coordinates").optional().custom(Utility.isValidCoordinatesObject),
         body("coordinates").optional().custom(Utility.isValidCoordinatesArray),
       ]),
-      body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
-      body("pageFrom").optional().isInt({ gt: 0 }),
-      body("pageTo").optional().isInt({ gt: 0 }),
+      body("pages").optional().isString().notEmpty().custom(Utility.isValidPages),
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
@@ -86,15 +69,18 @@ class DocumentRoutes {
             description: req.body.description,
             coordinates: req.body.coordinates || null,
             pages: req.body.pages || null,
-            pageFrom: req.body.pageFrom || null,
-            pageTo: req.body.pageTo || null
           })
-          .then((document) => {
-            res.status(201).json(document);
-          })
+          .then((document) => res.status(201).json(document))
           .catch((err) => next(err));
       }
     );
+
+    this.router.delete("/:id", Utility.isLoggedIn, param("id").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
+      this.documentController
+        .deleteDocument(req.params.id)
+        .then(() => res.status(204).end())
+        .catch((err) => next(err));
+    });
 
     this.router.get("/document-types", (req, res, next) => {
       this.documentController
@@ -120,12 +106,8 @@ class DocumentRoutes {
     this.router.get("/:id", param("id").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
       this.documentController
         .getDocumentById(req.params.id)
-        .then((document) => {
-          res.status(200).json(document);
-        })
-        .catch((err) => {
-          next(err);
-        });
+        .then((document) => res.status(200).json(document))
+        .catch((err) => next(err));
     });
 
     this.router.put(
@@ -144,9 +126,7 @@ class DocumentRoutes {
         body("coordinates").optional().custom(Utility.isValidCoordinatesObject),
         body("coordinates").optional().custom(Utility.isValidCoordinatesArray),
       ]),
-      body("pages").optional().isInt({ gt: 0 }).custom(Utility.isValidPageParameter),
-      body("pageFrom").optional().isInt({ gt: 0 }),
-      body("pageTo").optional().isInt({ gt: 0 }),
+      body("pages").optional().isString().notEmpty().custom(Utility.isValidPages),
       Utility.validateRequest,
       (req, res, next) => {
         this.documentController
@@ -161,8 +141,6 @@ class DocumentRoutes {
             description: req.body.description,
             coordinates: req.body.coordinates || null,
             pages: req.body.pages || null,
-            pageFrom: req.body.pageFrom || null,
-            pageTo: req.body.pageTo || null
           })
           .then(() => res.status(204).end())
           .catch((err) => next(err));
@@ -219,6 +197,13 @@ class DocumentRoutes {
         }
       }
     );
+
+    this.router.delete("/link/:linkID", Utility.isLoggedIn, param("linkID").isInt({ gt: 0 }), Utility.validateRequest, (req, res, next) => {
+      this.documentController
+        .deleteLink(Number(req.params.linkID))
+        .then(() => res.status(204).end())
+        .catch((err) => next(err));
+    });
   };
 }
 

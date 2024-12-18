@@ -33,6 +33,8 @@ function Links(props) {
   const [saveStatus, setSaveStatus] = useState("");
   const [linkedDocuments, setLinkedDocuments] = useState([]);
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
+
   const [linkData, setLinkData] = useState({
     document1: "",
     document2: [],
@@ -49,12 +51,13 @@ function Links(props) {
   useEffect(() => {
     const fetchDocuments = async () => {
       try {
-        const response = await API.getDocuments();
+        const response = await API.getDocuments(undefined, true);
         setDocuments(response);
         const response2 = await API.getTypeLinks();
         setTypeLink(response2);
       } catch (error) {
         console.error("Error fetching documents:", error);
+        setError("Error fetching documents.");
       }
     };
     fetchDocuments();
@@ -79,13 +82,11 @@ function Links(props) {
             .map((doc) => doc.linkedDocID); // Prendo solo gli ID dei documenti
 
           setLinkedDocuments(filteredLinkedDocs);
-
-          console.log("gggggggg:", filteredLinkedDocs);
-
           // Setta i documenti filtrati
           setLinkedDocuments(filteredLinkedDocs);
         } catch (error) {
-          console.error("Error fetching linked documents:", error);
+          console.error("Error fetching connected documents:", error);
+          setError("Error fetching connected documents.");
         }
       };
 
@@ -106,7 +107,7 @@ function Links(props) {
       newErrors.document2 = "You must select at least one document.";
     }
     if (!linkData.linkType) {
-      newErrors.linkType = "You must select a type of link.";
+      newErrors.linkType = "You must select a type of connection.";
     }
     setErrors(newErrors);
 
@@ -120,7 +121,7 @@ function Links(props) {
       props.setNewDoc("");
     } catch (error) {
       if (error.message === "Conflict") {
-        setErrors({ err: "The link already exists." });
+        setErrors({ err: "The connection already exists." });
       }
       setSaveStatus("Not Completed");
       setShowModal(true);
@@ -132,7 +133,7 @@ function Links(props) {
     setLinkData({ document1: "", document2: [], linkType: "" });
   };
 
-  const handleClose = () => navigate("/");
+  const handleClose = () => navigate("/graph");
 
   const handleDocument1Change = (docId) => {
     setLinkData({
@@ -162,15 +163,26 @@ function Links(props) {
   return (
     <div className="links-background">
       <Container className="links-container d-flex align-items-top justify-content-center min-vh-100">
+        {error && (
+          <Alert
+            variant="danger"
+            className="fixed-top mt-3"
+            style={{ zIndex: 150000000000 }}
+            dismissible
+            onClose={() => setError(null)}
+          >
+            <p>{error}</p>
+          </Alert>
+        )}
         <Card
           className="p-4 shadow-lg w-100"
           style={{ maxWidth: "700px", maxHeight: "650px", marginTop: "50px" }}
         >
           <Card.Body>
-            <Card.Title className="links-card-title">ADD NEW LINK</Card.Title>
+            <Card.Title className="links-card-title">ADD NEW CONNECTION</Card.Title>
             <div className="step-button">
-              <i class="bi bi-share-fill"></i>
-              LINK STEP
+              <i className="bi bi-share-fill"></i>
+              CONNECTION STEP
             </div>
 
             <Form className="cd-body">
@@ -204,15 +216,16 @@ function Links(props) {
               <Row className="mb-3">
                 <Col className="mb-3">
                   <Form.Group controlId="linkType" className="links-form-group">
-                    <Form.Label className="links-form-label">Link Type*</Form.Label>
+                    <Form.Label className="links-form-label">Connection Type*</Form.Label>
                     <Form.Select
                       name="linkType"
                       value={linkData.linkType}
                       onChange={(e) => handleLinkTypeChange(e.target.value)}
                       isInvalid={!!errors.linkType}
                       disabled={!linkData.document1}
+                      className="input-multi"
                     >
-                      <option value="">Select a type of Link</option>
+                      <option value="">Select a type of connection</option>
                       {typeLink.map((type, index) => (
                         <option key={index} value={type.name}>
                           {type.name}
@@ -239,12 +252,12 @@ function Links(props) {
                           ? `${linkData.document2.length} Documents Selected`
                           : "Select Documents"}
                       </Dropdown.Toggle>
-                      <Dropdown.Menu as={CustomMenu}>
+                      <Dropdown.Menu className="dropdown-force-down" as={CustomMenu}>
                         {documents
                           .filter(
                             (doc) =>
                               !linkedDocuments.includes(doc.id) && doc.id !== linkData.document1
-                          ) // Filtro per rimuovere anche linkData.document1
+                          )
                           .map((doc) => (
                             <Dropdown.Item
                               key={doc.id}
@@ -256,6 +269,7 @@ function Links(props) {
                           ))}
                       </Dropdown.Menu>
                     </Dropdown>
+
                     {errors.document2 && (
                       <div className="invalid-feedback d-block">{errors.document2}</div>
                     )}
@@ -266,7 +280,7 @@ function Links(props) {
               {/* Save Button */}
               <div className="text-center mt-5">
                 <Button variant="primary" onClick={handleSaveLinks} className="btn-save">
-                  Save Link
+                  Save Connection
                 </Button>
               </div>
             </Form>
@@ -282,13 +296,13 @@ function Links(props) {
           </Modal.Header>
           <Modal.Body className="links-modal-body">
             {saveStatus === "Completed"
-              ? "Link saved successfully!"
-              : `Failed to save the link. ${errors.err || ""}`}
+              ? "Connection saved successfully!"
+              : `Failed to save the connection. ${errors.err || ""}`}
           </Modal.Body>
           <Modal.Footer>
             {saveStatus === "Completed" ? (
               <Button variant="primary" onClick={handleNewLink} className="btn-saveLink">
-                Save New Link
+                Add New Connection
               </Button>
             ) : (
               <Button variant="primary" onClick={handleNewLink} className="btn-saveLink">
@@ -296,7 +310,7 @@ function Links(props) {
               </Button>
             )}
             <Button variant="secondary" onClick={handleClose}>
-              Go to Home
+              Go to Diagram
             </Button>
           </Modal.Footer>
         </Modal>

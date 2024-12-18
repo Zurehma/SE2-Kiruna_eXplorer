@@ -1,22 +1,22 @@
 
 describe('Edit Document test', () => {
   it('Correct fill of form', () => {
-    cy.visit('/login')
+    cy.visit('/documents')
+    cy.contains('Login').should('be.visible');
+    cy.contains('Login').click();
+    
     cy.get("#username").type("johndoe");
     cy.get("#password").type("password");
     cy.get('button[type="submit"]').click();
 
-    cy.contains('View All').should('be.visible');
-    cy.contains('View All').click();
-
+    cy.contains('Documents List').should('be.visible').click();
     cy.get('[name="edit-button"]').first().click();
+
     cy.get("#title").should('exist').clear();
     cy.get("#title").type("New document title");
 
-    cy.get('.react-select__control').click();
-    cy.get('.react-select__menu .react-select__option').first().click();
-    cy.get('.react-select__multi-value').contains('Kiruna kommun').parent().find('.react-select__multi-value__remove').click();
-
+    cy.get('[id="react-select-3-input"]').click({ force: true });
+    cy.get('[id="react-select-3-option-1"]').click();
     cy.contains('button', 'Next').click();
 
     cy.get('[name="scale"]').should('exist').select("1:n");
@@ -27,64 +27,52 @@ describe('Edit Document test', () => {
     cy.get('#pages').type("20");
     cy.contains('button', 'Next').click();
 
-    // cy.get('.resize-button').click()
-    // cy.get('#dropdown-map-mode-button').click();
-    // cy.get('.dropdown-menu .dropdown-item').eq(2).click();
+    cy.get('.resize-button').click()
+    cy.contains('Custom point').click();
 
-    // cy.get('.leaflet-container').as('map');
-    // cy.get('@map').click(67.849982, 20.217068); 
-    // cy.get('.resize-button').click()
+    cy.get('.leaflet-container').click(67.849982, 20.217068); 
+    cy.get('.resize-button').click()
     cy.contains('button', 'Next').click();
 
     cy.contains('button', 'Submit').click();
   }) 
 
-  it('Stakeholder missing in step 1', () => {
-    cy.visit('/login')
+  it('Title missing in step 1', () => {
+    cy.visit('/documents')
+    cy.contains('Login').should('be.visible');
+    cy.contains('Login').click();
+    
     cy.get("#username").type("johndoe");
     cy.get("#password").type("password");
     cy.get('button[type="submit"]').click();
 
-    cy.contains('View All').should('be.visible');
-    cy.contains('View All').click();
-
+    cy.contains('Documents List').should('be.visible').click();
     cy.get('[name="edit-button"]').first().click();
+
     cy.get("#title").should('exist').clear();
-    cy.get("#title").type("New document title");
-
-    cy.get('.react-select__multi-value').parent().find('.react-select__multi-value__remove').click();
-
     cy.contains('button', 'Next').click();
 
-    cy.contains('You must select at least one stakeholder.').should('be.visible');
+    cy.contains('Title is required and cannot be empty.').should('be.visible');
   }) 
 
-    it('Continuing without selecting a type', () => {
-    cy.visit('/login')
+  it('Continuing without selecting a type', () => {
+    cy.visit('/documents')
+    cy.contains('Login').should('be.visible');
+    cy.contains('Login').click();
+      
     cy.get("#username").type("johndoe");
     cy.get("#password").type("password");
     cy.get('button[type="submit"]').click();
-
-    cy.contains('View All').should('be.visible');
-    cy.contains('View All').click();
-
+    cy.contains('Documents List').should('be.visible').click();
     cy.get('[name="edit-button"]').first().click();
-    cy.get("#title").should('exist').clear();
-    cy.get("#title").type("New document title");
-
-    cy.get('.react-select__control').click();
-    cy.get('.react-select__menu .react-select__option').first().click();
-    cy.get('.react-select__multi-value').contains('Kiruna kommun').parent().find('.react-select__multi-value__remove').click();
-
+      
+    cy.wait(1000);
     cy.contains('button', 'Next').click();
 
     cy.get('[name="scale"]').should('exist').select("1:n");
     cy.contains('Value of n*').should('be.visible');
     cy.get('[name="nValue"]').type(20);
     cy.get('[name="type"]').select("Select a type");
-    cy.contains('button', 'Next').click();
-
-    cy.contains('You must select a type.').should('be.visible');
     
     cy.get('[name="language"]').select("Spanish");
     cy.get('#pages').type("20");

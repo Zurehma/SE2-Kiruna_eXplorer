@@ -44,7 +44,7 @@ describe("DocumentRoutes", () => {
     await cleanup();
   });
 
-  describe("1. - GET /api/documents", () => {
+  describe.only("1. - GET /api/documents", () => {
     const exampleData = [
       {
         title: "title1",
@@ -55,7 +55,7 @@ describe("DocumentRoutes", () => {
         language: "English",
         description: "Lore ipsum...",
         coordinates: {"lat": 67.849982, "long": 20.217068},
-        pages: 16
+        pages: "1"
       },
       {
         title: "title2",
@@ -66,16 +66,16 @@ describe("DocumentRoutes", () => {
         language: "English",
         description: "Lore ipsum...",
         coordinates: {"lat": 67.849982, "long": 20.217068},
-        pages: 16
+        pages: "1"
       }
     ] 
-    test("1 - It should return 200 a list of all documents", async() => {
+    test.only("1 - It should return 200 a list of all documents", async() => {
       //count all present documents in the database
       let countResult = await request(app)
       .get(basePath + "/documents")
       .set("Cookie", userCookie)
       .expect(200);
-      let count = countResult.body.length;
+      let count = countResult.body.elements.length;
 
       let result1 = await request(app)
         .post(basePath + "/documents")
@@ -95,7 +95,7 @@ describe("DocumentRoutes", () => {
         .set("Cookie", userCookie)
         .expect(200);
 
-      expect(res.body.length).toBe(count+2);
+      expect(res.body.elements.length).toBe(count+2);
     });
   
     test("2 - It should return 200 a list of all the filtered by type documents", async() => {
@@ -104,7 +104,7 @@ describe("DocumentRoutes", () => {
       .get(basePath + "/documents"+"?type=Prescriptive")
       .set("Cookie", userCookie)
       .expect(200);
-      let count = countResult.body.length;
+      let count = countResult.body.elements.length;
 
       let result1 = await request(app)
         .post(basePath + "/documents")
@@ -124,8 +124,8 @@ describe("DocumentRoutes", () => {
         .set("Cookie", userCookie)
         .expect(200);
 
-      expect(res.body.length).toBe(count+1);
-      expect(res.body[0].type).toBe("Prescriptive");
+      expect(countResult.body.elements.length).toBe(count+1);
+      expect(countResult.body[0].elements[0].type).toBe("Prescriptive");
     });
 
     test("3 - It should return 200 a list of all the filtered by stakeholder documents", async() => {
@@ -133,7 +133,7 @@ describe("DocumentRoutes", () => {
       .get(basePath + "/documents/"+"?stakeholder=stakeholder")
       .set("Cookie", userCookie)
       .expect(200);
-      let count = countResult.body.length;
+      let count = countResult.body.elements.length;
 
       let result1 = await request(app)
         .post(basePath + "/documents")
@@ -153,8 +153,8 @@ describe("DocumentRoutes", () => {
         .set("Cookie", userCookie)
         .expect(200);
 
-      expect(res.body.length).toBe(count+1);
-      expect(res.body[0].stakeholders[0]).toBe("stakeholder");
+      expect(countResult.body.elements.length).toBe(count+1);
+      expect(res.body[0].elements[0].stakeholders[0]).toBe("stakeholder");
     });
 
     test("4 - It should return 200 a list of all the documents in the range of the issuanceDate", async() => {
@@ -163,7 +163,7 @@ describe("DocumentRoutes", () => {
       .get(basePath + "/documents"+"?issuanceDateFrom=2015-01-10&issuanceDateTo=2025-10-20")
       .set("Cookie", userCookie)
       .expect(200);
-      let count = countResult.body.length;
+      let count = countResult.body.elements.length;
 
       let result1 = await request(app)
         .post(basePath + "/documents")
@@ -183,7 +183,7 @@ describe("DocumentRoutes", () => {
         .set("Cookie", userCookie)
         .expect(200);
 
-      expect(res.body.length).toBe(count+1);
+      expect(countResult.body.elements.length).toBe(count+1);
     });
   });
   
