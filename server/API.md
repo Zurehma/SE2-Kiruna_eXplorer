@@ -116,7 +116,7 @@ Returns the list of already existing document types.
 - Example:
 
 ```json
-["Informative", "Prescriptive", "Material", "Design", "Technical"]
+["Informative", "Prescriptive", "Material effect", "Design", "Technical"]
 ```
 
 - Access Constraints: Can only be called by a logged in user.

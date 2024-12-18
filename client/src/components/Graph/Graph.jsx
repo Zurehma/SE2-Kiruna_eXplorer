@@ -1,16 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import API from "../../../API";
-import "../../styles/DocumentChartStatic.css";
+import "../../styles/DocumentChartStatic.css"; // Ensure this path is correct
 import GraphUtils from "../../utils/graphUtils";
 import useWebSocket from "../../hooks/useWebSocket";
 import FilterAndLegendSidebar from "./FilterAndLegendSidebar";
-import DeleteLinkModal from "./deleteLinkModal";
-import Filters from "../Filters/Filters";
-import { useLocation } from "react-router-dom";
+import DeleteLinkModal from "./DeleteLinkModal";
+import updateDocument from "../Filters/UpdateDocument";
 
 const DocumentChartStatic = (props) => {
   const svgRef = useRef();
@@ -29,6 +28,7 @@ const DocumentChartStatic = (props) => {
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetch Document Types, Stakeholders, and Links
   useEffect(() => {
     Promise.all([API.getDocumentTypes(), API.getStakeholders(), API.allExistingLinks()])
       .then(([documentTypes, stakeholders, links]) => {
@@ -39,10 +39,15 @@ const DocumentChartStatic = (props) => {
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 
+  // Fetch Documents
   useEffect(() => {
     API.getDocuments(undefined, true)
-      .then((documents) => setChartData(documents))
-      .catch((error) => console.error("Error fetching data:", error));
+      .then((documents) => {
+        const doc = documents.map(updateDocument);
+        setChartData(doc);
+      })
+      .catch((error) => console.error("Error fetching data:", error))
+      .finally(() => setLoading(false));
   }, []);
 
   // States for handling deletion modal
@@ -79,13 +84,55 @@ const DocumentChartStatic = (props) => {
 
     d3.select(svgRef.current).style("background", "linear-gradient(to bottom, #fafafa, #f0f0f0)");
 
-    const years = Array.from(new Set(chartData.map((d) => new Date(d.issuanceDate).getFullYear()))).sort((a, b) => a - b);
-    const scales = Array.from(new Set(["Text", ...chartData.map((d) => d.scale).filter((v, i, a) => a.indexOf(v) === i)]));
-    const yScales = scales.includes("Blueprint") ? scales : [...scales, "Blueprint"];
-    yScales.pop();
+    // === Updated Scales Setup ===
+
+    // 1. Normalize scale values: Map any scale containing "Blueprint" to "Blueprint"
+    const normalizeScale = (scale) => {
+      if (typeof scale === "string") {
+        if (scale.toLowerCase().includes("blueprint")) {
+          return "Blueprint";
+        }
+        return scale;
+      }
+      return scale; // Keep numeric scales as is
+    };
+
+    const normalizedScales = chartData.map((d) => normalizeScale(d.scale));
+
+    // 2. Create a Set to ensure unique scales, including "Text"
+    const scalesSet = new Set(["Text", ...normalizedScales]);
+    let scales = Array.from(scalesSet);
+
+    // 3. Ensure "Blueprint" is always the last element
+    if (scales.includes("Blueprint")) {
+      scales = scales.filter((scale) => scale !== "Blueprint");
+    }
+    scales.push("Blueprint");
+
+    const yScales = scales;
+
+    // 4. Define the yScale with the updated yScales array
+    const yScale = d3.scaleBand().domain(yScales).range([0, height]).padding(0.2);
+
+    // === End of Updated Scales Setup ===
+
+    // Prepare xScale based on unique years
+    const years = Array.from(
+      new Set(
+        chartData
+          .map((d) => {
+            const date = new Date(d.issuanceDate);
+            if (isNaN(date)) {
+              console.warn(`Invalid issuanceDate for document ID ${d.id}: ${d.issuanceDate}`);
+              return null; // Exclude invalid dates
+            }
+            return date.getFullYear();
+          })
+          .filter((year) => year !== null)
+      )
+    ).sort((a, b) => a - b);
 
     const xScale = d3.scaleBand().domain(years).range([0, width]).padding(0.1);
-    const yScale = d3.scaleBand().domain(yScales).range([0, height]).padding(0.2);
 
     const xAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
     const yAxis = d3
@@ -129,25 +176,54 @@ const DocumentChartStatic = (props) => {
     });
 
     function getCellCoords(doc) {
-      const year = new Date(doc.issuanceDate).getFullYear();
+      const date = new Date(doc.issuanceDate);
+      const year = date.getFullYear();
+      if (isNaN(year)) {
+        console.warn(`Invalid issuanceDate for document ID ${doc.id}: ${doc.issuanceDate}`);
+        return { cellX: null, cellY: null };
+      }
+      const normalizedScale = normalizeScale(doc.scale);
       return {
         cellX: xScale(year),
-        cellY: yScale(doc.scale),
+        cellY: yScale(normalizedScale),
       };
     }
 
     // Initialize docCoordsRef.current
     docCoordsRef.current = {}; // Reset before setting
+
+    // Group documents by their cellX and cellY
+    const positionGroups = {};
+
     chartData.forEach((doc) => {
       const { cellX, cellY } = getCellCoords(doc);
-
-      if (cellX != null && cellY != null) {
-        docCoordsRef.current[doc.id] = {
-          x: cellWidth / 2,
-          y: cellHeight / 2,
-        };
-      } else {
+      if (cellX == null || cellY == null) {
         console.warn(`Document with id ${doc.id} has invalid issuanceDate or scale.`);
+        return;
+      }
+      const key = `${cellX}-${cellY}`;
+      if (!positionGroups[key]) {
+        positionGroups[key] = [];
+      }
+      positionGroups[key].push(doc);
+    });
+
+    // Assign positions with offsets
+    Object.entries(positionGroups).forEach(([key, docs]) => {
+      const [cellX, cellY] = key.split("-").map(Number);
+      const count = docs.length;
+      if (count === 1) {
+        // Single document: center of the cell
+        docCoordsRef.current[docs[0].id] = { x: cellWidth / 2, y: cellHeight / 2 };
+      } else {
+        // Multiple documents: arrange in a circle
+        const radius = Math.min(cellWidth, cellHeight) / 4; // Adjust radius as needed
+        docs.forEach((doc, index) => {
+          const angle = (2 * Math.PI * index) / count;
+          const offsetX = radius * Math.cos(angle);
+          const offsetY = radius * Math.sin(angle);
+          docCoordsRef.current[doc.id] = { x: cellWidth / 2 + offsetX, y: cellHeight / 2 + offsetY };
+        });
       }
     });
 
@@ -217,34 +293,27 @@ const DocumentChartStatic = (props) => {
       }
     });
 
-    console.log("After initialization, controlPointsRef.current:", controlPointsRef.current);
-
     // Update docCoordsRef.current with messageReceived
     if (messageReceived.messageType === "update-configuration") {
       const nodes = messageReceived["nodes"];
       const connections = messageReceived["connections"];
 
-      if (messageReceived.messageType === "update-configuration") {
-        const nodes = messageReceived["nodes"];
-        const connections = messageReceived["connections"];
+      console.log("nodes: ", nodes);
+      console.log("connections: ", connections);
 
-        console.log("nodes: ", nodes);
-        console.log("connections: ", connections);
+      Object.entries(nodes).forEach(([nodeId, node]) => {
+        if (docCoordsRef.current.hasOwnProperty(nodeId)) {
+          docCoordsRef.current[nodeId].x = cellWidth / 2 + node.x * cellWidth;
+          docCoordsRef.current[nodeId].y = cellHeight / 2 + node.y * cellHeight;
+        }
+      });
 
-        Object.entries(nodes).forEach(([nodeId, node]) => {
-          if (docCoordsRef.current.hasOwnProperty(nodeId)) {
-            docCoordsRef.current[nodeId].x = cellWidth / 2 + node.x * cellWidth;
-            docCoordsRef.current[nodeId].y = cellHeight / 2 + node.y * cellHeight;
-          }
-        });
-
-        Object.entries(connections).forEach(([connectionId, connection]) => {
-          if (controlPointsRef.current.hasOwnProperty(connectionId)) {
-            controlPointsRef.current[connectionId].x = connection.x * width;
-            controlPointsRef.current[connectionId].y = connection.y * height;
-          }
-        });
-      }
+      Object.entries(connections).forEach(([connectionId, connection]) => {
+        if (controlPointsRef.current.hasOwnProperty(connectionId)) {
+          controlPointsRef.current[connectionId].x = connection.x * width;
+          controlPointsRef.current[connectionId].y = connection.y * height;
+        }
+      });
     }
 
     // Tooltip setup
@@ -344,7 +413,7 @@ const DocumentChartStatic = (props) => {
         const cx = control.x;
         const cy = control.y;
 
-        // Calculate P1 = P2 so that the curve passes through (cx, cy) at t=0.5
+        // Calculate P1 and P2 so that the curve passes through (cx, cy) at t=0.5
         // Formula derived:
         // CP = (S + E)/8 + (3/4)*X  =>  X = [CP - (S+E)/8]*(4/3)
         const Px = (cx - (startX + endX) / 8) * (4 / 3);
@@ -637,9 +706,9 @@ const DocumentChartStatic = (props) => {
     if (docId) {
       setSelectedDoc(docId);
     }
-  });
+  }, [location.search]); // Added dependency to avoid missing dependencies warning
 
-  //if selected document then highlight the document
+  // Highlight Selected Document
   useEffect(() => {
     if (selectedDoc) {
       const doc = chartData.find((d) => d.id === selectedDoc);
@@ -649,12 +718,19 @@ const DocumentChartStatic = (props) => {
         const selectedDocEl = docSelection.filter((d) => d.id === doc.id);
         if (!selectedDocEl.empty()) {
           selectedDocEl.select("foreignObject div").classed("highlighted", true);
+          // Remove highlight after 10 seconds
+          const timeout = setTimeout(() => {
+            selectedDocEl.select("foreignObject div").classed("highlighted", false);
+          }, 10000); // 10 seconds
+
+          // Clean up timeout on unmount or when `selectedDoc` changes
+          return () => clearTimeout(timeout);
         } else {
           svg.selectAll(".doc").select("foreignObject div").style("background", null).style("transform", "scale(1)").style("box-shadow", null);
         }
       }
     }
-  });
+  }, [selectedDoc, chartData]);
 
   return (
     <div className="d-flex align-items-center justify-content-center graph-outer-wrapper">
@@ -672,9 +748,25 @@ const DocumentChartStatic = (props) => {
       />
 
       <div className="graph-inner-wrapper">
-        <div id="image" style={{ width: "100%", height: "100%", position: "relative" }}>
-          <svg ref={svgRef} style={{ width: "100%", height: "100%" }}></svg>
-        </div>
+        {loading ? (
+          // Loading Spinner
+          <div className="d-flex align-items-center justify-content-center" style={{ height: "100%" }}>
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        ) : chartData.length === 0 ? (
+          // No Data Message
+          <div className="no-data-container d-flex flex-column align-items-center justify-content-center" style={{ height: "100%" }}>
+            <h3 className="text-muted">No Documents Available</h3>
+            <p className="text-muted">Please add some documents to see the chart.</p>
+          </div>
+        ) : (
+          // SVG Chart
+          <div id="image" style={{ width: "100%", height: "100%", position: "relative" }}>
+            <svg ref={svgRef} style={{ width: "100%", height: "100%" }}></svg>
+          </div>
+        )}
       </div>
     </div>
   );

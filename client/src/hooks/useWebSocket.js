@@ -13,19 +13,16 @@ const useWebSocket = () => {
 
     wsRef.current.onopen = () => {
       setIsOpen(true);
-      console.log("connected");
     };
 
     wsRef.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
       setMessageReceived(data);
     };
 
     wsRef.current.onclose = () => {
       setIsOpen(false);
       wsRef.current = null;
-      console.log("disconnected");
     };
   };
 
@@ -38,8 +35,6 @@ const useWebSocket = () => {
   const sendMessage = (message) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(message));
-    } else {
-      console.log("WebSocket is not open, cannot send message.");
     }
   };
 

@@ -91,11 +91,17 @@ function MapNavigation(props) {
         setSelectedAreas(selectedAreas.filter(area => area.docId !== docId));
     };
 
+    //extract documentID from URL
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
         const docId = parseInt(searchParams.get('id'));
         if (docId) {
             setSelectedDoc(data.find(doc => doc.id === docId));
+            const doc = data.find(doc => doc.id === docId);
+            // If the document has an area, add it to selectedAreas
+            if (doc?.area) {
+                handleMarkerClick(doc);
+            }
         }
     },[location.search,data]);
 

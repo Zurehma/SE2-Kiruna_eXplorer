@@ -4,6 +4,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import API from "../../../API";
+import updateDocument from "./UpdateDocument";
+
+
 
 function Filters(props) {
   const { showDateFilters = true } = props;
@@ -57,7 +60,7 @@ function Filters(props) {
           ? props.currentPage
           : undefined;
       const all = props.currentPage !== null && props.currentPage !== undefined ? false : true;
-      console.log("Current Page: ", currentPage);
+      
       const paginatedFilters = { ...filteredParams, pageNo: currentPage + 1 };
       let response = await API.getDocuments(paginatedFilters, all);
 
@@ -67,8 +70,10 @@ function Filters(props) {
           props.setCurrentPage(0);
         }
         props.setTotalPages(response.totalPages);
+        response.elements = response.elements.map(updateDocument);
         props.setDocuments(response.elements);
       } else {
+        response = response.map(updateDocument);
         props.setDocuments(response);
       }
     } catch (error) {
