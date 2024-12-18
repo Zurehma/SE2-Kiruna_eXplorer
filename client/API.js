@@ -197,7 +197,6 @@ const setLink = async (linkData) => {
  */
 const signIn = async (newUser) => {
   try {
-    console.log("newUser", newUser);
     const response = await fetch(SERVER_URL + "/api/sessions/register", {
       method: "POST",
       headers: {

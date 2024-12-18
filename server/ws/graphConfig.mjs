@@ -7,7 +7,6 @@ const loadGraphConfiguration = async () => {
   if (!fs.existsSync(CONFIG_FILE_PATH)) {
     const baseSetup = {};
     Object.values(ELEMENT_TYPES).forEach((element) => (baseSetup[element] = {}));
-    console.log(baseSetup);
     await fs.promises.writeFile(CONFIG_FILE_PATH, JSON.stringify(baseSetup), "utf8");
   }
 
@@ -30,7 +29,6 @@ const removeGraphConfiguration = async (type, id) => {
 const resetGraphConfiguration = async () => {
   const baseSetup = {};
   Object.values(ELEMENT_TYPES).forEach((element) => (baseSetup[element] = {}));
-  console.log(baseSetup);
   await fs.promises.writeFile(CONFIG_FILE_PATH, JSON.stringify(baseSetup), "utf8");
 };
 
